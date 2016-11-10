@@ -14,10 +14,13 @@
     [Shared]
     internal class NameArgumentsCodeFixProvider : CodeFixProvider
     {
-        private static SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
+        private static readonly SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0001NameArguments.DiagnosticId);
+
+        /// <inheritdoc/>
+        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
