@@ -192,5 +192,44 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresWhenInExpressionTree()
+        {
+            var testCode = @"
+    using System;
+    using System.Linq.Expressions;
+
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+
+        private Expression<Func<Foo>> Create(int a, int b, int c, int d)
+        {
+            return () => new Foo(
+                a,
+                b,
+                c,
+                d);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

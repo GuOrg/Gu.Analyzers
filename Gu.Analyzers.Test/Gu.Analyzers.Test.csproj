@@ -60,6 +60,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PublicApiTests.cs" />
+    <Compile Include="Sandbox\Class1.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.Helper.cs" />
     <Compile Include="Verifiers\CodeFixVerifier{TAnalyzer,TCodeFix}.cs" />
@@ -130,9 +131,7 @@
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sandbox\" />
-  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">
       <ItemGroup>

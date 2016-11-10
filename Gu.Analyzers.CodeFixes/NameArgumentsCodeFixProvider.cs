@@ -14,6 +14,8 @@
     [Shared]
     internal class NameArgumentsCodeFixProvider : CodeFixProvider
     {
+        private static SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
+
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0001NameArguments.DiagnosticId);
 
@@ -61,7 +63,8 @@
             for (int i = 0; i < arguments.Arguments.Count; i++)
             {
                 var argument = withNames.Arguments[i];
-                var withNameColon = argument.WithNameColon(SyntaxFactory.NameColon(method.Parameters[i].Name)).WithLeadingTrivia(argument.GetLeadingTrivia());
+                var leadingTrivia = argument.GetLeadingTrivia();
+                var withNameColon = argument.WithLeadingTrivia(SpaceTrivia).WithNameColon(SyntaxFactory.NameColon(method.Parameters[i].Name)).WithLeadingTrivia(leadingTrivia);
                 withNames = withNames.ReplaceNode(argument, withNameColon);
             }
 
