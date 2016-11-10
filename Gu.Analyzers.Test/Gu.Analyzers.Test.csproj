@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeTests.cs" />
+    <Compile Include="GU0002NamedArgumentPositionMatchesTests\CodeFix.cs" />
+    <Compile Include="GU0002NamedArgumentPositionMatchesTests\HappyPath.cs" />
     <Compile Include="GU0001NameArgumentsTests\HappyPath.cs" />
     <Compile Include="GU0001NameArgumentsTests\CodeFix.cs" />
     <Compile Include="Documentation\Tests.cs" />
