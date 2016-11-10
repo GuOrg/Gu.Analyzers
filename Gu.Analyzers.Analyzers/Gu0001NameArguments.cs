@@ -2,6 +2,7 @@
 {
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Threading;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -59,7 +60,7 @@
                 return;
             }
 
-            if (IsInExpressionTree(argumentListSyntax, context.SemanticModel))
+            if (IsInExpressionTree(argumentListSyntax, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -82,11 +83,11 @@
             }
         }
 
-        private static bool IsInExpressionTree(ArgumentListSyntax argumentListSyntax, SemanticModel semanticModel)
+        private static bool IsInExpressionTree(ArgumentListSyntax argumentListSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             foreach (var lamda in argumentListSyntax.Ancestors().OfType<LambdaExpressionSyntax>())
             {
-                var lambdaType = semanticModel.GetTypeInfo(lamda).ConvertedType;
+                var lambdaType = semanticModel.GetTypeInfo(lamda, cancellationToken).ConvertedType;
                 if (lambdaType != null &&
                     lambdaType.Is(KnownSymbol.Expression))
                 {
