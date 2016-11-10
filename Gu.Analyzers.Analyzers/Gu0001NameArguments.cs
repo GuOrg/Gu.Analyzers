@@ -50,7 +50,9 @@
             var method = context.SemanticModel.SemanticModelFor(argumentListSyntax.Parent)
                                 .GetSymbolInfo(argumentListSyntax.Parent, context.CancellationToken)
                                 .Symbol as IMethodSymbol;
-            if (method == null || method == KnownSymbol.String.Format)
+            if (method == null ||
+                method.ContainingType == KnownSymbol.String ||
+                method.ContainingType == KnownSymbol.DependencyProperty)
             {
                 return;
             }

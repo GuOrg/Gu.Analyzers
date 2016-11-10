@@ -43,11 +43,12 @@
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
+    <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\KnownSymbols\KnownSymbol.cs" />
-    <Compile Include="Helpers\KnownSymbols\NamespaceParts.cs" />
-    <Compile Include="Helpers\KnownSymbols\QualifiedMember.cs" />
-    <Compile Include="Helpers\KnownSymbols\QualifiedMethod.cs" />
-    <Compile Include="Helpers\KnownSymbols\QualifiedProperty.cs" />
+    <Compile Include="Helpers\KnownSymbols\BaseTypes\NamespaceParts.cs" />
+    <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedMember.cs" />
+    <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedMethod.cs" />
+    <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedProperty.cs" />
     <Compile Include="Helpers\KnownSymbols\StringType.cs" />
     <Compile Include="Helpers\SemanticModelExt.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
@@ -63,7 +64,7 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
     <Compile Include="Gu0001NameArguments.cs" />
     <Compile Include="HelpLink.cs" />
-    <Compile Include="Helpers\KnownSymbols\QualifiedType.cs" />
+    <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedType.cs" />
     <Compile Include="NoCodeFixAttribute.cs" />
     <Compile Include="NoDiagnosticAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
