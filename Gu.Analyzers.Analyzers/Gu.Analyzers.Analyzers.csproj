@@ -42,9 +42,6 @@
   <ItemGroup>
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
-    <Compile Include="Helpers\KnownSymbols\DependencyObjectType.cs" />
-    <Compile Include="Helpers\KnownSymbols\DependencyPropertyKeyType.cs" />
-    <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\KnownSymbol.cs" />
     <Compile Include="Helpers\KnownSymbols\NamespaceParts.cs" />

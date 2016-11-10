@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\RenameHelper.cs" />
-    <Compile Include="Helpers\SyntaxTokenListExt.cs" />
     <Compile Include="FinishedTasks.cs" />
     <Compile Include="NameArgumentsCodeFixProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

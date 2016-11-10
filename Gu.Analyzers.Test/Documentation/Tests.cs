@@ -122,7 +122,7 @@
                 "WPF0041",
                 "Avoid side effects in CLR accessor.",
                 DiagnosticSeverity.Warning,
-                "https://github.com/DotNetAnalyzers/Gu.Analyzers",
+                "https://github.com/JohanLarsson/Gu.Analyzers",
                 AnalyzerCategory.Correctness,
                 "AvoidSideEffectsInClrAccessor.",
                 "Bindings do not call accessor when updating value. Use callbacks.");
@@ -157,7 +157,7 @@
                              .Replace("## ADD TITLE HERE", $"## {title}")
                              .Replace("{SEVERITY}", severity.ToString())
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/Gu.Analyzers")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/JohanLarsson/Gu.Analyzers")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)
@@ -201,7 +201,7 @@
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null
-                    ? @"https://github.com/DotNetAnalyzers/Gu.Analyzers/blob/master/" +
+                    ? @"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/" +
                       this.CodeFileName.Substring(SolutionDirectory.Length).Replace("\\", "/")
                     : "missing";
             }

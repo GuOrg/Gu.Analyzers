@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -13,7 +12,7 @@
         public const string DiagnosticId = "GU0001";
         private const string Title = "Name the arguments.";
         private const string MessageFormat = "Name the arguments.";
-        private const string Description = "Name the arguments.";
+        private const string Description = "Name the arguments of calls to methods that have more than 3 arguments.";
         private static readonly string HelpLink = Gu.Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -21,7 +20,7 @@
                                                                       Title,
                                                                       MessageFormat,
                                                                       AnalyzerCategory.Correctness,
-                                                                      DiagnosticSeverity.Error,
+                                                                      DiagnosticSeverity.Warning,
                                                                       AnalyzerConstants.EnabledByDefault,
                                                                       Description,
                                                                       HelpLink);

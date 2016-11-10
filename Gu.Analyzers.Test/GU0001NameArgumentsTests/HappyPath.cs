@@ -1,6 +1,7 @@
-namespace Gu.Analyzers.Test.Gu0001NameArguments
+namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 {
     using System.Threading.Tasks;
+
     using NUnit.Framework;
 
     internal class HappyPath : HappyPathVerifier<GU0001NameArguments>

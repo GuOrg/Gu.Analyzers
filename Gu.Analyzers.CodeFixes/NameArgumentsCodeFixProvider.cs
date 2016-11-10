@@ -1,12 +1,9 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Threading;
     using System.Threading.Tasks;
-    using Gu.Analyzers.DependencyProperties;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -58,7 +55,7 @@
             }
         }
 
-        private static async Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, IMethodSymbol method, ArgumentListSyntax arguments)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, IMethodSymbol method, ArgumentListSyntax arguments)
         {
             var withNames = arguments;
             for (int i = 0; i < arguments.Arguments.Count; i++)
@@ -68,7 +65,7 @@
                 withNames = withNames.ReplaceNode(argument, withNameColon);
             }
 
-            return context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(arguments, withNames));
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(arguments, withNames)));
         }
 
         private static bool HasAnyNamedArgument(ArgumentListSyntax argumentList)

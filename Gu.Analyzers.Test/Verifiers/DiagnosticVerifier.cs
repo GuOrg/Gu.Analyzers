@@ -154,7 +154,7 @@ namespace Gu.Analyzers.Test
                         continue;
                     }
 
-                    string expected = $"https://github.com/DotNetAnalyzers/Gu.Analyzers/tree/master/documentation/{diagnostic.Id}.md";
+                    string expected = $"https://github.com/JohanLarsson/Gu.Analyzers/tree/master/documentation/{diagnostic.Id}.md";
                     Assert.AreEqual(expected, diagnostic.HelpLinkUri);
                 }
             }
