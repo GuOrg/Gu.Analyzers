@@ -156,5 +156,41 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresWhendifferentTypes()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int a, double b, string c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public double B { get; }
+
+        public string C { get; }
+
+        public int D { get; }
+
+        private Foo Create(int a, double b, string c, int d)
+        {
+            return new Foo(
+                a, 
+                b, 
+                c, 
+                d);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

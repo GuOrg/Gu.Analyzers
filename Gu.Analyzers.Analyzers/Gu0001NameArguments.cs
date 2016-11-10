@@ -40,7 +40,7 @@
         private static void HandleArguments(SyntaxNodeAnalysisContext context)
         {
             var argumentListSyntax = (ArgumentListSyntax)context.Node;
-            if (argumentListSyntax.Arguments.Count < 3)
+            if (argumentListSyntax.Arguments.Count < 4)
             {
                 return;
             }
@@ -48,7 +48,12 @@
             var method = context.SemanticModel.SemanticModelFor(argumentListSyntax.Parent)
                                 .GetSymbolInfo(argumentListSyntax.Parent, context.CancellationToken)
                                 .Symbol as IMethodSymbol;
-            if (method == KnownSymbol.String.Format)
+            if (method == null || method == KnownSymbol.String.Format)
+            {
+                return;
+            }
+
+            if (!HasAdjacentParametersOfSameType(method.Parameters))
             {
                 return;
             }
@@ -69,6 +74,25 @@
                     return;
                 }
             }
+        }
+
+        private static bool HasAdjacentParametersOfSameType(ImmutableArray<IParameterSymbol> parameters)
+        {
+            IParameterSymbol previous = null;
+            foreach (var parameter in parameters)
+            {
+                if (previous != null)
+                {
+                    if (parameter.Type.Name == previous.Type.Name)
+                    {
+                        return true;
+                    }
+                }
+
+                previous = parameter;
+            }
+
+            return false;
         }
     }
 }
