@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/Gu.Analyzers.svg)](https://www.nuget.org/packages/Gu.Analyzers/)
-
+[![Build status](https://ci.appveyor.com/api/projects/status/wep65e928gyytgvv/branch/master?svg=true)](https://ci.appveyor.com/project/JohanLarsson/gu-analyzers/branch/master)
 <!-- start generated table -->
 <table>
 <tr>
