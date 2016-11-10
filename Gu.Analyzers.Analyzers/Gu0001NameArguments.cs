@@ -2,8 +2,6 @@
 {
     using System.Collections.Immutable;
 
-    using Gu.Analyzers.Helpers.SyntaxtTreeHelpers;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Gu.Analyzers.Analyzers.CodeFixes")]
-[assembly: AssemblyDescription("Roslyn analyzers for WPF")]
+[assembly: AssemblyDescription("Roslyn analyzers for GU")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Johan Larsson")]
 [assembly: AssemblyProduct("Gu.Analyzers")]

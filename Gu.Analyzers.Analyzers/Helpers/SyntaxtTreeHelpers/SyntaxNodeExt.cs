@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Helpers.SyntaxtTreeHelpers
+﻿namespace Gu.Analyzers
 {
     using System.Threading;
 
