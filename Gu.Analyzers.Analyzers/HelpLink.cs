@@ -4,7 +4,7 @@
     {
         internal static string ForId(string id)
         {
-            return $"https://github.com/JohanLarsson/Gu.Analyzers/Gu.Analyzers/tree/master/documentation/{id}.md";
+            return $"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/{id}.md";
         }
     }
 }

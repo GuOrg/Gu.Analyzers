@@ -5,7 +5,7 @@
 <!-- start generated table -->
 <table>
 <tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/Gu.Analyzers/tree/master/documentation/GU0001.md">GU0001</a></td>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0001.md">GU0001</a></td>
   <td>Name the arguments.</td>
 </tr>
 <table>
