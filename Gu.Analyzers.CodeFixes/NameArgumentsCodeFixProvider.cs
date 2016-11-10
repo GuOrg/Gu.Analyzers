@@ -61,7 +61,7 @@
             for (int i = 0; i < arguments.Arguments.Count; i++)
             {
                 var argument = withNames.Arguments[i];
-                var withNameColon = argument.WithNameColon(SyntaxFactory.NameColon(method.Parameters[i].Name));
+                var withNameColon = argument.WithNameColon(SyntaxFactory.NameColon(method.Parameters[i].Name)).WithLeadingTrivia(argument.GetLeadingTrivia());
                 withNames = withNames.ReplaceNode(argument, withNameColon);
             }
 

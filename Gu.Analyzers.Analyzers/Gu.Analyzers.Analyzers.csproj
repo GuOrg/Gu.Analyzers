@@ -48,6 +48,7 @@
     <Compile Include="Helpers\KnownSymbols\QualifiedMember.cs" />
     <Compile Include="Helpers\KnownSymbols\QualifiedMethod.cs" />
     <Compile Include="Helpers\KnownSymbols\QualifiedProperty.cs" />
+    <Compile Include="Helpers\KnownSymbols\StringType.cs" />
     <Compile Include="Helpers\SemanticModelExt.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Helpers\SymbolHelpers\FieldSymbolExt.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\FieldDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\InvocationExpressionSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
+    <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
     <Compile Include="Gu0001NameArguments.cs" />
     <Compile Include="HelpLink.cs" />

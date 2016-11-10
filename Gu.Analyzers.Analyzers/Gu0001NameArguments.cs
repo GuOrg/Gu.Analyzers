@@ -1,6 +1,9 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+
+    using Gu.Analyzers.Helpers.SyntaxtTreeHelpers;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -44,8 +47,24 @@
                 return;
             }
 
+            var method = context.SemanticModel.SemanticModelFor(argumentListSyntax.Parent)
+                                .GetSymbolInfo(argumentListSyntax.Parent, context.CancellationToken)
+                                .Symbol as IMethodSymbol;
+            if (method == KnownSymbol.String.Format)
+            {
+                return;
+            }
+
+            var lineNumber = argumentListSyntax.OpenParenToken.StartingLineNumber(context.CancellationToken);
             foreach (var argument in argumentListSyntax.Arguments)
             {
+                var ln = argument.StartingLineNumber(context.CancellationToken);
+                if (ln == lineNumber)
+                {
+                    return;
+                }
+
+                lineNumber = ln;
                 if (argument.NameColon == null)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentListSyntax.GetLocation()));

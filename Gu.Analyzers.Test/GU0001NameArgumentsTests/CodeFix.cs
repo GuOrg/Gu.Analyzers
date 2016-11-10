@@ -31,7 +31,11 @@
 
         private Foo Create(int a, int b, int c, int d)
         {
-            return new Foo↓(a, b, c, d);
+            return new Foo↓(
+                a, 
+                b, 
+                c, 
+                d);
         }
     }";
             var expected = this.CSharpDiagnostic()
@@ -60,7 +64,11 @@
 
         private Foo Create(int a, int b, int c, int d)
         {
-            return new Foo(a: a, b: b, c: c, d: d);
+            return new Foo(
+                a: a,
+                b: b,
+                c: c,
+                d: d);
         }
     }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -90,7 +98,11 @@
 
         private Foo Create(int a, int b, int c, int d)
         {
-            return new Foo↓(a, b, c, d: d);
+            return new Foo↓(
+               a,
+               b,
+               c,
+               d: d);
         }
     }";
             var expected = this.CSharpDiagnostic()
