@@ -1,13 +1,13 @@
 ﻿type file
-version 0.2.3.4-dev
+version 0.1.0.0-dev
 title Gu.Analyzers
 id Gu.Analyzers
 authors Johan Larsson
 owners Johan Larsson
 copyright Copyright Johan Larsson 2016
 developmentDependency true
-description Roslyn analyzers for WPF.
-tags WPF Roslyn Diagnostic Analyzer DotnetAnalyzers
+description Roslyn analyzers.
+tags Roslyn Diagnostic Analyzer DotnetAnalyzers
 
 projectUrl https://github.com/JohanLarsson/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
