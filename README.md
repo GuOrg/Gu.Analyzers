@@ -1,6 +1,7 @@
 # Gu.Analyzers
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![NuGet](https://img.shields.io/nuget/v/Gu.Analyzers.svg)](https://www.nuget.org/packages/Gu.Analyzers/)
 
 <!-- start generated table -->
 <table>
