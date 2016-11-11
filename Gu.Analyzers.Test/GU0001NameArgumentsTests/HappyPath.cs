@@ -158,6 +158,28 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
         }
 
         [Test]
+        public async Task IgnoresTuple()
+        {
+            var testCode = @"
+    using System;
+
+    public static class Foo
+    {
+        private static Tuple<int,int,int,int> Bar(int a, int b, int c, int d)
+        {
+            return Tuple.Create(
+                a,
+                b,
+                c,
+                d);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnoresWhendifferentTypes()
         {
             var testCode = @"

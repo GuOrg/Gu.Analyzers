@@ -52,6 +52,7 @@
                                 .Symbol as IMethodSymbol;
             if (method == null ||
                 method.ContainingType == KnownSymbol.String ||
+                method.ContainingType.Is(KnownSymbol.Tuple) ||
                 method.ContainingType == KnownSymbol.DependencyProperty)
             {
                 return;
