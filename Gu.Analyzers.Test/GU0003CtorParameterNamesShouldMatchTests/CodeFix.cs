@@ -246,5 +246,45 @@
     }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresWhenBaseIsParams()
+        {
+            var fooCode = @"
+    public class Bar : Foo
+    {
+        public Bar(int ↓a1, int b, int c, int d)
+            : base(a1, b, c, d)
+        {
+        }
+    }";
+            var barCode = @"
+    public class Foo
+    {
+        public Foo(int a, params int[] values)
+        {
+            this.A = a;
+            this.Values = values;
+        }
+
+        public int A { get; }
+
+        public int[] Values { get; }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref fooCode)
+                               .WithMessage("Name the parameters to match the members.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Bar : Foo
+    {
+        public Bar(int a, int b, int c, int d)
+            : base(a, b, c, d)
+        {
+        }
+    }";
+            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode }, new[] { fixedCode, barCode }).ConfigureAwait(false);
+        }
     }
 }

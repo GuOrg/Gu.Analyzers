@@ -93,7 +93,15 @@
                         }
                         else
                         {
-                            this.ParameterNameMap.Add(match, ctor.Parameters[i].Name);
+                            if (ctor.Parameters.Length - 1 <= i &&
+                                ctor.Parameters[ctor.Parameters.Length - 1].IsParams)
+                            {
+                                this.ParameterNameMap.Add(match, null);
+                            }
+                            else
+                            {
+                                this.ParameterNameMap.Add(match, ctor.Parameters[i].Name);
+                            }
                         }
                     }
                 }
