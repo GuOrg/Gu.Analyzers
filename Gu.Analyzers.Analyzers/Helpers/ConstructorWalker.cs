@@ -115,16 +115,39 @@
             var fieldSymbol = symbol as IFieldSymbol;
             if (fieldSymbol != null)
             {
+                if (IsAllCaps(fieldSymbol.Name))
+                {
+                    return fieldSymbol.Name.ToLowerInvariant();
+                }
+
                 return FirstCharLowercase(TrimLeadingUnderscore(fieldSymbol.Name));
             }
 
             var propertySymbol = symbol as IPropertySymbol;
             if (propertySymbol != null)
             {
+                if (IsAllCaps(propertySymbol.Name))
+                {
+                    return propertySymbol.Name.ToLowerInvariant();
+                }
+
                 return FirstCharLowercase(propertySymbol.Name);
             }
 
             return null;
+        }
+
+        private static bool IsAllCaps(string name)
+        {
+            foreach (var c in name)
+            {
+                if (char.IsLetter(c) && char.IsLower(c))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static string TrimLeadingUnderscore(string text)

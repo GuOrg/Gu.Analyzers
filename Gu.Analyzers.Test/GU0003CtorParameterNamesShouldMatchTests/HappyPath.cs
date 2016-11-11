@@ -215,5 +215,21 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
             await this.VerifyHappyPathAsync(fooCode, barCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresIdCaps()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int id)
+        {
+            this.ID = id;
+        }
+
+        public int ID { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
     }
 }

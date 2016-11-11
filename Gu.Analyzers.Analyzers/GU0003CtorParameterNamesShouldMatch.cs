@@ -49,12 +49,22 @@
             {
                 foreach (var kvp in walker.ParameterNameMap)
                 {
-                    if (kvp.Value != null && kvp.Key.Identifier.ValueText != kvp.Value)
+                    if (kvp.Value != null && !IsMatch(kvp.Key.Identifier, kvp.Value))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, kvp.Key.Identifier.GetLocation()));
                     }
                 }
             }
+        }
+
+        private static bool IsMatch(SyntaxToken identifier, string name)
+        {
+            if (identifier.ValueText == name)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
