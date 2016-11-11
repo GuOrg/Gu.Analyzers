@@ -1,10 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -22,7 +19,7 @@
             ImmutableArray.Create(GU0002NamedArgumentPositionMatches.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => CustomBatchFixAllProvider.Instance;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)

@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,7 +14,7 @@
         private const string Title = "The position of a named argument should match.";
         private const string MessageFormat = "Use correct positions.";
         private const string Description = "The position of a named argument should match.";
-        private static readonly string HelpLink = Gu.Analyzers.HelpLink.ForId(DiagnosticId);
+        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             DiagnosticId,

@@ -16,7 +16,7 @@
         private const string Title = "Name the arguments.";
         private const string MessageFormat = "Name the arguments.";
         private const string Description = "Name the arguments of calls to methods that have more than 3 arguments and are placed on separate lines.";
-        private static readonly string HelpLink = Gu.Analyzers.HelpLink.ForId(DiagnosticId);
+        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
                                                                       DiagnosticId,

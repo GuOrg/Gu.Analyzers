@@ -40,6 +40,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FixAllContextHelper.cs" />
+    <Compile Include="Helpers\CustomBatchFixAllProvider.cs" />
     <Compile Include="Helpers\RenameHelper.cs" />
     <Compile Include="FinishedTasks.cs" />
     <Compile Include="MoveArgumentCodeFixProvider.cs" />
