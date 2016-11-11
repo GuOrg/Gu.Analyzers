@@ -45,6 +45,7 @@
     <Compile Include="MoveArgumentCodeFixProvider.cs" />
     <Compile Include="NameArgumentsCodeFixProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RenameConstructorArgumentsCodeFixProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

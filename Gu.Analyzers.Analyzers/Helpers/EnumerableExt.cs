@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
 
     internal static class EnumerableExt
@@ -29,6 +30,22 @@
             {
                 result = source[0];
                 return true;
+            }
+
+            result = default(TItem);
+            return false;
+        }
+
+        internal static bool TryGetSingle<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+            where TCollection : IReadOnlyList<TItem>
+        {
+            foreach (var item in source)
+            {
+                if (selector(item))
+                {
+                    result = item;
+                    return true;
+                }
             }
 
             result = default(TItem);
