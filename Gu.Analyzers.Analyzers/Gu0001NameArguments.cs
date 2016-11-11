@@ -23,7 +23,7 @@
                                                                       Title,
                                                                       MessageFormat,
                                                                       AnalyzerCategory.Correctness,
-                                                                      DiagnosticSeverity.Warning,
+                                                                      DiagnosticSeverity.Hidden,
                                                                       AnalyzerConstants.EnabledByDefault,
                                                                       Description,
                                                                       HelpLink);

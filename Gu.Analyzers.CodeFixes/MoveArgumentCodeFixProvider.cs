@@ -44,7 +44,7 @@
 
                 context.RegisterCodeFix(
                     CodeAction.Create(
-                        "Move argumentListSyntax.",
+                        "Move arguments to match parameter positions.",
                         cancellationToken => ApplyFixAsync(cancellationToken, context, semanticModel, arguments),
                         nameof(NameArgumentsCodeFixProvider)),
                     diagnostic);
