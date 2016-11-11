@@ -180,6 +180,32 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
         }
 
         [Test]
+        public async Task IgnoresParams()
+        {
+            var testCode = @"
+    public static class Foo
+    {
+        public static void Bar(params int[] args)
+        {
+        }
+
+        public static void Meh()
+        {
+            Bar(
+                1,
+                2,
+                3,
+                4,
+                5,
+                6);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnoresWhendifferentTypes()
         {
             var testCode = @"
