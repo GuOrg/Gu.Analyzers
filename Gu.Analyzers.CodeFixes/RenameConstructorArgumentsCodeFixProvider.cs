@@ -52,7 +52,7 @@
             var constructorDeclarationSyntax = parameter.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
             using (var walker = ConstructorWalker.Create(constructorDeclarationSyntax, semanticModel, context.CancellationToken))
             {
-                foreach (var kvp in walker.parameterNameMap)
+                foreach (var kvp in walker.ParameterNameMap)
                 {
                     if (kvp.Key == parameter)
                     {

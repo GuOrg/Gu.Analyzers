@@ -47,7 +47,7 @@
 
             using (var walker = ConstructorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
             {
-                foreach (var kvp in walker.parameterNameMap)
+                foreach (var kvp in walker.ParameterNameMap)
                 {
                     if (kvp.Value != null && kvp.Key.Identifier.ValueText != kvp.Value)
                     {

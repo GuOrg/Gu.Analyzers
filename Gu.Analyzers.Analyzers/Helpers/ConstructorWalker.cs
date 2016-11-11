@@ -11,8 +11,8 @@
 
     internal sealed class ConstructorWalker : CSharpSyntaxWalker, IDisposable
     {
+        internal readonly Dictionary<ParameterSyntax, string> ParameterNameMap = new Dictionary<ParameterSyntax, string>();
         private static readonly ConcurrentQueue<ConstructorWalker> Cache = new ConcurrentQueue<ConstructorWalker>();
-        internal readonly Dictionary<ParameterSyntax, string> parameterNameMap = new Dictionary<ParameterSyntax, string>();
 
         private ConstructorDeclarationSyntax constructor;
         private SemanticModel semanticModel;
@@ -33,7 +33,7 @@
                 walker = new ConstructorWalker();
             }
 
-            walker.parameterNameMap.Clear();
+            walker.ParameterNameMap.Clear();
             walker.constructor = constructor;
             walker.semanticModel = semanticModel;
             walker.cancellationToken = cancellationToken;
@@ -43,7 +43,7 @@
 
         public void Dispose()
         {
-            this.parameterNameMap.Clear();
+            this.ParameterNameMap.Clear();
             this.constructor = null;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
@@ -60,13 +60,13 @@
                 {
                     var symbol = this.semanticModel.SemanticModelFor(node.Left)
                                      .GetSymbolInfo(node.Left, this.cancellationToken).Symbol;
-                    if (this.parameterNameMap.ContainsKey(match))
+                    if (this.ParameterNameMap.ContainsKey(match))
                     {
-                        this.parameterNameMap[match] = null;
+                        this.ParameterNameMap[match] = null;
                     }
                     else
                     {
-                        this.parameterNameMap.Add(match, ParameterName(symbol));
+                        this.ParameterNameMap.Add(match, ParameterName(symbol));
                     }
                 }
             }
@@ -87,13 +87,13 @@
                     ParameterSyntax match;
                     if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out match))
                     {
-                        if (this.parameterNameMap.ContainsKey(match))
+                        if (this.ParameterNameMap.ContainsKey(match))
                         {
-                            this.parameterNameMap[match] = null;
+                            this.ParameterNameMap[match] = null;
                         }
                         else
                         {
-                            this.parameterNameMap.Add(match, ctor.Parameters[i].Name);
+                            this.ParameterNameMap.Add(match, ctor.Parameters[i].Name);
                         }
                     }
                 }

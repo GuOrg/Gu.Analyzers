@@ -1,13 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.Sandbox
 {
-    public class Bar : Foo
-    {
-        public Bar(int a, int b, int c, int d)
-            : base(a, b, c, d)
-        {
-        }
-    }
-
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
