@@ -32,6 +32,25 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         }
 
         [Test]
+        public async Task ConstructorSettingFields()
+        {
+            var testCode = @"
+public class Foo
+{
+    private readonly int value1;
+    private readonly int value2;
+
+    public Foo(int value1, int value2)
+    {
+        this.value1 = value1;
+        this.value2 = value2;
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task Increment()
         {
             var testCode = @"

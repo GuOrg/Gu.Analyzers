@@ -11,7 +11,7 @@
     {
         public const string DiagnosticId = "GU0010";
         private const string Title = "Assigning same value.";
-        private const string MessageFormat = "Assigning same value.";
+        private const string MessageFormat = "Assigning made to same, did you meant to assign something else?";
         private const string Description = "Assigning same value does not make sense.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
@@ -44,35 +44,22 @@
                 return;
             }
 
-            IdentifierNameSyntax left;
-            IdentifierNameSyntax right;
-            if (!TryGetIdentifier(assignment.Left, out left) ||
-                !TryGetIdentifier(assignment.Right, out right))
+            var left = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
+            if (left == null)
             {
                 return;
             }
 
-            if (left.Identifier.ValueText == right.Identifier.ValueText)
+            var right = context.SemanticModel.GetSymbolInfo(assignment.Right, context.CancellationToken).Symbol;
+            if (right == null)
+            {
+                return;
+            }
+
+            if (ReferenceEquals(left, right))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
             }
-        }
-
-        private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
-        {
-            result = expression as IdentifierNameSyntax;
-            if (result != null)
-            {
-                return true;
-            }
-
-            var member = expression as MemberAccessExpressionSyntax;
-            if (member?.Expression is ThisExpressionSyntax)
-            {
-                return TryGetIdentifier(member.Name, out result);
-            }
-
-            return false;
         }
     }
 }

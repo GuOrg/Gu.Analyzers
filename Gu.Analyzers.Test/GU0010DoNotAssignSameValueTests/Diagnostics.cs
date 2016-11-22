@@ -6,8 +6,11 @@
 
     internal class Diagnostics : DiagnosticVerifier<GU0010DoNotAssignSameValue>
     {
-        [Test]
-        public async Task SetPropertyToSelf()
+        [TestCase("this.A = this.A;", "this.A = this.A;")]
+        [TestCase("this.A = this.A;", "this.A = A;")]
+        [TestCase("this.A = this.A;", "A = A;")]
+        [TestCase("this.A = this.A;", "A = this.A;")]
+        public async Task SetPropertyToSelf(string before, string after)
         {
             var testCode = @"
     public class Foo
@@ -16,10 +19,10 @@
 
         private void Bar()
         {
-            ↓A = A;
+            ↓this.A = this.A;
         }
     }";
-
+            testCode = testCode.AssertReplace(before, after);
             var expected = this.CSharpDiagnostic().WithLocationIndicated(ref testCode).WithMessage("Assigning same value.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
         }
