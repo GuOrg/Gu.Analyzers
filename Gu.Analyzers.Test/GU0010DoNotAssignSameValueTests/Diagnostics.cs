@@ -23,7 +23,9 @@
         }
     }";
             testCode = testCode.AssertReplace(before, after);
-            var expected = this.CSharpDiagnostic().WithLocationIndicated(ref testCode).WithMessage("Assigning same value.");
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Assigning made to same, did you mean to assign something else?");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
         }
 
@@ -41,7 +43,9 @@
         }
     }";
 
-            var expected = this.CSharpDiagnostic().WithLocationIndicated(ref testCode).WithMessage("Assigning same value.");
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Assigning made to same, did you mean to assign something else?");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
         }
     }

@@ -14,6 +14,11 @@
             return property?.Identifier.ValueText;
         }
 
+        internal static SyntaxToken Identifier(this PropertyDeclarationSyntax propertty)
+        {
+            return propertty.Identifier;
+        }
+
         internal static bool TryGetGetAccessorDeclaration(this PropertyDeclarationSyntax property, out AccessorDeclarationSyntax result)
         {
             return TryGetAccessorDeclaration(property, SyntaxKind.GetAccessorDeclaration, out result);

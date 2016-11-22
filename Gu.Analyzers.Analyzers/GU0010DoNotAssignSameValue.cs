@@ -11,7 +11,7 @@
     {
         public const string DiagnosticId = "GU0010";
         private const string Title = "Assigning same value.";
-        private const string MessageFormat = "Assigning made to same, did you meant to assign something else?";
+        private const string MessageFormat = "Assigning made to same, did you mean to assign something else?";
         private const string Description = "Assigning same value does not make sense.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 

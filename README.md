@@ -19,6 +19,10 @@
   <td>Name the parameters to match the members.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0004.md">GU0004</a></td>
+  <td>Assign all readonly members.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
   <td>Assigning same value.</td>
 </tr>

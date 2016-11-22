@@ -51,6 +51,8 @@
     <Compile Include="AttributeTests.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatchTests\HappyPath.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatchTests\CodeFix.cs" />
+    <Compile Include="GU0004AssignAllReadOnlyMembersTests\Diagnostics.cs" />
+    <Compile Include="GU0004AssignAllReadOnlyMembersTests\HappyPath.cs" />
     <Compile Include="GU0010DoNotAssignSameValueTests\Diagnostics.cs" />
     <Compile Include="GU0010DoNotAssignSameValueTests\HappyPath.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatchesTests\CodeFix.cs" />

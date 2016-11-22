@@ -2,7 +2,6 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
     using System.Threading.Tasks;
     using NUnit.Framework;
-    using GU0002NamedArgumentPositionMatches = Gu.Analyzers.GU0002NamedArgumentPositionMatches;
 
     internal class HappyPath : HappyPathVerifier<GU0002NamedArgumentPositionMatches>
     {

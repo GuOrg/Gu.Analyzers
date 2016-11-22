@@ -2,11 +2,19 @@
 {
     public class Foo
     {
-        public Foo(int a)
+        public Foo(int a, int b)
+            : this(b)
         {
-            a = a;
+            this.A = a;
         }
 
-        public int A { get; private set; }
+        public Foo(int b)
+        {
+            this.B = b;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
     }
 }
