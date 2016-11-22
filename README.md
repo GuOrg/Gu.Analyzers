@@ -23,6 +23,10 @@
   <td>Assign all readonly members.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0005.md">GU0005</a></td>
+  <td>Use correct argument positions.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0006.md">GU0006</a></td>
   <td>Use nameof.</td>
 </tr>

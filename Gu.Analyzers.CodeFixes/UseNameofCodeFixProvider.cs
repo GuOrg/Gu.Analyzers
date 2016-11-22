@@ -47,12 +47,11 @@
 
         private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ArgumentSyntax argument)
         {
-            var text = ((LiteralExpressionSyntax) argument.Expression).Token.ValueText;
+            var text = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
             var argumentList = SyntaxFactory.ArgumentList(
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Argument(
-                        SyntaxFactory.IdentifierName(
-                            text))));
+                        SyntaxFactory.IdentifierName(text))));
             var nameofInvocation = SyntaxFactory.InvocationExpression(NameofIdentifier, argumentList);
             var nameofArgument = SyntaxFactory.Argument(nameofInvocation);
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(argument, nameofArgument)));
