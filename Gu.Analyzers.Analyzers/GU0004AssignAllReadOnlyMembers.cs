@@ -90,6 +90,12 @@
                 base.VisitAssignmentExpression(node);
             }
 
+            public void Dispose()
+            {
+                this.readOnlies.Clear();
+                Cache.Enqueue(this);
+            }
+
             private static IEnumerable<string> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var isStatic = semanticModel.GetDeclaredSymbol(ctor, cancellationToken).IsStatic;
@@ -140,12 +146,6 @@
                 }
 
                 return false;
-            }
-
-            public void Dispose()
-            {
-                this.readOnlies.Clear();
-                Cache.Enqueue(this);
             }
         }
     }
