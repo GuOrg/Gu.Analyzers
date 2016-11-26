@@ -4,9 +4,10 @@
     {
         public int A { get; private set; }
 
-        public Foo Clone()
+        public void Meh()
         {
-            return new Foo { A = A };
+            var foo = new Foo();
+            foo.A = A;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -39,27 +40,68 @@
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (assignment.IsMissing || assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() != null)
+            if (assignment.IsMissing)
             {
                 return;
             }
 
-            var left = context.SemanticModel.GetSymbolInfo(assignment.Left, context.CancellationToken).Symbol;
-            if (left == null)
+            if (AreSame(assignment.Left, assignment.Right))
             {
-                return;
-            }
+                if (assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() != null)
+                {
+                    return;
+                }
 
-            var right = context.SemanticModel.GetSymbolInfo(assignment.Right, context.CancellationToken).Symbol;
-            if (right == null)
-            {
-                return;
-            }
+                var left = context.SemanticModel.GetSymbolInfo(assignment.Left).Symbol;
+                var right = context.SemanticModel.GetSymbolInfo(assignment.Right).Symbol;
+                if (!ReferenceEquals(left, right))
+                {
+                    return;
+                }
 
-            if (ReferenceEquals(left, right))
-            {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
             }
+        }
+
+        private static bool AreSame(ExpressionSyntax left, ExpressionSyntax right)
+        {
+            IdentifierNameSyntax leftName;
+            IdentifierNameSyntax rightName;
+            if (TryGetIdentifierName(left, out leftName) ^ TryGetIdentifierName(right, out rightName))
+            {
+                return false;
+            }
+
+            if (leftName != null)
+            {
+                return leftName.Identifier.ValueText == rightName.Identifier.ValueText;
+            }
+
+            var leftMember = left as MemberAccessExpressionSyntax;
+            var rightMember = right as MemberAccessExpressionSyntax;
+            if (leftMember == null || rightMember == null)
+            {
+                return false;
+            }
+
+            return AreSame(leftMember.Name, rightMember.Name) && AreSame(leftMember.Expression, rightMember.Expression);
+        }
+
+        private static bool TryGetIdentifierName(ExpressionSyntax expression, out IdentifierNameSyntax result)
+        {
+            result = expression as IdentifierNameSyntax;
+            if (result != null)
+            {
+                return true;
+            }
+
+            var memberAccess = expression as MemberAccessExpressionSyntax;
+            if (memberAccess?.Expression is ThisExpressionSyntax)
+            {
+                return TryGetIdentifierName(memberAccess.Name, out result);
+            }
+
+            return false;
         }
     }
 }

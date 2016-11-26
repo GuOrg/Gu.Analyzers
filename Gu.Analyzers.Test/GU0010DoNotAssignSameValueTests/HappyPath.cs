@@ -83,5 +83,63 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [TestCase("foo.A = A;", "foo.A = this.A;")]
+        [TestCase("foo.A = A;", "foo.A = A;")]
+        public async Task SetSameMemberOnOtherInstance(string before, string after)
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public int A { get; private set; }
+
+        public void Meh()
+        {
+            var foo = new Foo();
+            foo.A = A;
+        }
+    }";
+            testCode = testCode.AssertReplace(before, after);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task SetSameMemberOnOtherInstance2()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public int A { get; private set; }
+
+        public void Meh()
+        {
+            var foo1 = new Foo();
+            var foo2 = new Foo();
+            foo1.A = foo2.A;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task SetSameMemberOnOtherInstanceRecursive()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo Next { get; private set; }
+
+        public void Meh()
+        {
+            var foo1 = new Foo();
+            var foo2 = new Foo();
+            foo1.Next.Next = foo2.Next.Next;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
