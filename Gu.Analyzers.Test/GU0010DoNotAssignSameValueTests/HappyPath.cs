@@ -66,5 +66,22 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task ObjectInitializer()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public int A { get; private set; }
+
+        public Foo Clone()
+        {
+            return new Foo { A = A };
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

@@ -2,19 +2,11 @@
 {
     public class Foo
     {
-        public Foo(int a, int b)
-            : this(b)
+        public int A { get; private set; }
+
+        public Foo Clone()
         {
-            this.A = a;
+            return new Foo { A = A };
         }
-
-        public Foo(int b)
-        {
-            this.B = b;
-        }
-
-        public int A { get; }
-
-        public int B { get; }
     }
 }

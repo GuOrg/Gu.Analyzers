@@ -39,7 +39,7 @@
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (assignment.IsMissing)
+            if (assignment.IsMissing || assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() != null)
             {
                 return;
             }
