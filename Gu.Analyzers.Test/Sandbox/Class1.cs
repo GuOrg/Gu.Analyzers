@@ -1,13 +1,16 @@
 ﻿namespace Gu.Analyzers.Test.Sandbox
 {
+    using System;
+
     public class Foo
     {
-        public int A { get; private set; }
-
-        public void Meh()
+        public void Meh(StringComparison value)
         {
-            var foo = new Foo();
-            foo.A = A;
+            switch (value)
+            {
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(value), value, null);
+            }
         }
     }
 }

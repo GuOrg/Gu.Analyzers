@@ -43,6 +43,7 @@
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0004AssignAllReadOnlyMembers.cs" />
+    <Compile Include="GU0006UseNameof.cs" />
     <Compile Include="GU0010DoNotAssignSameValue.cs" />
     <Compile Include="Helpers\ConstructorWalker.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatches.cs" />

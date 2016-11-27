@@ -23,6 +23,10 @@
   <td>Assign all readonly members.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0006.md">GU0006</a></td>
+  <td>Use nameof.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
   <td>Assigning same value.</td>
 </tr>
