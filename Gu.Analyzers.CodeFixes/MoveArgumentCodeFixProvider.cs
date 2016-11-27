@@ -15,8 +15,9 @@
     internal class MoveArgumentCodeFixProvider : CodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-            ImmutableArray.Create(GU0002NamedArgumentPositionMatches.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0002NamedArgumentPositionMatches.DiagnosticId,
+            GU0005ExceptionArgumentsPositions.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -36,22 +37,36 @@
                     continue;
                 }
 
-                var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (!HasWhitespaceTriviaOnly(arguments))
+                if (diagnostic.Id == GU0002NamedArgumentPositionMatches.DiagnosticId)
                 {
-                    continue;
+                    var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                    if (!HasWhitespaceTriviaOnly(arguments))
+                    {
+                        continue;
+                    }
+
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Move arguments to match parameter positions.",
+                            cancellationToken => ApplyFixGU0002Async(cancellationToken, context, semanticModel, arguments),
+                            nameof(NameArgumentsCodeFixProvider)),
+                        diagnostic);
                 }
 
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Move arguments to match parameter positions.",
-                        cancellationToken => ApplyFixAsync(cancellationToken, context, semanticModel, arguments),
-                        nameof(NameArgumentsCodeFixProvider)),
-                    diagnostic);
+                if (diagnostic.Id == GU0005ExceptionArgumentsPositions.DiagnosticId)
+                {
+                    var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Move name argument to match parameter positions.",
+                            cancellationToken => ApplyFixGU0005Async(cancellationToken, context, semanticModel, argument),
+                            nameof(NameArgumentsCodeFixProvider)),
+                        diagnostic);
+                }
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentListSyntax argumentListSyntax)
+        private static Task<Document> ApplyFixGU0002Async(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentListSyntax argumentListSyntax)
         {
             var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
             var method = semanticModel.SemanticModelFor(argumentListSyntax.Parent)
@@ -69,11 +84,46 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(semanticModel.SyntaxTree.GetRoot().ReplaceNode(argumentListSyntax, updated)));
         }
 
+        private static Task<Document> ApplyFixGU0005Async(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentSyntax nameArgument)
+        {
+            var argumentListSyntax = nameArgument.FirstAncestorOrSelf<ArgumentListSyntax>();
+            var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
+            var method = semanticModel.SemanticModelFor(argumentListSyntax.Parent)
+                                      .GetSymbolInfo(argumentListSyntax.Parent, cancellationToken)
+                                      .Symbol as IMethodSymbol;
+            var messageIndex = ParameterIndex(method, "message");
+            var nameIndex = ParameterIndex(method, "paramName");
+            for (var i = 0; i < argumentListSyntax.Arguments.Count; i++)
+            {
+                if (i == messageIndex)
+                {
+                    arguments[nameIndex] = argumentListSyntax.Arguments[i];
+                    continue;
+                }
+
+                if (i == nameIndex)
+                {
+                    arguments[messageIndex] = argumentListSyntax.Arguments[i];
+                    continue;
+                }
+
+                arguments[i] = argumentListSyntax.Arguments[i];
+            }
+
+            var updated = argumentListSyntax.WithArguments(SyntaxFactory.SeparatedList(arguments, argumentListSyntax.Arguments.GetSeparators()));
+            return Task.FromResult(context.Document.WithSyntaxRoot(semanticModel.SyntaxTree.GetRoot().ReplaceNode(argumentListSyntax, updated)));
+        }
+
         private static int ParameterIndex(IMethodSymbol method, ArgumentSyntax argument)
+        {
+            return ParameterIndex(method, argument.NameColon.Name.Identifier.ValueText);
+        }
+
+        private static int ParameterIndex(IMethodSymbol method, string name)
         {
             for (int i = 0; i < method.Parameters.Length; i++)
             {
-                if (argument.NameColon.Name.Identifier.ValueText == method.Parameters[i].Name)
+                if (method.Parameters[i].Name == name)
                 {
                     return i;
                 }
