@@ -45,19 +45,11 @@
                 return;
             }
 
-            var condition = argument.FirstAncestorOrSelf<IfStatementSyntax>()?.Condition as BinaryExpressionSyntax;
-            if (condition != null)
+            var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart);
+            ISymbol symbol;
+            if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out symbol))
             {
-                var left = condition.Left as IdentifierNameSyntax;
-                if (left == null)
-                {
-                    return;
-                }
-
-                if (left.Identifier.ValueText == literal.Token.ValueText)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
             }
         }
     }
