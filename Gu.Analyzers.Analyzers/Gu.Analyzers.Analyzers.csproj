@@ -49,6 +49,7 @@
     <Compile Include="GU0010DoNotAssignSameValue.cs" />
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
+    <Compile Include="GU0020SortProperties.cs" />
     <Compile Include="Helpers\ConstructorWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />

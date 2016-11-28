@@ -34,6 +34,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
   <td>Assigning same value.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
+  <td>Sort properties.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

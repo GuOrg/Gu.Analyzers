@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="AttributeTests.cs" />
     <Compile Include="GU0005ExceptionArgumentsPositionsTests\CodeFix.cs" />
+    <Compile Include="GU0020SortPropertiesTests\CodeFix.cs" />
     <Compile Include="GU0006UseNameofTests\CodeFix.cs" />
     <Compile Include="GU0006UseNameofTests\HappyPath.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatchTests\HappyPath.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="GU0004AssignAllReadOnlyMembersTests\Diagnostics.cs" />
     <Compile Include="GU0005ExceptionArgumentsPositionsTests\HappyPath.cs" />
     <Compile Include="GU0004AssignAllReadOnlyMembersTests\HappyPath.cs" />
+    <Compile Include="GU0020SortPropertiesTests\HappyPath.cs" />
     <Compile Include="GU0010DoNotAssignSameValueTests\Diagnostics.cs" />
     <Compile Include="GU0010DoNotAssignSameValueTests\HappyPath.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatchesTests\CodeFix.cs" />
