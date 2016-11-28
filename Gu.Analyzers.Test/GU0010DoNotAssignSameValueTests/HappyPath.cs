@@ -84,6 +84,23 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
+        [Test]
+        public async Task ObjectInitializerStruct()
+        {
+            var testCode = @"
+    public struct Foo
+    {
+        public int A { get; private set; }
+
+        public Foo Clone()
+        {
+            return new Foo { A = A };
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
         [TestCase("foo.A = A;", "foo.A = this.A;")]
         [TestCase("foo.A = A;", "foo.A = A;")]
         public async Task SetSameMemberOnOtherInstance(string before, string after)

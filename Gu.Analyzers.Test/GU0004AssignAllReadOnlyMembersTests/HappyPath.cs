@@ -26,6 +26,26 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
         }
 
         [Test]
+        public async Task ConstructorSettingPropertiesStruct()
+        {
+            var testCode = @"
+    public struct Foo
+    {
+        public Foo(int a, int b)
+        {
+            this.A = a;
+            this.B = b;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task StaticConstructorSettingProperties()
         {
             var testCode = @"

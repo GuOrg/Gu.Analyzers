@@ -33,6 +33,32 @@
         }
 
         [Test]
+        public async Task ConstructorSettingPropertiesStruct()
+        {
+            var testCode = @"
+    public struct Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ChainedConstructorSettingProperties()
         {
             var testCode = @"

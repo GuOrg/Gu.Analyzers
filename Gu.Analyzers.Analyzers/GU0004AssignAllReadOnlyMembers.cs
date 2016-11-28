@@ -99,8 +99,8 @@
             private static IEnumerable<string> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var isStatic = semanticModel.GetDeclaredSymbol(ctor, cancellationToken).IsStatic;
-                var classDeclarationSyntax = (ClassDeclarationSyntax)ctor.Parent;
-                foreach (var member in classDeclarationSyntax.Members)
+                var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
+                foreach (var member in typeDeclarationSyntax.Members)
                 {
                     var fieldDeclarationSyntax = member as FieldDeclarationSyntax;
                     if (fieldDeclarationSyntax != null)

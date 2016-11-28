@@ -32,6 +32,33 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
                       .ConfigureAwait(false);
         }
 
+        [TestCase("new Foo(a, b)")]
+        [TestCase("new Foo(a: a, b: b)")]
+        public async Task ConstructorCallWithTwoArgumentsStruct(string call)
+        {
+            var testCode = @"
+    public struct Foo
+    {
+        public Foo(int a, int b)
+        {
+            this.A = a;
+            this.B = b;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        private Foo Create(int a, int b)
+        {
+            return new Foo(a, b);
+        }
+    }";
+            testCode = testCode.AssertReplace("new Foo(a, b)", call);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
         [Test]
         public async Task ConstructorCallWithNamedArgumentsOnSameRow()
         {
