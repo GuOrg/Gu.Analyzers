@@ -38,8 +38,8 @@
                     continue;
                 }
 
-                var property = (PropertyDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                var propertySymbol = semanticModel.GetDeclaredSymbol(property);
+                var property = (BasePropertyDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                var propertySymbol = (IPropertySymbol)semanticModel.GetDeclaredSymbol(property, context.CancellationToken);
                 var type = propertySymbol.ContainingType;
                 using (var properties = GU0020SortProperties.SortedProperties.Create(type))
                 {
@@ -49,7 +49,7 @@
                         if (index == 0)
                         {
                             var previousSymbol = properties.Sorted[index + 1];
-                            var nextProperty = (PropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
+                            var nextProperty = (BasePropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
                                               .ConfigureAwait(false);
 
                             var parent = (TypeDeclarationSyntax)property.Parent;
@@ -68,7 +68,7 @@
                         else
                         {
                             var previousSymbol = properties.Sorted[index - 1];
-                            var previousProperty = (PropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
+                            var previousProperty = (BasePropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
                                               .ConfigureAwait(false);
 
                             var parent = (TypeDeclarationSyntax)property.Parent;
@@ -89,7 +89,7 @@
             }
         }
 
-        private static Task<Document> MoveAfterAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, PropertyDeclarationSyntax previous, PropertyDeclarationSyntax property)
+        private static Task<Document> MoveAfterAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, BasePropertyDeclarationSyntax previous, BasePropertyDeclarationSyntax property)
         {
             syntaxRoot = syntaxRoot.TrackNodes(previous, property);
             var trackedProperty = syntaxRoot.GetCurrentNode(property);
@@ -99,7 +99,7 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot));
         }
 
-        private static Task<Document> MoveBeforeAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, PropertyDeclarationSyntax next, PropertyDeclarationSyntax property)
+        private static Task<Document> MoveBeforeAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, BasePropertyDeclarationSyntax next, BasePropertyDeclarationSyntax property)
         {
             syntaxRoot = syntaxRoot.TrackNodes(next, property);
             var trackedProperty = syntaxRoot.GetCurrentNode(property);

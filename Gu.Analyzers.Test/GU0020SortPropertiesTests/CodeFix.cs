@@ -219,6 +219,138 @@
         }
 
         [Test]
+        public async Task CaulculatedBeforeGetOnly()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int b)
+        {
+            this.B = b;
+        }
+
+        public int A
+        {
+            get
+            {
+                return B;
+            }
+        }
+
+        public int B { get; }
+    }";
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 9, 9)
+                               .WithMessage("Sort properties.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 17, 9)
+                                .WithMessage("Sort properties.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo
+    {
+        public Foo(int b)
+        {
+            this.B = b;
+        }
+
+        public int B { get; }
+
+        public int A
+        {
+            get
+            {
+                return B;
+            }
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IndexerBeforeMutable()
+        {
+            var testCode = @"
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class Foo : IReadOnlyList<int>
+    {
+        public int Count { get; }
+
+        public int this[int index]
+        {
+            get
+            {
+                if (index != 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index), index, ""message"");
+                }
+
+                return A;
+            }
+        }
+
+        public int A { get; set; }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            yield return A;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }";
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 10, 9)
+                               .WithMessage("Sort properties.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 23, 9)
+                                .WithMessage("Sort properties.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class Foo : IReadOnlyList<int>
+    {
+        public int Count { get; }
+
+        public int A { get; set; }
+
+        public int this[int index]
+        {
+            get
+            {
+                if (index != 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index), index, ""message"");
+                }
+
+                return A;
+            }
+        }
+
+        public IEnumerator<int> GetEnumerator()
+        {
+            yield return A;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task PublicSetBeforePrivateSetFirst()
         {
             var testCode = @"

@@ -38,6 +38,7 @@
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(Handle, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.IndexerDeclaration);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -119,23 +120,39 @@
                 public int Compare(IPropertySymbol x, IPropertySymbol y)
                 {
                     int result;
-                    if (TryCompare(x.IsIndexer, y.IsIndexer, out result) ||
-                        TryCompare(x.IsStatic, y.IsStatic, out result) ||
-                        TryCompare(x.DeclaredAccessibility == Accessibility.Public, y.DeclaredAccessibility == Accessibility.Public, out result) ||
-                        TryCompare(x.DeclaredAccessibility == Accessibility.Internal, y.DeclaredAccessibility == Accessibility.Internal, out result) ||
-                        TryCompare(x.DeclaredAccessibility == Accessibility.Protected, y.DeclaredAccessibility == Accessibility.Protected, out result) ||
-                        TryCompare(x.DeclaredAccessibility == Accessibility.Private, y.DeclaredAccessibility == Accessibility.Private, out result) ||
-                        TryCompare(x.SetMethod == null, y.SetMethod == null, out result) ||
-                        TryCompare(!IsExpressionBody(x), !IsExpressionBody(y), out result) ||
-                        TryCompare(x.SetMethod?.DeclaredAccessibility == Accessibility.Private, y.SetMethod?.DeclaredAccessibility == Accessibility.Private, out result) ||
-                        TryCompare(x.SetMethod?.DeclaredAccessibility == Accessibility.Protected, y.SetMethod?.DeclaredAccessibility == Accessibility.Protected, out result) ||
-                        TryCompare(x.SetMethod?.DeclaredAccessibility == Accessibility.Internal, y.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result) ||
-                        TryCompare(x.SetMethod?.DeclaredAccessibility == Accessibility.Public, y.SetMethod?.DeclaredAccessibility == Accessibility.Public, out result))
+                    if (TryCompare(x, y, p => p.IsStatic, out result) ||
+                        TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Public, out result) ||
+                        TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Internal, out result) ||
+                        TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Protected, out result) ||
+                        TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Private, out result) ||
+                        TryCompare(x, y, p => !p.IsIndexer, out result))
+                    {
+                        return result;
+                    }
+
+                    var xDeclaration = (BasePropertyDeclarationSyntax)x.DeclaringSyntaxReferences[0].GetSyntax();
+                    var yDeclaration = (BasePropertyDeclarationSyntax)y.DeclaringSyntaxReferences[0].GetSyntax();
+                    if (TryCompare(xDeclaration, yDeclaration, IsGetOnly, out result) ||
+                        TryCompare(xDeclaration, yDeclaration, IsCalculated, out result) ||
+                        TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Private, out result) ||
+                        TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Protected, out result) ||
+                        TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result) ||
+                        TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Public, out result))
                     {
                         return result;
                     }
 
                     return 0;
+                }
+
+                private static bool TryCompare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, Func<BasePropertyDeclarationSyntax, bool> criteria, out int result)
+                {
+                    return TryCompare(criteria(x), criteria(y), out result);
+                }
+
+                private static bool TryCompare(IPropertySymbol x, IPropertySymbol y, Func<IPropertySymbol, bool> criteria, out int result)
+                {
+                    return TryCompare(criteria(x), criteria(y), out result);
                 }
 
                 private static bool TryCompare(bool x, bool y, out int result)
@@ -156,10 +173,38 @@
                     return true;
                 }
 
-                private static bool IsExpressionBody(IPropertySymbol property)
+                private static bool IsGetOnly(BasePropertyDeclarationSyntax property)
                 {
-                    var declaration = (PropertyDeclarationSyntax)property.DeclaringSyntaxReferences[0].GetSyntax();
-                    return declaration.ExpressionBody != null;
+                    AccessorDeclarationSyntax getter;
+                    if (property.TryGetGetAccessorDeclaration(out getter) && getter.Body == null)
+                    {
+                        AccessorDeclarationSyntax _;
+                        if (property.TryGetSetAccessorDeclaration(out _))
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                private static bool IsCalculated(BasePropertyDeclarationSyntax property)
+                {
+                    AccessorDeclarationSyntax _;
+                    if (property.TryGetSetAccessorDeclaration(out _))
+                    {
+                        return false;
+                    }
+
+                    AccessorDeclarationSyntax getter;
+                    if (property.TryGetGetAccessorDeclaration(out getter) && getter.Body != null)
+                    {
+                        return true;
+                    }
+
+                    return (property as PropertyDeclarationSyntax)?.ExpressionBody != null;
                 }
             }
         }
