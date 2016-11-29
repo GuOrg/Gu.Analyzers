@@ -38,6 +38,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
   <td>Sort properties.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0021.md">GU0021</a></td>
+  <td>Expression body allocates reference type.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

@@ -1,36 +1,24 @@
 ﻿namespace Gu.Analyzers.Test.Sandbox
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-
-    public class Foo : IReadOnlyList<int>
+    public class Foo
     {
-        public int Count { get; }
-
-        public int this[int index]
+        public Foo(int a, int b, int c, int d)
         {
-            get
-            {
-                if (index != 0)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(index), index, "message");
-                }
-
-                return A;
-            }
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+            this.Bar = new Foo(this.A, this.B, this.C, this.D);
         }
 
-        public int A { get; set; }
+        public int A { get; }
 
-        public IEnumerator<int> GetEnumerator()
-        {
-            yield return A;
-        }
+        public int B { get; }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return this.GetEnumerator();
-        }
+        public int C { get; }
+
+        public int D { get; }
+
+        public Foo Bar { get; }
     }
 }
