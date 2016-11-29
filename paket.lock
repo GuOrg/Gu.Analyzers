@@ -24,11 +24,11 @@ FRAMEWORK: NET452
 NUGET
   remote: http://www.nuget.org/api/v2
     AsyncUsageAnalyzers (1.0.0-alpha003)
-    JetBrains.Annotations (10.1.5)
+    JetBrains.Annotations (10.2.1)
     StyleCop.Analyzers (1.0)
 
 GROUP Test
 FRAMEWORK: NET452
 NUGET
   remote: http://www.nuget.org/api/v2
-    NUnit (3.4.1)
+    NUnit (3.5)
