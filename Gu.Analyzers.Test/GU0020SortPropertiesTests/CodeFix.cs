@@ -277,7 +277,7 @@
         }
 
         [Test]
-        public async Task CaulculatedBeforeGetOnly()
+        public async Task CalculatedBeforeGetOnly()
         {
             var testCode = @"
     public class Foo
