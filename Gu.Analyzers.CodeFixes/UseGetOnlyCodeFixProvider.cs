@@ -145,12 +145,17 @@
             var field = symbol as IFieldSymbol;
             if (field != null && !(field.IsConst || field.IsReadOnly))
             {
-                return false;
+                return true;
             }
 
             if (property == null && field == null)
             {
                 return true;
+            }
+
+            if (expression is IdentifierNameSyntax)
+            {
+                return false;
             }
 
             var memberAccess = expression as MemberAccessExpressionSyntax;
