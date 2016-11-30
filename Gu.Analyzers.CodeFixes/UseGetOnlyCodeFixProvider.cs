@@ -50,6 +50,12 @@
                     return;
                 }
 
+                if (objectCreation.Initializer != null &&
+                    IsAnyInitializerMutable(semanticModel, objectCreation.Initializer))
+                {
+                    return;
+                }
+
                 var property = (PropertyDeclarationSyntax)arrow.Parent;
                 ConstructorDeclarationSyntax ctor;
                 if (TryGetConstructor(property, out ctor))
@@ -88,39 +94,72 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot));
         }
 
-        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, SeparatedSyntaxList<ArgumentSyntax> arguments)
+        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer)
         {
-            foreach (var argument in arguments)
+            foreach (var expression in initializer.Expressions)
             {
-                if (argument.Expression is LiteralExpressionSyntax)
+                var assignment = expression as AssignmentExpressionSyntax;
+                if (assignment == null)
                 {
-                    continue;
+                    // Don't know if this can ever happen but erroring on the safe side flagging it as mutable.
+                    return true;
                 }
 
-                var symbol = semanticModel.GetSymbolInfo(argument.Expression)
-                                          .Symbol;
-                var property = symbol as IPropertySymbol;
-                if (property != null)
+                if (IsMutable(semanticModel, assignment.Right))
                 {
-                    if (property.SetMethod != null)
-                    {
-                        return true;
-                    }
-
-                    continue;
-                }
-
-                var field = symbol as IFieldSymbol;
-                if (field != null)
-                {
-                    if (!(field.IsConst || field.IsReadOnly))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
             return false;
+        }
+
+        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, SeparatedSyntaxList<ArgumentSyntax> arguments)
+        {
+            foreach (var argument in arguments)
+            {
+                if (IsMutable(semanticModel, argument.Expression))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsMutable(SemanticModel semanticModel, ExpressionSyntax expression)
+        {
+            if (expression is LiteralExpressionSyntax || expression is ThisExpressionSyntax || expression is ParenthesizedLambdaExpressionSyntax)
+            {
+                return false;
+            }
+
+            var symbol = semanticModel.GetSymbolInfo(expression)
+                                      .Symbol;
+            var property = symbol as IPropertySymbol;
+            if (property?.SetMethod != null)
+            {
+                return true;
+            }
+
+            var field = symbol as IFieldSymbol;
+            if (field != null && !(field.IsConst || field.IsReadOnly))
+            {
+                return false;
+            }
+
+            if (property == null && field == null)
+            {
+                return true;
+            }
+
+            var memberAccess = expression as MemberAccessExpressionSyntax;
+            if (memberAccess != null)
+            {
+                return IsMutable(semanticModel, memberAccess.Expression);
+            }
+
+            return true;
         }
 
         private static bool TryGetConstructor(PropertyDeclarationSyntax property, out ConstructorDeclarationSyntax result)
