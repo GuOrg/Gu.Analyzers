@@ -45,16 +45,8 @@
                 var arrow = (ArrowExpressionClauseSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 var objectCreation = (ObjectCreationExpressionSyntax)arrow.Expression;
                 var arguments = objectCreation.ArgumentList.Arguments;
-                if (IsAnyArgumentMutable(semanticModel, arguments))
-                {
-                    return;
-                }
-
-                if (objectCreation.Initializer != null &&
-                    IsAnyInitializerMutable(semanticModel, objectCreation.Initializer))
-                {
-                    return;
-                }
+                bool hasMutable = IsAnyArgumentMutable(semanticModel, arguments) ||
+                                  IsAnyInitializerMutable(semanticModel, objectCreation.Initializer);
 
                 var property = (PropertyDeclarationSyntax)arrow.Parent;
                 ConstructorDeclarationSyntax ctor;
@@ -62,7 +54,7 @@
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
-                            "Use get-only",
+                            "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
                             _ => ApplyFixAsync(context, syntaxRoot, ctor, property),
                             nameof(UseGetOnlyCodeFixProvider)),
                         diagnostic);
@@ -96,6 +88,11 @@
 
         private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer)
         {
+            if (initializer == null)
+            {
+                return false;
+            }
+
             foreach (var expression in initializer.Expressions)
             {
                 var assignment = expression as AssignmentExpressionSyntax;
@@ -150,7 +147,7 @@
 
             if (property == null && field == null)
             {
-                return true;
+                return false;
             }
 
             if (expression is IdentifierNameSyntax)

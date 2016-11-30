@@ -299,6 +299,58 @@ namespace Test
         }
 
         [Test]
+        public async Task AllocatingReferenceTypeMethodGroup()
+        {
+            var testCode = @"
+namespace Test
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(Func<int> creator)
+        {
+            this.Value = creator();
+        }
+        
+        public int Value { get; set; }
+
+        public Foo Bar ↓=> new Foo(CreateNumber);
+
+        private static int CreateNumber() => 2;
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Expression body allocates reference type.");
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace Test
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(Func<int> creator)
+        {
+            this.Value = creator();
+            this.Bar = new Foo(CreateNumber);
+        }
+        
+        public int Value { get; set; }
+
+        public Foo Bar { get; }
+
+        private static int CreateNumber() => 2;
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutablePropertyNoFix1()
         {
             var testCode = @"
@@ -332,6 +384,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutablePropertyNoFix2()
         {
             var testCode = @"
@@ -365,6 +418,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableFieldNoFix()
         {
             var testCode = @"
@@ -394,6 +448,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
         {
             var testCode = @"
@@ -423,6 +478,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
         {
             var testCode = @"
@@ -459,6 +515,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromSecondLevelNoFix1()
         {
             var testCode = @"
@@ -495,6 +552,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromSecondLevelNoFix2()
         {
             var testCode = @"
