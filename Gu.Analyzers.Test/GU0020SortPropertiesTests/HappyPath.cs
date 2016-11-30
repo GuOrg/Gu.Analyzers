@@ -236,6 +236,5 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
-
     }
 }

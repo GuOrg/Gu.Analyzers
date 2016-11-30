@@ -117,6 +117,64 @@
         }
 
         [Test]
+        public async Task WhenMutableBeforeGetOnlyFirstWithInitializers()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; set; } = 1;
+
+        public int B { get; } = 2;
+
+        public int C { get; } = 3;
+
+        public int D { get; } = 4;
+    }";
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 12, 9)
+                               .WithMessage("Sort properties.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 14, 9)
+                                .WithMessage("Sort properties.");
+            var expected3 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 16, 9)
+                                .WithMessage("Sort properties.");
+            var expected4 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 18, 9)
+                                .WithMessage("Sort properties.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2, expected3, expected4 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int B { get; } = 2;
+
+        public int C { get; } = 3;
+
+        public int D { get; } = 4;
+
+        public int A { get; set; } = 1;
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenMutableBeforeGetOnlyWithComments()
         {
             var testCode = @"
