@@ -42,39 +42,59 @@
                     continue;
                 }
 
-                var arrow = (ArrowExpressionClauseSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                var objectCreation = (ObjectCreationExpressionSyntax)arrow.Expression;
-                var arguments = objectCreation.ArgumentList.Arguments;
-                bool hasMutable = IsAnyArgumentMutable(semanticModel, arguments) ||
-                                  IsAnyInitializerMutable(semanticModel, objectCreation.Initializer);
-
-                var property = (PropertyDeclarationSyntax)arrow.Parent;
-                ConstructorDeclarationSyntax ctor;
-                if (TryGetConstructor(property, out ctor))
+                var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                var objectCreation = GetObjectCreation(syntaxNode);
+                if (objectCreation != null)
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                            _ => ApplyFixAsync(context, syntaxRoot, ctor, property),
-                            nameof(UseGetOnlyCodeFixProvider)),
-                        diagnostic);
+                    var arguments = objectCreation.ArgumentList.Arguments;
+                    var hasMutable = IsAnyArgumentMutable(semanticModel, arguments) ||
+                                      IsAnyInitializerMutable(semanticModel, objectCreation.Initializer);
+
+                    var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+                    ConstructorDeclarationSyntax ctor;
+                    if (TryGetConstructor(property, out ctor))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
+                                _ => ApplyFixAsync(context, syntaxRoot, ctor, property, objectCreation),
+                                nameof(UseGetOnlyCodeFixProvider)),
+                            diagnostic);
+                    }
                 }
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ConstructorDeclarationSyntax ctor, PropertyDeclarationSyntax property)
+        private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
+        {
+            var arrow = node as ArrowExpressionClauseSyntax;
+            if (arrow != null)
+            {
+                return arrow.Expression as ObjectCreationExpressionSyntax;
+            }
+
+            var returnStatement = node as ReturnStatementSyntax;
+            return returnStatement?.Expression as ObjectCreationExpressionSyntax;
+        }
+
+        private static Task<Document> ApplyFixAsync(
+            CodeFixContext context,
+            SyntaxNode syntaxRoot,
+            ConstructorDeclarationSyntax ctor,
+            PropertyDeclarationSyntax property,
+            ObjectCreationExpressionSyntax objectCreation)
         {
             var member = SyntaxFactory.MemberAccessExpression(
                 SyntaxKind.SimpleMemberAccessExpression,
                 SyntaxFactory.ThisExpression(),
                 SyntaxFactory.Token(SyntaxKind.DotToken),
-                SyntaxFactory.IdentifierName(property.Identifier));
+                SyntaxFactory.IdentifierName(property.Identifier.ValueText));
             var assignment =
                 SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.AssignmentExpression(
                                      SyntaxKind.SimpleAssignmentExpression,
                                      member,
-                                     property.ExpressionBody.Expression));
+                                     objectCreation));
             syntaxRoot = syntaxRoot.TrackNodes(ctor.Body, property);
             var updatedBody = ctor.Body.AddStatements(assignment);
             syntaxRoot = syntaxRoot.ReplaceNode(syntaxRoot.GetCurrentNode(ctor.Body), updatedBody);

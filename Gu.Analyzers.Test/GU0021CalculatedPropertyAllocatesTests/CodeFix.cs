@@ -7,7 +7,7 @@
     internal class CodeFix : CodeFixVerifier<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>
     {
         [Test]
-        public async Task AllocatingReferenceTypeFromGetOnlyProperties()
+        public async Task ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
 public class Foo
@@ -29,6 +29,64 @@ public class Foo
     public int D { get; }
 
     public Foo Bar ↓=> new Foo(this.A, this.B, this.C, this.D);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Calculated property allocates reference type.");
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+        this.Bar = new Foo(this.A, this.B, this.C, this.D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
+        {
+            var testCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar
+    { 
+        get { ↓return new Foo(this.A, this.B, this.C, this.D); }
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
