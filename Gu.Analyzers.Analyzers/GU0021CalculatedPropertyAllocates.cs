@@ -7,12 +7,12 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0021ExpressionBodyAllocates : DiagnosticAnalyzer
+    internal class GU0021CalculatedPropertyAllocates : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0021";
-        private const string Title = "Expression body allocates reference type.";
-        private const string MessageFormat = "Expression body allocates reference type.";
-        private const string Description = "Expression body allocates reference type.";
+        private const string Title = "Calculated property allocates reference type.";
+        private const string MessageFormat = "Calculated property allocates reference type.";
+        private const string Description = "Calculated property allocates reference type.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(

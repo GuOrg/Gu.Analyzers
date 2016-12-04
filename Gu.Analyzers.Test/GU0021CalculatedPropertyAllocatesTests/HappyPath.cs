@@ -1,9 +1,9 @@
-namespace Gu.Analyzers.Test.GU0021ExpressionBodyAllocatesTests
+namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0021ExpressionBodyAllocates>
+    internal class HappyPath : HappyPathVerifier<GU0021CalculatedPropertyAllocates>
     {
         [Test]
         public async Task ArrowAdd()

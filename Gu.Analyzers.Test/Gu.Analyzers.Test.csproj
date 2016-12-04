@@ -50,8 +50,8 @@
   <ItemGroup>
     <Compile Include="AttributeTests.cs" />
     <Compile Include="GU0005ExceptionArgumentsPositionsTests\CodeFix.cs" />
-    <Compile Include="GU0021ExpressionBodyAllocatesTests\CodeFix.cs" />
-    <Compile Include="GU0021ExpressionBodyAllocatesTests\HappyPath.cs" />
+    <Compile Include="GU0021CalculatedPropertyAllocatesTests\CodeFix.cs" />
+    <Compile Include="GU0021CalculatedPropertyAllocatesTests\HappyPath.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFix.cs" />
     <Compile Include="GU0006UseNameofTests\CodeFix.cs" />
     <Compile Include="GU0006UseNameofTests\HappyPath.cs" />

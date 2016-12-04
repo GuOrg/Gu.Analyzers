@@ -1,10 +1,10 @@
-﻿namespace Gu.Analyzers.Test.GU0021ExpressionBodyAllocatesTests
+﻿namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
     using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0021ExpressionBodyAllocates, UseGetOnlyCodeFixProvider>
+    internal class CodeFix : CodeFixVerifier<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>
     {
         [Test]
         public async Task AllocatingReferenceTypeFromGetOnlyProperties()
@@ -32,7 +32,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -87,7 +87,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -139,7 +139,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -188,7 +188,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -231,7 +231,7 @@ namespace Test
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -273,7 +273,7 @@ namespace Test
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -322,7 +322,7 @@ namespace Test
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -376,7 +376,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -410,7 +410,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -441,7 +441,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
@@ -471,7 +471,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
@@ -507,7 +507,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -544,7 +544,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 
@@ -581,7 +581,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Expression body allocates reference type.");
+                               .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
 

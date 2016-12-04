@@ -198,6 +198,39 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         }
 
         [Test]
+        public async Task StaticBeforeInstance()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int b)
+        {
+            this.B = b;
+        }
+
+        private static int A { get; } = 1;
+
+        public int B { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task StaticGetOnlyBeforeCalculated()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private static int A { get; } = 1;
+
+        public int B => A;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task Realistic()
         {
             var testCode = @"
