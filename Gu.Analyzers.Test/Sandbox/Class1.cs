@@ -1,15 +1,16 @@
 ﻿namespace Gu.Analyzers.Test.Sandbox
 {
-    public class Foo
+    using System;
+    using System.IO;
+
+    public static class Foo
     {
-        public Foo(int a, int b)
+        public static long Bar()
         {
-            this.A = a;
-            this.B = b;
+            using (var stream = File.OpenRead(""))
+            {
+                return stream.Length;
+            }
         }
-
-        public int A { get; }
-
-        public int B { get; }
     }
 }

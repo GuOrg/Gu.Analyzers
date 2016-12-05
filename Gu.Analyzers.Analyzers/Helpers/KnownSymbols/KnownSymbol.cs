@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Gu.Analyzers
 {
     internal static class KnownSymbol
@@ -5,6 +6,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Object = Create("System.Object");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
+        internal static readonly QualifiedType IDisposable = Create("System.IDisposable");
         internal static readonly QualifiedType ArgumentException = Create("System.ArgumentException");
         internal static readonly QualifiedType ArgumentNullException = Create("System.ArgumentNullException");
         internal static readonly QualifiedType ArgumentOutOfRangeException = Create("System.ArgumentOutOfRangeException");
