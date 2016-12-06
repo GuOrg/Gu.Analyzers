@@ -47,8 +47,13 @@
             }
 
             var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
+            if (symbol == null)
+            {
+                return;
+            }
+
             ITypeSymbol _;
-            if (symbol?.Type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _) == true)
+            if (symbol.Type == KnownSymbol.IDisposable || symbol.Type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _) == true)
             {
                 if (!(variableDeclaration.Parent is UsingStatementSyntax))
                 {
