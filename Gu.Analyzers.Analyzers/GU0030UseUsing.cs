@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -87,94 +86,6 @@
 
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
-            }
-        }
-
-        private static class Disposable
-        {
-            internal static bool IsCreation(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                if (expression is ObjectCreationExpressionSyntax)
-                {
-                    return true;
-                }
-
-                var symbol = semanticModel.SemanticModelFor(expression)
-                                          .GetSymbolInfo(expression, cancellationToken)
-                                          .Symbol;
-                if (symbol is IFieldSymbol)
-                {
-                    return false;
-                }
-
-                if (symbol is IMethodSymbol)
-                {
-                    MethodDeclarationSyntax methodDeclaration;
-                    if (symbol.TryGetDeclaration(cancellationToken, out methodDeclaration))
-                    {
-                        ExpressionSyntax returnValue;
-                        if (methodDeclaration.TryGetReturnExpression(out returnValue))
-                        {
-                            return IsCreation(returnValue, semanticModel, cancellationToken);
-                        }
-                    }
-
-                    return true;
-                }
-
-                var property = symbol as IPropertySymbol;
-                if (property != null)
-                {
-                    if (property == KnownSymbol.PasswordBox.SecurePassword)
-                    {
-                        return true;
-                    }
-
-                    PropertyDeclarationSyntax propertyDeclaration;
-                    if (property.TryGetDeclaration(cancellationToken, out propertyDeclaration))
-                    {
-                        if (propertyDeclaration.ExpressionBody != null)
-                        {
-                            return IsCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken);
-                        }
-
-                        AccessorDeclarationSyntax getter;
-                        if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
-                        {
-                            ExpressionSyntax returnValue;
-                            if (getter.Body.TryGetReturnExpression(out returnValue))
-                            {
-                                return IsCreation(returnValue, semanticModel, cancellationToken);
-                            }
-                        }
-                    }
-
-                    return false;
-                }
-
-                var local = symbol as ILocalSymbol;
-                if (local != null)
-                {
-                    VariableDeclaratorSyntax variable;
-                    if (local.TryGetDeclaration(cancellationToken, out variable))
-                    {
-                        return IsCreation(variable.Initializer.Value, semanticModel, cancellationToken);
-                    }
-                }
-
-                return false;
-            }
-
-            internal static bool IsAssignableTo(ITypeSymbol type)
-            {
-                if (type == null)
-                {
-                    return false;
-                }
-
-                ITypeSymbol _;
-                return type == KnownSymbol.IDisposable ||
-                       type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
             }
         }
     }
