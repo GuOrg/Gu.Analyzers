@@ -60,5 +60,34 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task ExpressionBodyMethodIsNoError()
+        {
+            var testCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar() => new Foo(this.A, this.B, this.C, this.D);
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

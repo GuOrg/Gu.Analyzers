@@ -40,6 +40,11 @@
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
+            if (!(context.Node.Parent is PropertyDeclarationSyntax))
+            {
+                return;
+            }
+
             var arrow = (ArrowExpressionClauseSyntax)context.Node;
             var objectCreation = arrow.Expression as ObjectCreationExpressionSyntax;
             if (objectCreation == null)
