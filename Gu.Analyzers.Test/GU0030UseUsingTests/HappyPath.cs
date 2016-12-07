@@ -99,5 +99,109 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             await this.VerifyHappyPathAsync(testCode, disposableCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedMethodSimple()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            return File.OpenRead("""");
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedMethodBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            var stream = File.OpenRead("""");
+            return stream;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedMethodExpressionBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar() => File.OpenRead("""");
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedPropertySimple()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar
+        {
+            get
+            {
+                return File.OpenRead("""");;
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedPropertyBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar
+        {
+            get
+            {
+                var stream = File.OpenRead("""");
+                return stream;
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenDisposableIsReturnedPropertyExpressionBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar => File.OpenRead("""");
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

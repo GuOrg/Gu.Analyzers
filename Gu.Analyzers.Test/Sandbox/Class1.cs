@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.Sandbox
+﻿// ReSharper disable All
+namespace Gu.Analyzers.Test.Sandbox
 {
-    using System;
     using System.IO;
 
     public static class Foo
     {
         public static long Bar()
         {
-            using (var stream = File.OpenRead(""))
-            {
-                return stream.Length;
-            }
+            var stream = GetStream();
+            return stream.Length;
         }
+
+        public static Stream GetStream() => File.OpenRead("");
     }
 }

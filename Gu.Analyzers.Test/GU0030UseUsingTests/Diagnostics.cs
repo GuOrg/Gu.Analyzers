@@ -56,7 +56,7 @@
         }
 
         [Test]
-        public async Task MethodCreatingDisposable()
+        public async Task MethodCreatingDisposable1()
         {
             var testCode = @"
     using System.IO;
@@ -72,6 +72,130 @@
         public static Stream GetStream()
         {
             return File.OpenRead("""");
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodCreatingDisposable2()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static long Bar()
+        {
+            ↓var stream = GetStream();
+            return stream.Length;
+        }
+
+        public static Stream GetStream()
+        {
+            var stream = File.OpenRead("""");
+            return stream;
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodCreatingDisposableExpressionBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static long Bar()
+        {
+            ↓var stream = GetStream();
+            return stream.Length;
+        }
+
+        public static Stream GetStream() => File.OpenRead("""");
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PropertyCreatingDisposableSimple()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Stream 
+        {
+           get { return File.OpenRead(""""); }
+        }
+
+        public static long Bar()
+        {
+            ↓var stream = Stream;
+            return stream.Length;
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PropertyCreatingDisposableGetBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Stream 
+        {
+           get
+           {
+               var stream = File.OpenRead("""");
+               return stream;
+           }
+        }
+
+        public static long Bar()
+        {
+            ↓var stream = Stream;
+            return stream.Length;
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PropertyCreatingDisposableExpressionBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Stream => File.OpenRead("""");
+
+        public static long Bar()
+        {
+            ↓var stream = Stream;
+            return stream.Length;
         }
     }";
             var expected = this.CSharpDiagnostic()

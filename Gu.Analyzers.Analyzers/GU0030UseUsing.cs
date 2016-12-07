@@ -1,8 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Immutable;
     using System.Threading;
+    using Gu.Analyzers.Helpers.SymbolHelpers;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -54,11 +54,38 @@
                 return;
             }
 
-            if (Disposable.Is(symbol.Type))
+            if (Disposable.IsAssignableTo(symbol.Type))
             {
-                if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken) &&
-                    !(variableDeclaration.Parent is UsingStatementSyntax))
+                if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
                 {
+                    if (variableDeclaration.Parent is UsingStatementSyntax)
+                    {
+                        return;
+                    }
+
+                    SyntaxNode declaration;
+                    if (context.ContainingSymbol.TryGetDeclaration(context.CancellationToken, out declaration))
+                    {
+                        var methodDeclarationSyntax = declaration as MethodDeclarationSyntax;
+                        ExpressionSyntax returnValue;
+                        if (methodDeclarationSyntax.TryGetReturnExpression(out returnValue))
+                        {
+                            if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText == declarator.Identifier.ValueText)
+                            {
+                                return;
+                            }
+                        }
+
+                        var getter = declaration as AccessorDeclarationSyntax;
+                        if (getter?.Body?.TryGetReturnExpression(out returnValue) == true)
+                        {
+                            if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText == declarator.Identifier.ValueText)
+                            {
+                                return;
+                            }
+                        }
+                    }
+
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
             }
@@ -83,14 +110,13 @@
 
                 if (symbol is IMethodSymbol)
                 {
-                    SyntaxReference syntaxReference;
-                    if (symbol.DeclaringSyntaxReferences.TryGetSingle(out syntaxReference))
+                    MethodDeclarationSyntax methodDeclaration;
+                    if (symbol.TryGetDeclaration(cancellationToken, out methodDeclaration))
                     {
-                        var methodDeclaration = (MethodDeclarationSyntax)syntaxReference.GetSyntax(cancellationToken);
-                        ReturnStatementSyntax returnStatement;
-                        if (TryGetReturnStatement(methodDeclaration, out returnStatement))
+                        ExpressionSyntax returnValue;
+                        if (methodDeclaration.TryGetReturnExpression(out returnValue))
                         {
-                            return IsCreation(returnStatement.Expression, semanticModel, cancellationToken);
+                            return IsCreation(returnValue, semanticModel, cancellationToken);
                         }
                     }
 
@@ -105,12 +131,42 @@
                         return true;
                     }
 
+                    PropertyDeclarationSyntax propertyDeclaration;
+                    if (property.TryGetDeclaration(cancellationToken, out propertyDeclaration))
+                    {
+                        if (propertyDeclaration.ExpressionBody != null)
+                        {
+                            return IsCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken);
+                        }
+
+                        AccessorDeclarationSyntax getter;
+                        if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
+                        {
+                            ExpressionSyntax returnValue;
+                            if (getter.Body.TryGetReturnExpression(out returnValue))
+                            {
+                                return IsCreation(returnValue, semanticModel, cancellationToken);
+                            }
+                        }
+                    }
+
                     return false;
                 }
+
+                var local = symbol as ILocalSymbol;
+                if (local != null)
+                {
+                    VariableDeclaratorSyntax variable;
+                    if (local.TryGetDeclaration(cancellationToken, out variable))
+                    {
+                        return IsCreation(variable.Initializer.Value, semanticModel, cancellationToken);
+                    }
+                }
+
                 return false;
             }
 
-            internal static bool Is(ITypeSymbol type)
+            internal static bool IsAssignableTo(ITypeSymbol type)
             {
                 if (type == null)
                 {
@@ -120,33 +176,6 @@
                 ITypeSymbol _;
                 return type == KnownSymbol.IDisposable ||
                        type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
-            }
-
-            private static bool TryGetReturnStatement(MethodDeclarationSyntax method, out ReturnStatementSyntax result)
-            {
-                result = null;
-                if (method.Body != null)
-                {
-                    foreach (var statementSyntax in method.Body.Statements)
-                    {
-                        var temp = statementSyntax as ReturnStatementSyntax;
-                        if (result != null && temp != null)
-                        {
-                            return false;
-                        }
-
-                        result = temp;
-                    }
-
-                    return result != null;
-                }
-
-                if (method.ExpressionBody != null)
-                {
-                    throw new NotImplementedException();
-                }
-
-                return false;
             }
         }
     }
