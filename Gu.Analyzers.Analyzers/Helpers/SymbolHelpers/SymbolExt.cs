@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Helpers.SymbolHelpers
+﻿namespace Gu.Analyzers
 {
     using System.Threading;
     using Microsoft.CodeAnalysis;

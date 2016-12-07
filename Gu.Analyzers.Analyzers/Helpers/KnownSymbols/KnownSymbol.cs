@@ -1,8 +1,6 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers
 {
-    using Microsoft.CodeAnalysis;
-
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Object = Create("System.Object");

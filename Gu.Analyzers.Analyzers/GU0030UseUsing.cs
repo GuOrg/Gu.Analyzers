@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using System.Threading;
-    using Gu.Analyzers.Helpers.SymbolHelpers;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
