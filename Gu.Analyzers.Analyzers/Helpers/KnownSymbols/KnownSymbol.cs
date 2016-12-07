@@ -1,6 +1,8 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers
 {
+    using Microsoft.CodeAnalysis;
+
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Object = Create("System.Object");
@@ -13,6 +15,8 @@ namespace Gu.Analyzers
 
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
+
+        internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
 
         private static QualifiedType Create(string qualifiedName)
         {

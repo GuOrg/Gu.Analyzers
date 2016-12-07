@@ -1,6 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,13 +54,99 @@
                 return;
             }
 
-            ITypeSymbol _;
-            if (symbol.Type == KnownSymbol.IDisposable || symbol.Type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _) == true)
+            if (Disposable.Is(symbol.Type))
             {
-                if (!(variableDeclaration.Parent is UsingStatementSyntax))
+                if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken) &&
+                    !(variableDeclaration.Parent is UsingStatementSyntax))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
+            }
+        }
+
+        private static class Disposable
+        {
+            internal static bool IsCreation(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                if (expression is ObjectCreationExpressionSyntax)
+                {
+                    return true;
+                }
+
+                var symbol = semanticModel.SemanticModelFor(expression)
+                                          .GetSymbolInfo(expression, cancellationToken)
+                                          .Symbol;
+                if (symbol is IFieldSymbol)
+                {
+                    return false;
+                }
+
+                if (symbol is IMethodSymbol)
+                {
+                    SyntaxReference syntaxReference;
+                    if (symbol.DeclaringSyntaxReferences.TryGetSingle(out syntaxReference))
+                    {
+                        var methodDeclaration = (MethodDeclarationSyntax)syntaxReference.GetSyntax(cancellationToken);
+                        ReturnStatementSyntax returnStatement;
+                        if (TryGetReturnStatement(methodDeclaration, out returnStatement))
+                        {
+                            return IsCreation(returnStatement.Expression, semanticModel, cancellationToken);
+                        }
+                    }
+
+                    return true;
+                }
+
+                var property = symbol as IPropertySymbol;
+                if (property != null)
+                {
+                    if (property == KnownSymbol.PasswordBox.SecurePassword)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+                return false;
+            }
+
+            internal static bool Is(ITypeSymbol type)
+            {
+                if (type == null)
+                {
+                    return false;
+                }
+
+                ITypeSymbol _;
+                return type == KnownSymbol.IDisposable ||
+                       type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
+            }
+
+            private static bool TryGetReturnStatement(MethodDeclarationSyntax method, out ReturnStatementSyntax result)
+            {
+                result = null;
+                if (method.Body != null)
+                {
+                    foreach (var statementSyntax in method.Body.Statements)
+                    {
+                        var temp = statementSyntax as ReturnStatementSyntax;
+                        if (result != null && temp != null)
+                        {
+                            return false;
+                        }
+
+                        result = temp;
+                    }
+
+                    return result != null;
+                }
+
+                if (method.ExpressionBody != null)
+                {
+                    throw new NotImplementedException();
+                }
+
+                return false;
             }
         }
     }

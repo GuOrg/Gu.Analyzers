@@ -26,6 +26,51 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         }
 
         [Test]
+        public async Task DontUseUsingWhenAssigningAField()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        private static readonly Stream Stream = File.OpenRead("""");
+
+        public static long Bar()
+        {
+            var stream = Stream;
+            return stream.Length;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DontUseUsingWhenAssigningACallThatReturnsAField()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        private static readonly Stream Stream = File.OpenRead("""");
+
+        public static long Bar()
+        {
+            var stream = GetStream();
+            return stream.Length;
+        }
+
+        public static Stream GetStream()
+        {
+            return Stream;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task UsingNewDisposable()
         {
             var disposableCode = @"
