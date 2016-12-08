@@ -12,23 +12,25 @@ namespace Gu.Analyzers
     {
         internal static bool IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            var symbol = semanticModel.SemanticModelFor(disposable)
+                          .GetSymbolInfo(disposable, cancellationToken)
+                          .Symbol;
+
             if (disposable is ObjectCreationExpressionSyntax)
             {
-                return true;
+                return IsAssignableTo(symbol.ContainingType);
             }
 
-            var symbol = semanticModel.SemanticModelFor(disposable)
-                                      .GetSymbolInfo(disposable, cancellationToken)
-                                      .Symbol;
             if (symbol is IFieldSymbol)
             {
                 return false;
             }
 
-            if (symbol is IMethodSymbol)
+            var methodSymbol = symbol as IMethodSymbol;
+            if (methodSymbol != null)
             {
                 MethodDeclarationSyntax methodDeclaration;
-                if (symbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
+                if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
                 {
                     ExpressionSyntax returnValue;
                     if (methodDeclaration.TryGetReturnExpression(out returnValue))
@@ -37,7 +39,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                return true;
+                return IsAssignableTo(methodSymbol.ReturnType);
             }
 
             var property = symbol as IPropertySymbol;

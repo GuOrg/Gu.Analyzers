@@ -59,7 +59,7 @@
 
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            if (node.Initializer != null && 
+            if (node.Initializer != null &&
                 ReferenceEquals(this.semanticModel.SemanticModelFor(node).GetDeclaredSymbol(node), this.symbol))
             {
                 this.assignments.Add(node.Initializer.Value);

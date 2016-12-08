@@ -233,5 +233,57 @@ namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoreFieldThatIsNotDisposable()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly object bar = new object();
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly object bar = Meh();
+
+        private static object Meh() => new object();
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly object bar = string.Copy("""");
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoredStaticField()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private static Stream stream = File.OpenRead("""");
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
