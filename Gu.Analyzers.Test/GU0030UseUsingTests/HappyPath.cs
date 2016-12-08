@@ -46,6 +46,66 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         }
 
         [Test]
+        public async Task DontUseUsingWhenAssigningAFieldInAMethod()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public void Bar()
+        {
+            this.stream = File.OpenRead("""");
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public void Bar()
+        {
+            var newStream = File.OpenRead("""");
+            this.stream = newStream;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DontUseUsingWhenAddingLocalVariableToFieldList()
+        {
+            var testCode = @"
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly List<Stream> streams = new List<Stream>();
+
+        public void Bar()
+        {
+            var stream = File.OpenRead("""");
+            this.streams.Add(stream);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DontUseUsingWhenAssigningACallThatReturnsAField()
         {
             var testCode = @"

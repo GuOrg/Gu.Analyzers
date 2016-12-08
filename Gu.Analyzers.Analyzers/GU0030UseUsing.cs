@@ -61,27 +61,22 @@
                         return;
                     }
 
-                    SyntaxNode declaration;
-                    if (context.ContainingSymbol.TryGetDeclaration(context.CancellationToken, out declaration))
+                    ExpressionSyntax _;
+                    if (declarator.IsReturned(context.SemanticModel, context.CancellationToken, out _))
                     {
-                        var methodDeclarationSyntax = declaration as MethodDeclarationSyntax;
-                        ExpressionSyntax returnValue;
-                        if (methodDeclarationSyntax.TryGetReturnExpression(out returnValue))
-                        {
-                            if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText == declarator.Identifier.ValueText)
-                            {
-                                return;
-                            }
-                        }
+                        return;
+                    }
 
-                        var getter = declaration as AccessorDeclarationSyntax;
-                        if (getter?.Body?.TryGetReturnExpression(out returnValue) == true)
-                        {
-                            if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText == declarator.Identifier.ValueText)
-                            {
-                                return;
-                            }
-                        }
+                    AssignmentExpressionSyntax assignment;
+                    if (declarator.IsAssigned(context.SemanticModel, context.CancellationToken, out assignment))
+                    {
+                        return;
+                    }
+
+                    InvocationExpressionSyntax invocation;
+                    if (declarator.IsPassedAsArgument(context.SemanticModel, context.CancellationToken, out invocation))
+                    {
+                        return;
                     }
 
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
