@@ -90,5 +90,107 @@ namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DisposingPropertyWhenInitializedInProperty()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead("""");
+        }
+
+        public Stream Stream { get; set; }
+        
+        public void Dispose()
+        {
+            this.Stream.Dispose();
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingPropertyWhenInitializedInline()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Stream Stream { get; set; } = File.OpenRead("""");
+        
+        public void Dispose()
+        {
+            this.Stream.Dispose();
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnorePassedInViaCtor()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable bar;
+        
+        public Foo(IDisposable bar)
+        {
+            this.bar = bar;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoredWhenNotAssigned()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable bar;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoredWhenBackingField()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private Stream stream;
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            set { this.stream = value; }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

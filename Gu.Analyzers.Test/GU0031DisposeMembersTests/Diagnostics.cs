@@ -66,5 +66,54 @@
                                .WithMessage("Dispose members.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task NotDisposingPropertyWhenInitializedInline()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓public Stream Stream { get; set; } = File.OpenRead("""");
+        
+        public void Dispose()
+        {
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose members.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingPropertyWhenInitializedInCtor()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead("""");
+        }
+
+        ↓public Stream Stream { get; set; }
+        
+        public void Dispose()
+        {
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose members.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
     }
 }

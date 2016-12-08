@@ -10,15 +10,15 @@ namespace Gu.Analyzers
 
     internal static class Disposable
     {
-        internal static bool IsCreation(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (expression is ObjectCreationExpressionSyntax)
+            if (disposable is ObjectCreationExpressionSyntax)
             {
                 return true;
             }
 
-            var symbol = semanticModel.SemanticModelFor(expression)
-                                      .GetSymbolInfo(expression, cancellationToken)
+            var symbol = semanticModel.SemanticModelFor(disposable)
+                                      .GetSymbolInfo(disposable, cancellationToken)
                                       .Symbol;
             if (symbol is IFieldSymbol)
             {
@@ -28,7 +28,7 @@ namespace Gu.Analyzers
             if (symbol is IMethodSymbol)
             {
                 MethodDeclarationSyntax methodDeclaration;
-                if (symbol.TryGetDeclaration(cancellationToken, out methodDeclaration))
+                if (symbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
                 {
                     ExpressionSyntax returnValue;
                     if (methodDeclaration.TryGetReturnExpression(out returnValue))
@@ -49,7 +49,7 @@ namespace Gu.Analyzers
                 }
 
                 PropertyDeclarationSyntax propertyDeclaration;
-                if (property.TryGetDeclaration(cancellationToken, out propertyDeclaration))
+                if (property.TryGetSingleDeclaration(cancellationToken, out propertyDeclaration))
                 {
                     if (propertyDeclaration.ExpressionBody != null)
                     {
@@ -74,7 +74,7 @@ namespace Gu.Analyzers
             if (local != null)
             {
                 VariableDeclaratorSyntax variable;
-                if (local.TryGetDeclaration(cancellationToken, out variable))
+                if (local.TryGetSingleDeclaration(cancellationToken, out variable))
                 {
                     return IsCreation(variable.Initializer.Value, semanticModel, cancellationToken);
                 }
@@ -93,6 +93,11 @@ namespace Gu.Analyzers
             ITypeSymbol _;
             return type == KnownSymbol.IDisposable ||
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
+        }
+
+        internal static DisposeWalker CreateDisposeWalker(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return DisposeWalker.Create(block, semanticModel, cancellationToken);
         }
 
         internal sealed class DisposeWalker : CSharpSyntaxWalker, IDisposable

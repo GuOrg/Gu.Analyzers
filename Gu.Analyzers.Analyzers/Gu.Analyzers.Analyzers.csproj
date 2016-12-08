@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\AssignmentWalker.cs" />
     <Compile Include="GU0001NameArguments.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatches.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatch.cs" />
