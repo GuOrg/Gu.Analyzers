@@ -51,6 +51,27 @@
         }
 
         [Test]
+        public async Task NotDisposingFieldOfTypeObjectInDisposeMethod()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓private readonly object stream = File.OpenRead("""");
+        
+        public void Dispose()
+        {
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose members.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingFieldWhenContainingTypeIsNotIDisposable()
         {
             var testCode = @"
@@ -77,6 +98,28 @@
     public sealed class Foo : IDisposable
     {
         ↓public Stream Stream { get; set; } = File.OpenRead("""");
+        
+        public void Dispose()
+        {
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose members.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingPropertyOfTypeObjectWhenInitializedInline()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓public object Stream { get; set; } = File.OpenRead("""");
         
         public void Dispose()
         {

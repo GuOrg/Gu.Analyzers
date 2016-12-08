@@ -45,15 +45,14 @@
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
             var field = (IFieldSymbol)context.ContainingSymbol;
-            if (field.IsStatic ||
-                !Disposable.IsAssignableTo(field.Type))
+            if (field.IsStatic)
             {
                 return;
             }
 
             using (var walker = AssignmentWalker.Create(field, context.SemanticModel, context.CancellationToken))
             {
-                if (HasCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
+                if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
                 {
                     CheckThatMemberIsDisposed(context);
                 }
@@ -64,8 +63,7 @@
         {
             var property = (IPropertySymbol)context.ContainingSymbol;
             if (property.IsStatic ||
-                property.IsIndexer ||
-                !Disposable.IsAssignableTo(property.Type))
+                property.IsIndexer)
             {
                 return;
             }
@@ -86,7 +84,7 @@
 
             using (var walker = AssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
             {
-                if (HasCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
+                if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
                 {
                     CheckThatMemberIsDisposed(context);
                 }
@@ -125,7 +123,7 @@
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
         }
 
-        private static bool HasCreation(IReadOnlyList<ExpressionSyntax> assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAnyADisposableCreation(IReadOnlyList<ExpressionSyntax> assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             foreach (var assignment in assignments)
             {
