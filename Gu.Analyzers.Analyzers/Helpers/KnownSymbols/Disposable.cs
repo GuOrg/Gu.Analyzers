@@ -98,7 +98,7 @@ namespace Gu.Analyzers
         internal sealed class DisposeWalker : CSharpSyntaxWalker, IDisposable
         {
             private static readonly ConcurrentQueue<DisposeWalker> Cache = new ConcurrentQueue<DisposeWalker>();
-            private readonly List<MemberAccessExpressionSyntax> disposeCalls = new List<MemberAccessExpressionSyntax>();
+            private readonly List<InvocationExpressionSyntax> disposeCalls = new List<InvocationExpressionSyntax>();
 
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
@@ -107,7 +107,7 @@ namespace Gu.Analyzers
             {
             }
 
-            public IReadOnlyList<MemberAccessExpressionSyntax> DisposeCalls => this.disposeCalls;
+            public IReadOnlyList<InvocationExpressionSyntax> DisposeCalls => this.disposeCalls;
 
             public static DisposeWalker Create(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
@@ -129,7 +129,7 @@ namespace Gu.Analyzers
                 var symbol = this.semanticModel.SemanticModelFor(node).GetSymbolInfo(node, this.cancellationToken).Symbol;
                 if (symbol.Name == KnownSymbol.IDisposable.Dispose.Name)
                 {
-                    this.disposeCalls.Add((MemberAccessExpressionSyntax)node.Expression);
+                    this.disposeCalls.Add(node);
                 }
 
                 base.VisitInvocationExpression(node);

@@ -1,17 +1,40 @@
 ﻿// ReSharper disable All
 namespace Gu.Analyzers.Test.Sandbox
 {
-    using System.Collections.Generic;
+    using System;
     using System.IO;
 
-    public class Foo
+    public class Foo : IDisposable
     {
-        private readonly List<Stream> streams = new List<Stream>();
+        private readonly Stream stream = File.OpenRead("");
+        private bool disposed;
 
-        public void Bar()
+        public void Dispose()
         {
-            var stream = File.OpenRead("");
-            this.streams.Add(stream);
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+        }
+
+        protected void VerifyDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
         }
     }
 }

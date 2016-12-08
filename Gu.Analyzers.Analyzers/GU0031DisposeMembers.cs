@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -51,9 +52,7 @@
                 return;
             }
 
-            var typeSymbol = context.Compilation.GetTypeByMetadataName("System.IDisposable");
-            var disposeMethod = containingType.FindImplementationForInterfaceMember(typeSymbol.GetMembers()[0]);
-            if (disposeMethod != null)
+            foreach (var disposeMethod in containingType.GetMembers("Dispose").OfType<IMethodSymbol>())
             {
                 MethodDeclarationSyntax declaration;
                 if (disposeMethod.TryGetDeclaration(context.CancellationToken, out declaration))
@@ -62,7 +61,8 @@
                     {
                         foreach (var disposeCall in walker.DisposeCalls)
                         {
-                            var disposedSymbol = context.SemanticModel.GetSymbolInfo(disposeCall.Expression, context.CancellationToken).Symbol;
+                            var expressionSyntax = DisposedMember(disposeCall);
+                            var disposedSymbol = context.SemanticModel.GetSymbolInfo(expressionSyntax, context.CancellationToken).Symbol;
                             if (ReferenceEquals(disposedSymbol, context.ContainingSymbol))
                             {
                                 return;
@@ -73,6 +73,23 @@
             }
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.Parent.Parent.GetLocation()));
+        }
+
+        private static ExpressionSyntax DisposedMember(InvocationExpressionSyntax disposeCall)
+        {
+            var memberAccess = disposeCall.Expression as MemberAccessExpressionSyntax;
+            if (memberAccess != null)
+            {
+                return memberAccess.Expression;
+            }
+
+            if (disposeCall.Expression is MemberBindingExpressionSyntax)
+            {
+                var conditionalAccess = (ConditionalAccessExpressionSyntax)disposeCall.Parent;
+                return conditionalAccess.Expression;
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(disposeCall), disposeCall, "Could not find disposed member.");
         }
 
         private static bool IsDisposableMember(ISymbol symbol)
