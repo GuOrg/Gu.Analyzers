@@ -139,11 +139,10 @@ namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
         }
 
         [Test]
-        public async Task IgnorePassedInViaCtor()
+        public async Task IgnorePassedInViaCtor1()
         {
             var testCode = @"
     using System;
-    using System.IO;
 
     public sealed class Foo
     {
@@ -152,6 +151,48 @@ namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
         public Foo(IDisposable bar)
         {
             this.bar = bar;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnorePassedInViaCtor2()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable _bar;
+        
+        public Foo(IDisposable bar)
+        {
+            _bar = bar;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnorePassedInViaCtor3()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable _bar;
+        
+        public Foo(IDisposable bar)
+        {
+            _bar = bar;
+        }
+
+        public void Dispose()
+        {
         }
     }";
             await this.VerifyHappyPathAsync(testCode)
