@@ -28,7 +28,7 @@ namespace Gu.Analyzers
         internal sealed class ReturnWalker : CSharpSyntaxWalker, IDisposable
         {
             private static readonly ConcurrentQueue<ReturnWalker> Cache = new ConcurrentQueue<ReturnWalker>();
-            private List<ReturnStatementSyntax> returnStatements = new List<ReturnStatementSyntax>();
+            private readonly List<ReturnStatementSyntax> returnStatements = new List<ReturnStatementSyntax>();
 
             private ReturnWalker()
             {
