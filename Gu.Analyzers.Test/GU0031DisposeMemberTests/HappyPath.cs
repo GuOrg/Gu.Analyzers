@@ -75,6 +75,26 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         }
 
         [Test]
+        public async Task DisposingFieldInExpressionBodyDispose()
+        {
+            var disposableCode = @"
+using System;
+class Disposable : IDisposable {
+    public void Dispose() { }
+}";
+
+            var testCode = @"
+using System;
+class Goof : IDisposable {
+    IDisposable _disposable;
+    public void Create()  => _disposable = new Disposable();
+    public void Dispose() => _disposable.Dispose();
+}";
+            await this.VerifyHappyPathAsync(disposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingFieldAsCast()
         {
             var testCode = @"

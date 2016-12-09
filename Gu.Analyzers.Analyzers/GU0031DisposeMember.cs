@@ -101,10 +101,9 @@
 
             foreach (var disposeMethod in containingType.GetMembers("Dispose").OfType<IMethodSymbol>())
             {
-                MethodDeclarationSyntax declaration;
-                if (disposeMethod.TryGetSingleDeclaration(context.CancellationToken, out declaration))
+                foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
                 {
-                    using (var walker = IdentifierNameWalker.Create(declaration.Body))
+                    using (var walker = IdentifierNameWalker.Create(declaration))
                     {
                         foreach (var identifier in walker.IdentifierNames)
                         {
