@@ -10,12 +10,12 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0031DisposeMembers : DiagnosticAnalyzer
+    internal class GU0031DisposeMember : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0031";
-        private const string Title = "Dispose members.";
-        private const string MessageFormat = "Dispose members.";
-        private const string Description = "Dispose members that are assigned with created `IDisposable`s anywhere within the class.";
+        private const string Title = "Dispose member.";
+        private const string MessageFormat = "Dispose member.";
+        private const string Description = "Dispose member that is assigned with created `IDisposable`s anywhere within the type.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(

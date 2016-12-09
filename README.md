@@ -48,7 +48,7 @@
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0031.md">GU0031</a></td>
-  <td>Dispose members.</td>
+  <td>Dispose member.</td>
 </tr>
 <table>
 <!-- end generated table -->

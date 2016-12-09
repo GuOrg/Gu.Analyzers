@@ -53,7 +53,7 @@
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0030UseUsing.cs" />
-    <Compile Include="GU0031DisposeMembers.cs" />
+    <Compile Include="GU0031DisposeMember.cs" />
     <Compile Include="Helpers\ConstructorWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />

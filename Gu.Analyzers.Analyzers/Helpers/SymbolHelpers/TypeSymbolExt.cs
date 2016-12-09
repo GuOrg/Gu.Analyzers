@@ -20,6 +20,11 @@
             return type.TryGetSingleMember(name, out property);
         }
 
+        internal static bool TryGetMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
+        {
+            return type.TryGetSingleMember(name, out property);
+        }
+
         internal static bool TryGetSingleMember<TMember>(this ITypeSymbol type, string name, out TMember member)
             where TMember : class, ISymbol
         {

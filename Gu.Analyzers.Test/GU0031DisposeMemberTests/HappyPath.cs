@@ -1,9 +1,10 @@
-namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
+namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 {
     using System.Threading.Tasks;
+
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0031DisposeMembers>
+    internal class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
         [TestCase("this.stream.Dispose();")]
         [TestCase("stream.Dispose();")]
