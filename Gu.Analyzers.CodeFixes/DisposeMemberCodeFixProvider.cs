@@ -68,9 +68,10 @@
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
+            var prefix = member.Name[0] == '_' ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
             {
-                var statement = SyntaxFactory.ParseStatement($"(this.{member.Name} as IDisposable)?.Dispose();")
+                var statement = SyntaxFactory.ParseStatement($"({prefix}{member.Name} as IDisposable)?.Dispose();")
                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 var updatedBody = disposeMethod.Body.AddStatements(statement);
@@ -80,7 +81,7 @@
             var isReadonly = IsReadOnly(member);
             if (isReadonly)
             {
-                var statement = SyntaxFactory.ParseStatement($"this.{member.Name}.Dispose();")
+                var statement = SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
                                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 var updatedBody = disposeMethod.Body.AddStatements(statement);
@@ -88,7 +89,7 @@
             }
             else
             {
-                var statement = SyntaxFactory.ParseStatement($"this.{member.Name}?.Dispose();")
+                var statement = SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
                                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 var updatedBody = disposeMethod.Body.AddStatements(statement);

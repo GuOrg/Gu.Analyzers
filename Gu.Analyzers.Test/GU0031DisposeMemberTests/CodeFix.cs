@@ -44,6 +44,44 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task NotDisposingFieldAssignedInExpressionBody()
+        {
+            var disposableCode = @"
+using System;
+class Disposable : IDisposable {
+    public void Dispose() { }
+}";
+
+            var testCode = @"
+using System;
+class Foo : IDisposable
+{
+    ↓IDisposable _disposable;
+    public void Create()  => _disposable = new Disposable();
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+class Foo : IDisposable
+{
+    IDisposable _disposable;
+    public void Create()  => _disposable = new Disposable();
+    public void Dispose()
+    {
+        _disposable?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingPrivateFieldThatCanBeNullInDisposeMethod()
         {
             var testCode = @"
