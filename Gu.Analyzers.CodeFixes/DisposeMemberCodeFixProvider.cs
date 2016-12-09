@@ -49,8 +49,7 @@
                 if (memberSymbol != null &&
                     memberSymbol.ContainingType.TryGetMethod("Dispose", out disposeMethodSymbol) &&
                     disposeMethodSymbol.Parameters.Length == 0 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration) &&
-                    disposeMethodDeclaration.Body != null)
+                    disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
@@ -68,33 +67,56 @@
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
+            var newDisposeStatement = CreateDisposeStatement(member);
+            var statements = CreateStatements(disposeMethod, newDisposeStatement);
+            if (disposeMethod.Body != null)
+            {
+                var updatedBody = disposeMethod.Body.WithStatements(statements);
+                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
+            }
+
+            if (disposeMethod.ExpressionBody != null)
+            {
+                var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
+                                             .WithExpressionBody(null)
+                                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
+                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod, newMethod)));
+            }
+
+            return Task.FromResult(context.Document);
+        }
+
+        private static StatementSyntax CreateDisposeStatement(ISymbol member)
+        {
             var prefix = member.Name[0] == '_' ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
             {
-                var statement = SyntaxFactory.ParseStatement($"({prefix}{member.Name} as IDisposable)?.Dispose();")
+                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as IDisposable)?.Dispose();")
                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                var updatedBody = disposeMethod.Body.AddStatements(statement);
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
             }
 
             var isReadonly = IsReadOnly(member);
             if (isReadonly)
             {
-                var statement = SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
-                                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                var updatedBody = disposeMethod.Body.AddStatements(statement);
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
+                return SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
+                                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             }
-            else
+
+            return SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
+                                .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+        }
+
+        private static SyntaxList<StatementSyntax> CreateStatements(MethodDeclarationSyntax method, StatementSyntax newStatement)
+        {
+            if (method.ExpressionBody != null)
             {
-                var statement = SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
-                                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                var updatedBody = disposeMethod.Body.AddStatements(statement);
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
+                return SyntaxFactory.List(new[] { SyntaxFactory.ExpressionStatement(method.ExpressionBody.Expression), newStatement });
             }
+
+            return method.Body.Statements.Add(newStatement);
         }
 
         private static bool IsReadOnly(ISymbol member)

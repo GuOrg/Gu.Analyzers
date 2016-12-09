@@ -205,6 +205,43 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task NotDisposingFieldInDisposeMethodExpressionBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream1 = File.OpenRead("""");
+    ↓private readonly Stream stream2 = File.OpenRead("""");
+        
+    public void Dispose() => this.stream1.Dispose();
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream1 = File.OpenRead("""");
+    private readonly Stream stream2 = File.OpenRead("""");
+        
+    public void Dispose()
+    {
+        this.stream1.Dispose();
+        this.stream2.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingFieldOfTypeObjectInDisposeMethod()
         {
             var testCode = @"
