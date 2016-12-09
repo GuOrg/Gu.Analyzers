@@ -49,7 +49,6 @@
                 if (memberSymbol != null &&
                     memberSymbol.ContainingType.TryGetMethod("Dispose", out disposeMethodSymbol) &&
                     disposeMethodSymbol.Parameters.Length == 0 &&
-                    Disposable.IsAssignableTo(MemberType(memberSymbol)) &&
                     disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration) &&
                     disposeMethodDeclaration.Body != null)
                 {
@@ -69,6 +68,15 @@
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
+            if (!Disposable.IsAssignableTo(MemberType(member)))
+            {
+                var statement = SyntaxFactory.ParseStatement($"(this.{member.Name} as IDisposable)?.Dispose();")
+                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                var updatedBody = disposeMethod.Body.AddStatements(statement);
+                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
+            }
+
             var isReadonly = IsReadOnly(member);
             if (isReadonly)
             {

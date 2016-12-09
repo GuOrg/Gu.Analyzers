@@ -186,20 +186,20 @@ public sealed class Foo : IDisposable
                                .WithMessage("Dispose member.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
 
-//            var fixedCode = @"
-//using System;
-//using System.IO;
+            var fixedCode = @"
+using System;
+using System.IO;
 
-//public sealed class Foo : IDisposable
-//{
-//    private readonly object stream = File.OpenRead("""");
+public sealed class Foo : IDisposable
+{
+    private readonly object stream = File.OpenRead("""");
         
-//    public void Dispose()
-//    {
-//        ((IDisposable)this.stream).Dispose();
-//    }
-//}";
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+    public void Dispose()
+    {
+        (this.stream as IDisposable)?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
@@ -315,20 +315,20 @@ public sealed class Foo : IDisposable
                                .WithMessage("Dispose member.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
 
-//            var fixedCode = @"
-//using System;
-//using System.IO;
+            var fixedCode = @"
+using System;
+using System.IO;
 
-//public sealed class Foo : IDisposable
-//{
-//    public object Stream { get; set; } = File.OpenRead("""");
+public sealed class Foo : IDisposable
+{
+    public object Stream { get; set; } = File.OpenRead("""");
         
-//    public void Dispose()
-//    {
-//        (this.Stream as IDisposable)?.Dispose();
-//    }
-//}";
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+    public void Dispose()
+    {
+        (this.Stream as IDisposable)?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
@@ -352,20 +352,20 @@ public sealed class Foo : IDisposable
                                .WithMessage("Dispose member.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
 
-//            var fixedCode = @"
-//using System;
-//using System.IO;
+            var fixedCode = @"
+using System;
+using System.IO;
 
-//public sealed class Foo : IDisposable
-//{
-//    public object Stream { get; } = File.OpenRead("""");
+public sealed class Foo : IDisposable
+{
+    public object Stream { get; } = File.OpenRead("""");
         
-//    public void Dispose()
-//    {
-//        ((IDisposable)this.Stream).Dispose();
-//    }
-//}";
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+    public void Dispose()
+    {
+        (this.Stream as IDisposable)?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]

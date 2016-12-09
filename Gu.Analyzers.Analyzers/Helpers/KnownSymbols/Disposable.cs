@@ -134,7 +134,7 @@ namespace Gu.Analyzers
             public override void VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 var symbol = this.semanticModel.SemanticModelFor(node).GetSymbolInfo(node, this.cancellationToken).Symbol as IMethodSymbol;
-                if (symbol?.Name == KnownSymbol.IDisposable.Dispose.Name && 
+                if (symbol?.Name == KnownSymbol.IDisposable.Dispose.Name &&
                     symbol?.Parameters.Length == 0)
                 {
                     this.disposeCalls.Add(node);
