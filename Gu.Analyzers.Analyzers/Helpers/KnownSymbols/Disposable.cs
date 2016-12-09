@@ -97,7 +97,7 @@ namespace Gu.Analyzers
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
         }
 
-        internal static DisposeWalker CreateDisposeWalker(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static DisposeWalker CreateDisposeCallsWalker(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return DisposeWalker.Create(block, semanticModel, cancellationToken);
         }

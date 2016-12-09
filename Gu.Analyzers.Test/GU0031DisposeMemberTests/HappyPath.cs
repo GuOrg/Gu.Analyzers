@@ -7,7 +7,9 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
     internal class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
         [TestCase("this.stream.Dispose();")]
+        [TestCase("this.stream?.Dispose();")]
         [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
         public async Task DisposingField(string disposeCall)
         {
             var testCode = @"
@@ -24,26 +26,6 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         }
     }";
             testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task ConditionalDisposingField()
-        {
-            var testCode = @"
-    using System;
-    using System.IO;
-
-    public sealed class Foo : IDisposable
-    {
-        private readonly Stream stream = File.OpenRead("""");
-        
-        public void Dispose()
-        {
-            this.stream?.Dispose();
-        }
-    }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }

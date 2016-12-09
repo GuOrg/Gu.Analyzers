@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -104,17 +105,21 @@
                 MethodDeclarationSyntax declaration;
                 if (disposeMethod.TryGetSingleDeclaration(context.CancellationToken, out declaration))
                 {
-                    using (var walker = Disposable.CreateDisposeWalker(declaration.Body, context.SemanticModel, context.CancellationToken))
+                    using (var walker = IdentifierNameWalker.Create(declaration.Body))
                     {
-                        foreach (var disposeCall in walker.DisposeCalls)
+                        foreach (var identifier in walker.IdentifierNames)
                         {
-                            ISymbol disposedSymbol;
-                            if (TryFindDisposedMember(disposeCall, context.SemanticModel, context.CancellationToken, out disposedSymbol))
+                            if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
                             {
-                                if (ReferenceEquals(disposedSymbol, context.ContainingSymbol))
-                                {
-                                    return;
-                                }
+                                continue;
+                            }
+
+                            var symbol = context.SemanticModel.SemanticModelFor(identifier)
+                                                .GetSymbolInfo(identifier, context.CancellationToken)
+                                                .Symbol;
+                            if (ReferenceEquals(symbol, context.ContainingSymbol))
+                            {
+                                return;
                             }
                         }
                     }
@@ -131,60 +136,6 @@
                 if (Disposable.IsCreation(assignment, semanticModel, cancellationToken))
                 {
                     return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool TryFindDisposedMember(
-            InvocationExpressionSyntax disposeCall,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken,
-            out ISymbol disposedMember)
-        {
-            disposedMember = null;
-            ExpressionSyntax invokee;
-            if (disposeCall.TryFindInvokee(out invokee))
-            {
-                var symbol = semanticModel.GetSymbolInfo(invokee, cancellationToken).Symbol;
-                if (symbol is IPropertySymbol ||
-                    symbol is IFieldSymbol)
-                {
-                    disposedMember = symbol;
-                    return true;
-                }
-
-                var localSymbol = symbol as ILocalSymbol;
-                VariableDeclaratorSyntax declarator;
-                if (localSymbol.TryGetSingleDeclaration(cancellationToken, out declarator))
-                {
-                    var initializerValue = declarator.Initializer?.Value;
-                    if (initializerValue == null)
-                    {
-                        return false;
-                    }
-
-                    if (initializerValue is IdentifierNameSyntax)
-                    {
-                        disposedMember = semanticModel.GetSymbolInfo(initializerValue, cancellationToken)
-                                                      .Symbol;
-                    }
-                    else if (initializerValue.IsKind(SyntaxKind.AsExpression))
-                    {
-                        disposedMember = semanticModel.GetSymbolInfo(((BinaryExpressionSyntax)initializerValue).Left, cancellationToken)
-                                                      .Symbol;
-                    }
-                    else if (initializerValue is CastExpressionSyntax)
-                    {
-                        disposedMember = semanticModel.GetSymbolInfo(((CastExpressionSyntax)initializerValue).Expression, cancellationToken)
-                              .Symbol;
-                    }
-
-                    if (disposedMember is IPropertySymbol || disposedMember is IFieldSymbol)
-                    {
-                        return true;
-                    }
                 }
             }
 
