@@ -92,6 +92,88 @@ namespace Gu.Analyzers.Test.GU0031DisposeMembersTests
         }
 
         [Test]
+        public async Task DisposingFieldAsCast()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly object stream =  File.OpenRead("""");
+
+        public void Dispose()
+        {
+            var disposable = this.stream as IDisposable;
+            disposable?.Dispose();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingFieldInlineAsCast()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly object stream =  File.OpenRead("""");
+
+        public void Dispose()
+        {
+            (this.stream as IDisposable)?.Dispose();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingFieldExplicitCast()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly object stream =  File.OpenRead("""");
+
+        public void Dispose()
+        {
+            var disposable = (IDisposable)this.stream;
+            disposable.Dispose();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingFieldInlineExplicitCast()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly object stream =  File.OpenRead("""");
+
+        public void Dispose()
+        {
+            ((IDisposable)this.stream).Dispose();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingPropertyWhenInitializedInProperty()
         {
             var testCode = @"

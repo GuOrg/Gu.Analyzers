@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -9,6 +10,11 @@
         {
             result = null;
             return invocation?.ArgumentList?.Arguments.TryGetAtIndex(index, out result) == true;
+        }
+
+        internal static bool TryFindInvokee(this InvocationExpressionSyntax invocation, out ExpressionSyntax invokee)
+        {
+            return TryFindInvokee(invocation.Expression, out invokee);
         }
 
         internal static string Name(this InvocationExpressionSyntax invocation)
@@ -42,6 +48,66 @@
         internal static bool IsNameOf(this InvocationExpressionSyntax invocation)
         {
             return invocation.Name() == "nameof";
+        }
+
+        private static bool TryFindInvokee(ExpressionSyntax expression, out ExpressionSyntax invokee)
+        {
+            invokee = null;
+            var memberAccess = expression as MemberAccessExpressionSyntax;
+            if (memberAccess != null)
+            {
+                var parensExpr = memberAccess.Expression as ParenthesizedExpressionSyntax;
+                if (parensExpr != null)
+                {
+                    return TryFindInvokee(parensExpr.Expression, out invokee);
+                }
+
+                if (memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                    !(memberAccess.Expression is ThisExpressionSyntax))
+                {
+                    invokee = memberAccess.Expression;
+                }
+                else
+                {
+                    invokee = memberAccess;
+                }
+
+                return true;
+            }
+
+            var parenthesizedExpressionSyntax = expression as ParenthesizedExpressionSyntax;
+            if (parenthesizedExpressionSyntax != null)
+            {
+                return TryFindInvokee(parenthesizedExpressionSyntax.Expression, out invokee);
+            }
+
+            var castExpression = expression as CastExpressionSyntax;
+            if (castExpression != null)
+            {
+                return TryFindInvokee(castExpression.Expression, out invokee);
+            }
+
+            if (expression.IsKind(SyntaxKind.AsExpression))
+            {
+                return TryFindInvokee(((BinaryExpressionSyntax)expression).Left, out invokee);
+            }
+
+            if (expression is MemberBindingExpressionSyntax)
+            {
+                var conditionalAccess = expression.Parent.Parent as ConditionalAccessExpressionSyntax;
+                if (conditionalAccess != null)
+                {
+                    return TryFindInvokee(conditionalAccess.Expression, out invokee);
+                }
+            }
+
+            if (expression is IdentifierNameSyntax)
+            {
+                invokee = expression;
+                return true;
+            }
+
+            return false;
         }
     }
 }

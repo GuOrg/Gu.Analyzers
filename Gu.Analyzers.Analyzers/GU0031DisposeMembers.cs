@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Threading;
@@ -109,11 +108,13 @@
                     {
                         foreach (var disposeCall in walker.DisposeCalls)
                         {
-                            var expressionSyntax = DisposedMember(disposeCall);
-                            var disposedSymbol = context.SemanticModel.GetSymbolInfo(expressionSyntax, context.CancellationToken).Symbol;
-                            if (ReferenceEquals(disposedSymbol, context.ContainingSymbol))
+                            ISymbol disposedSymbol;
+                            if (TryFindDisposedMember(disposeCall, context.SemanticModel, context.CancellationToken, out disposedSymbol))
                             {
-                                return;
+                                if (ReferenceEquals(disposedSymbol, context.ContainingSymbol))
+                                {
+                                    return;
+                                }
                             }
                         }
                     }
@@ -136,21 +137,58 @@
             return false;
         }
 
-        private static ExpressionSyntax DisposedMember(InvocationExpressionSyntax disposeCall)
+        private static bool TryFindDisposedMember(
+            InvocationExpressionSyntax disposeCall,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken,
+            out ISymbol disposedMember)
         {
-            var memberAccess = disposeCall.Expression as MemberAccessExpressionSyntax;
-            if (memberAccess != null)
+            disposedMember = null;
+            ExpressionSyntax invokee;
+            if (disposeCall.TryFindInvokee(out invokee))
             {
-                return memberAccess.Expression;
+                var symbol = semanticModel.GetSymbolInfo(invokee, cancellationToken).Symbol;
+                if (symbol is IPropertySymbol ||
+                    symbol is IFieldSymbol)
+                {
+                    disposedMember = symbol;
+                    return true;
+                }
+
+                var localSymbol = symbol as ILocalSymbol;
+                VariableDeclaratorSyntax declarator;
+                if (localSymbol.TryGetSingleDeclaration(cancellationToken, out declarator))
+                {
+                    var initializerValue = declarator.Initializer?.Value;
+                    if (initializerValue == null)
+                    {
+                        return false;
+                    }
+
+                    if (initializerValue is IdentifierNameSyntax)
+                    {
+                        disposedMember = semanticModel.GetSymbolInfo(initializerValue, cancellationToken)
+                                                      .Symbol;
+                    }
+                    else if (initializerValue.IsKind(SyntaxKind.AsExpression))
+                    {
+                        disposedMember = semanticModel.GetSymbolInfo(((BinaryExpressionSyntax)initializerValue).Left, cancellationToken)
+                                                      .Symbol;
+                    }
+                    else if (initializerValue is CastExpressionSyntax)
+                    {
+                        disposedMember = semanticModel.GetSymbolInfo(((CastExpressionSyntax)initializerValue).Expression, cancellationToken)
+                              .Symbol;
+                    }
+
+                    if (disposedMember is IPropertySymbol || disposedMember is IFieldSymbol)
+                    {
+                        return true;
+                    }
+                }
             }
 
-            if (disposeCall.Expression is MemberBindingExpressionSyntax)
-            {
-                var conditionalAccess = (ConditionalAccessExpressionSyntax)disposeCall.Parent;
-                return conditionalAccess.Expression;
-            }
-
-            throw new ArgumentOutOfRangeException(nameof(disposeCall), disposeCall, "Could not find disposed member.");
+            return false;
         }
     }
 }
