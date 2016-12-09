@@ -31,6 +31,10 @@
   <td>Use nameof.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0007.md">GU0007</a></td>
+  <td>Prefer injecting.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
   <td>Assigning same value.</td>
 </tr>
