@@ -154,7 +154,7 @@ public class Foo
     {
         public Stream Bar()
         {
-            return File.OpenRead("""");
+            return File.OpenRead(string.Empty);
         }
     }";
             await this.VerifyHappyPathAsync(testCode)

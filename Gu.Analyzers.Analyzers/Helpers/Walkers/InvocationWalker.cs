@@ -27,7 +27,11 @@
             }
 
             walker.invocations.Clear();
-            walker.Visit(node);
+            if (node != null)
+            {
+                walker.Visit(node);
+            }
+
             return walker;
         }
 

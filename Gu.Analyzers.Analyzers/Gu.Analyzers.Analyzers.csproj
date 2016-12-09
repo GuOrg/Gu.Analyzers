@@ -40,6 +40,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+
     <Compile Include="GU0001NameArguments.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatches.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatch.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="GU0021CalculatedPropertyAllocates.cs" />
     <Compile Include="GU0030UseUsing.cs" />
     <Compile Include="GU0031DisposeMember.cs" />
+    <Compile Include="GU0032DisposeBeforeReassigning.cs" />
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposable.cs" />
