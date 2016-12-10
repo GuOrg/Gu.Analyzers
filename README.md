@@ -45,6 +45,10 @@
   <td>Assigning same value.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0011.md">GU0011</a></td>
+  <td>Don't ignore returnvalue.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
   <td>Sort properties.</td>
 </tr>
