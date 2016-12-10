@@ -28,6 +28,42 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         }
 
         [Test]
+        public async Task WhenNotInjectingChained()
+        {
+            var fooCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(Bar bar)
+        {
+            this.bar = bar;
+        }
+    }";
+            var barCode = @"
+    public class Bar
+    {
+        private readonly int value;
+
+        public Bar(int value)
+        {
+            this.value = value;
+        }
+    }";
+
+            var mehCode = @"
+    public class Meh : Foo
+    {
+        public Meh()
+           : base(new Bar(1))
+        {
+        }
+    }";
+            await this.VerifyHappyPathAsync(new[] { fooCode, barCode, mehCode })
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenStatic()
         {
             var fooCode = @"

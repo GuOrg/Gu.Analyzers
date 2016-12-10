@@ -65,8 +65,8 @@
             return true;
         }
 
-        internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector , out TItem result)
-    where TCollection : IReadOnlyList<TItem>
+        internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+            where TCollection : IReadOnlyList<TItem>
         {
             foreach (var item in source)
             {

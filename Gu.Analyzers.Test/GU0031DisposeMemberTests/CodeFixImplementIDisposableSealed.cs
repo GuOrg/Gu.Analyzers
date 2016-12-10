@@ -175,9 +175,10 @@ public sealed class Foo : IDisposable
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
         {
             return base.GetCSharpDiagnosticAnalyzers()
-                       .Concat(new[] {DummyAnalyzer.Default});
+                       .Concat(new[] { DummyAnalyzer.Default });
         }
 
+        [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class DummyAnalyzer : DiagnosticAnalyzer
         {
             public static readonly DummyAnalyzer Default = new DummyAnalyzer();
@@ -186,18 +187,19 @@ public sealed class Foo : IDisposable
             {
             }
 
+            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
+                ImmutableArray.Create(
+                    new DiagnosticDescriptor(
+                        "CS0535",
+                        string.Empty,
+                        "'Foo' does not implement interface member 'IDisposable.Dispose()'",
+                        string.Empty,
+                        DiagnosticSeverity.Error,
+                        false));
+
             public override void Initialize(AnalysisContext context)
             {
             }
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-                ImmutableArray.Create(
-                    new DiagnosticDescriptor("CS0535",
-                                             "",
-                                             "'Foo' does not implement interface member 'IDisposable.Dispose()'",
-                                             "",
-                                             DiagnosticSeverity.Error, 
-                                             false));
         }
     }
 }

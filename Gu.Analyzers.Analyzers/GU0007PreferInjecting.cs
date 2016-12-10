@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -52,7 +53,49 @@
                 return;
             }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+            if (CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+            }
+        }
+
+        private static bool CanInject(ObjectCreationExpressionSyntax objectCreation, ConstructorDeclarationSyntax ctor)
+        {
+            foreach (var argument in objectCreation.ArgumentList.Arguments)
+            {
+                var identifierName = argument.Expression as IdentifierNameSyntax;
+                if (identifierName != null)
+                {
+                    var identifier = identifierName.Identifier.ValueText;
+                    if (identifier == null)
+                    {
+                        return false;
+                    }
+
+                    ParameterSyntax parameter;
+                    if (!ctor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out parameter))
+                    {
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                var nestedObjectCreation = argument.Expression as ObjectCreationExpressionSyntax;
+                if (nestedObjectCreation != null)
+                {
+                    if (!CanInject(nestedObjectCreation, ctor))
+                    {
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                return false;
+            }
+
+            return true;
         }
 
         private static bool IsValidCreationType(IMethodSymbol ctor)

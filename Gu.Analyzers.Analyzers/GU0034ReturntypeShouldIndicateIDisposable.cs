@@ -79,8 +79,8 @@
         }
 
         private static ITypeSymbol MemberType(ISymbol member) =>
-            (member as IMethodSymbol)?.ReturnType ?? 
-            (member as IFieldSymbol)?.Type ?? 
+            (member as IMethodSymbol)?.ReturnType ??
+            (member as IFieldSymbol)?.Type ??
             (member as IPropertySymbol)?.Type;
     }
 }
