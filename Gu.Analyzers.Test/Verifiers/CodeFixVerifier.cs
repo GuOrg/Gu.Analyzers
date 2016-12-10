@@ -413,6 +413,7 @@ namespace Gu.Analyzers.Test
                     Console.Write(actualCode);
                     Console.WriteLine();
                 }
+
                 Assert.AreEqual(expectedCode, actualCode);
             }
         }

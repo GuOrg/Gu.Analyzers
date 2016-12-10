@@ -54,6 +54,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0031.md">GU0031</a></td>
   <td>Dispose member.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0033.md">GU0033</a></td>
+  <td>Don't ignore returnvalue of type IDisposable.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

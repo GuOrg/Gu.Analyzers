@@ -60,11 +60,11 @@
 
         private static string Parametername(ObjectCreationExpressionSyntax objectCreation)
         {
-            var type = (IdentifierNameSyntax) objectCreation.Type;
+            var type = (IdentifierNameSyntax)objectCreation.Type;
             var typeName = type.Identifier.ValueText;
             if (char.IsUpper(typeName[0]))
             {
-                return new string(char.ToLower(typeName[0]),1) + typeName.Substring(1);
+                return new string(char.ToLower(typeName[0]), 1) + typeName.Substring(1);
             }
 
             return typeName;

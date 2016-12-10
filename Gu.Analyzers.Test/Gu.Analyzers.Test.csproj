@@ -51,6 +51,8 @@
     <Compile Include="AttributeTests.cs" />
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\Diagnostics.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFix.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.cs" />
     <Compile Include="GU0030UseUsingTests\Diagnostics.cs" />
