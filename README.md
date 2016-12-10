@@ -58,6 +58,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0033.md">GU0033</a></td>
   <td>Don't ignore returnvalue of type IDisposable.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0034.md">GU0034</a></td>
+  <td>Returntype should indicate that the value should be disposed.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
