@@ -47,6 +47,11 @@
             }
 
             var returnStatement = (ReturnStatementSyntax)context.Node;
+            if (returnStatement.Expression == null)
+            {
+                return;
+            }
+
             if (Disposable.IsCreation(returnStatement.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnStatement.Expression.GetLocation()));
@@ -62,15 +67,20 @@
             }
 
             var arrowClause = (ArrowExpressionClauseSyntax)context.Node;
+            if (arrowClause.Expression == null)
+            {
+                return;
+            }
+
             if (Disposable.IsCreation(arrowClause.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, arrowClause.Expression.GetLocation()));
             }
         }
 
-        private static ITypeSymbol MemberType(ISymbol member) => 
-            (member as IMethodSymbol)?.ReturnType ??
-            (member as IFieldSymbol)?.Type ??
+        private static ITypeSymbol MemberType(ISymbol member) =>
+            (member as IMethodSymbol)?.ReturnType ?? 
+            (member as IFieldSymbol)?.Type ?? 
             (member as IPropertySymbol)?.Type;
     }
 }

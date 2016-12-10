@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
+﻿#pragma warning disable 1998
+namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 {
     using System.Threading;
     using System.Threading.Tasks;

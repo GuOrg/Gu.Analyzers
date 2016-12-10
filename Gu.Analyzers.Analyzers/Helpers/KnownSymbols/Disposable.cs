@@ -12,6 +12,11 @@ namespace Gu.Analyzers
     {
         internal static bool IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (disposable == null)
+            {
+                return false;
+            }
+
             var symbol = semanticModel.SemanticModelFor(disposable)
                           .GetSymbolInfo(disposable, cancellationToken)
                           .Symbol;
