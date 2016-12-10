@@ -39,6 +39,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0005.md = documentation\GU0005.md
 		documentation\GU0006.md = documentation\GU0006.md
 		documentation\GU0007.md = documentation\GU0007.md
+		documentation\GU0008.md = documentation\GU0008.md
 		documentation\GU0010.md = documentation\GU0010.md
 		documentation\GU0020.md = documentation\GU0020.md
 		documentation\GU0021.md = documentation\GU0021.md
