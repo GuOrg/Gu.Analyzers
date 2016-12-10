@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -66,6 +65,7 @@
         private static bool CanIgnore(InvocationExpressionSyntax invocation)
         {
             // Returning self should be allowed like StringBuilder.Write()
+            return false;
         }
 
         private static bool IsIgnored(SyntaxNode node)
