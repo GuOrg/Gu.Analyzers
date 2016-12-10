@@ -40,12 +40,13 @@
 
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
         {
-            if (!Disposable.IsCreation((ObjectCreationExpressionSyntax)context.Node, context.SemanticModel, context.CancellationToken))
+            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
+            if (!Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
 
-            if (IsIgnored(context.Node))
+            if (IsIgnored(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -54,12 +55,17 @@
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
+            if (invocation == null)
+            {
+                return;
+            }
+
             if (!Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
 
-            if (IsIgnored(context.Node))
+            if (IsIgnored(invocation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

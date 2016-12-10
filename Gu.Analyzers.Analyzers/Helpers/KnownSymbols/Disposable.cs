@@ -1,8 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -13,20 +10,6 @@ namespace Gu.Analyzers
         internal static bool IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (disposable == null)
-            {
-                return false;
-            }
-
-            var symbol = semanticModel.SemanticModelFor(disposable)
-                          .GetSymbolInfo(disposable, cancellationToken)
-                          .Symbol;
-
-            if (disposable is ObjectCreationExpressionSyntax)
-            {
-                return IsAssignableTo(symbol.ContainingType);
-            }
-
-            if (symbol is IFieldSymbol)
             {
                 return false;
             }
@@ -43,6 +26,24 @@ namespace Gu.Analyzers
             {
                 return IsCreation(conditional.WhenTrue, semanticModel, cancellationToken) ||
                        IsCreation(conditional.WhenFalse, semanticModel, cancellationToken);
+            }
+
+            var symbol = semanticModel.SemanticModelFor(disposable)
+                          .GetSymbolInfo(disposable, cancellationToken)
+                          .Symbol;
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            if (disposable is ObjectCreationExpressionSyntax)
+            {
+                return IsAssignableTo(symbol.ContainingType);
+            }
+
+            if (symbol is IFieldSymbol)
+            {
+                return false;
             }
 
             var methodSymbol = symbol as IMethodSymbol;
@@ -114,61 +115,6 @@ namespace Gu.Analyzers
             ITypeSymbol _;
             return type == KnownSymbol.IDisposable ||
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
-        }
-
-        internal static DisposeWalker CreateDisposeCallsWalker(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return DisposeWalker.Create(block, semanticModel, cancellationToken);
-        }
-
-        internal sealed class DisposeWalker : CSharpSyntaxWalker, IDisposable
-        {
-            private static readonly ConcurrentQueue<DisposeWalker> Cache = new ConcurrentQueue<DisposeWalker>();
-            private readonly List<InvocationExpressionSyntax> disposeCalls = new List<InvocationExpressionSyntax>();
-
-            private SemanticModel semanticModel;
-            private CancellationToken cancellationToken;
-
-            private DisposeWalker()
-            {
-            }
-
-            public IReadOnlyList<InvocationExpressionSyntax> DisposeCalls => this.disposeCalls;
-
-            public static DisposeWalker Create(BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                DisposeWalker walker;
-                if (!Cache.TryDequeue(out walker))
-                {
-                    walker = new DisposeWalker();
-                }
-
-                walker.disposeCalls.Clear();
-                walker.semanticModel = semanticModel;
-                walker.cancellationToken = cancellationToken;
-                walker.Visit(block);
-                return walker;
-            }
-
-            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-            {
-                var symbol = this.semanticModel.SemanticModelFor(node).GetSymbolInfo(node, this.cancellationToken).Symbol as IMethodSymbol;
-                if (symbol?.Name == KnownSymbol.IDisposable.Dispose.Name &&
-                    symbol?.Parameters.Length == 0)
-                {
-                    this.disposeCalls.Add(node);
-                }
-
-                base.VisitInvocationExpression(node);
-            }
-
-            public void Dispose()
-            {
-                this.disposeCalls.Clear();
-                this.semanticModel = null;
-                this.cancellationToken = CancellationToken.None;
-                Cache.Enqueue(this);
-            }
         }
     }
 }
