@@ -53,7 +53,8 @@
 
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
-            if (!Disposable.IsCreation((InvocationExpressionSyntax)context.Node, context.SemanticModel, context.CancellationToken))
+            var invocation = (InvocationExpressionSyntax)context.Node;
+            if (!Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -75,7 +76,7 @@
             if (argument != null)
             {
                 var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
-                if ((objectCreation.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("Reader") == true)
+                if ((objectCreation?.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("Reader") == true)
                 {
                     return false;
                 }

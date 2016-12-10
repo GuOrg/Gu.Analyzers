@@ -29,28 +29,27 @@ public sealed class Foo
         [Test]
         public async Task IgnoringNewDisposable()
         {
-            var testCode = @"
+            var disposableCode = @"
 using System;
-using System.IO;
-
-public class Disposable : IDisposable
+class Disposable : IDisposable
 {
     public void Dispose()
-    {
-    }
-}
+	{
+	}
+}";
 
+            var testCode = @"
 public sealed class Foo
 {
     public void Meh()
     {
-        ↓File.OpenRead("""");
+        ↓new Disposable();
     }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
         }
 
         [Test]
@@ -81,6 +80,44 @@ public sealed class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoringNewDisposabledPassedIntoCtor()
+        {
+            var disposableCode = @"
+using System;
+class Disposable : IDisposable
+{
+    public void Dispose()
+	{
+	}
+}";
+            var barCode = @"
+using System;
+
+public class Bar
+{
+    private readonly IDisposable disposable;
+
+    public Bar(IDisposable disposable)
+    {
+       this.disposable = disposable;
+    }
+}";
+
+            var testCode = @"
+public sealed class Foo
+{
+    public Bar Meh()
+    {
+        return new Bar(↓new Disposable());
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, barCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
         }
     }
 }

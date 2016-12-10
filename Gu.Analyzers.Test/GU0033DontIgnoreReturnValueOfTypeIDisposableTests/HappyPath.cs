@@ -23,6 +23,40 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
         }
 
         [Test]
+        public async Task MethodWithArgReturningObject()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            Meh(""Meh"");
+        }
+
+        private static object Meh(string arg) => new object();
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodWithObjArgReturningObject()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            Id(new Foo());
+        }
+
+        private static object Id(object arg) => arg;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task Returning()
         {
             var testCode = @"
