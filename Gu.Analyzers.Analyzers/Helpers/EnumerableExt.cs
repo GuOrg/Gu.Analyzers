@@ -65,6 +65,22 @@
             return true;
         }
 
+        internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector , out TItem result)
+    where TCollection : IReadOnlyList<TItem>
+        {
+            foreach (var item in source)
+            {
+                if (selector(item))
+                {
+                    result = item;
+                    return true;
+                }
+            }
+
+            result = default(TItem);
+            return false;
+        }
+
         internal static bool TryGetLast<TCollection, TItem>(this TCollection source, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
@@ -76,6 +92,23 @@
 
             result = source[source.Count - 1];
             return true;
+        }
+
+        internal static bool TryGetLast<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+             where TCollection : IReadOnlyList<TItem>
+        {
+            for (var i = source.Count - 1; i >= 0; i--)
+            {
+                var item = source[i];
+                if (selector(item))
+                {
+                    result = item;
+                    return true;
+                }
+            }
+
+            result = default(TItem);
+            return false;
         }
     }
 }

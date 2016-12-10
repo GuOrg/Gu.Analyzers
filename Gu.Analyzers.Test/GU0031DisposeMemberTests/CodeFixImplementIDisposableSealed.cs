@@ -75,8 +75,7 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        [Explicit]
-        public async Task ImplementIDisposableDisposeMethodWithProtectedProperty()
+        public async Task ImplementIDisposableDisposeMethodWithProtectedPrivateSetProperty()
         {
             var testCode = @"
 using System;
@@ -98,6 +97,74 @@ public sealed class Foo : IDisposable
     private int Value { get; set; }
 
     public void Dispose()
+    {
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableDisposeMethodWithPublicVirtualMethod()
+        {
+            var testCode = @"
+using System;
+
+public class Foo : ↓IDisposable
+{
+    public virtual void Bar()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic("CS0535")
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    public void Bar()
+    {
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableDisposeMethodWithProtectedVirtualMethod()
+        {
+            var testCode = @"
+using System;
+
+public class Foo : ↓IDisposable
+{
+    protected virtual void Bar()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic("CS0535")
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    public void Dispose()
+    {
+    }
+
+    private void Bar()
     {
     }
 }";

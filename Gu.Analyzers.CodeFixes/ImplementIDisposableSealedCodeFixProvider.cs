@@ -83,10 +83,24 @@
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
+            MemberDeclarationSyntax method;
+            SyntaxNode updated = typeDeclaration;
+            var disposeMethod = syntaxGenerator.MethodDeclaration("Dispose", accessibility: Accessibility.Public);
+            if (typeDeclaration.Members.TryGetLast(
+                                   x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                                   out method))
+            {
+                updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
+            }
+            else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+            {
+                updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
+            }
+            else
+            {
+                updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+            }
 
-            var updated = syntaxGenerator.AddMembers(
-                typeDeclaration,
-                syntaxGenerator.MethodDeclaration("Dispose", accessibility: Accessibility.Public));
             if (!Disposable.IsAssignableTo(type))
             {
                 updated = syntaxGenerator.AddBaseType(updated, IDisposableInterface);
@@ -97,12 +111,107 @@
                 updated = syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
             }
 
+            updated = MakeSealedRewriter.Default.Visit(updated);
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)
         {
             return type.Modifiers.Any(SyntaxKind.SealedKeyword);
+        }
+
+        private class MakeSealedRewriter : CSharpSyntaxRewriter
+        {
+            public static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
+
+            public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
+            {
+                SyntaxToken modifier;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                }
+
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
+                }
+
+                return base.VisitFieldDeclaration(node);
+            }
+
+            public override SyntaxNode VisitEventDeclaration(EventDeclarationSyntax node)
+            {
+                SyntaxToken modifier;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                }
+
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
+                }
+
+                return base.VisitEventDeclaration(node);
+            }
+
+            public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+            {
+                SyntaxToken modifier;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                }
+
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
+                }
+
+                return base.VisitPropertyDeclaration(node);
+            }
+
+            public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
+            {
+                SyntaxToken modifier;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                }
+
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
+                }
+
+                if (node.FirstAncestorOrSelf<PropertyDeclarationSyntax>()
+                        .Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
+                {
+                    if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
+                    {
+                        node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                    }
+                }
+
+                return base.VisitAccessorDeclaration(node);
+            }
+
+            public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
+            {
+                SyntaxToken modifier;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
+                }
+
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                {
+                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
+                }
+
+                return base.VisitMethodDeclaration(node);
+            }
         }
     }
 }
