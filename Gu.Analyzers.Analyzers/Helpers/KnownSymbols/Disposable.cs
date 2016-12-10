@@ -26,6 +26,20 @@ namespace Gu.Analyzers
                 return false;
             }
 
+            if (disposable.IsKind(SyntaxKind.CoalesceExpression))
+            {
+                var binaryExpression = (BinaryExpressionSyntax)disposable;
+                return IsCreation(binaryExpression.Left, semanticModel, cancellationToken) ||
+                       IsCreation(binaryExpression.Right, semanticModel, cancellationToken);
+            }
+
+            var conditional = disposable as ConditionalExpressionSyntax;
+            if (conditional != null)
+            {
+                return IsCreation(conditional.WhenTrue, semanticModel, cancellationToken) ||
+                       IsCreation(conditional.WhenFalse, semanticModel, cancellationToken);
+            }
+
             var methodSymbol = symbol as IMethodSymbol;
             if (methodSymbol != null)
             {

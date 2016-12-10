@@ -130,6 +130,144 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task NotDisposingFieldAssignedInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Stream stream;
+
+    public Foo()
+    {
+        this.stream = File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo()
+    {
+        this.stream = File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+        this.stream.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInCtorNullCoalescing()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Stream stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream ?? File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream ?? File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+        this.stream.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInCtorTernary()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Stream stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream != null ? stream : File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream != null ? stream : File.OpenRead("""");
+    }
+
+    public void Dispose()
+    {
+        this.stream.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingProtectedFieldInDisposeMethod()
         {
             var testCode = @"
