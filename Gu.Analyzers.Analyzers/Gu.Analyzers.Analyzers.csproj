@@ -55,6 +55,7 @@
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposable.cs" />
+    <Compile Include="GU0034ReturntypeShouldIndicateIDisposable.cs" />
     <Compile Include="Helpers\ConstructorWalker.cs" />
     <Compile Include="Helpers\AssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />

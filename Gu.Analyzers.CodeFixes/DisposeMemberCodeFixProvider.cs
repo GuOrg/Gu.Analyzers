@@ -130,10 +130,7 @@
             return isReadOnly.Value;
         }
 
-        private static ITypeSymbol MemberType(ISymbol member)
-        {
-            return (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
-        }
+        private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
 
         private static ISymbol MemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
