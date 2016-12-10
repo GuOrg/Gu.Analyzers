@@ -491,6 +491,65 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task NotDisposingGetSetPropertyWithBackingFieldWhenInitializedInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private Stream _stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead("""");
+    }
+
+    public Stream Stream
+    {
+        get { return _stream; }
+        set { _stream = value; }
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private Stream _stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead("""");
+    }
+
+    public Stream Stream
+    {
+        get { return _stream; }
+        set { _stream = value; }
+    }
+
+    public void Dispose()
+    {
+        _stream?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingGetOnlyPropertyWhenInitializedInCtor()
         {
             var testCode = @"

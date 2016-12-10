@@ -55,6 +55,22 @@
                 {
                     CheckThatMemberIsDisposed(context);
                 }
+
+                foreach (var assignment in walker.Assignments)
+                {
+                    var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
+                    if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
+                    {
+                        var property = context.SemanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
+                        using (var propertyWalker = AssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
+                        {
+                            if (IsAnyADisposableCreation(propertyWalker.Assignments, context.SemanticModel, context.CancellationToken))
+                            {
+                                CheckThatMemberIsDisposed(context);
+                            }
+                        }
+                    }
+                }
             }
         }
 

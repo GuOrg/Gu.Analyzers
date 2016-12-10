@@ -40,22 +40,22 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GU0007PreferInjecting.cs" />
-    <Compile Include="Helpers\AssignmentWalker.cs" />
     <Compile Include="GU0001NameArguments.cs" />
     <Compile Include="GU0002NamedArgumentPositionMatches.cs" />
     <Compile Include="GU0003CtorParameterNamesShouldMatch.cs" />
     <Compile Include="GU0004AssignAllReadOnlyMembers.cs" />
     <Compile Include="GU0005ExceptionArgumentsPositions.cs" />
     <Compile Include="GU0006UseNameof.cs" />
+    <Compile Include="GU0007PreferInjecting.cs" />
     <Compile Include="GU0010DoNotAssignSameValue.cs" />
     <Compile Include="GU0020SortProperties.cs" />
     <Compile Include="GU0021CalculatedPropertyAllocates.cs" />
-    <Compile Include="AnalyzerCategory.cs" />
-    <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0030UseUsing.cs" />
     <Compile Include="GU0031DisposeMember.cs" />
+    <Compile Include="AnalyzerCategory.cs" />
+    <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="Helpers\ConstructorWalker.cs" />
+    <Compile Include="Helpers\AssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\KnownSymbols\Disposable.cs" />
