@@ -401,7 +401,19 @@ namespace Gu.Analyzers.Test
             for (var i = 0; i < updatedDocuments.Length; i++)
             {
                 var actual = await GetStringFromDocumentAsync(updatedDocuments[i], cancellationToken).ConfigureAwait(false);
-                Assert.AreEqual(newSources[i].NormalizeNewLine(), actual.NormalizeNewLine());
+                var expectedCode = newSources[i].NormalizeNewLine();
+                var actualCode = actual.NormalizeNewLine();
+                if (actualCode != expectedCode)
+                {
+                    Console.WriteLine("Expected:");
+                    Console.Write(expectedCode);
+                    Console.WriteLine();
+                    Console.WriteLine();
+                    Console.WriteLine("Actual:");
+                    Console.Write(actualCode);
+                    Console.WriteLine();
+                }
+                Assert.AreEqual(expectedCode, actualCode);
             }
         }
 
