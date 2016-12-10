@@ -125,13 +125,11 @@ namespace Gu.Analyzers.Test
         }
 
         [Test]
-        public virtual void IdMatches()
+        public void IdMatches()
         {
-            foreach (var diagnosticAnalyzer in this.GetCSharpDiagnosticAnalyzers())
-            {
-                StringAssert.StartsWith(diagnosticAnalyzer.SupportedDiagnostics.Single().Id, diagnosticAnalyzer.GetType().Name);
-                StringAssert.Contains(diagnosticAnalyzer.GetType().Name, this.GetType().FullName, "Name of test class does not match analyzer name.");
-            }
+            var diagnosticAnalyzer = this.GetCSharpDiagnosticAnalyzers().First();
+            StringAssert.StartsWith(diagnosticAnalyzer.SupportedDiagnostics.Single().Id, diagnosticAnalyzer.GetType().Name);
+            StringAssert.Contains(diagnosticAnalyzer.GetType().Name, this.GetType().FullName, "Name of test class does not match analyzer name.");
         }
 
         /// <summary>
@@ -142,24 +140,20 @@ namespace Gu.Analyzers.Test
         public void TestHelpLink()
         {
             // ReSharper disable HeuristicUnreachableCode
-            foreach (var diagnosticAnalyzer in this.GetCSharpDiagnosticAnalyzers())
+            var diagnosticAnalyzer = this.GetCSharpDiagnosticAnalyzers().First();
+            foreach (var diagnostic in diagnosticAnalyzer.SupportedDiagnostics)
             {
-                foreach (var diagnostic in diagnosticAnalyzer.SupportedDiagnostics)
+                if (diagnostic.DefaultSeverity == DiagnosticSeverity.Hidden && diagnostic.CustomTags.Contains(WellKnownDiagnosticTags.NotConfigurable))
                 {
-                    if (diagnostic.DefaultSeverity == DiagnosticSeverity.Hidden && diagnostic.CustomTags.Contains(WellKnownDiagnosticTags.NotConfigurable))
-                    {
-                        Assert.Inconclusive(diagnostic.HelpLinkUri);
+                    Assert.Inconclusive(diagnostic.HelpLinkUri);
 
-                        // This diagnostic will never appear in the UI.
-                        continue;
-                    }
-
-                    string expected = $"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/{diagnostic.Id}.md";
-                    Assert.AreEqual(expected, diagnostic.HelpLinkUri);
+                    // This diagnostic will never appear in the UI.
+                    continue;
                 }
-            }
 
-            // ReSharper restore HeuristicUnreachableCode
+                string expected = $"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/{diagnostic.Id}.md";
+                Assert.AreEqual(expected, diagnostic.HelpLinkUri);
+            }
         }
 
         /// <summary>

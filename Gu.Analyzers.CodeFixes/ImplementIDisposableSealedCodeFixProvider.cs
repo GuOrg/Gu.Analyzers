@@ -11,27 +11,14 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableSealedCodeFixProvider))]
     [Shared]
     internal class ImplementIDisposableSealedCodeFixProvider : CodeFixProvider
     {
-        ////private static readonly SyntaxTriviaList ElasticTriviaList = SyntaxTriviaList.Create(SyntaxFactory.ElasticMarker);
-
-        private static readonly MethodDeclarationSyntax EmptyDisposeMethod = SyntaxFactory.MethodDeclaration(
-            attributeLists: SyntaxFactory.List<AttributeListSyntax>(),
-            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)),
-            returnType: SyntaxFactory.ParseName("void"),
-            explicitInterfaceSpecifier: null,
-            identifier: SyntaxFactory.Identifier("Dispose"),
-            typeParameterList: null,
-            parameterList: SyntaxFactory.ParameterList(),
-            constraintClauses: SyntaxFactory.List<TypeParameterConstraintClauseSyntax>(),
-            body: SyntaxFactory.Block(),
-            semicolonToken: SyntaxFactory.Token(SyntaxKind.None));
-
         // ReSharper disable once InconsistentNaming
-        private static readonly SimpleBaseTypeSyntax IDisposableInterface = SyntaxFactory.SimpleBaseType(SyntaxFactory.ParseTypeName("IDisposable"));
+        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -72,59 +59,45 @@
                     continue;
                 }
 
+                if (diagnostic.Id == GU0031DisposeMember.DiagnosticId && Disposable.IsAssignableTo(semanticModel.GetDeclaredSymbol(typeDeclaration)))
+                {
+                    continue;
+                }
+
                 context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Implement IDisposable and make class sealed.",
-                        cancellationToken =>
-                            ApplyImplementIDisposableSealedFixAsync(
-                                context,
-                                semanticModel,
-                                cancellationToken,
-                                syntaxRoot,
-                                typeDeclaration),
-                        nameof(ImplementIDisposableSealedCodeFixProvider)),
-                    diagnostic);
+                CodeAction.Create(
+                    "Implement IDisposable and make class sealed.",
+                    cancellationToken =>
+                        ApplyImplementIDisposableSealedFixAsync(
+                            context,
+                            semanticModel,
+                            cancellationToken,
+                            syntaxRoot,
+                            typeDeclaration),
+                    nameof(ImplementIDisposableSealedCodeFixProvider)),
+                diagnostic);
             }
         }
 
         private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
-            var classDeclaration = typeDeclaration as ClassDeclarationSyntax;
-            if (classDeclaration != null)
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
+
+            var updated = syntaxGenerator.AddMembers(
+                typeDeclaration,
+                syntaxGenerator.MethodDeclaration("Dispose", accessibility: Accessibility.Public));
+            if (!Disposable.IsAssignableTo(type))
             {
-                var updated = classDeclaration.AddMembers(EmptyDisposeMethod);
-                if (!Disposable.IsAssignableTo(type))
-                {
-                    updated = updated.AddBaseListTypes(IDisposableInterface);
-                }
-
-                if (!IsSealed(typeDeclaration))
-                {
-                    updated = updated.AddModifiers(SyntaxFactory.Token(SyntaxKind.SealedKeyword));
-                }
-
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
+                updated = syntaxGenerator.AddBaseType(updated, IDisposableInterface);
             }
 
-            var structDeclaration = typeDeclaration as StructDeclarationSyntax;
-            if (structDeclaration != null)
+            if (!IsSealed(typeDeclaration))
             {
-                var updated = structDeclaration.AddMembers(EmptyDisposeMethod);
-                if (!Disposable.IsAssignableTo(type))
-                {
-                    updated = updated.AddBaseListTypes(IDisposableInterface);
-                }
-
-                if (!IsSealed(typeDeclaration))
-                {
-                    updated = updated.AddModifiers(SyntaxFactory.Token(SyntaxKind.SealedKeyword));
-                }
-
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
+                updated = syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
             }
 
-            return Task.FromResult(context.Document);
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)
