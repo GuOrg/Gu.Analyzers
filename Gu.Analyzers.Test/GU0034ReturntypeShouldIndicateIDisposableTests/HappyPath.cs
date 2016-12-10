@@ -86,6 +86,26 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
         }
 
         [Test]
+        public async Task GenericMethod()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            Id(1);
+        }
+
+        private static T Id<T>(T meh)
+        {
+            return meh;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task PropertyReturningObjectExpressionBody()
         {
             var testCode = @"
