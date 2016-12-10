@@ -12,7 +12,7 @@
             SyntaxReference syntaxReference;
             if (symbol.DeclaringSyntaxReferences.TryGetSingle(out syntaxReference))
             {
-                declaration = (T)syntaxReference.GetSyntax(cancellationToken);
+                declaration = syntaxReference.GetSyntax(cancellationToken) as T;
                 return declaration != null;
             }
 

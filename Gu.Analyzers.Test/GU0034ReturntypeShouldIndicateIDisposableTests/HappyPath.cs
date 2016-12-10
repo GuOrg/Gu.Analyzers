@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
 {
+    using System;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -41,6 +42,28 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
             return new object();
         }
     }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodReturningFuncObject()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public void Bar()
+    {
+        Meh();
+    }
+
+    private static Func<object> Meh()
+    {
+        return () => new object();
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
