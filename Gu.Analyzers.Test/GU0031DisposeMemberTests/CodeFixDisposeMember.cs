@@ -5,7 +5,7 @@
 
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
+    internal class CodeFixDisposeMember : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
     {
         [Test]
         public async Task NotDisposingPrivateReadonlyFieldInDisposeMethod()
