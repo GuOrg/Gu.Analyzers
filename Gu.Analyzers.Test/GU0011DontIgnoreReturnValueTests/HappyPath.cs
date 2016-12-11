@@ -48,6 +48,68 @@ public class Foo
         }
 
         [Test]
+        public async Task VoidMethodWithReturn()
+        {
+            var testCode = @"
+public class Foo
+{
+    private void Bar()
+    {
+        Meh();
+    }
+
+    private void Meh()
+    {
+        return;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task StaticVoidMethod()
+        {
+            var testCode = @"
+public class Foo
+{
+    private void Bar()
+    {
+        Meh();
+    }
+
+    private static void Meh()
+    {
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task StaticVoidMethodWithReturn()
+        {
+            var testCode = @"
+public class Foo
+{
+    private void Bar()
+    {
+        Meh();
+    }
+
+    private static void Meh()
+    {
+        return;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IfTry()
         {
             var testCode = @"

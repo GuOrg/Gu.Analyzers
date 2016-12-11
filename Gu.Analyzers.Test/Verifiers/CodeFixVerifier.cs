@@ -382,7 +382,7 @@ namespace Gu.Analyzers.Test
 
                 var message = new StringBuilder();
                 message.Append("Fix introduced new compiler diagnostics:\r\n");
-                newCompilerDiagnostics.Aggregate(message, (sb, d) => sb.Append(d.ToString()).Append("\r\n"));
+                newCompilerDiagnostics.Aggregate(message, (sb, d) => sb.Append(d.ToString()).Append("\r\n")).IgnoreReturnValue();
                 foreach (var document in project.Documents)
                 {
                     message.Append("\r\n").Append(document.Name).Append(":\r\n");

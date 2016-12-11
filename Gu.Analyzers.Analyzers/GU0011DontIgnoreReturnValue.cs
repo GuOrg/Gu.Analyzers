@@ -80,6 +80,13 @@
 
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
+                                          .Symbol;
+            if (symbol == null || symbol.ReturnsVoid)
+            {
+                return true;
+            }
+
             if (!(invocation.Parent is StatementSyntax))
             {
                 return true;
@@ -88,15 +95,11 @@
             if (invocation.Parent is ExpressionStatementSyntax &&
                 invocation.Parent.Parent is BlockSyntax)
             {
-                var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
-                                                          .Symbol;
-                if (symbol == null)
-                {
-                    return true;
-                }
 
-                if (symbol == KnownSymbol.StringBuilder.AppendLine ||
-                    symbol == KnownSymbol.StringBuilder.Append)
+
+                if (symbol == KnownSymbol.StringBuilder.Append ||
+                    symbol == KnownSymbol.StringBuilder.AppendLine ||
+                    symbol == KnownSymbol.StringBuilder.AppendFormat)
                 {
                     return true;
                 }
