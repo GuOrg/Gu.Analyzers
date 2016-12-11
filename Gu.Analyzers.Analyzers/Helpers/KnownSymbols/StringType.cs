@@ -7,7 +7,7 @@ namespace Gu.Analyzers
         internal StringType()
             : base("System.String")
         {
-            this.Format = new QualifiedMethod(this, "Format");
+            this.Format = new QualifiedMethod(this, nameof(this.Format));
         }
     }
 }

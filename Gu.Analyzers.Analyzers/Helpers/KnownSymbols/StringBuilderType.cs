@@ -8,8 +8,8 @@ namespace Gu.Analyzers
         internal StringBuilderType()
             : base("System.Text.StringBuilder")
         {
-            this.AppendLine = new QualifiedMethod(this, "AppendLine");
-            this.Append = new QualifiedMethod(this, "Append");
+            this.AppendLine = new QualifiedMethod(this, nameof(this.AppendLine));
+            this.Append = new QualifiedMethod(this, nameof(this.Append));
         }
     }
 }

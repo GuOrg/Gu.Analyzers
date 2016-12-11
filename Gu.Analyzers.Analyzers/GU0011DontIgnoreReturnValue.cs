@@ -17,14 +17,14 @@
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            DiagnosticId,
-            Title,
-            MessageFormat,
-            AnalyzerCategory.Correctness,
-            DiagnosticSeverity.Hidden,
-            AnalyzerConstants.EnabledByDefault,
-            Description,
-            HelpLink);
+            id: DiagnosticId,
+            title: Title,
+            messageFormat: MessageFormat,
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: Description,
+            helpLinkUri: HelpLink);
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
@@ -42,6 +42,10 @@
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
         {
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
+            if (objectCreation == null || CanIgnore(objectCreation))
+            {
+                return;
+            }
 
             if (IsIgnored(objectCreation))
             {
@@ -61,6 +65,17 @@
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
+        }
+
+        private static bool CanIgnore(ObjectCreationExpressionSyntax invocation)
+        {
+            if (invocation.Parent is ExpressionStatementSyntax &&
+                invocation.Parent.Parent is BlockSyntax)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)

@@ -110,7 +110,23 @@ public class Foo
         }
 
         [Test]
-        public async Task WhenInvokactionInExpressionBody()
+        public async Task WhenThrowing()
+        {
+            var testCode = @"
+using System;
+public class Foo
+{
+    public Foo Bar()
+    {
+        throw new Exception();
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenInvocationInExpressionBody()
         {
             var testCode = @"
 public class Foo

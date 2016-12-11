@@ -10,8 +10,8 @@ namespace Gu.Analyzers
         internal readonly NamespaceParts Namespace;
         internal readonly string Type;
 
-        internal QualifiedType(string qualifiedName)
-            : this(qualifiedName, NamespaceParts.Create(qualifiedName), qualifiedName.Substring(qualifiedName.LastIndexOf('.') + 1))
+        internal QualifiedType(string fullName)
+            : this(fullName, NamespaceParts.Create(fullName), fullName.Substring(fullName.LastIndexOf('.') + 1))
         {
         }
 

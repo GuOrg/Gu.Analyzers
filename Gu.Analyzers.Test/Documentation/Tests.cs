@@ -191,13 +191,13 @@
 
         public class DescriptorInfo
         {
-            public DescriptorInfo(DiagnosticAnalyzer analyzer)
+            public DescriptorInfo(DiagnosticAnalyzer diagnosticAnalyzer)
             {
-                this.DiagnosticAnalyzer = analyzer;
+                this.DiagnosticAnalyzer = diagnosticAnalyzer;
                 this.DocFileName = Path.Combine(DocumentsDirectory, this.DiagnosticDescriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory,
-                                                 analyzer.GetType().Name + ".cs",
+                                                 diagnosticAnalyzer.GetType().Name + ".cs",
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null

@@ -7,7 +7,7 @@ namespace Gu.Analyzers
         internal DisposableType()
             : base("System.IDisposable")
         {
-            this.Dispose = new QualifiedMethod(this, "Dispose");
+            this.Dispose = new QualifiedMethod(this, nameof(this.Dispose));
         }
     }
 }
