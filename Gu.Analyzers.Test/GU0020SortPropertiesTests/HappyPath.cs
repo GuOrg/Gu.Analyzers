@@ -208,7 +208,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             this.B = b;
         }
 
-        private static int A { get; } = 1;
+        public static int A { get; } = 1;
 
         public int B { get; }
     }";
@@ -222,9 +222,28 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             var testCode = @"
     public class Foo
     {
-        private static int A { get; } = 1;
+        public static int A { get; } = 1;
 
         public int B => A;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PublicBeforeProtectedStatic()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(int a)
+        {
+            this.A = a;
+        }
+
+        public int A { get; }
+
+        protected static int B { get; }
     }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

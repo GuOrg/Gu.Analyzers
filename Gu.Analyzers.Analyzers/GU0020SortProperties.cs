@@ -120,11 +120,11 @@
                 public int Compare(IPropertySymbol x, IPropertySymbol y)
                 {
                     int result;
-                    if (TryCompare(x, y, p => p.IsStatic, out result) ||
-                        TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Public, out result) ||
+                    if (TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Public, out result) ||
                         TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Internal, out result) ||
                         TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Protected, out result) ||
                         TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Private, out result) ||
+                        TryCompare(x, y, p => p.IsStatic, out result) ||
                         TryCompare(x, y, p => !p.IsIndexer, out result))
                     {
                         return result;
