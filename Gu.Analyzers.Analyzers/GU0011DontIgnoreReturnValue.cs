@@ -70,39 +70,44 @@
                 return true;
             }
 
-            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
-                                       .Symbol;
-            if (symbol == KnownSymbol.StringBuilder.AppendLine ||
-                symbol == KnownSymbol.StringBuilder.Append)
+            if (invocation.Parent is ExpressionStatementSyntax &&
+                invocation.Parent.Parent is BlockSyntax)
             {
-                return true;
-            }
-
-            MethodDeclarationSyntax declaration;
-            if (symbol.TryGetSingleDeclaration(cancellationToken, out declaration))
-            {
-                using (var walker = ReturnExpressionsWalker.Create(declaration))
+                var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
+                           .Symbol;
+                if (symbol == KnownSymbol.StringBuilder.AppendLine ||
+                    symbol == KnownSymbol.StringBuilder.Append)
                 {
-                    if (symbol.IsStatic)
-                    {
-                        
-                    }
-                    else
-                    {
-                        foreach (var returnValue in walker.ReturnValues)
-                        {
-                            if (!returnValue.IsKind(SyntaxKind.ThisExpression))
-                            {
-                                return false;
-                            }
-                        }
+                    return true;
+                }
 
-                        return true;
+                MethodDeclarationSyntax declaration;
+                if (symbol.TryGetSingleDeclaration(cancellationToken, out declaration))
+                {
+                    using (var walker = ReturnExpressionsWalker.Create(declaration))
+                    {
+                        if (symbol.IsStatic)
+                        {
+                        }
+                        else
+                        {
+                            foreach (var returnValue in walker.ReturnValues)
+                            {
+                                if (!returnValue.IsKind(SyntaxKind.ThisExpression))
+                                {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        }
                     }
                 }
+
+                return symbol.ReturnsVoid;
             }
 
-            return symbol.ReturnsVoid;
+            return true;
         }
 
         private static bool IsIgnored(SyntaxNode node)

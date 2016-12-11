@@ -180,5 +180,30 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IfTry()
+        {
+            var testCode = @"
+public class Foo
+{
+    private void Bar()
+    {
+        int value;
+        if(Try(out value))
+        {
+        }
+    }
+
+    private bool Try(out int value)
+    {
+        value = 1;
+        return true;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
