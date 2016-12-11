@@ -105,7 +105,6 @@
     <Compile Include="Verifiers\Helpers\TestXmlReferenceResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="paket.references" />
     <None Include="Gu.Analyzers.Test.ruleset" />
   </ItemGroup>
@@ -138,7 +137,23 @@
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Sandbox\" />
+  </ItemGroup>
+  <Import Project="..\.paket\paket.targets" />
+  <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\analyzers\Gu.Analyzers\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\packages\analyzers\Gu.Analyzers\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll">
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
@@ -154,17 +169,12 @@
     </Analyzer>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Sandbox\" />
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">
@@ -279,5 +289,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <Import Project="..\.paket\paket.targets" />
 </Project>

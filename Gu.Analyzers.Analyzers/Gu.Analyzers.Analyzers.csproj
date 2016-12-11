@@ -101,17 +101,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
     <None Include="paket.references" />
     <None Include="Gu.Analyzers.Analyzers.ruleset" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
+  </ItemGroup>
+  <Import Project="..\.paket\paket.targets" />
+  <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\analyzers\Gu.Analyzers\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\packages\analyzers\Gu.Analyzers\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll">
+      <Paket>True</Paket>
+    </Analyzer>
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">
@@ -218,5 +228,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <Import Project="..\.paket\paket.targets" />
 </Project>

@@ -6,8 +6,8 @@ Microsoft.Composition
 System.Collections.Immutable
 
 group Analyzers
+  Gu.Analyzers
   StyleCop.Analyzers
   AsyncUsageAnalyzers
   JetBrains.Annotations
   Microsoft.CodeAnalysis.Analyzers
-
