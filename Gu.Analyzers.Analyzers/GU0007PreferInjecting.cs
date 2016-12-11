@@ -128,7 +128,7 @@
 
             var ctor = context.SemanticModel.GetSymbolInfo(objectCreation)
                                 .Symbol as IMethodSymbol;
-            if (ctor == null || IsValidCreationType(ctor))
+            if (ctor == null || !IsInjectionType(ctor.ContainingType))
             {
                 return;
             }
@@ -151,17 +151,9 @@
             var symbol = context.SemanticModel.GetSymbolInfo(memberAccess, context.CancellationToken)
                                 .Symbol;
             var memberType = MemberType(symbol);
-            if (memberType == null)
+            if (memberType == null || !IsInjectionType(memberType))
             {
                 return;
-            }
-
-            foreach (var namespaceSymbol in memberType.ContainingNamespace.ConstituentNamespaces)
-            {
-                if (namespaceSymbol.Name == "System")
-                {
-                    return;
-                }
             }
 
             if (IsInjectable(memberAccess, ctor) != Injectable.No)
@@ -170,23 +162,23 @@
             }
         }
 
-        private static bool IsValidCreationType(IMethodSymbol ctor)
+        private static bool IsInjectionType(ITypeSymbol type)
         {
-            if (ctor.ContainingType.IsValueType ||
-                ctor.IsStatic)
+            if (type.IsValueType ||
+                type.IsStatic)
             {
-                return true;
+                return false;
             }
 
-            foreach (var namespaceSymbol in ctor.ContainingNamespace.ConstituentNamespaces)
+            foreach (var namespaceSymbol in type.ContainingNamespace.ConstituentNamespaces)
             {
                 if (namespaceSymbol.Name == "System")
                 {
-                    return true;
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
     }
 }
