@@ -28,6 +28,8 @@ namespace Gu.Analyzers.Test
             this.MessageFormat = descriptor.MessageFormat;
         }
 
+        public bool HasLocation => (this.spans != null) && (this.spans.Length > 0);
+
         public FileLinePositionSpan[] Spans
         {
             get
@@ -71,8 +73,6 @@ namespace Gu.Analyzers.Test
         public LocalizableString MessageFormat { get; set; }
 
         public object[] MessageArguments { get; set; }
-
-        public bool HasLocation => (this.spans != null) && (this.spans.Length > 0);
 
         public DiagnosticResult WithArguments(params object[] arguments)
         {

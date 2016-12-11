@@ -14,7 +14,7 @@
     {
         public const string DiagnosticId = "GU0020";
         private const string Title = "Sort properties.";
-        private const string MessageFormat = "Sort properties.";
+        private const string MessageFormat = "Move property.";
         private const string Description = "Sort properties by StyleCop rules then by mutability.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 

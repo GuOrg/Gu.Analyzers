@@ -50,7 +50,9 @@ namespace Gu.Analyzers.Test
                     else
                     {
                         Assert.LessOrEqual(1, matches.Count, "Use class per file, it catches more bugs");
+#pragma warning disable GU0006 // Use nameof.
                         name = matches[0].Groups["name"].Value;
+#pragma warning restore GU0006 // Use nameof.
                         if (matches[0].Groups["typeArg"].Success)
                         {
                             name += $"{{{matches[0].Groups["typeArg"].Value}}}";
@@ -100,8 +102,8 @@ namespace Gu.Analyzers.Test
                 var compilationWithAnalyzers = compilation.WithAnalyzers(analyzers, project.AnalyzerOptions, cancellationToken);
                 var compilerDiagnostics = compilation.GetDiagnostics(cancellationToken);
                 var compilerErrors = compilerDiagnostics.Where(i => i.Severity == DiagnosticSeverity.Error);
-                var diags = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync().ConfigureAwait(false);
-                var allDiagnostics = await compilationWithAnalyzers.GetAllDiagnosticsAsync().ConfigureAwait(false);
+                var diags = await compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(cancellationToken).ConfigureAwait(false);
+                var allDiagnostics = await compilationWithAnalyzers.GetAllDiagnosticsAsync(cancellationToken).ConfigureAwait(false);
                 var failureDiagnostics = allDiagnostics.Where(diagnostic => diagnostic.Id == "AD0001");
                 foreach (var diag in diags.Concat(compilerErrors).Concat(failureDiagnostics))
                 {

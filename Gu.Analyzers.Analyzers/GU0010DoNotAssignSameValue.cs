@@ -16,14 +16,14 @@
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            DiagnosticId,
-            Title,
-            MessageFormat,
-            AnalyzerCategory.Correctness,
-            DiagnosticSeverity.Error,
-            AnalyzerConstants.EnabledByDefault,
-            Description,
-            HelpLink);
+            id: DiagnosticId,
+            title: Title,
+            messageFormat: MessageFormat,
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Error,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: Description,
+            helpLinkUri: HelpLink);
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

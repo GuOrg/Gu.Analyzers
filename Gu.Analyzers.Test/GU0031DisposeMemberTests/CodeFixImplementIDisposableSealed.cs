@@ -190,12 +190,12 @@ public sealed class Foo : IDisposable
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
                 ImmutableArray.Create(
                     new DiagnosticDescriptor(
-                        "CS0535",
-                        string.Empty,
-                        "'Foo' does not implement interface member 'IDisposable.Dispose()'",
-                        string.Empty,
-                        DiagnosticSeverity.Error,
-                        false));
+                        id: "CS0535",
+                        title: string.Empty,
+                        messageFormat: "'Foo' does not implement interface member 'IDisposable.Dispose()'",
+                        category: string.Empty,
+                        defaultSeverity: DiagnosticSeverity.Error,
+                        isEnabledByDefault: false));
 
             public override void Initialize(AnalysisContext context)
             {

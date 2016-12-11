@@ -33,6 +33,8 @@ namespace Gu.Analyzers.Test
             this.UseTabs = DefaultUseTabs;
         }
 
+        protected internal static DiagnosticResult[] EmptyDiagnosticResults { get; } = { };
+
         /// <summary>
         /// Gets or sets the value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.IndentationSize"/> to apply to the test
         /// workspace.
@@ -70,8 +72,6 @@ namespace Gu.Analyzers.Test
             get;
             protected set;
         }
-
-        protected internal static DiagnosticResult[] EmptyDiagnosticResults { get; } = { };
 
         public static FileLinePositionSpan GetErrorPosition(string[] testCode)
         {

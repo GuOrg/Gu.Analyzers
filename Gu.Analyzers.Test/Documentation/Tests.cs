@@ -119,13 +119,13 @@
         public void DumpStub()
         {
             var stub = CreateStub(
-                "WPF0041",
-                "Avoid side effects in CLR accessor.",
-                DiagnosticSeverity.Warning,
-                "https://github.com/JohanLarsson/Gu.Analyzers",
-                AnalyzerCategory.Correctness,
-                "AvoidSideEffectsInClrAccessor.",
-                "Bindings do not call accessor when updating value. Use callbacks.");
+                id: "WPF0041",
+                title: "Avoid side effects in CLR accessor.",
+                severity: DiagnosticSeverity.Warning,
+                codeFileUrl: "https://github.com/JohanLarsson/Gu.Analyzers",
+                category: AnalyzerCategory.Correctness,
+                typeName: "AvoidSideEffectsInClrAccessor.",
+                description: "Bindings do not call accessor when updating value. Use callbacks.");
 
             File.WriteAllText(Path.Combine(DocumentsDirectory, "Generated.md"), stub);
             Console.Write(stub);
@@ -135,13 +135,13 @@
         {
             var descriptor = descriptorInfo.DiagnosticDescriptor;
             return CreateStub(
-                descriptor.Id,
-                descriptor.Title.ToString(),
-                descriptor.DefaultSeverity,
-                descriptorInfo.CodeFileUri,
-                descriptor.Category,
-                descriptorInfo.DiagnosticAnalyzer.GetType().Name,
-                descriptor.Description.ToString());
+                id: descriptor.Id,
+                title: descriptor.Title.ToString(),
+                severity: descriptor.DefaultSeverity,
+                codeFileUrl: descriptorInfo.CodeFileUri,
+                category: descriptor.Category,
+                typeName: descriptorInfo.DiagnosticAnalyzer.GetType().Name,
+                description: descriptor.Description.ToString());
         }
 
         private static string CreateStub(
@@ -208,15 +208,15 @@
 
             public DiagnosticAnalyzer DiagnosticAnalyzer { get; }
 
-            public bool DocExists => File.Exists(this.DocFileName);
-
-            public DiagnosticDescriptor DiagnosticDescriptor => this.DiagnosticAnalyzer.SupportedDiagnostics.Single();
-
             public string DocFileName { get; }
 
             public string CodeFileName { get; }
 
             public string CodeFileUri { get; }
+
+            public bool DocExists => File.Exists(this.DocFileName);
+
+            public DiagnosticDescriptor DiagnosticDescriptor => this.DiagnosticAnalyzer.SupportedDiagnostics.Single();
 
             public static DescriptorInfo Create(DiagnosticAnalyzer analyzer) => new DescriptorInfo(analyzer);
 
