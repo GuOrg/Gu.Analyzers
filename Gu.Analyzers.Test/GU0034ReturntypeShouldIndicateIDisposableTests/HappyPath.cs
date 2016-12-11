@@ -1,6 +1,5 @@
 namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
 {
-    using System;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
