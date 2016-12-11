@@ -11,9 +11,9 @@
     internal class GU0011DontIgnoreReturnValue : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0011";
-        private const string Title = "Don't ignore returnvalue.";
+        private const string Title = "Don't ignore the returnvalue.";
         private const string MessageFormat = "Don't ignore returnvalue.";
-        private const string Description = "Don't ignore returnvalue.";
+        private const string Description = "Don't ignore the returnvalue.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -106,8 +106,18 @@
                 {
                     using (var walker = ReturnExpressionsWalker.Create(declaration))
                     {
-                        if (symbol.IsStatic)
+                        if (symbol.IsExtensionMethod)
                         {
+                            var identifier = declaration.ParameterList.Parameters[0].Identifier;
+                            foreach (var returnValue in walker.ReturnValues)
+                            {
+                                if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
+                                {
+                                    return false;
+                                }
+                            }
+
+                            return true;
                         }
                         else
                         {

@@ -144,6 +144,30 @@ public class Foo
         }
 
         [Test]
+        public async Task WhenExtensionMethodReturningThis()
+        {
+            var barCode = @"
+internal static class Bar
+{
+    internal static T Id<T>(this T value)
+    {
+        return value;
+    }
+}";
+            var testCode = @"
+public class Foo
+{
+    private Foo()
+    {
+        var meh =1;
+        meh.Id();
+    }
+}";
+            await this.VerifyHappyPathAsync(barCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenThrowing()
         {
             var testCode = @"
