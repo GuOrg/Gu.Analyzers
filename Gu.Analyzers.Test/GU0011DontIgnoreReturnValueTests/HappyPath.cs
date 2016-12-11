@@ -108,5 +108,34 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task WhenInvokactionInExpressionBody()
+        {
+            var testCode = @"
+public class Foo
+{
+    public Foo Bar()
+    {
+        return this;
+    }
+
+    public void Meh() => Bar();
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenNewInExpressionBody()
+        {
+            var testCode = @"
+public class Foo
+{
+    public void Meh() => new Foo();
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
