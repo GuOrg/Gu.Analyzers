@@ -85,6 +85,48 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
         }
 
         [Test]
+        public async Task ChainedConstructorSettingAllFields()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly int a;
+        private readonly int b;
+        
+        public Foo()
+            : this(1, 2)
+        {
+        }
+     
+        private Foo(int a, int b)
+        {
+            this.a = a;
+            this.b = b;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenNoUninitializedFields()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly int a = 1;
+        
+        public Foo()
+        {
+        }
+     
+        public int A => a;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task StaticConstructorSettingFields()
         {
             var testCode = @"

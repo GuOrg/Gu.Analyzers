@@ -44,6 +44,11 @@
         private static void HandleConstructor(SyntaxNodeAnalysisContext context)
         {
             var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
+            var ctor = (IMethodSymbol)context.ContainingSymbol;
+            if (ctor.DeclaredAccessibility == Accessibility.Private)
+            {
+                return;
+            }
 
             using (var walker = CtorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
             {
