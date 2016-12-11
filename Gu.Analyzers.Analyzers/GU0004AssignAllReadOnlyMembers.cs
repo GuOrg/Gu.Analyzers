@@ -6,6 +6,7 @@
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -45,7 +46,7 @@
         {
             var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
             var ctor = (IMethodSymbol)context.ContainingSymbol;
-            if (ctor.DeclaredAccessibility == Accessibility.Private)
+            if (!ctor.IsStatic && ctor.DeclaredAccessibility == Accessibility.Private)
             {
                 return;
             }
@@ -65,6 +66,9 @@
 
             private readonly List<string> readOnlies = new List<string>();
 
+            private SemanticModel semanticModel;
+            private CancellationToken cancellationToken;
+
             private CtorWalker()
             {
             }
@@ -80,6 +84,8 @@
                 }
 
                 walker.readOnlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
                 walker.Visit(constructor);
                 return walker;
             }
@@ -89,15 +95,30 @@
                 IdentifierNameSyntax left;
                 if (TryGetIdentifier(node.Left, out left))
                 {
-                    this.readOnlies.Remove(left.Identifier.ValueText);
+                    this.readOnlies.Remove(left.Identifier.ValueText).IgnoreReturnValue();
                 }
 
                 base.VisitAssignmentExpression(node);
             }
 
+            public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
+            {
+                var ctor = this.semanticModel.GetSymbolInfo(node, this.cancellationToken)
+                                 .Symbol;
+                ConstructorDeclarationSyntax declaration;
+                if (ctor.TryGetSingleDeclaration(this.cancellationToken, out declaration))
+                {
+                    this.Visit(declaration);
+                }
+
+                base.VisitConstructorInitializer(node);
+            }
+
             public void Dispose()
             {
                 this.readOnlies.Clear();
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
                 Cache.Enqueue(this);
             }
 
@@ -125,7 +146,7 @@
                     }
 
                     var propertyDeclarationSyntax = member as PropertyDeclarationSyntax;
-                    if (propertyDeclarationSyntax != null)
+                    if (propertyDeclarationSyntax != null && propertyDeclarationSyntax.ExpressionBody == null)
                     {
                         var symbol = semanticModel.GetDeclaredSymbol(propertyDeclarationSyntax, cancellationToken);
                         if (symbol.IsReadOnly && symbol.IsStatic == isStatic && propertyDeclarationSyntax.Initializer == null)

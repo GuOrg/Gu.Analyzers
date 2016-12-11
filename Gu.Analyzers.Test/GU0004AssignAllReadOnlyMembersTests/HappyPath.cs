@@ -147,6 +147,26 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
         }
 
         [Test]
+        public async Task StaticConstructorSettingUninitializedField()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public static readonly int A;
+
+        public static readonly int B = 2;
+
+        static Foo()
+        {
+            A = 1;
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ConstructorSettingReadonlyFieldIgnoringMutable()
         {
             var testCode = @"
