@@ -58,8 +58,8 @@
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposable.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposable.cs" />
-    <Compile Include="Helpers\ConstructorWalker.cs" />
-    <Compile Include="Helpers\AssignmentWalker.cs" />
+    <Compile Include="Helpers\Walkers\ConstructorWalker.cs" />
+    <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\KnownSymbols\Disposable.cs" />
@@ -90,6 +90,9 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\VariableDeclaratorSyntaxExt.cs" />
+    <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
+    <Compile Include="Helpers\Walkers\ReturnExpressionsWalker.cs" />
+    <Compile Include="Helpers\Walkers\InvocationWalker.cs" />
     <Compile Include="HelpLink.cs" />
     <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedType.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\MethodDeclarationSyntaxExt.cs" />
@@ -98,6 +101,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="paket.references" />
     <None Include="Gu.Analyzers.Analyzers.ruleset" />
   </ItemGroup>
@@ -106,6 +110,8 @@
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
   </ItemGroup>
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">

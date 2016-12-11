@@ -54,12 +54,30 @@ public class Foo
 using System.Text;
 public class Foo
 {
-    private int value;
-
     public void Bar()
     {
         var sb = new StringBuilder();
         sb.AppendLine(""test"");
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenReturningThis()
+        {
+            var testCode = @"
+public class Foo
+{
+    public Foo Bar()
+    {
+        return this;
+    }
+
+    public void Meh()
+    {
+        Bar();
     }
 }";
             await this.VerifyHappyPathAsync(testCode)

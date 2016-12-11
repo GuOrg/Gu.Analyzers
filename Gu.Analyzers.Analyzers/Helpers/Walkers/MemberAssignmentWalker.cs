@@ -9,26 +9,26 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignmentWalker : CSharpSyntaxWalker, IDisposable
+    internal sealed class MemberAssignmentWalker : CSharpSyntaxWalker, IDisposable
     {
-        private static readonly ConcurrentQueue<AssignmentWalker> Cache = new ConcurrentQueue<AssignmentWalker>();
+        private static readonly ConcurrentQueue<MemberAssignmentWalker> Cache = new ConcurrentQueue<MemberAssignmentWalker>();
         private readonly List<ExpressionSyntax> assignments = new List<ExpressionSyntax>();
         private ISymbol symbol;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
-        private AssignmentWalker()
+        private MemberAssignmentWalker()
         {
         }
 
         public IReadOnlyList<ExpressionSyntax> Assignments => this.assignments;
 
-        public static AssignmentWalker Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static MemberAssignmentWalker Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(property, semanticModel, cancellationToken);
         }
 
-        public static AssignmentWalker Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static MemberAssignmentWalker Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(field, semanticModel, cancellationToken);
         }
@@ -77,12 +77,12 @@
             Cache.Enqueue(this);
         }
 
-        private static AssignmentWalker CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static MemberAssignmentWalker CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            AssignmentWalker walker;
+            MemberAssignmentWalker walker;
             if (!Cache.TryDequeue(out walker))
             {
-                walker = new AssignmentWalker();
+                walker = new MemberAssignmentWalker();
             }
 
             walker.assignments.Clear();

@@ -70,13 +70,38 @@
                 return true;
             }
 
-            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation)
+            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
                                        .Symbol;
             if (symbol == KnownSymbol.StringBuilder.AppendLine ||
                 symbol == KnownSymbol.StringBuilder.Append)
             {
                 return true;
             }
+
+            MethodDeclarationSyntax declaration;
+            if (symbol.TryGetSingleDeclaration(cancellationToken, out declaration))
+            {
+                using (var walker = ReturnExpressionsWalker.Create(declaration))
+                {
+                    if (symbol.IsStatic)
+                    {
+                        
+                    }
+                    else
+                    {
+                        foreach (var returnValue in walker.ReturnValues)
+                        {
+                            if (!returnValue.IsKind(SyntaxKind.ThisExpression))
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+            }
+
             return symbol.ReturnsVoid;
         }
 

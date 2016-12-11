@@ -105,6 +105,7 @@
     <Compile Include="Verifiers\Helpers\TestXmlReferenceResolver.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="paket.references" />
     <None Include="Gu.Analyzers.Test.ruleset" />
   </ItemGroup>
@@ -153,6 +154,8 @@
     </Analyzer>
   </ItemGroup>
   <ItemGroup>
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
+    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>

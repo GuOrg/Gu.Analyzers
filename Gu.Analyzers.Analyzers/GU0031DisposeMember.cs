@@ -49,7 +49,7 @@
                 return;
             }
 
-            using (var walker = AssignmentWalker.Create(field, context.SemanticModel, context.CancellationToken))
+            using (var walker = MemberAssignmentWalker.Create(field, context.SemanticModel, context.CancellationToken))
             {
                 if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
                 {
@@ -62,7 +62,7 @@
                     if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                     {
                         var property = context.SemanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
-                        using (var propertyWalker = AssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
+                        using (var propertyWalker = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
                         {
                             if (IsAnyADisposableCreation(propertyWalker.Assignments, context.SemanticModel, context.CancellationToken))
                             {
@@ -97,7 +97,7 @@
                 return;
             }
 
-            using (var walker = AssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
+            using (var walker = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
             {
                 if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
                 {

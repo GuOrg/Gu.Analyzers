@@ -6,24 +6,21 @@ namespace Gu.Analyzers
     using System.Linq;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class BlockSyntaxExt
     {
         internal static bool TryGetReturnExpression(this BlockSyntax body, out ExpressionSyntax returnValue)
         {
-            using (var walker = ReturnWalker.Create(body))
+            using (var walker = ReturnExpressionsWalker.Create(body))
             {
-                if (walker.ReturnStatements.Count > 1)
+                if (walker.ReturnValues.Count > 1)
                 {
                     returnValue = null;
                     return false;
                 }
 
-                returnValue = walker.ReturnStatements.SingleOrDefault()
-                               ?.Expression;
-                return returnValue != null;
+                return walker.ReturnValues.TryGetSingle(out returnValue);
             }
         }
 
@@ -61,117 +58,6 @@ namespace Gu.Analyzers
             }
 
             return false;
-        }
-
-        internal sealed class ReturnWalker : CSharpSyntaxWalker, IDisposable
-        {
-            private static readonly ConcurrentQueue<ReturnWalker> Cache = new ConcurrentQueue<ReturnWalker>();
-            private readonly List<ReturnStatementSyntax> returnStatements = new List<ReturnStatementSyntax>();
-
-            private ReturnWalker()
-            {
-            }
-
-            public IReadOnlyList<ReturnStatementSyntax> ReturnStatements => this.returnStatements;
-
-            public static ReturnWalker Create(BlockSyntax block)
-            {
-                ReturnWalker walker;
-                if (!Cache.TryDequeue(out walker))
-                {
-                    walker = new ReturnWalker();
-                }
-
-                walker.returnStatements.Clear();
-                walker.Visit(block);
-                return walker;
-            }
-
-            public override void VisitReturnStatement(ReturnStatementSyntax node)
-            {
-                this.returnStatements.Add(node);
-                base.VisitReturnStatement(node);
-            }
-
-            public void Dispose()
-            {
-                this.returnStatements.Clear();
-                Cache.Enqueue(this);
-            }
-        }
-
-        internal sealed class AssignmentWalker : CSharpSyntaxWalker, IDisposable
-        {
-            private static readonly ConcurrentQueue<AssignmentWalker> Cache = new ConcurrentQueue<AssignmentWalker>();
-            private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
-
-            private AssignmentWalker()
-            {
-            }
-
-            public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
-
-            public static AssignmentWalker Create(BlockSyntax block)
-            {
-                AssignmentWalker walker;
-                if (!Cache.TryDequeue(out walker))
-                {
-                    walker = new AssignmentWalker();
-                }
-
-                walker.assignments.Clear();
-                walker.Visit(block);
-                return walker;
-            }
-
-            public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
-            {
-                this.assignments.Add(node);
-                base.VisitAssignmentExpression(node);
-            }
-
-            public void Dispose()
-            {
-                this.assignments.Clear();
-                Cache.Enqueue(this);
-            }
-        }
-
-        internal sealed class InvocationWalker : CSharpSyntaxWalker, IDisposable
-        {
-            private static readonly ConcurrentQueue<InvocationWalker> Cache = new ConcurrentQueue<InvocationWalker>();
-            private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
-
-            private InvocationWalker()
-            {
-            }
-
-            public IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
-
-            public static InvocationWalker Create(BlockSyntax block)
-            {
-                InvocationWalker walker;
-                if (!Cache.TryDequeue(out walker))
-                {
-                    walker = new InvocationWalker();
-                }
-
-                walker.invocations.Clear();
-                walker.Visit(block);
-                return walker;
-            }
-
-            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-            {
-                this.invocations.Add(node);
-                base.VisitInvocationExpression(node);
-            }
-
-            public void Dispose()
-            {
-                this.invocations.Clear();
-                Cache.Enqueue(this);
-            }
         }
     }
 }
