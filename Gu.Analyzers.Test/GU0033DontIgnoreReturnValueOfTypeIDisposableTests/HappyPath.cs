@@ -121,15 +121,36 @@ public class Foo
             var testCode = @"
 using System;
 using System.Threading.Tasks;
-
 public class Foo
 {
     public void Meh()
     {
         this.Bar(() => Task.Delay(0));
     }
-
     public void Bar(Func<Task> func)
+    {
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodWithFuncStreamAsParameter()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        this.Bar(() => File.OpenRead(""""));
+    }
+
+    public void Bar(Func<Stream> func)
     {
     }
 }";

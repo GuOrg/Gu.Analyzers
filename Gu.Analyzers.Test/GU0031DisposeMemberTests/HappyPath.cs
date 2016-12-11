@@ -370,5 +370,33 @@ class Goof : IDisposable {
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoreTask()
+        {
+            var testCode = @"
+    using System.Threading.Tasks;
+
+    public sealed class Foo
+    {
+        private readonly Task stream = Task.Delay(0);
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreTaskOfInt()
+        {
+            var testCode = @"
+    using System.Threading.Tasks;
+
+    public sealed class Foo
+    {
+        private readonly Task<int> stream = Task.FromResult(0);
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

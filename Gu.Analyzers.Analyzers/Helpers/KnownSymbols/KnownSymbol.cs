@@ -13,6 +13,9 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ArgumentOutOfRangeException = Create("System.ArgumentOutOfRangeException");
 
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
+
+        internal static readonly QualifiedType Task = new QualifiedType("System.Threading.Tasks.Task");
+
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
 

@@ -112,6 +112,12 @@ namespace Gu.Analyzers
                 return false;
             }
 
+            // https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
+            if (type == KnownSymbol.Task)
+            {
+                return false;
+            }
+
             ITypeSymbol _;
             return type == KnownSymbol.IDisposable ||
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
