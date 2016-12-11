@@ -114,5 +114,28 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task MatehodWithFuncTaskAsParameter()
+        {
+            var testCode = @"
+using System;
+using System.Threading.Tasks;
+
+public class Foo
+{
+    public void Meh()
+    {
+        this.Bar(() => Task.Delay(0));
+    }
+
+    public void Bar(Func<Task> func)
+    {
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

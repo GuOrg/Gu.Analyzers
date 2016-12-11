@@ -46,7 +46,7 @@
                 return;
             }
 
-            if (IsIgnored(objectCreation))
+            if (MustBeHandled(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -72,14 +72,19 @@
                 return;
             }
 
-            if (IsIgnored(invocation))
+            if (MustBeHandled(invocation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
         }
 
-        private static bool IsIgnored(SyntaxNode node)
+        private static bool MustBeHandled(SyntaxNode node)
         {
+            if (node.Parent is AnonymousFunctionExpressionSyntax)
+            {
+                return false;
+            }
+
             if (node.Parent is StatementSyntax)
             {
                 return !(node.Parent is ReturnStatementSyntax);
