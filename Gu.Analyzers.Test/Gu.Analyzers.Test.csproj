@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttributeTests.cs" />
+    <Compile Include="GU0011DontIgnoreReturnValueTests\Diagnostics.cs" />
+    <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.cs" />
     <Compile Include="GU0008AvoidRelayPropertiesTests\CodeFix.cs" />
     <Compile Include="GU0008AvoidRelayPropertiesTests\HappyPath.cs" />
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />

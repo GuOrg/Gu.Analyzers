@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -51,7 +52,7 @@
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
             var invocation = (InvocationExpressionSyntax)context.Node;
-            if (invocation == null || CanIgnore(invocation))
+            if (invocation == null || CanIgnore(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -62,10 +63,21 @@
             }
         }
 
-        private static bool CanIgnore(InvocationExpressionSyntax invocation)
+        private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            // Returning self should be allowed like StringBuilder.Write()
-            return false;
+            if (!(invocation.Parent is StatementSyntax))
+            {
+                return true;
+            }
+
+            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation)
+                                       .Symbol;
+            if (symbol == KnownSymbol.StringBuilder.AppendLine ||
+                symbol == KnownSymbol.StringBuilder.Append)
+            {
+                return true;
+            }
+            return symbol.ReturnsVoid;
         }
 
         private static bool IsIgnored(SyntaxNode node)

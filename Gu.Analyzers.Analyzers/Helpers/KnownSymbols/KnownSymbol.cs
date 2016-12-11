@@ -1,9 +1,10 @@
 // ReSharper disable InconsistentNaming
+// ReSharper disable UnusedMember.Global
 namespace Gu.Analyzers
 {
     internal static class KnownSymbol
     {
-        ////internal static readonly QualifiedType Object = Create("System.Object");
+        internal static readonly QualifiedType Object = Create("System.Object");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly DisposableType IDisposable = new DisposableType();
@@ -11,6 +12,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ArgumentNullException = Create("System.ArgumentNullException");
         internal static readonly QualifiedType ArgumentOutOfRangeException = Create("System.ArgumentOutOfRangeException");
 
+        internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
 
