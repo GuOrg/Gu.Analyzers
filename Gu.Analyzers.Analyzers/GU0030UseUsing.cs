@@ -74,12 +74,6 @@
                         return;
                     }
 
-                    if (variableDeclaration.Parent is ObjectCreationExpressionSyntax)
-                    {
-                        var parentSymbol = context.SemanticModel.GetSymbolInfo(variableDeclaration.Parent, context.CancellationToken);
-
-                    }
-
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
             }

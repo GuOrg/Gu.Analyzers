@@ -1,6 +1,5 @@
 namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
-    using System.IO;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
