@@ -12,7 +12,7 @@
     {
         public const string DiagnosticId = "GU0011";
         private const string Title = "Don't ignore the returnvalue.";
-        private const string MessageFormat = "Don't ignore returnvalue.";
+        private const string MessageFormat = "Don't ignore the returnvalue.";
         private const string Description = "Don't ignore the returnvalue.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
@@ -95,8 +95,6 @@
             if (invocation.Parent is ExpressionStatementSyntax &&
                 invocation.Parent.Parent is BlockSyntax)
             {
-
-
                 if (symbol == KnownSymbol.StringBuilder.Append ||
                     symbol == KnownSymbol.StringBuilder.AppendLine ||
                     symbol == KnownSymbol.StringBuilder.AppendFormat)

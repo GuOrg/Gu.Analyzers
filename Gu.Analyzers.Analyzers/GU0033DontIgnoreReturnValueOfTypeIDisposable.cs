@@ -60,6 +60,13 @@
                 return;
             }
 
+            var symbol = (IMethodSymbol)context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken)
+                                               .Symbol;
+            if (symbol == null || symbol.ReturnsVoid)
+            {
+                return;
+            }
+
             if (!Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;

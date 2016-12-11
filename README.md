@@ -45,7 +45,7 @@
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0011.md">GU0011</a></td>
-  <td>Don't ignore returnvalue.</td>
+  <td>Don't ignore the returnvalue.</td>
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>

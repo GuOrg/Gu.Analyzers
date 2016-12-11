@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
@@ -24,6 +25,9 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
+
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                             .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
@@ -34,34 +38,74 @@
 
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
                 var objectCreation = node as ObjectCreationExpressionSyntax;
-                if (objectCreation == null)
+                if (objectCreation != null)
                 {
-                    continue;
+                    var type = (ITypeSymbol)semanticModel.GetSymbolInfo(objectCreation)
+                                                              .Symbol.ContainingSymbol;
+                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
+                                                       .WithType(SyntaxFactory.ParseTypeName(type.Name));
+                    switch (GU0007PreferInjecting.CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
+                    {
+                        case GU0007PreferInjecting.Injectable.No:
+                            continue;
+                        case GU0007PreferInjecting.Injectable.Safe:
+                            context.RegisterCodeFix(
+                                CodeAction.Create(
+                                    "Inject",
+                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, objectCreation, parameterSyntax),
+                                    nameof(InjectCodeFixProvider)),
+                                diagnostic);
+                            break;
+                        case GU0007PreferInjecting.Injectable.Unsafe:
+                            context.RegisterCodeFix(
+                                CodeAction.Create(
+                                    "Inject UNSAFE",
+                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, objectCreation, parameterSyntax),
+                                    nameof(InjectCodeFixProvider)),
+                                diagnostic);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
 
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Inject",
-                        cancellationToken => ApplyFixAsync(context, syntaxRoot, objectCreation),
-                        nameof(InjectCodeFixProvider)),
-                    diagnostic);
+                var memberAccess = node as MemberAccessExpressionSyntax;
+                if (memberAccess != null)
+                {
+                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolInfo(memberAccess).Symbol);
+                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
+                                                       .WithType(SyntaxFactory.ParseTypeName(type.Name));
+                    switch (GU0007PreferInjecting.IsInjectable(memberAccess, memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
+                    {
+                        case GU0007PreferInjecting.Injectable.No:
+                            continue;
+                        case GU0007PreferInjecting.Injectable.Safe:
+                        case GU0007PreferInjecting.Injectable.Unsafe:
+                            context.RegisterCodeFix(
+                                CodeAction.Create(
+                                    "Inject UNSAFE",
+                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, memberAccess, parameterSyntax),
+                                    nameof(InjectCodeFixProvider)),
+                                diagnostic);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ObjectCreationExpressionSyntax objectCreation)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ExpressionSyntax objectCreation, ParameterSyntax parameterSyntax)
         {
             var ctor = objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(objectCreation)))
-                                               .WithType(objectCreation.Type);
             var updated = ctor.ReplaceNode(objectCreation, SyntaxFactory.IdentifierName(parameterSyntax.Identifier));
             updated = updated.WithParameterList(ctor.ParameterList.AddParameters(parameterSyntax));
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(ctor, updated)));
         }
 
-        private static string Parametername(ObjectCreationExpressionSyntax objectCreation)
+        private static string Parametername(ITypeSymbol type)
         {
-            var type = (IdentifierNameSyntax)objectCreation.Type;
-            var typeName = type.Identifier.ValueText;
+            var typeName = type.Name;
             if (char.IsUpper(typeName[0]))
             {
                 return new string(char.ToLower(typeName[0]), 1) + typeName.Substring(1);

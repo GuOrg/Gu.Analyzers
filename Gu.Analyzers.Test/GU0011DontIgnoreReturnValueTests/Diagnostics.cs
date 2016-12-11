@@ -23,7 +23,7 @@ class Foo
             testCode = testCode.AssertReplace("ints.Select(x => x);", linq);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore returnvalue.");
+                               .WithMessage("Don't ignore the returnvalue.");
             await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected).ConfigureAwait(false);
         }
 
@@ -44,7 +44,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore returnvalue.");
+                               .WithMessage("Don't ignore the returnvalue.");
             await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected).ConfigureAwait(false);
         }
     }

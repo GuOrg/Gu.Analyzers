@@ -92,7 +92,7 @@ namespace Gu.Analyzers.Test
             var projects = new HashSet<Project>();
             foreach (var document in documents)
             {
-                projects.Add(document.Project);
+                projects.Add(document.Project).IgnoreReturnValue();
             }
 
             var diagnostics = ImmutableArray.CreateBuilder<Diagnostic>();
