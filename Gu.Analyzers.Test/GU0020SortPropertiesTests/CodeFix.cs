@@ -30,16 +30,16 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 12, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 14, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             var expected3 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             var expected4 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2, expected3, expected4 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -88,10 +88,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 16, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -140,16 +140,16 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 12, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 14, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             var expected3 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             var expected4 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2, expected3, expected4 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -204,10 +204,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 19, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 24, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -255,10 +255,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 9, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 11, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -299,10 +299,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 9, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 17, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -365,10 +365,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                .WithLocation("Foo.cs", 10, 9)
-                               .WithMessage("Sort properties.");
+                               .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 23, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -426,10 +426,10 @@
     }";
             var expected1 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 10, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 12, 9)
-                                .WithMessage("Sort properties.");
+                                .WithMessage("Move property.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
