@@ -20,7 +20,7 @@
             title: Title,
             messageFormat: MessageFormat,
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: Description,
             helpLinkUri: HelpLink);
