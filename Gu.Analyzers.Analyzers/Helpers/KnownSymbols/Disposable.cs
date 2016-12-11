@@ -96,7 +96,8 @@ namespace Gu.Analyzers
             if (local != null)
             {
                 VariableDeclaratorSyntax variable;
-                if (local.TryGetSingleDeclaration(cancellationToken, out variable))
+                if (local.TryGetSingleDeclaration(cancellationToken, out variable) &&
+                    variable.Initializer != null)
                 {
                     return IsCreation(variable.Initializer.Value, semanticModel, cancellationToken);
                 }

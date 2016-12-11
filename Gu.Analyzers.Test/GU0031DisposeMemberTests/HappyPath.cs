@@ -398,5 +398,44 @@ class Goof : IDisposable {
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task FieldOfTypeArrayOfInt()
+        {
+            var testCode = @"
+    public sealed class Foo
+    {
+        private readonly int[] ints = new[] { 1, 2, 3 };
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PropertyWithBackingFieldOfTypeArrayOfInt()
+        {
+            var testCode = @"
+    public sealed class Foo
+    {
+        private int[] ints;
+
+        public int[] Ints
+        {
+            get
+            {
+                return this.ints ?? (this.ints = new int[] { });
+            }
+
+            set
+            {
+                this.ints = value;
+            }
+        }
+
+        public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

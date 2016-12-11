@@ -124,7 +124,9 @@
 
             private static IEnumerable<string> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var isStatic = semanticModel.GetDeclaredSymbol(ctor, cancellationToken).IsStatic;
+                var isStatic = semanticModel.SemanticModelFor(ctor)
+                                            .GetDeclaredSymbol(ctor, cancellationToken)
+                                            .IsStatic;
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
@@ -135,7 +137,8 @@
                         VariableDeclaratorSyntax variable;
                         if (declaration.Variables.TryGetSingle(out variable))
                         {
-                            var symbol = (IFieldSymbol)semanticModel.GetDeclaredSymbol(variable, cancellationToken);
+                            var symbol = (IFieldSymbol) semanticModel.SemanticModelFor(variable)
+                                                                     .GetDeclaredSymbol(variable, cancellationToken);
                             if (symbol.IsReadOnly && symbol.IsStatic == isStatic && variable.Initializer == null)
                             {
                                 yield return fieldDeclarationSyntax.Identifier().ValueText;
@@ -148,7 +151,8 @@
                     var propertyDeclarationSyntax = member as PropertyDeclarationSyntax;
                     if (propertyDeclarationSyntax != null && propertyDeclarationSyntax.ExpressionBody == null)
                     {
-                        var symbol = semanticModel.GetDeclaredSymbol(propertyDeclarationSyntax, cancellationToken);
+                        var symbol = semanticModel.SemanticModelFor(propertyDeclarationSyntax)
+                                                  .GetDeclaredSymbol(propertyDeclarationSyntax, cancellationToken);
                         if (symbol.IsReadOnly && symbol.IsStatic == isStatic && propertyDeclarationSyntax.Initializer == null)
                         {
                             yield return propertyDeclarationSyntax.Identifier().ValueText;
