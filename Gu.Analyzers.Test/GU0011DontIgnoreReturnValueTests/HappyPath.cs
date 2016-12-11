@@ -90,6 +90,40 @@ public class Foo
         }
 
         [Test]
+        public async Task StringBuilderAppend()
+        {
+            var testCode = @"
+using System.Text;
+public class Foo
+{
+    public void Bar()
+    {
+        var sb = new StringBuilder();
+        sb.Append(""test"");
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task StringBuilderAppendChained()
+        {
+            var testCode = @"
+using System.Text;
+public class Foo
+{
+    public void Bar()
+    {
+        var sb = new StringBuilder();
+        sb.Append(""1"").Append(""2"");
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenReturningThis()
         {
             var testCode = @"

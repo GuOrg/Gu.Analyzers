@@ -9,6 +9,12 @@
         internal static bool TryGetSingleDeclaration<T>(this ISymbol symbol, CancellationToken cancellationToken, out T declaration)
             where T : SyntaxNode
         {
+            declaration = null;
+            if (symbol == null)
+            {
+                return false;
+            }
+
             SyntaxReference syntaxReference;
             if (symbol.DeclaringSyntaxReferences.TryGetSingle(out syntaxReference))
             {
@@ -16,7 +22,6 @@
                 return declaration != null;
             }
 
-            declaration = null;
             return false;
         }
 

@@ -89,7 +89,12 @@
                 invocation.Parent.Parent is BlockSyntax)
             {
                 var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
-                           .Symbol;
+                                                          .Symbol;
+                if (symbol == null)
+                {
+                    return true;
+                }
+
                 if (symbol == KnownSymbol.StringBuilder.AppendLine ||
                     symbol == KnownSymbol.StringBuilder.Append)
                 {
