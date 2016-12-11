@@ -91,7 +91,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PublicApiTests.cs" />
-    <Compile Include="Sandbox\Walker.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.cs" />
     <Compile Include="Verifiers\CodeFixVerifier.Helper.cs" />
     <Compile Include="Verifiers\CodeFixVerifier{TAnalyzer,TCodeFix}.cs" />
@@ -137,7 +136,9 @@
   <ItemGroup>
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Sandbox\" />
+  </ItemGroup>
   <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">

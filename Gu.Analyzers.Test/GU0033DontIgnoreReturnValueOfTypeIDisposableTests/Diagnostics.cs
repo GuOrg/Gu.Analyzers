@@ -85,48 +85,6 @@ public sealed class Foo
         }
 
         [Test]
-        public async Task FactoryMethodNewDisposableCached()
-        {
-            var disposableCode = @"
-using System;
-
-class Disposable : IDisposable
-{
-    public void Dispose()
-	{
-	}
-}";
-
-            var testCode = @"
-using System.Collections.Concurrent;
-
-public sealed class Foo
-{
-    private static readonly ConcurrentQueue<Disposable> Cache = new ConcurrentQueue<Disposable>();
-
-    public void Meh()
-    {
-        ↓Create();
-    }
-
-    private static Disposable Create()
-    {
-        Disposable disposable;
-        if (!Cache.TryDequeue(out disposable))
-        {
-            disposable = new Disposable();
-        }
-
-        return disposable;
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        [Test]
         public async Task IgnoringFileOpenReadPassedIntoCtor()
         {
             var testCode = @"
