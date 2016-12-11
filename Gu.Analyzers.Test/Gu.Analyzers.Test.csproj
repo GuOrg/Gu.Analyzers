@@ -137,10 +137,6 @@
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
-    <Analyzer Include="..\packages\Gu.Analyzers.0.1.9.3-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Sandbox\" />
   </ItemGroup>
   <Import Project="..\.paket\paket.targets" />
