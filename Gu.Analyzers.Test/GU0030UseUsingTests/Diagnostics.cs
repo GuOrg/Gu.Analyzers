@@ -16,7 +16,7 @@
     {
         public long Bar()
         {
-            ↓var stream = File.OpenRead("""");
+            ↓var stream = File.OpenRead(string.Empty);
             return stream.Length;
         }
     }";
@@ -71,7 +71,7 @@
 
         public static Stream GetStream()
         {
-            return File.OpenRead("""");
+            return File.OpenRead(string.Empty);
         }
     }";
             var expected = this.CSharpDiagnostic()
@@ -96,7 +96,7 @@
 
         public static Stream GetStream()
         {
-            var stream = File.OpenRead("""");
+            var stream = File.OpenRead(string.Empty);
             return stream;
         }
     }";
@@ -120,7 +120,7 @@
             return stream.Length;
         }
 
-        public static Stream GetStream() => File.OpenRead("""");
+        public static Stream GetStream() => File.OpenRead(string.Empty);
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -138,7 +138,7 @@
     {
         public static Stream Stream 
         {
-           get { return File.OpenRead(""""); }
+           get { return File.OpenRead(string.Empty); }
         }
 
         public static long Bar()
@@ -165,7 +165,7 @@
         {
            get
            {
-               var stream = File.OpenRead("""");
+               var stream = File.OpenRead(string.Empty);
                return stream;
            }
         }
@@ -190,7 +190,7 @@
 
     public static class Foo
     {
-        public static Stream Stream => File.OpenRead("""");
+        public static Stream Stream => File.OpenRead(string.Empty);
 
         public static long Bar()
         {

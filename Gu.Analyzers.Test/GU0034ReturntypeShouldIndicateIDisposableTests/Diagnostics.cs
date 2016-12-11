@@ -17,7 +17,7 @@ public sealed class Foo
 {
     public object Meh()
     {
-        return ↓File.OpenRead("""");
+        return ↓File.OpenRead(string.Empty);
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -35,7 +35,7 @@ using System.IO;
 
 public sealed class Foo
 {
-    public object Meh() => ↓File.OpenRead("""");
+    public object Meh() => ↓File.OpenRead(string.Empty);
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -52,7 +52,7 @@ using System.IO;
 
 public sealed class Foo
 {
-    public object Meh => ↓File.OpenRead("""");
+    public object Meh => ↓File.OpenRead(string.Empty);
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)

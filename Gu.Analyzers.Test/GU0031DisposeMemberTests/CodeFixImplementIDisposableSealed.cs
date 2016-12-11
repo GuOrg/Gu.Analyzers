@@ -23,7 +23,7 @@ using System.IO;
 
 public class Foo
 {
-    ↓private readonly Stream stream = File.OpenRead("""");
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
 }";
             var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
@@ -37,7 +37,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream = File.OpenRead("""");
+    private readonly Stream stream = File.OpenRead(string.Empty);
 
     public void Dispose()
     {

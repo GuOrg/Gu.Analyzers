@@ -137,7 +137,7 @@
                         VariableDeclaratorSyntax variable;
                         if (declaration.Variables.TryGetSingle(out variable))
                         {
-                            var symbol = (IFieldSymbol) semanticModel.SemanticModelFor(variable)
+                            var symbol = (IFieldSymbol)semanticModel.SemanticModelFor(variable)
                                                                      .GetDeclaredSymbol(variable, cancellationToken);
                             if (symbol.IsReadOnly && symbol.IsStatic == isStatic && variable.Initializer == null)
                             {

@@ -66,7 +66,7 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
     {
         public Stream Bar()
         {
-            return File.OpenRead("""");
+            return File.OpenRead(string.Empty);
         }
     }";
             await this.VerifyHappyPathAsync(testCode)
@@ -83,7 +83,7 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
     {
         public StreamReader Bar()
         {
-            return new StreamReader(File.OpenRead(""""));
+            return new StreamReader(File.OpenRead(string.Empty));
         }
     }";
             await this.VerifyHappyPathAsync(testCode)
@@ -147,7 +147,7 @@ public class Foo
 {
     public void Meh()
     {
-        this.Bar(() => File.OpenRead(""""));
+        this.Bar(() => File.OpenRead(string.Empty));
     }
 
     public void Bar(Func<Stream> func)
@@ -158,5 +158,25 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task WhenCreatingStreamReader()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            using(var reader = new StreamReader(File.OpenRead(string.Empty)))
+			{
+			}
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
     }
 }

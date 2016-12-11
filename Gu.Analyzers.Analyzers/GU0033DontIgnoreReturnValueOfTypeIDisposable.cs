@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -46,7 +47,7 @@
                 return;
             }
 
-            if (MustBeHandled(objectCreation))
+            if (MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -72,13 +73,13 @@
                 return;
             }
 
-            if (MustBeHandled(invocation))
+            if (MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
         }
 
-        private static bool MustBeHandled(SyntaxNode node)
+        private static bool MustBeHandled(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (node.Parent is AnonymousFunctionExpressionSyntax)
             {
@@ -88,6 +89,17 @@
             if (node.Parent is StatementSyntax)
             {
                 return !(node.Parent is ReturnStatementSyntax);
+            }
+
+            if (node.Parent is ArgumentSyntax)
+            {
+                var objectCreation = node.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
+                var symbol = semanticModel.GetSymbolInfo(objectCreation, cancellationToken)
+                                          .Symbol as IMethodSymbol;
+                if (symbol?.ContainingType == KnownSymbol.TextReader)
+                {
+                    return false;
+                }
             }
 
             var argument = node.FirstAncestorOrSelf<ArgumentSyntax>();

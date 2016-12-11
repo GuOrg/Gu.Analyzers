@@ -55,28 +55,5 @@
 
             return false;
         }
-
-        internal static bool IsPassedAsArgument(this VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax invocation)
-        {
-            invocation = null;
-            if (variable == null)
-            {
-                return false;
-            }
-
-            var symbol = semanticModel.SemanticModelFor(variable).GetDeclaredSymbol(variable, cancellationToken);
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
-            if (block?.TryGetInvocation(symbol, out invocation) == true)
-            {
-                return true;
-            }
-
-            return false;
-        }
     }
 }

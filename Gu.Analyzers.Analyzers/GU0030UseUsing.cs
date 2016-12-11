@@ -52,11 +52,12 @@
                 return;
             }
 
-            if (Disposable.IsAssignableTo(symbol.Type))
+            if (Disposable.IsAssignableTo(symbol.Type) && declarator.Initializer != null)
             {
                 if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
                 {
-                    if (variableDeclaration.Parent is UsingStatementSyntax)
+                    if (variableDeclaration.Parent is UsingStatementSyntax ||
+                        variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
                     {
                         return;
                     }
@@ -73,10 +74,10 @@
                         return;
                     }
 
-                    InvocationExpressionSyntax invocation;
-                    if (declarator.IsPassedAsArgument(context.SemanticModel, context.CancellationToken, out invocation))
+                    if (variableDeclaration.Parent is ObjectCreationExpressionSyntax)
                     {
-                        return;
+                        var parentSymbol = context.SemanticModel.GetSymbolInfo(variableDeclaration.Parent, context.CancellationToken);
+
                     }
 
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));

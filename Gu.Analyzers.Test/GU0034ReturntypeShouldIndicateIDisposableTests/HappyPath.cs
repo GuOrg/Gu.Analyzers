@@ -170,7 +170,7 @@ using System.IO;
 
 public sealed class Foo
 {
-    private readonly Stream stream = File.OpenRead("""");
+    private readonly Stream stream = File.OpenRead(string.Empty);
 
     public object Meh()
     {

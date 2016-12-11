@@ -1,7 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System.Linq;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -31,24 +29,6 @@ namespace Gu.Analyzers
                     if ((assignment.Right as IdentifierNameSyntax)?.Identifier.ValueText == symbol.Name)
                     {
                         result = assignment;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        internal static bool TryGetInvocation(this BlockSyntax body, ISymbol symbol, out InvocationExpressionSyntax result)
-        {
-            result = null;
-            using (var walker = InvocationWalker.Create(body))
-            {
-                foreach (var invocation in walker.Invocations)
-                {
-                    if (invocation.ArgumentList?.Arguments.Any(a => (a.Expression as IdentifierNameSyntax)?.Identifier.ValueText == symbol.Name) == true)
-                    {
-                        result = invocation;
                         return true;
                     }
                 }

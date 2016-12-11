@@ -16,7 +16,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓private readonly Stream stream = File.OpenRead("""");
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
 
     public void Dispose()
     {
@@ -33,7 +33,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream = File.OpenRead("""");
+    private readonly Stream stream = File.OpenRead(string.Empty);
 
     public void Dispose()
     {
@@ -90,7 +90,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓private Stream stream = File.OpenRead("""");
+    ↓private Stream stream = File.OpenRead(string.Empty);
 
     public void Meh()
     {
@@ -113,7 +113,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private Stream stream = File.OpenRead("""");
+    private Stream stream = File.OpenRead(string.Empty);
 
     public void Meh()
     {
@@ -142,7 +142,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        this.stream = File.OpenRead("""");
+        this.stream = File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -164,7 +164,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        this.stream = File.OpenRead("""");
+        this.stream = File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -188,7 +188,7 @@ public sealed class Foo : IDisposable
 
     public Foo(Stream stream)
     {
-        this.stream = stream ?? File.OpenRead("""");
+        this.stream = stream ?? File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -210,7 +210,7 @@ public sealed class Foo : IDisposable
 
     public Foo(Stream stream)
     {
-        this.stream = stream ?? File.OpenRead("""");
+        this.stream = stream ?? File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -234,7 +234,7 @@ public sealed class Foo : IDisposable
 
     public Foo(Stream stream)
     {
-        this.stream = stream != null ? stream : File.OpenRead("""");
+        this.stream = stream != null ? stream : File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -256,7 +256,7 @@ public sealed class Foo : IDisposable
 
     public Foo(Stream stream)
     {
-        this.stream = stream != null ? stream : File.OpenRead("""");
+        this.stream = stream != null ? stream : File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -276,7 +276,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓protected Stream stream = File.OpenRead("""");
+    ↓protected Stream stream = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -292,7 +292,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    protected Stream stream = File.OpenRead("""");
+    protected Stream stream = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -311,8 +311,8 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream1 = File.OpenRead("""");
-    ↓private readonly Stream stream2 = File.OpenRead("""");
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -330,8 +330,8 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream1 = File.OpenRead("""");
-    private readonly Stream stream2 = File.OpenRead("""");
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    private readonly Stream stream2 = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -351,8 +351,8 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream1 = File.OpenRead("""");
-    ↓private readonly Stream stream2 = File.OpenRead("""");
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
         
     public void Dispose() => this.stream1.Dispose();
 }";
@@ -367,8 +367,8 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly Stream stream1 = File.OpenRead("""");
-    private readonly Stream stream2 = File.OpenRead("""");
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    private readonly Stream stream2 = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -388,7 +388,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓private readonly object stream = File.OpenRead("""");
+    ↓private readonly object stream = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -405,7 +405,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    private readonly object stream = File.OpenRead("""");
+    private readonly object stream = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -424,7 +424,7 @@ public sealed class Foo : IDisposable
 
     public sealed class Foo
     {
-        ↓private readonly Stream stream = File.OpenRead("""");
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -442,7 +442,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓public Stream Stream { get; set; } = File.OpenRead("""");
+    ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -460,7 +460,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    public Stream Stream { get; set; } = File.OpenRead("""");
+    public Stream Stream { get; set; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -479,7 +479,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓public Stream Stream { get; } = File.OpenRead("""");
+    ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -497,7 +497,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    public Stream Stream { get; } = File.OpenRead("""");
+    public Stream Stream { get; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -516,7 +516,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓public object Stream { get; set; } = File.OpenRead("""");
+    ↓public object Stream { get; set; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -534,7 +534,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    public object Stream { get; set; } = File.OpenRead("""");
+    public object Stream { get; set; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -553,7 +553,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    ↓public object Stream { get; } = File.OpenRead("""");
+    ↓public object Stream { get; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -571,7 +571,7 @@ using System.IO;
 
 public sealed class Foo : IDisposable
 {
-    public object Stream { get; } = File.OpenRead("""");
+    public object Stream { get; } = File.OpenRead(string.Empty);
         
     public void Dispose()
     {
@@ -592,7 +592,7 @@ public sealed class Foo : IDisposable
 {
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     ↓public Stream Stream { get; set; }
@@ -615,7 +615,7 @@ public sealed class Foo : IDisposable
 {
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream { get; set; }
@@ -641,7 +641,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream
@@ -670,7 +670,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream
@@ -698,7 +698,7 @@ public sealed class Foo : IDisposable
 {
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     ↓public Stream Stream { get; }
@@ -721,7 +721,7 @@ public sealed class Foo : IDisposable
 {
     public Foo()
     {
-        this.Stream = File.OpenRead("""");
+        this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream { get; }

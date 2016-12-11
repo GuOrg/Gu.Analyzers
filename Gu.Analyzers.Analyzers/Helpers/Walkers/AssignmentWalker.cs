@@ -31,7 +31,7 @@
             return walker;
         }
 
-        public static AssignmentWalker Create(IReadOnlyList<SyntaxNode> block)
+        public static AssignmentWalker Create(IReadOnlyList<SyntaxNode> nodes)
         {
             AssignmentWalker walker;
             if (!Cache.TryDequeue(out walker))
@@ -40,7 +40,7 @@
             }
 
             walker.assignments.Clear();
-            foreach (var node in block)
+            foreach (var node in nodes)
             {
                 walker.Visit(node);
             }

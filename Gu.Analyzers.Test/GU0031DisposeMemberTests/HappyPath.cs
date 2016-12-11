@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     public sealed class Foo : IDisposable
     {
-        private readonly Stream stream = File.OpenRead("""");
+        private readonly Stream stream = File.OpenRead(string.Empty);
         
         public void Dispose()
         {
@@ -39,7 +39,7 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     public class Foo : IDisposable
     {
-        private readonly Stream stream = File.OpenRead("""");
+        private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
 
         public void Dispose()
@@ -103,7 +103,7 @@ class Goof : IDisposable {
 
     public sealed class Foo : IDisposable
     {
-        private readonly object stream =  File.OpenRead("""");
+        private readonly object stream =  File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -124,7 +124,7 @@ class Goof : IDisposable {
 
     public sealed class Foo : IDisposable
     {
-        private readonly object stream =  File.OpenRead("""");
+        private readonly object stream =  File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -144,7 +144,7 @@ class Goof : IDisposable {
 
     public sealed class Foo : IDisposable
     {
-        private readonly object stream =  File.OpenRead("""");
+        private readonly object stream =  File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -165,7 +165,7 @@ class Goof : IDisposable {
 
     public sealed class Foo : IDisposable
     {
-        private readonly object stream =  File.OpenRead("""");
+        private readonly object stream =  File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -187,7 +187,7 @@ class Goof : IDisposable {
     {
         public Foo()
         {
-            this.Stream = File.OpenRead("""");
+            this.Stream = File.OpenRead(string.Empty);
         }
 
         public Stream Stream { get; set; }
@@ -211,7 +211,7 @@ class Goof : IDisposable {
 
     public sealed class Foo : IDisposable
     {
-        public Stream Stream { get; set; } = File.OpenRead("""");
+        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
         
         public void Dispose()
         {
@@ -351,7 +351,7 @@ class Goof : IDisposable {
             var testCode = @"
     public class Foo
     {
-        private readonly object bar = string.Copy("""");
+        private readonly object bar = string.Copy(string.Empty);
     }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -365,7 +365,7 @@ class Goof : IDisposable {
 
     public sealed class Foo
     {
-        private static Stream stream = File.OpenRead("""");
+        private static Stream stream = File.OpenRead(string.Empty);
     }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

@@ -17,7 +17,7 @@ public sealed class Foo
 {
     public void Meh()
     {
-        ↓File.OpenRead("""");
+        ↓File.OpenRead(string.Empty);
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -105,7 +105,7 @@ public sealed class Foo
 {
     public Bar Meh()
     {
-        return new Bar(↓File.OpenRead(""""));
+        return new Bar(↓File.OpenRead(string.Empty));
     }
 }";
             var expected = this.CSharpDiagnostic()
