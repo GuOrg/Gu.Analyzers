@@ -103,7 +103,7 @@
 
             if (!Disposable.IsAssignableTo(type))
             {
-                updated = syntaxGenerator.AddBaseType(updated, IDisposableInterface);
+                updated = syntaxGenerator.AddInterfaceType(updated, IDisposableInterface);
             }
 
             if (!IsSealed(typeDeclaration))

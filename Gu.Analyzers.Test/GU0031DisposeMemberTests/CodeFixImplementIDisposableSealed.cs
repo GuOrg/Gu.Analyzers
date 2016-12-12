@@ -14,7 +14,6 @@
     internal class CodeFixImplementIDisposableSealed : CodeFixVerifier<GU0031DisposeMember, ImplementIDisposableSealedCodeFixProvider>
     {
         [Test]
-        [Explicit("Testfixture broken here.")]
         public async Task ImplementIDisposable()
         {
             var testCode = @"
@@ -43,7 +42,7 @@ public sealed class Foo : IDisposable
     {
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode)
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
                       .ConfigureAwait(false);
         }
 
