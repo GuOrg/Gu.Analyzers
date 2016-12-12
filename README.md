@@ -64,6 +64,10 @@
   <td>Dispose member.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0032.md">GU0032</a></td>
+  <td>Dispose before re-assigning.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0033.md">GU0033</a></td>
   <td>Don't ignore returnvalue of type IDisposable.</td>
 </tr>
