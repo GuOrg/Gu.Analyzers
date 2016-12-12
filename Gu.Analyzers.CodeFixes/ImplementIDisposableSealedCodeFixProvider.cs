@@ -19,6 +19,7 @@
     {
         // ReSharper disable once InconsistentNaming
         private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -112,7 +113,16 @@
             }
 
             updated = MakeSealedRewriter.Default.Visit(updated);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
+            var newRoot = (CompilationUnitSyntax)syntaxRoot.ReplaceNode(typeDeclaration, updated);
+            UsingDirectiveSyntax @using;
+            if (!newRoot.Usings.TryGetSingle(x => x.Name.ToString() == "System", out @using))
+            {
+                newRoot = newRoot.Usings.Any() 
+                    ? newRoot.InsertNodesBefore(newRoot.Usings.First(), new[] { UsingSystem })
+                    : newRoot.AddUsings(UsingSystem);
+            }
+
+            return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)

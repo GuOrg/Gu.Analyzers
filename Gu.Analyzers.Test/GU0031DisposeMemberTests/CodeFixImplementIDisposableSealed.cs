@@ -17,7 +17,6 @@
         public async Task ImplementIDisposable()
         {
             var testCode = @"
-using System;
 using System.IO;
 
 public class Foo
@@ -30,8 +29,7 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
                       .ConfigureAwait(false);
 
-            var fixedCode = @"
-using System;
+            var fixedCode = @"using System;
 using System.IO;
 
 public sealed class Foo : IDisposable
