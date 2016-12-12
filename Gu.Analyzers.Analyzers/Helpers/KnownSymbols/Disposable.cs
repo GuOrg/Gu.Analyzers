@@ -128,5 +128,33 @@ namespace Gu.Analyzers
             return type == KnownSymbol.IDisposable ||
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
         }
+
+        public static bool BaseTypeHasVirtualDisposeMethod(ITypeSymbol type)
+        {
+            var baseType = type.BaseType;
+            while (baseType != null)
+            {
+                foreach (var member in baseType.GetMembers("Dispose"))
+                {
+                    var method = member as IMethodSymbol;
+                    if (method == null)
+                    {
+                        continue;
+                    }
+
+                    if (member.DeclaredAccessibility == Accessibility.Protected &&
+                        member.IsVirtual &&
+                        method.Parameters.Length == 1 &&
+                        method.Parameters[0].Type == KnownSymbol.Boolean)
+                    {
+                        return true;
+                    }
+                }
+
+                baseType = baseType.BaseType;
+            }
+
+            return false;
+        }
     }
 }

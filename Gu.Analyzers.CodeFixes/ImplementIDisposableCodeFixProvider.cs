@@ -60,25 +60,85 @@
                     continue;
                 }
 
+                var type = semanticModel.GetDeclaredSymbol(typeDeclaration, context.CancellationToken);
                 if (diagnostic.Id == GU0031DisposeMember.DiagnosticId &&
-                    Disposable.IsAssignableTo(semanticModel.GetDeclaredSymbol(typeDeclaration, context.CancellationToken)))
+                    Disposable.IsAssignableTo(type) &&
+                    Disposable.BaseTypeHasVirtualDisposeMethod(type))
                 {
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "override Dispose(bool)",
+                            cancellationToken =>
+                                ApplyOverrideDisposeFixAsync(
+                                    context,
+                                    semanticModel,
+                                    cancellationToken,
+                                    syntaxRoot,
+                                    typeDeclaration),
+                            nameof(ImplementIDisposableCodeFixProvider)),
+                        diagnostic);
                     continue;
                 }
 
                 context.RegisterCodeFix(
-                CodeAction.Create(
-                    "Implement IDisposable and make class sealed.",
-                    cancellationToken =>
-                        ApplyImplementIDisposableSealedFixAsync(
-                            context,
-                            semanticModel,
-                            cancellationToken,
-                            syntaxRoot,
-                            typeDeclaration),
-                    nameof(ImplementIDisposableCodeFixProvider)),
-                diagnostic);
+                    CodeAction.Create(
+                        "Implement IDisposable and make class sealed.",
+                        cancellationToken =>
+                            ApplyImplementIDisposableSealedFixAsync(
+                                context,
+                                semanticModel,
+                                cancellationToken,
+                                syntaxRoot,
+                                typeDeclaration),
+                        nameof(ImplementIDisposableCodeFixProvider)),
+                    diagnostic);
             }
+        }
+
+        private static Task<Document> ApplyOverrideDisposeFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
+        {
+            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
+            SyntaxNode updated = typeDeclaration;
+            IMethodSymbol existsingMethod;
+            if (!type.TryGetMethod("Dispose", out existsingMethod))
+            {
+                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+
+                var ifDisposedReturn = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression("this.disposed"),
+                    new[] { SyntaxFactory.ReturnStatement() });
+                var ifDisposing = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression("disposing"),
+                    new EmptyStatementSyntax[0]);
+
+                var disposeMethod = syntaxGenerator.MethodDeclaration(
+                    "Dispose",
+                    accessibility: Accessibility.Protected,
+                    modifiers: DeclarationModifiers.Override,
+                    parameters: new[] { SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool")) },
+                    statements: new[]
+                    {
+                        ifDisposedReturn,
+                        SyntaxFactory.ParseStatement("this.disposed = true;"),
+                        ifDisposing,
+                        SyntaxFactory.ParseStatement("base.Dispose(disposing);")
+                    });
+
+                SyntaxNode method;
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
+                                       out method))
+                {
+                    updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
+                }
+                else
+                {
+                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                }
+            }
+
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
         }
 
         private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
@@ -90,27 +150,7 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                IFieldSymbol existsingField;
-                if (!type.TryGetField("disposed", out existsingField))
-                {
-                    var disposedField = syntaxGenerator.FieldDeclaration(
-                        "disposed",
-                        accessibility: Accessibility.Private,
-                        type: SyntaxFactory.ParseTypeName("bool"));
-                    MemberDeclarationSyntax field;
-                    if (typeDeclaration.Members.TryGetLast(x => x is FieldDeclarationSyntax, out field))
-                    {
-                        updated = updated.InsertNodesAfter(field, new[] { disposedField });
-                    }
-                    else if (typeDeclaration.Members.TryGetFirst(out field))
-                    {
-                        updated = updated.InsertNodesBefore(field, new[] { disposedField });
-                    }
-                    else
-                    {
-                        updated = syntaxGenerator.AddMembers(updated, disposedField);
-                    }
-                }
+                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
 
                 var ifDisposedReturn = syntaxGenerator.IfStatement(
                     SyntaxFactory.ParseExpression("this.disposed"),
@@ -184,6 +224,33 @@
             }
 
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
+        }
+
+        private static SyntaxNode WithDisposedField(ITypeSymbol type, TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator)
+        {
+            IFieldSymbol existsingField;
+            if (!type.TryGetField("disposed", out existsingField))
+            {
+                var disposedField = syntaxGenerator.FieldDeclaration(
+                    "disposed",
+                    accessibility: Accessibility.Private,
+                    type: SyntaxFactory.ParseTypeName("bool"));
+                MemberDeclarationSyntax field;
+                if (typeDeclaration.Members.TryGetLast(x => x is FieldDeclarationSyntax, out field))
+                {
+                    return typeDeclaration.InsertNodesAfter(field, new[] { disposedField });
+                }
+                else if (typeDeclaration.Members.TryGetFirst(out field))
+                {
+                    return typeDeclaration.InsertNodesBefore(field, new[] { disposedField });
+                }
+                else
+                {
+                    return syntaxGenerator.AddMembers(typeDeclaration, disposedField);
+                }
+            }
+
+            return typeDeclaration;
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)

@@ -5,6 +5,7 @@ namespace Gu.Analyzers
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Object = Create("System.Object");
+        internal static readonly QualifiedType Boolean = Create("System.Boolean");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly DisposableType IDisposable = new DisposableType();
