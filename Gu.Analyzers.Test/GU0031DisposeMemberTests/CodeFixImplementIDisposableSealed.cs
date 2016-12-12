@@ -11,7 +11,7 @@
 
     using NUnit.Framework;
 
-    internal class CodeFixImplementIDisposableSealed : CodeFixVerifier<GU0031DisposeMember, ImplementIDisposableSealedCodeFixProvider>
+    internal class CodeFixImplementIDisposableSealed : CodeFixVerifier<GU0031DisposeMember, ImplementIDisposableCodeFixProvider>
     {
         [Test]
         public async Task ImplementIDisposable()
@@ -35,9 +35,24 @@ using System.IO;
 public sealed class Foo : IDisposable
 {
     private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
 
     public void Dispose()
     {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
@@ -98,8 +113,24 @@ using System;
 
 public sealed class Foo : IDisposable
 {
+    private bool disposed;
+
     public void Dispose()
     {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
@@ -126,10 +157,26 @@ using System;
 
 public sealed class Foo : IDisposable
 {
+    private bool disposed;
+
     private int Value { get; set; }
 
     public void Dispose()
     {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
@@ -158,15 +205,31 @@ using System;
 
 public sealed class Foo : IDisposable
 {
+    private bool disposed;
+
     public void Bar()
     {
     }
 
     public void Dispose()
     {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
                       .ConfigureAwait(false);
         }
 
@@ -192,15 +255,31 @@ using System;
 
 public sealed class Foo : IDisposable
 {
+    private bool disposed;
+
     public void Dispose()
     {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
     }
 
     private void Bar()
     {
     }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true)
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
                       .ConfigureAwait(false);
         }
 

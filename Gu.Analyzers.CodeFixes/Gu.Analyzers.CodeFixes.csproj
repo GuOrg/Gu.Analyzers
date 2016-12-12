@@ -40,7 +40,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ImplementIDisposableSealedCodeFixProvider.cs" />
+    <Compile Include="ImplementIDisposableCodeFixProvider.cs" />
     <Compile Include="DisposeMemberCodeFixProvider.cs" />
     <Compile Include="Helpers\RenameHelper.cs" />
     <Compile Include="FinishedTasks.cs" />
