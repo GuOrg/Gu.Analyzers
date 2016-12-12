@@ -1,7 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -9,10 +7,19 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ConstructorWalker : CSharpSyntaxWalker, IDisposable
+    internal sealed class ConstructorWalker : CSharpSyntaxWalker
     {
         internal readonly Dictionary<ParameterSyntax, string> ParameterNameMap = new Dictionary<ParameterSyntax, string>();
-        private static readonly ConcurrentQueue<ConstructorWalker> Cache = new ConcurrentQueue<ConstructorWalker>();
+
+        private static readonly Pool<ConstructorWalker> Cache = new Pool<ConstructorWalker>(
+            () => new ConstructorWalker(),
+            x =>
+            {
+                x.ParameterNameMap.Clear();
+                x.constructor = null;
+                x.semanticModel = null;
+                x.cancellationToken = CancellationToken.None;
+            });
 
         private ConstructorDeclarationSyntax constructor;
         private SemanticModel semanticModel;
@@ -22,32 +29,17 @@
         {
         }
 
-        public static ConstructorWalker Create(
+        public static Pool<ConstructorWalker>.Pooled Create(
             ConstructorDeclarationSyntax constructor,
             SemanticModel semanticModel,
             CancellationToken cancellationToken)
         {
-            ConstructorWalker walker;
-            if (!Cache.TryDequeue(out walker))
-            {
-                walker = new ConstructorWalker();
-            }
-
-            walker.ParameterNameMap.Clear();
-            walker.constructor = constructor;
-            walker.semanticModel = semanticModel;
-            walker.cancellationToken = cancellationToken;
-            walker.Visit(constructor);
-            return walker;
-        }
-
-        public void Dispose()
-        {
-            this.ParameterNameMap.Clear();
-            this.constructor = null;
-            this.semanticModel = null;
-            this.cancellationToken = CancellationToken.None;
-            Cache.Enqueue(this);
+            var pooled = Cache.GetOrCreate();
+            pooled.Item.constructor = constructor;
+            pooled.Item.semanticModel = semanticModel;
+            pooled.Item.cancellationToken = cancellationToken;
+            pooled.Item.Visit(constructor);
+            return pooled;
         }
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)

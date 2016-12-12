@@ -41,14 +41,14 @@
                 var property = (BasePropertyDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 var propertySymbol = (IPropertySymbol)semanticModel.GetDeclaredSymbol(property, context.CancellationToken);
                 var type = propertySymbol.ContainingType;
-                using (var properties = GU0020SortProperties.SortedProperties.Create(type))
+                using (var pooled = GU0020SortProperties.SortedProperties.Create(type))
                 {
-                    if (!properties.IsSorted)
+                    if (!pooled.Item.IsSorted)
                     {
-                        var index = properties.IndexOfSorted(propertySymbol);
+                        var index = pooled.Item.IndexOfSorted(propertySymbol);
                         if (index == 0)
                         {
-                            var previousSymbol = properties.Sorted[index + 1];
+                            var previousSymbol = pooled.Item.Sorted[index + 1];
                             var nextProperty = (BasePropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
                                               .ConfigureAwait(false);
 
@@ -67,7 +67,7 @@
                         }
                         else
                         {
-                            var previousSymbol = properties.Sorted[index - 1];
+                            var previousSymbol = pooled.Item.Sorted[index - 1];
                             var previousProperty = (BasePropertyDeclarationSyntax)await previousSymbol.DeclaringSyntaxReferences[0].GetSyntaxAsync(context.CancellationToken)
                                               .ConfigureAwait(false);
 

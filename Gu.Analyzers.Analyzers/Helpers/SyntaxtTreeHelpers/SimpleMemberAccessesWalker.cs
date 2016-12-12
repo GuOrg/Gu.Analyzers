@@ -1,16 +1,17 @@
 namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class SimpleMemberAccessesWalker : CSharpSyntaxWalker, IDisposable
+    internal sealed class SimpleMemberAccessesWalker : CSharpSyntaxWalker
     {
-        private static readonly ConcurrentQueue<SimpleMemberAccessesWalker> Cache = new ConcurrentQueue<SimpleMemberAccessesWalker>();
+        private static readonly Pool<SimpleMemberAccessesWalker> Cache = new Pool<SimpleMemberAccessesWalker>(
+            () => new SimpleMemberAccessesWalker(),
+            x => x.simpleMemberAccesses.Clear());
+
         private readonly List<MemberAccessExpressionSyntax> simpleMemberAccesses = new List<MemberAccessExpressionSyntax>();
 
         private SimpleMemberAccessesWalker()
@@ -19,17 +20,11 @@ namespace Gu.Analyzers
 
         public IReadOnlyList<MemberAccessExpressionSyntax> SimpleMemberAccesses => this.simpleMemberAccesses;
 
-        public static SimpleMemberAccessesWalker Create(SyntaxNode node)
+        public static Pool<SimpleMemberAccessesWalker>.Pooled Create(SyntaxNode node)
         {
-            SimpleMemberAccessesWalker walker;
-            if (!Cache.TryDequeue(out walker))
-            {
-                walker = new SimpleMemberAccessesWalker();
-            }
-
-            walker.simpleMemberAccesses.Clear();
-            walker.Visit(node);
-            return walker;
+            var pooled = Cache.GetOrCreate();
+            pooled.Item.Visit(node);
+            return pooled;
         }
 
         public override void VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
@@ -40,12 +35,6 @@ namespace Gu.Analyzers
             }
 
             base.VisitMemberAccessExpression(node);
-        }
-
-        public void Dispose()
-        {
-            this.simpleMemberAccesses.Clear();
-            Cache.Enqueue(this);
         }
     }
 }

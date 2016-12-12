@@ -120,7 +120,7 @@
     <Rule Id="GU0004" Action="Warning" />
     <Rule Id="GU0005" Action="Warning" />
     <Rule Id="GU0006" Action="Warning" />
-    <Rule Id="GU0007" Action="Warning" />
+    <Rule Id="GU0007" Action="Hidden" />
     <Rule Id="GU0008" Action="Warning" />
     <Rule Id="GU0010" Action="Warning" />
     <Rule Id="GU0011" Action="Warning" />

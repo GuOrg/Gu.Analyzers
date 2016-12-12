@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
@@ -45,18 +44,26 @@
         {
             var property = (IPropertySymbol)context.ContainingSymbol;
             var type = (ITypeSymbol)property.ContainingType;
-            using (var sorted = SortedProperties.Create(type))
+            using (var pooled = SortedProperties.Create(type))
             {
-                if (!sorted.IsAtCorrectPosition(property))
+                if (!pooled.Item.IsAtCorrectPosition(property))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
             }
         }
 
-        internal sealed class SortedProperties : IDisposable
+        internal sealed class SortedProperties
         {
-            private static readonly ConcurrentQueue<SortedProperties> Cache = new ConcurrentQueue<SortedProperties>();
+            private static readonly Pool<SortedProperties> Cache = new Pool<SortedProperties>(
+                () => new SortedProperties(),
+                x =>
+                {
+                    x.documentOrder.Clear();
+
+                    x.sorted.Clear();
+                });
+
             private readonly List<IPropertySymbol> documentOrder = new List<IPropertySymbol>();
             private readonly List<IPropertySymbol> sorted = new List<IPropertySymbol>();
 
@@ -82,25 +89,13 @@
                 }
             }
 
-            public static SortedProperties Create(ITypeSymbol type)
+            public static Pool<SortedProperties>.Pooled Create(ITypeSymbol type)
             {
-                SortedProperties sorted;
-                if (!Cache.TryDequeue(out sorted))
-                {
-                    sorted = new SortedProperties();
-                }
-
-                sorted.documentOrder.AddRange(type.GetMembers().OfType<IPropertySymbol>());
-                sorted.sorted.AddRange(sorted.documentOrder);
-                sorted.sorted.Sort(PropertyComparer.Default);
-                return sorted;
-            }
-
-            public void Dispose()
-            {
-                this.documentOrder.Clear();
-                this.sorted.Clear();
-                Cache.Enqueue(this);
+                var pooled = Cache.GetOrCreate();
+                pooled.Item.documentOrder.AddRange(type.GetMembers().OfType<IPropertySymbol>());
+                pooled.Item.sorted.AddRange(pooled.Item.documentOrder);
+                pooled.Item.sorted.Sort(PropertyComparer.Default);
+                return pooled;
             }
 
             public bool IsAtCorrectPosition(IPropertySymbol property)

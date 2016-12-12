@@ -45,9 +45,9 @@
                 return;
             }
 
-            using (var walker = ConstructorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
+            using (var pooled = ConstructorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
             {
-                foreach (var kvp in walker.ParameterNameMap)
+                foreach (var kvp in pooled.Item.ParameterNameMap)
                 {
                     if (kvp.Value != null && !IsMatch(kvp.Key.Identifier, kvp.Value))
                     {

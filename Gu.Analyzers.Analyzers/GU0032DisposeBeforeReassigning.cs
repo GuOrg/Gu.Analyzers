@@ -73,9 +73,9 @@
 
         private static bool IsDisposedBeforeAssignment(ISymbol symbol, AssignmentExpressionSyntax assignment)
         {
-            using (var walker = InvocationWalker.Create(assignment.FirstAncestorOrSelf<BlockSyntax>()))
+            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<BlockSyntax>()))
             {
-                foreach (var invocation in walker.Invocations)
+                foreach (var invocation in pooled.Item.Invocations)
                 {
                     if (invocation.SpanStart > assignment.SpanStart)
                     {
@@ -85,9 +85,9 @@
                     var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
                     if (statement != null)
                     {
-                        using (var identifierNameWalker = IdentifierNameWalker.Create(statement))
+                        using (var pooledStatement = IdentifierNameWalker.Create(statement))
                         {
-                            foreach (var identifierName in identifierNameWalker.IdentifierNames)
+                            foreach (var identifierName in pooledStatement.Item.IdentifierNames)
                             {
                                 if (identifierName?.Identifier.ValueText == symbol.Name)
                                 {

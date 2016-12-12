@@ -105,12 +105,12 @@
                 MethodDeclarationSyntax declaration;
                 if (symbol.TryGetSingleDeclaration(cancellationToken, out declaration))
                 {
-                    using (var walker = ReturnExpressionsWalker.Create(declaration))
+                    using (var pooled = ReturnExpressionsWalker.Create(declaration))
                     {
                         if (symbol.IsExtensionMethod)
                         {
                             var identifier = declaration.ParameterList.Parameters[0].Identifier;
-                            foreach (var returnValue in walker.ReturnValues)
+                            foreach (var returnValue in pooled.Item.ReturnValues)
                             {
                                 if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
                                 {
@@ -122,7 +122,7 @@
                         }
                         else
                         {
-                            foreach (var returnValue in walker.ReturnValues)
+                            foreach (var returnValue in pooled.Item.ReturnValues)
                             {
                                 if (!returnValue.IsKind(SyntaxKind.ThisExpression))
                                 {

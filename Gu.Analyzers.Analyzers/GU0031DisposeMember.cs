@@ -49,22 +49,22 @@
                 return;
             }
 
-            using (var walker = MemberAssignmentWalker.Create(field, context.SemanticModel, context.CancellationToken))
+            using (var pooled = MemberAssignmentWalker.Create(field, context.SemanticModel, context.CancellationToken))
             {
-                if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
+                if (IsAnyADisposableCreation(pooled.Item.Assignments, context.SemanticModel, context.CancellationToken))
                 {
                     CheckThatMemberIsDisposed(context);
                 }
 
-                foreach (var assignment in walker.Assignments)
+                foreach (var assignment in pooled.Item.Assignments)
                 {
                     var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                     {
                         var property = context.SemanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
-                        using (var propertyWalker = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
+                        using (var pooledPropertyWalker = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
                         {
-                            if (IsAnyADisposableCreation(propertyWalker.Assignments, context.SemanticModel, context.CancellationToken))
+                            if (IsAnyADisposableCreation(pooledPropertyWalker.Item.Assignments, context.SemanticModel, context.CancellationToken))
                             {
                                 CheckThatMemberIsDisposed(context);
                             }
@@ -97,9 +97,9 @@
                 return;
             }
 
-            using (var walker = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
+            using (var pooled = MemberAssignmentWalker.Create(property, context.SemanticModel, context.CancellationToken))
             {
-                if (IsAnyADisposableCreation(walker.Assignments, context.SemanticModel, context.CancellationToken))
+                if (IsAnyADisposableCreation(pooled.Item.Assignments, context.SemanticModel, context.CancellationToken))
                 {
                     CheckThatMemberIsDisposed(context);
                 }
@@ -119,9 +119,9 @@
             {
                 foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
                 {
-                    using (var walker = IdentifierNameWalker.Create(declaration))
+                    using (var pooled = IdentifierNameWalker.Create(declaration))
                     {
-                        foreach (var identifier in walker.IdentifierNames)
+                        foreach (var identifier in pooled.Item.IdentifierNames)
                         {
                             if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
                             {

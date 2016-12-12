@@ -1,7 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -9,9 +7,18 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class MemberAssignmentWalker : CSharpSyntaxWalker, IDisposable
+    internal sealed class MemberAssignmentWalker : CSharpSyntaxWalker
     {
-        private static readonly ConcurrentQueue<MemberAssignmentWalker> Cache = new ConcurrentQueue<MemberAssignmentWalker>();
+        private static readonly Pool<MemberAssignmentWalker> Pool = new Pool<MemberAssignmentWalker>(
+            () => new MemberAssignmentWalker(),
+            x =>
+            {
+                x.assignments.Clear();
+                x.symbol = null;
+                x.semanticModel = null;
+                x.cancellationToken = CancellationToken.None;
+            });
+
         private readonly List<ExpressionSyntax> assignments = new List<ExpressionSyntax>();
         private ISymbol symbol;
         private SemanticModel semanticModel;
@@ -23,12 +30,12 @@
 
         public IReadOnlyList<ExpressionSyntax> Assignments => this.assignments;
 
-        public static MemberAssignmentWalker Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<MemberAssignmentWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(property, semanticModel, cancellationToken);
         }
 
-        public static MemberAssignmentWalker Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<MemberAssignmentWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(field, semanticModel, cancellationToken);
         }
@@ -68,33 +75,19 @@
             base.VisitPropertyDeclaration(node);
         }
 
-        public void Dispose()
+        private static Pool<MemberAssignmentWalker>.Pooled CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            this.assignments.Clear();
-            this.symbol = null;
-            this.semanticModel = null;
-            this.cancellationToken = CancellationToken.None;
-            Cache.Enqueue(this);
-        }
-
-        private static MemberAssignmentWalker CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            MemberAssignmentWalker walker;
-            if (!Cache.TryDequeue(out walker))
-            {
-                walker = new MemberAssignmentWalker();
-            }
-
-            walker.assignments.Clear();
-            walker.symbol = symbol;
-            walker.semanticModel = semanticModel;
-            walker.cancellationToken = cancellationToken;
+            var pooled = Pool.GetOrCreate();
+            pooled.Item.assignments.Clear();
+            pooled.Item.symbol = symbol;
+            pooled.Item.semanticModel = semanticModel;
+            pooled.Item.cancellationToken = cancellationToken;
             foreach (var typeDeclaration in symbol.ContainingType.Declarations(cancellationToken))
             {
-                walker.Visit(typeDeclaration);
+                pooled.Item.Visit(typeDeclaration);
             }
 
-            return walker;
+            return pooled;
         }
     }
 }
