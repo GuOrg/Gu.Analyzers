@@ -103,8 +103,9 @@
 
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
-                var ctor = this.semanticModel.GetSymbolInfo(node, this.cancellationToken)
-                                 .Symbol;
+                var ctor = this.semanticModel.SemanticModelFor(node)
+                               .GetSymbolInfo(node, this.cancellationToken)
+                               .Symbol;
                 ConstructorDeclarationSyntax declaration;
                 if (ctor.TryGetSingleDeclaration(this.cancellationToken, out declaration))
                 {
