@@ -45,6 +45,41 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ImplementIDisposableWhenInterfaceIsMissing()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public void Dispose()
+    {
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ImplementIDisposableDisposeMethod()
         {
             var testCode = @"

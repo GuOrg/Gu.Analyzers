@@ -84,23 +84,28 @@
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            MemberDeclarationSyntax method;
             SyntaxNode updated = typeDeclaration;
-            var disposeMethod = syntaxGenerator.MethodDeclaration("Dispose", accessibility: Accessibility.Public);
-            if (typeDeclaration.Members.TryGetLast(
-                                   x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
-                                   out method))
+            IMethodSymbol existsingDisposeMethod;
+            if (!type.TryGetMethod("Dispose", out existsingDisposeMethod))
             {
-                updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
+                MemberDeclarationSyntax method;
+                var disposeMethod = syntaxGenerator.MethodDeclaration("Dispose", accessibility: Accessibility.Public);
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                                       out method))
+                {
+                    updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
+                }
+                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                {
+                    updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
+                }
+                else
+                {
+                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                }
             }
-            else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
-            {
-                updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
-            }
-            else
-            {
-                updated = syntaxGenerator.AddMembers(updated, disposeMethod);
-            }
+
 
             if (!Disposable.IsAssignableTo(type))
             {

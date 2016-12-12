@@ -75,6 +75,57 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         }
 
         [Test]
+        public async Task DisposingFieldInVirtualDispose2()
+        {
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+            var testCode = @"
+using System;
+
+public class Foo : IDisposable
+{
+    private readonly IDisposable _disposable = new Disposable();
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _disposable.Dispose();
+        }
+    }
+
+    protected void VerifyDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(disposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingFieldInExpressionBodyDispose()
         {
             var disposableCode = @"
@@ -283,7 +334,6 @@ class Goof : IDisposable {
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
-
 
         [TestCase("disposables.First();")]
         [TestCase("disposables.Single();")]
