@@ -17,6 +17,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Task = new QualifiedType("System.Threading.Tasks.Task");
         internal static readonly TextReaderType TextReader = new TextReaderType();
 
+        internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
 

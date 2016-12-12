@@ -284,6 +284,29 @@ class Goof : IDisposable {
                       .ConfigureAwait(false);
         }
 
+
+        [TestCase("disposables.First();")]
+        [TestCase("disposables.Single();")]
+        public async Task IgnoreLinq(string linq)
+        {
+            var testCode = @"
+using System;
+using System.Linq;
+
+public sealed class Foo
+{
+    private readonly IDisposable _bar;
+        
+    public Foo(IDisposable[] disposables)
+    {
+        _bar = disposables.First();
+    }
+}";
+            testCode = testCode.AssertReplace("disposables.First();", linq);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
         [Test]
         public async Task IgnoredWhenNotAssigned()
         {

@@ -59,6 +59,11 @@ namespace Gu.Analyzers
                     }
                 }
 
+                if (methodSymbol.ContainingType == KnownSymbol.Enumerable)
+                {
+                    return false;
+                }
+
                 return IsAssignableTo(methodSymbol.ReturnType);
             }
 
