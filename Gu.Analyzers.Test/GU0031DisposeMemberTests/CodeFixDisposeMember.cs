@@ -733,5 +733,182 @@ public sealed class Foo : IDisposable
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DisposeMemberWhenVirtualDisposeMethod()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.stream.Dispose();
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposeMemberWhenOverriddenDisposeMethod()
+        {
+            var baseCode = @"
+using System;
+
+public class BaseClass : IDisposable
+{
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            var testCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected, CancellationToken.None)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.stream.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+                      .ConfigureAwait(false);
+        }
     }
 }

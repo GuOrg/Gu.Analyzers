@@ -47,21 +47,35 @@
                 IMethodSymbol disposeMethodSymbol;
                 MethodDeclarationSyntax disposeMethodDeclaration;
                 if (memberSymbol != null &&
-                    memberSymbol.ContainingType.TryGetMethod("Dispose", out disposeMethodSymbol) &&
-                    disposeMethodSymbol.Parameters.Length == 0 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                    memberSymbol.ContainingType.TryGetMethod("Dispose", out disposeMethodSymbol))
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Dispose member.",
-                            _ => ApplyFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
-                            nameof(DisposeMemberCodeFixProvider)),
-                        diagnostic);
+                    if (disposeMethodSymbol.Parameters.Length == 0 &&
+                       disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Dispose member.",
+                                _ => ApplyDisposeMemberPublicFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                nameof(DisposeMemberCodeFixProvider)),
+                            diagnostic);
+                        continue;
+                    }
+
+                    if (disposeMethodSymbol.Parameters.Length == 1 &&
+                        disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Dispose member.",
+                                _ => ApplyDisposeMemberProtectedFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                nameof(DisposeMemberCodeFixProvider)),
+                            diagnostic);
+                    }
                 }
             }
         }
 
-        private static Task<Document> ApplyFixAsync(
+        private static Task<Document> ApplyDisposeMemberPublicFixAsync(
             CodeFixContext context,
             SyntaxNode syntaxRoot,
             MethodDeclarationSyntax disposeMethod,
@@ -81,6 +95,39 @@
                                              .WithExpressionBody(null)
                                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
                 return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod, newMethod)));
+            }
+
+            return Task.FromResult(context.Document);
+        }
+
+        private static Task<Document> ApplyDisposeMemberProtectedFixAsync(
+            CodeFixContext context,
+            SyntaxNode syntaxRoot,
+            MethodDeclarationSyntax disposeMethod,
+            ISymbol member)
+        {
+            var newDisposeStatement = CreateDisposeStatement(member);
+            if (disposeMethod.Body != null)
+            {
+                foreach (var statement in disposeMethod.Body.Statements)
+                {
+                    var ifStatement = statement as IfStatementSyntax;
+                    if (ifStatement == null)
+                    {
+                        continue;
+                    }
+
+                    if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
+                    {
+                        var block = ifStatement.Statement as BlockSyntax;
+                        if (block != null)
+                        {
+                            var statements = block.Statements.Add(newDisposeStatement);
+                            var newBlock = block.WithStatements(statements);
+                            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(block, newBlock)));
+                        }
+                    }
+                }
             }
 
             return Task.FromResult(context.Document);
