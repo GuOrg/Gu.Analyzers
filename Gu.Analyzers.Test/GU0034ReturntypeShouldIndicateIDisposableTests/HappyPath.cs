@@ -205,5 +205,51 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IEnumerableOfInt()
+        {
+            var testCode = @"
+using System.Collections;
+using System.Collections.Generic;
+
+public class Foo : IEnumerable<int>
+{
+    private readonly List<int> ints = new List<int>();
+
+    public IEnumerator<int> GetEnumerator()
+    {
+        return this.ints.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.GetEnumerator();
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IEnumerableOfIntExpressionBodies()
+        {
+            var testCode = @"
+using System.Collections;
+using System.Collections.Generic;
+
+public class Foo : IEnumerable<int>
+{
+    private readonly List<int> ints = new List<int>();
+
+    public IEnumerator<int> GetEnumerator() => this.ints.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

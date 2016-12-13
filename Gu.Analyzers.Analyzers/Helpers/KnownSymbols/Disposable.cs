@@ -49,6 +49,11 @@ namespace Gu.Analyzers
             var methodSymbol = symbol as IMethodSymbol;
             if (methodSymbol != null)
             {
+                if (methodSymbol.MetadataName == "GetEnumerator")
+                {
+                    return false;
+                }
+
                 MethodDeclarationSyntax methodDeclaration;
                 if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
                 {
