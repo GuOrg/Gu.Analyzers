@@ -25,6 +25,28 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
 
+        [TestCase("Stream stream;")]
+        [TestCase("Stream stream = null;")]
+        [TestCase("var stream = (Stream)null;")]
+        public async Task VariableSplitDeclarationAndAssignment(string declaration)
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            Stream stream;
+            stream = File.OpenRead(string.Empty);
+        }
+    }";
+
+            testCode = testCode.AssertReplace("Stream stream;", declaration);
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
         [Test]
         public async Task DisposingFieldInCtor()
         {

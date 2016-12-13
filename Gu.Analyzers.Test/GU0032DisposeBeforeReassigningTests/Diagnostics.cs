@@ -9,7 +9,6 @@
         public async Task NotDisposingVariable()
         {
             var testCode = @"
-    using System;
     using System.IO;
 
     public class Foo

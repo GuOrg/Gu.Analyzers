@@ -1,6 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -46,12 +48,14 @@
             }
 
             var symbol = context.SemanticModel.SemanticModelFor(assignment.Left)
-                                    .GetSymbolInfo(assignment.Left).Symbol;
+                                .GetSymbolInfo(assignment.Left)
+                                .Symbol;
 
             var localSymbol = symbol as ILocalSymbol;
             if (localSymbol != null)
             {
-                if (IsDisposedBeforeAssignment(symbol, assignment))
+                if (!IsVariableAssignedBefore(localSymbol, assignment, context.SemanticModel, context.CancellationToken) ||
+                    IsDisposedBeforeAssignment(symbol, assignment))
                 {
                     return;
                 }
@@ -71,9 +75,42 @@
             }
         }
 
+        private static bool IsVariableAssignedBefore(ILocalSymbol symbol, AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            VariableDeclaratorSyntax declarator;
+            if (symbol.TryGetSingleDeclaration(cancellationToken, out declarator))
+            {
+                if (Disposable.IsCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
+                {
+                    return true;
+                }
+            }
+
+            using (var pooled = AssignmentWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var previousAssignment in pooled.Item.Assignments)
+                {
+                    if (previousAssignment.SpanStart >= assignment.SpanStart)
+                    {
+                        return false;
+                    }
+
+                    if (previousAssignment.Left == assignment.Left)
+                    {
+                        if (Disposable.IsCreation(assignment.Right, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private static bool IsDisposedBeforeAssignment(ISymbol symbol, AssignmentExpressionSyntax assignment)
         {
-            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<BlockSyntax>()))
+            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
                 foreach (var invocation in pooled.Item.Invocations)
                 {
