@@ -79,6 +79,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0035.md">GU0035</a></td>
   <td>Implement IDisposable.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0036.md">GU0036</a></td>
+  <td>Don't dispose injected.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

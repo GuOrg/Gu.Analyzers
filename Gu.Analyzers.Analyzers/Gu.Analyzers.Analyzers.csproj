@@ -54,6 +54,7 @@
     <Compile Include="GU0021CalculatedPropertyAllocates.cs" />
     <Compile Include="GU0030UseUsing.cs" />
     <Compile Include="GU0031DisposeMember.cs" />
+    <Compile Include="GU0036DontDisposeInjected.cs" />
     <Compile Include="GU0032DisposeBeforeReassigning.cs" />
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
