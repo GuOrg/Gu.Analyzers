@@ -26,8 +26,8 @@
             GU0031DisposeMember.DiagnosticId,
             "CS0535");
 
-        /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        ///// <inheritdoc/>
+        //public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -80,11 +80,41 @@
                     continue;
                 }
 
+                if (type.IsSealed)
+                {
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Implement IDisposable.",
+                            cancellationToken =>
+                                ApplyImplementIDisposableSealedFixAsync(
+                                    context,
+                                    semanticModel,
+                                    cancellationToken,
+                                    syntaxRoot,
+                                    typeDeclaration),
+                            nameof(ImplementIDisposableCodeFixProvider)),
+                        diagnostic);
+                    continue;
+                }
+
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Implement IDisposable and make class sealed.",
                         cancellationToken =>
                             ApplyImplementIDisposableSealedFixAsync(
+                                context,
+                                semanticModel,
+                                cancellationToken,
+                                syntaxRoot,
+                                typeDeclaration),
+                        nameof(ImplementIDisposableCodeFixProvider)),
+                    diagnostic);
+
+                context.RegisterCodeFix(
+                    CodeAction.Create(
+                        "Implement IDisposable with virtual dispose method.",
+                        cancellationToken =>
+                            ApplyImplementIDisposableVirtualFixAsync(
                                 context,
                                 semanticModel,
                                 cancellationToken,
@@ -141,6 +171,86 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
         }
 
+        private static Task<Document> ApplyImplementIDisposableVirtualFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
+        {
+            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
+            var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
+            SyntaxNode updated = typeDeclaration;
+
+            IMethodSymbol existsingMethod;
+            if (!type.TryGetMethod("Dispose", out existsingMethod))
+            {
+                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+
+                var disposeMethod = syntaxGenerator.MethodDeclaration(
+                    "Dispose",
+                    accessibility: Accessibility.Public,
+                    statements: new[] { SyntaxFactory.ParseStatement("this.Dispose(true);") });
+
+                MemberDeclarationSyntax method;
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                                       out method))
+                {
+                    updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
+                }
+                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                {
+                    updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
+                }
+                else
+                {
+                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                }
+
+                var ifDisposedReturn = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression("this.disposed"),
+                    new[] { SyntaxFactory.ReturnStatement() });
+                var ifDisposing = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression("disposing"),
+                    new EmptyStatementSyntax[0]);
+                var virtualDisposeMethod = syntaxGenerator.MethodDeclaration(
+                    name: "Dispose",
+                    accessibility: Accessibility.Protected,
+                    modifiers: DeclarationModifiers.Virtual,
+                    parameters: new[] { SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool")) },
+                    statements: new[] { ifDisposedReturn, SyntaxFactory.ParseStatement("this.disposed = true;"), ifDisposing, });
+
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                                       out method))
+                {
+                    updated = updated.InsertNodesAfter(method, new[] { virtualDisposeMethod });
+                }
+                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                {
+                    updated = updated.InsertNodesBefore(method, new[] { virtualDisposeMethod });
+                }
+                else
+                {
+                    updated = syntaxGenerator.AddMembers(updated, virtualDisposeMethod);
+                }
+
+                updated = WithThrowIfDisposed(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+            }
+
+            if (!Disposable.IsAssignableTo(type))
+            {
+                updated = syntaxGenerator.AddInterfaceType(updated, IDisposableInterface);
+            }
+
+            var newRoot = (CompilationUnitSyntax)syntaxRoot.ReplaceNode(typeDeclaration, updated);
+            UsingDirectiveSyntax @using;
+            if (!newRoot.Usings.TryGetSingle(x => x.Name.ToString() == "System", out @using))
+            {
+                newRoot = newRoot.Usings.Any()
+                    ? newRoot.InsertNodesBefore(newRoot.Usings.First(), new[] { UsingSystem })
+                    : newRoot.AddUsings(UsingSystem);
+            }
+
+            return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
+        }
+
         private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
@@ -180,27 +290,7 @@
                     updated = syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
 
-                if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
-                {
-                    var ifDisposedThrow = syntaxGenerator.IfStatement(
-                        SyntaxFactory.ParseExpression("this.disposed"),
-                        new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
-                    var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
-                        "ThrowIfDisposed",
-                        accessibility: Accessibility.Protected,
-                        statements: new[] { ifDisposedThrow });
-
-                    if (typeDeclaration.Members.TryGetLast(
-                                           x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
-                                           out method))
-                    {
-                        updated = updated.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
-                    }
-                    else
-                    {
-                        updated = syntaxGenerator.AddMembers(updated, throwIfDisposedMethod);
-                    }
-                }
+                updated = WithThrowIfDisposed(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
             }
 
             if (!Disposable.IsAssignableTo(type))
@@ -211,9 +301,9 @@
             if (!IsSealed(typeDeclaration))
             {
                 updated = syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
+                updated = MakeSealedRewriter.Default.Visit(updated);
             }
 
-            updated = MakeSealedRewriter.Default.Visit(updated);
             var newRoot = (CompilationUnitSyntax)syntaxRoot.ReplaceNode(typeDeclaration, updated);
             UsingDirectiveSyntax @using;
             if (!newRoot.Usings.TryGetSingle(x => x.Name.ToString() == "System", out @using))
@@ -224,6 +314,33 @@
             }
 
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
+        }
+
+        private static SyntaxNode WithThrowIfDisposed(ITypeSymbol type, TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator)
+        {
+            IMethodSymbol existsingMethod;
+            if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
+            {
+                var ifDisposedThrow = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression("this.disposed"),
+                    new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
+                var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
+                    "ThrowIfDisposed",
+                    accessibility: Accessibility.Protected,
+                    statements: new[] { ifDisposedThrow });
+
+                MemberDeclarationSyntax method;
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
+                                       out method))
+                {
+                    return typeDeclaration.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
+                }
+
+                return syntaxGenerator.AddMembers(typeDeclaration, throwIfDisposedMethod);
+            }
+
+            return typeDeclaration;
         }
 
         private static SyntaxNode WithDisposedField(ITypeSymbol type, TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator)

@@ -359,6 +359,57 @@ public class Foo : BaseClass
                       .ConfigureAwait(false);
         }
 
+        [Test]
+        public async Task VirtualDispose()
+        {
+            var testCode = @"
+using System;
+
+public class Foo : ↓IDisposable
+{
+}";
+            var expected = this.CSharpDiagnostic("CS0535")
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public class Foo : IDisposable
+{
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 1)
+                      .ConfigureAwait(false);
+        }
+
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
         {
             return base.GetCSharpDiagnosticAnalyzers()
