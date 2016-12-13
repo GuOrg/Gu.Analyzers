@@ -159,6 +159,52 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ImplementIDisposableSealedClassUnderscore()
+        {
+            var testCode = @"
+using System.IO;
+
+public sealed class Foo
+{
+    ↓private readonly Stream _stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream _stream = File.OpenRead(string.Empty);
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ImplementIDisposableAbstractClass()
         {
             var testCode = @"
@@ -203,6 +249,60 @@ public abstract class Foo : IDisposable
     protected void ThrowIfDisposed()
     {
         if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableAbstractClassUnderscore()
+        {
+            var testCode = @"
+using System.IO;
+
+public abstract class Foo
+{
+    ↓private readonly Stream _stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public abstract class Foo : IDisposable
+{
+    private readonly Stream _stream = File.OpenRead(string.Empty);
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (_disposed)
         {
             throw new ObjectDisposedException(GetType().FullName);
         }
@@ -501,6 +601,82 @@ public class Foo : BaseClass
         }
 
         this.disposed = true;
+        if (disposing)
+        {
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task OverrideDisposeUnderscore()
+        {
+            var baseCode = @"
+using System;
+
+public class BaseClass : IDisposable
+{
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            var testCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    ↓private readonly Stream _stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    private readonly Stream _stream = File.OpenRead(string.Empty);
+    private bool _disposed;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
         if (disposing)
         {
         }

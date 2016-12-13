@@ -17,9 +17,9 @@
     [Shared]
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
-        // ReSharper disable once InconsistentNaming
         private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
         private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
+        private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -164,25 +164,19 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
-
-                var ifDisposedReturn = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("this.disposed"),
-                    new[] { SyntaxFactory.ReturnStatement() });
-                var ifDisposing = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("disposing"),
-                    new EmptyStatementSyntax[0]);
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     name: "Dispose",
                     accessibility: Accessibility.Protected,
                     modifiers: DeclarationModifiers.Override,
-                    parameters: new[] { SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool")) },
+                    parameters: new[] { DisposingParameter },
                     statements: new[]
                     {
-                        ifDisposedReturn,
-                        SyntaxFactory.ParseStatement("this.disposed = true;"),
-                        ifDisposing,
+                        syntaxGenerator.IfDisposedReturn(usesUnderscoreNames),
+                        syntaxGenerator.SetDisposedTrue(usesUnderscoreNames),
+                        syntaxGenerator.IfDisposing(),
                         SyntaxFactory.ParseStatement("base.Dispose(disposing);")
                     });
 
@@ -211,12 +205,13 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     "Dispose",
                     accessibility: Accessibility.Public,
-                    statements: new[] { SyntaxFactory.ParseStatement("this.Dispose(true);") });
+                    statements: new[] { SyntaxFactory.ParseStatement(usesUnderscoreNames ? "Dispose(true);" : "this.Dispose(true);") });
 
                 MemberDeclarationSyntax method;
                 if (typeDeclaration.Members.TryGetLast(
@@ -234,18 +229,18 @@
                     updated = syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
 
-                var ifDisposedReturn = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("this.disposed"),
-                    new[] { SyntaxFactory.ReturnStatement() });
-                var ifDisposing = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("disposing"),
-                    new EmptyStatementSyntax[0]);
                 var virtualDisposeMethod = syntaxGenerator.MethodDeclaration(
                     name: "Dispose",
                     accessibility: Accessibility.Protected,
                     modifiers: DeclarationModifiers.Virtual,
-                    parameters: new[] { SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool")) },
-                    statements: new[] { ifDisposedReturn, SyntaxFactory.ParseStatement("this.disposed = true;"), ifDisposing, });
+                    parameters: new[] { DisposingParameter },
+                    statements:
+                    new[]
+                        {
+                            syntaxGenerator.IfDisposedReturn(usesUnderscoreNames),
+                            syntaxGenerator.SetDisposedTrue(usesUnderscoreNames),
+                            syntaxGenerator.IfDisposing(),
+                        });
 
                 if (typeDeclaration.Members.TryGetLast(
                                        x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
@@ -262,7 +257,7 @@
                     updated = syntaxGenerator.AddMembers(updated, virtualDisposeMethod);
                 }
 
-                updated = WithThrowIfDisposed(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+                updated = ((TypeDeclarationSyntax)updated).WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
             }
 
             if (!Disposable.IsAssignableTo(type))
@@ -291,18 +286,16 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                updated = WithDisposedField(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
-                var ifDisposedReturn = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("this.disposed"),
-                    new[] { SyntaxFactory.ReturnStatement() });
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     "Dispose",
                     accessibility: Accessibility.Public,
                     statements: new[]
                     {
-                        ifDisposedReturn,
-                        SyntaxFactory.ParseStatement("this.disposed = true;")
+                        syntaxGenerator.IfDisposedReturn(usesUnderscoreNames),
+                        syntaxGenerator.SetDisposedTrue(usesUnderscoreNames)
                     });
 
                 MemberDeclarationSyntax method;
@@ -321,7 +314,7 @@
                     updated = syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
 
-                updated = WithThrowIfDisposed(type, (TypeDeclarationSyntax)updated, syntaxGenerator);
+                updated = ((TypeDeclarationSyntax)updated).WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
             }
 
             if (!Disposable.IsAssignableTo(type))
@@ -345,60 +338,6 @@
             }
 
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
-        }
-
-        private static SyntaxNode WithThrowIfDisposed(ITypeSymbol type, TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator)
-        {
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
-            {
-                var ifDisposedThrow = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression("this.disposed"),
-                    new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
-                var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
-                    "ThrowIfDisposed",
-                    accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,
-                    statements: new[] { ifDisposedThrow });
-
-                MemberDeclarationSyntax method;
-                if (typeDeclaration.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
-                                       out method))
-                {
-                    return typeDeclaration.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
-                }
-
-                return syntaxGenerator.AddMembers(typeDeclaration, throwIfDisposedMethod);
-            }
-
-            return typeDeclaration;
-        }
-
-        private static SyntaxNode WithDisposedField(ITypeSymbol type, TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator)
-        {
-            IFieldSymbol existsingField;
-            if (!type.TryGetField("disposed", out existsingField))
-            {
-                var disposedField = syntaxGenerator.FieldDeclaration(
-                    "disposed",
-                    accessibility: Accessibility.Private,
-                    type: SyntaxFactory.ParseTypeName("bool"));
-                MemberDeclarationSyntax field;
-                if (typeDeclaration.Members.TryGetLast(x => x is FieldDeclarationSyntax, out field))
-                {
-                    return typeDeclaration.InsertNodesAfter(field, new[] { disposedField });
-                }
-                else if (typeDeclaration.Members.TryGetFirst(out field))
-                {
-                    return typeDeclaration.InsertNodesBefore(field, new[] { disposedField });
-                }
-                else
-                {
-                    return syntaxGenerator.AddMembers(typeDeclaration, disposedField);
-                }
-            }
-
-            return typeDeclaration;
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)
