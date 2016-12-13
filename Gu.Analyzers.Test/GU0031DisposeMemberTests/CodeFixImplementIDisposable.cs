@@ -337,7 +337,7 @@ using System.IO;
 
 public class Foo : BaseClass
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    private readonly Stream stream = File.OpenRead(string.Empty);
     private bool disposed;
 
     protected override void Dispose(bool disposing)
