@@ -77,6 +77,15 @@
                 return;
             }
 
+            if (usingStatement.Expression is InvocationExpressionSyntax)
+            {
+                if (!Disposable.IsPotentialCreation(usingStatement.Expression, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
+                    return;
+                }
+            }
+
             if (usingStatement.Declaration != null)
             {
                 foreach (var variableDeclarator in usingStatement.Declaration.Variables)

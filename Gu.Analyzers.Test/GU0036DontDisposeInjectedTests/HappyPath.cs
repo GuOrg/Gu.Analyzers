@@ -191,5 +191,174 @@ public sealed class Foo : IDisposable
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task UsingCreatedUsingInjectedConcreteFactory()
+        {
+            var factoryCode = @"
+using System;
+
+public class Factory
+{
+    public IDisposable Create()
+    {
+        return new Disposable();
+    }
+}";
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+public class Foo
+{
+    public Foo(Factory factory)
+    {
+        using (factory.Create())
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(new[] { factoryCode, disposableCode, testCode })
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task UsingCreatedUsingInjectedInterfaceFactory()
+        {
+            var iFactoryCode = @"
+using System;
+
+public interface IFactory
+{
+    IDisposable Create();
+}";
+            var factoryCode = @"
+using System;
+
+public class Factory : IFactory
+{
+    public IDisposable Create()
+    {
+        return new Disposable();
+    }
+}";
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+public class Foo
+{
+    public Foo(IFactory factory)
+    {
+        using (factory.Create())
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(new[] { iFactoryCode, factoryCode, disposableCode, testCode })
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task UsingCreatedUsingInjectedAbstractFactory()
+        {
+            var abstractFactoryCode = @"
+using System;
+
+public abstract class FactoryBase
+{
+    public abstract IDisposable Create();
+}";
+            var factoryCode = @"
+using System;
+
+public class Factory : FactoryBase
+{
+    public override IDisposable Create()
+    {
+        return new Disposable();
+    }
+}";
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+public class Foo
+{
+    public Foo(FactoryBase factory)
+    {
+        using (factory.Create())
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(new[] { abstractFactoryCode, factoryCode, disposableCode, testCode })
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task UsingCreatedUsingInjectedVirtualFactory()
+        {
+            var abstractFactoryCode = @"
+using System;
+
+public class FactoryBase
+{
+    public virtual IDisposable Create() => new Disposable();
+}";
+            var factoryCode = @"
+using System;
+
+public class Factory : FactoryBase
+{
+    public override IDisposable Create()
+    {
+        return new Disposable();
+    }
+}";
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+public class Foo
+{
+    public Foo(FactoryBase factory)
+    {
+        using (factory.Create())
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(new[] { abstractFactoryCode, factoryCode, disposableCode, testCode })
+                      .ConfigureAwait(false);
+        }
     }
 }
