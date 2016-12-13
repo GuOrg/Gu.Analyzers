@@ -43,9 +43,7 @@
                     continue;
                 }
 
-                var method = semanticModel.SemanticModelFor(arguments.Parent)
-                          .GetSymbolInfo(arguments.Parent, context.CancellationToken)
-                          .Symbol as IMethodSymbol;
+                var method = semanticModel.GetSymbolSafe(arguments.Parent, context.CancellationToken) as IMethodSymbol;
                 if (method == null)
                 {
                     continue;

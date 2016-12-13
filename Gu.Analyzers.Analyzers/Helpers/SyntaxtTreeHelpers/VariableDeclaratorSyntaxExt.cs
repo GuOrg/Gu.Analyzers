@@ -15,7 +15,7 @@
                 return false;
             }
 
-            var symbol = semanticModel.SemanticModelFor(variable).GetDeclaredSymbol(variable, cancellationToken);
+            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
             if (symbol == null)
             {
                 return false;
@@ -41,7 +41,7 @@
                 return false;
             }
 
-            var symbol = semanticModel.SemanticModelFor(variable).GetDeclaredSymbol(variable, cancellationToken);
+            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
             if (symbol == null)
             {
                 return false;

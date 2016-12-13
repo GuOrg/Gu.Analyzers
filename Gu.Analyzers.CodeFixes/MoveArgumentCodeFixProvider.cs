@@ -69,9 +69,7 @@
         private static Task<Document> ApplyFixGU0002Async(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentListSyntax argumentListSyntax)
         {
             var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = semanticModel.SemanticModelFor(argumentListSyntax.Parent)
-                                      .GetSymbolInfo(argumentListSyntax.Parent, cancellationToken)
-                                      .Symbol as IMethodSymbol;
+            var method = semanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
             foreach (var argument in argumentListSyntax.Arguments)
             {
                 var index = ParameterIndex(method, argument);
@@ -88,9 +86,7 @@
         {
             var argumentListSyntax = nameArgument.FirstAncestorOrSelf<ArgumentListSyntax>();
             var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = semanticModel.SemanticModelFor(argumentListSyntax.Parent)
-                                      .GetSymbolInfo(argumentListSyntax.Parent, cancellationToken)
-                                      .Symbol as IMethodSymbol;
+            var method = semanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
             var messageIndex = ParameterIndex(method, "message");
             var nameIndex = ParameterIndex(method, "paramName");
             for (var i = 0; i < argumentListSyntax.Arguments.Count; i++)

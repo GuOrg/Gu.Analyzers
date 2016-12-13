@@ -26,8 +26,8 @@
             GU0031DisposeMember.DiagnosticId,
             "CS0535");
 
-        ///// <inheritdoc/>
-        //public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        /////// <inheritdoc/>
+        //// public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -143,7 +143,7 @@
                     new EmptyStatementSyntax[0]);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
-                    "Dispose",
+                    name: "Dispose",
                     accessibility: Accessibility.Protected,
                     modifiers: DeclarationModifiers.Override,
                     parameters: new[] { SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool")) },

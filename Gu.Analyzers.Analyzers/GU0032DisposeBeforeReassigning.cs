@@ -47,9 +47,7 @@
                 return;
             }
 
-            var symbol = context.SemanticModel.SemanticModelFor(assignment.Left)
-                                .GetSymbolInfo(assignment.Left)
-                                .Symbol;
+            var symbol = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
 
             var localSymbol = symbol as ILocalSymbol;
             if (localSymbol != null)

@@ -68,9 +68,7 @@
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
-            var symbol = semanticModel.SemanticModelFor(assignment.Left)
-                                      .GetSymbolInfo(assignment.Left, cancellationToken)
-                                      .Symbol;
+            var symbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
             if (symbol == null)
             {
                 result = null;

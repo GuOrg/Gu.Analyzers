@@ -50,8 +50,7 @@
                 ParameterSyntax match;
                 if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out match))
                 {
-                    var symbol = this.semanticModel.SemanticModelFor(node.Left)
-                                     .GetSymbolInfo(node.Left, this.cancellationToken).Symbol;
+                    var symbol = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
                     if (this.ParameterNameMap.ContainsKey(match))
                     {
                         this.ParameterNameMap[match] = null;
@@ -68,9 +67,7 @@
 
         public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
         {
-            var ctor = this.semanticModel.SemanticModelFor(node)
-                           .GetSymbolInfo(node)
-                           .Symbol as IMethodSymbol;
+            var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
             if (ctor != null)
             {
                 for (var i = 0; i < node.ArgumentList.Arguments.Count; i++)

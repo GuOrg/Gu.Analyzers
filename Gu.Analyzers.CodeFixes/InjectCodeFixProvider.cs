@@ -40,8 +40,12 @@
                 var objectCreation = node as ObjectCreationExpressionSyntax;
                 if (objectCreation != null)
                 {
-                    var type = (ITypeSymbol)semanticModel.GetSymbolInfo(objectCreation)
-                                                              .Symbol.ContainingSymbol;
+                    var type = (ITypeSymbol)semanticModel.GetSymbolSafe(objectCreation, context.CancellationToken)?.ContainingSymbol;
+                    if (type == null)
+                    {
+                        continue;
+                    }
+
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
                                                        .WithType(SyntaxFactory.ParseTypeName(type.Name));
                     switch (GU0007PreferInjecting.CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
@@ -72,7 +76,7 @@
                 var memberAccess = node as MemberAccessExpressionSyntax;
                 if (memberAccess != null)
                 {
-                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolInfo(memberAccess).Symbol);
+                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(memberAccess, context.CancellationToken));
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
                                                        .WithType(SyntaxFactory.ParseTypeName(type.Name));
                     switch (GU0007PreferInjecting.IsInjectable(memberAccess, memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))

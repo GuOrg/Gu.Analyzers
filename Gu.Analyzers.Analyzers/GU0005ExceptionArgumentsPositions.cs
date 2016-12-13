@@ -53,7 +53,7 @@
                 type == KnownSymbol.ArgumentOutOfRangeException)
             {
                 var symbols = context.SemanticModel.LookupSymbols(objectCreationExpressionSyntax.SpanStart);
-                var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolInfo(objectCreationExpressionSyntax).Symbol;
+                var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(objectCreationExpressionSyntax, context.CancellationToken);
                 int parameterIndex;
                 ArgumentSyntax argument;
                 int argumentIndex;

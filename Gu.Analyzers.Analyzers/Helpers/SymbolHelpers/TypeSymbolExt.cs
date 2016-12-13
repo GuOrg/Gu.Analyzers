@@ -114,8 +114,7 @@
                 return true;
             }
 
-            var typeInfo = semanticModel.SemanticModelFor(value)
-                                        .GetTypeInfo(value, cancellationToken);
+            var typeInfo = semanticModel.GetTypeInfoSafe(value, cancellationToken);
             return namedTypeSymbol.TypeArguments[0].IsSameType(typeInfo.Type);
         }
 

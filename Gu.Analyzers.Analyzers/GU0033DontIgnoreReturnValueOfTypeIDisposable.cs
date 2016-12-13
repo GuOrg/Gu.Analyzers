@@ -61,8 +61,7 @@
                 return;
             }
 
-            var symbol = (IMethodSymbol)context.SemanticModel.GetSymbolInfo(invocation, context.CancellationToken)
-                                               .Symbol;
+            var symbol = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
             if (symbol == null || symbol.ReturnsVoid)
             {
                 return;
@@ -94,8 +93,7 @@
             if (node.Parent is ArgumentSyntax)
             {
                 var objectCreation = node.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
-                var symbol = semanticModel.GetSymbolInfo(objectCreation, cancellationToken)
-                                          .Symbol as IMethodSymbol;
+                var symbol = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
                 if (symbol?.ContainingType == KnownSymbol.TextReader)
                 {
                     return false;

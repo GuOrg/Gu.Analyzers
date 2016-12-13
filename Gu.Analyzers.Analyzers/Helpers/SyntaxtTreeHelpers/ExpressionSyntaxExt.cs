@@ -3,7 +3,6 @@ namespace Gu.Analyzers
 {
     using System.Threading;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -32,8 +31,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var symbol = semanticModel.SemanticModelFor(expression)
-                                      .GetTypeInfo(expression, cancellationToken)
+            var symbol = semanticModel.GetTypeInfoSafe(expression, cancellationToken)
                                       .Type;
             return symbol.Is(type);
         }
@@ -61,8 +59,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var symbol = semanticModel.SemanticModelFor(expression)
-                                      .GetTypeInfo(expression, cancellationToken)
+            var symbol = semanticModel.GetTypeInfoSafe(expression, cancellationToken)
                                       .Type;
             return symbol.IsSameType(type);
         }

@@ -51,8 +51,8 @@
                     return;
                 }
 
-                var left = context.SemanticModel.GetSymbolInfo(assignment.Left).Symbol;
-                var right = context.SemanticModel.GetSymbolInfo(assignment.Right).Symbol;
+                var left = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
+                var right = context.SemanticModel.GetSymbolSafe(assignment.Right, context.CancellationToken);
                 if (!ReferenceEquals(left, right))
                 {
                     return;

@@ -27,8 +27,7 @@ namespace Gu.Analyzers
 
             var semanticModel = await annotatedDocument.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
             var symbol = annotatedToken.Parent is IdentifierNameSyntax
-                             ? semanticModel.GetSymbolInfo(annotatedToken.Parent, cancellationToken)
-                                            .Symbol
+                             ? semanticModel.GetSymbolSafe(annotatedToken.Parent, cancellationToken)
                              : semanticModel.GetDeclaredSymbol(annotatedToken.Parent, cancellationToken);
 
             var newSolution = await Renamer.RenameSymbolAsync(annotatedSolution, symbol, newName, null, cancellationToken).ConfigureAwait(false);

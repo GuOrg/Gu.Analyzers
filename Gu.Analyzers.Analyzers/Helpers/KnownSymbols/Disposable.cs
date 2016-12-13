@@ -28,9 +28,7 @@ namespace Gu.Analyzers
                        IsCreation(conditional.WhenFalse, semanticModel, cancellationToken);
             }
 
-            var symbol = semanticModel.SemanticModelFor(disposable)
-                          .GetSymbolInfo(disposable, cancellationToken)
-                          .Symbol;
+            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol == null)
             {
                 return false;
@@ -134,7 +132,7 @@ namespace Gu.Analyzers
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
         }
 
-        public static bool BaseTypeHasVirtualDisposeMethod(ITypeSymbol type)
+        internal static bool BaseTypeHasVirtualDisposeMethod(ITypeSymbol type)
         {
             var baseType = type.BaseType;
             while (baseType != null)

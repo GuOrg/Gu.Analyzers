@@ -2,6 +2,7 @@
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
@@ -47,8 +48,8 @@
                 if (objectCreation != null)
                 {
                     var arguments = objectCreation.ArgumentList.Arguments;
-                    var hasMutable = IsAnyArgumentMutable(semanticModel, arguments) ||
-                                      IsAnyInitializerMutable(semanticModel, objectCreation.Initializer);
+                    var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
+                                      IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
 
                     var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
                     ConstructorDeclarationSyntax ctor;
@@ -106,7 +107,7 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot));
         }
 
-        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer)
+        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, CancellationToken cancellationToken, InitializerExpressionSyntax initializer)
         {
             if (initializer == null)
             {
@@ -122,7 +123,7 @@
                     return true;
                 }
 
-                if (IsMutable(semanticModel, assignment.Right))
+                if (IsMutable(semanticModel, cancellationToken, assignment.Right))
                 {
                     return true;
                 }
@@ -131,11 +132,11 @@
             return false;
         }
 
-        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, SeparatedSyntaxList<ArgumentSyntax> arguments)
+        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, CancellationToken cancellationToken, SeparatedSyntaxList<ArgumentSyntax> arguments)
         {
             foreach (var argument in arguments)
             {
-                if (IsMutable(semanticModel, argument.Expression))
+                if (IsMutable(semanticModel, cancellationToken, argument.Expression))
                 {
                     return true;
                 }
@@ -144,15 +145,14 @@
             return false;
         }
 
-        private static bool IsMutable(SemanticModel semanticModel, ExpressionSyntax expression)
+        private static bool IsMutable(SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression)
         {
             if (expression is LiteralExpressionSyntax || expression is ThisExpressionSyntax || expression is ParenthesizedLambdaExpressionSyntax)
             {
                 return false;
             }
 
-            var symbol = semanticModel.GetSymbolInfo(expression)
-                                      .Symbol;
+            var symbol = semanticModel.GetSymbolSafe(expression, cancellationToken);
             var property = symbol as IPropertySymbol;
             if (property?.SetMethod != null)
             {
@@ -178,7 +178,7 @@
             var memberAccess = expression as MemberAccessExpressionSyntax;
             if (memberAccess != null)
             {
-                return IsMutable(semanticModel, memberAccess.Expression);
+                return IsMutable(semanticModel, cancellationToken, memberAccess.Expression);
             }
 
             return true;

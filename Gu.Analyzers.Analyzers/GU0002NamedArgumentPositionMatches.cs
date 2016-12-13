@@ -51,9 +51,7 @@
                 return;
             }
 
-            var method = context.SemanticModel.SemanticModelFor(argumentListSyntax.Parent)
-                                .GetSymbolInfo(argumentListSyntax.Parent, context.CancellationToken)
-                                .Symbol as IMethodSymbol;
+            var method = context.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, context.CancellationToken) as IMethodSymbol;
             if (method == null || method.Parameters.Length != argumentListSyntax.Arguments.Count)
             {
                 return;

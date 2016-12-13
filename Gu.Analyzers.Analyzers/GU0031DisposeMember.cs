@@ -128,9 +128,7 @@
                                 continue;
                             }
 
-                            var symbol = context.SemanticModel.SemanticModelFor(identifier)
-                                                .GetSymbolInfo(identifier, context.CancellationToken)
-                                                .Symbol;
+                            var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
                             if (ReferenceEquals(symbol, context.ContainingSymbol))
                             {
                                 return;

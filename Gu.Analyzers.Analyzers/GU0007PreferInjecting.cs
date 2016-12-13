@@ -126,8 +126,7 @@
                 return;
             }
 
-            var ctor = context.SemanticModel.GetSymbolInfo(objectCreation)
-                                .Symbol as IMethodSymbol;
+            var ctor = context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) as IMethodSymbol;
             if (ctor == null || !IsInjectionType(ctor.ContainingType))
             {
                 return;
@@ -148,8 +147,7 @@
                 return;
             }
 
-            var symbol = context.SemanticModel.GetSymbolInfo(memberAccess, context.CancellationToken)
-                                .Symbol;
+            var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
             var memberType = MemberType(symbol);
             if (memberType == null || !IsInjectionType(memberType))
             {

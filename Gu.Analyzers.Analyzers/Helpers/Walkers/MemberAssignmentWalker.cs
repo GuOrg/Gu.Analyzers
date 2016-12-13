@@ -42,9 +42,7 @@
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
-            var left = this.semanticModel.SemanticModelFor(node)
-                           .GetSymbolInfo(node.Left, this.cancellationToken)
-                           .Symbol;
+            var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
             if (ReferenceEquals(left, this.symbol))
             {
                 this.assignments.Add(node.Right);
@@ -56,7 +54,7 @@
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
             if (node.Initializer != null &&
-                ReferenceEquals(this.semanticModel.SemanticModelFor(node).GetDeclaredSymbol(node), this.symbol))
+                ReferenceEquals(this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken), this.symbol))
             {
                 this.assignments.Add(node.Initializer.Value);
             }
@@ -67,7 +65,7 @@
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
             if (node.Initializer != null &&
-                ReferenceEquals(this.semanticModel.SemanticModelFor(node).GetDeclaredSymbol(node), this.symbol))
+                ReferenceEquals(this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken), this.symbol))
             {
                 this.assignments.Add(node.Initializer.Value);
             }

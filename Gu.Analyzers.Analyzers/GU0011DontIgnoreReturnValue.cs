@@ -80,8 +80,7 @@
 
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var symbol = (IMethodSymbol)semanticModel.GetSymbolInfo(invocation, cancellationToken)
-                                          .Symbol;
+            var symbol = (IMethodSymbol)semanticModel.GetSymbolSafe(invocation, cancellationToken);
             if (symbol == null || symbol.ReturnsVoid)
             {
                 return true;
