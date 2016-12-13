@@ -54,7 +54,7 @@
 
             if (Disposable.IsAssignableTo(symbol.Type) && declarator.Initializer != null)
             {
-                if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsPotentialCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
                 {
                     if (variableDeclaration.Parent is UsingStatementSyntax ||
                         variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)

@@ -47,7 +47,10 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal static bool IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        internal static bool IsPotentialCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (disposable == null)
             {
@@ -57,15 +60,15 @@ namespace Gu.Analyzers
             if (disposable.IsKind(SyntaxKind.CoalesceExpression))
             {
                 var binaryExpression = (BinaryExpressionSyntax)disposable;
-                return IsCreation(binaryExpression.Left, semanticModel, cancellationToken) ||
-                       IsCreation(binaryExpression.Right, semanticModel, cancellationToken);
+                return IsPotentialCreation(binaryExpression.Left, semanticModel, cancellationToken) ||
+                       IsPotentialCreation(binaryExpression.Right, semanticModel, cancellationToken);
             }
 
             var conditional = disposable as ConditionalExpressionSyntax;
             if (conditional != null)
             {
-                return IsCreation(conditional.WhenTrue, semanticModel, cancellationToken) ||
-                       IsCreation(conditional.WhenFalse, semanticModel, cancellationToken);
+                return IsPotentialCreation(conditional.WhenTrue, semanticModel, cancellationToken) ||
+                       IsPotentialCreation(conditional.WhenFalse, semanticModel, cancellationToken);
             }
 
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
@@ -95,10 +98,17 @@ namespace Gu.Analyzers
                 MethodDeclarationSyntax methodDeclaration;
                 if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
                 {
-                    ExpressionSyntax returnValue;
-                    if (methodDeclaration.TryGetReturnExpression(out returnValue))
+                    using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
                     {
-                        return IsCreation(returnValue, semanticModel, cancellationToken);
+                        foreach (var returnValue in pooled.Item.ReturnValues)
+                        {
+                            if (IsPotentialCreation(returnValue, semanticModel, cancellationToken))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
                     }
                 }
 
@@ -123,16 +133,23 @@ namespace Gu.Analyzers
                 {
                     if (propertyDeclaration.ExpressionBody != null)
                     {
-                        return IsCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken);
+                        return IsPotentialCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken);
                     }
 
                     AccessorDeclarationSyntax getter;
                     if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
                     {
-                        ExpressionSyntax returnValue;
-                        if (getter.Body.TryGetReturnExpression(out returnValue))
+                        using (var pooled = ReturnExpressionsWalker.Create(getter))
                         {
-                            return IsCreation(returnValue, semanticModel, cancellationToken);
+                            foreach (var returnValue in pooled.Item.ReturnValues)
+                            {
+                                if (IsPotentialCreation(returnValue, semanticModel, cancellationToken))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
                         }
                     }
                 }
@@ -147,7 +164,7 @@ namespace Gu.Analyzers
                 if (local.TryGetSingleDeclaration(cancellationToken, out variable) &&
                     variable.Initializer != null)
                 {
-                    return IsCreation(variable.Initializer.Value, semanticModel, cancellationToken);
+                    return IsPotentialCreation(variable.Initializer.Value, semanticModel, cancellationToken);
                 }
             }
 
@@ -246,7 +263,7 @@ namespace Gu.Analyzers
         {
             foreach (var assignment in assignments)
             {
-                if (Disposable.IsCreation(assignment, semanticModel, cancellationToken))
+                if (Disposable.IsPotentialCreation(assignment, semanticModel, cancellationToken))
                 {
                     return true;
                 }

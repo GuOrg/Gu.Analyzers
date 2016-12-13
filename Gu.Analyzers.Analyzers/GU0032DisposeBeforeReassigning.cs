@@ -42,7 +42,7 @@
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (!Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentialCreation(assignment.Right, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -78,7 +78,7 @@
             VariableDeclaratorSyntax declarator;
             if (symbol.TryGetSingleDeclaration(cancellationToken, out declarator))
             {
-                if (Disposable.IsCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
+                if (Disposable.IsPotentialCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -95,7 +95,7 @@
 
                     if (previousAssignment.Left == assignment.Left)
                     {
-                        if (Disposable.IsCreation(assignment.Right, semanticModel, cancellationToken))
+                        if (Disposable.IsPotentialCreation(assignment.Right, semanticModel, cancellationToken))
                         {
                             return true;
                         }

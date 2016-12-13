@@ -52,7 +52,7 @@
                 return;
             }
 
-            if (Disposable.IsCreation(returnStatement.Expression, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentialCreation(returnStatement.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnStatement.Expression.GetLocation()));
             }
@@ -72,7 +72,7 @@
                 return;
             }
 
-            if (Disposable.IsCreation(arrowClause.Expression, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentialCreation(arrowClause.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, arrowClause.Expression.GetLocation()));
             }

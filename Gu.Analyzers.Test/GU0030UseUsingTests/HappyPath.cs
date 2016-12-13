@@ -132,6 +132,42 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         }
 
         [Test]
+        public async Task DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public static class Foo
+{
+    private static readonly Stream Stream = File.OpenRead(string.Empty);
+
+    public static long Bar()
+    {
+        var stream = GetStream(FileAccess.Read);
+        return stream.Length;
+    }
+
+    public static Stream GetStream(FileAccess fileAccess)
+    {
+        switch (fileAccess)
+        {
+            case FileAccess.Read:
+                return Stream;
+            case FileAccess.Write:
+                return Stream;
+            case FileAccess.ReadWrite:
+                return Stream;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(fileAccess), fileAccess, null);
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task UsingNewDisposable()
         {
             var disposableCode = @"

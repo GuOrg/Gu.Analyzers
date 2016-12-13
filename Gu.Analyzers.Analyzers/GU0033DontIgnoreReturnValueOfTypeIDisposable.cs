@@ -42,7 +42,7 @@
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
         {
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (!Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentialCreation(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -67,7 +67,7 @@
                 return;
             }
 
-            if (!Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentialCreation(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }

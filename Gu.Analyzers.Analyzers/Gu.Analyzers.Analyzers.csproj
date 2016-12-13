@@ -100,7 +100,6 @@
     <Compile Include="Helpers\Walkers\Pool.cs" />
     <Compile Include="HelpLink.cs" />
     <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedType.cs" />
-    <Compile Include="Helpers\SyntaxtTreeHelpers\MethodDeclarationSyntaxExt.cs" />
     <Compile Include="NoCodeFixAttribute.cs" />
     <Compile Include="NoDiagnosticAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
