@@ -43,6 +43,12 @@
                                                .GetDeclaredSymbol(node, cancellationToken);
         }
 
+        internal static ITypeSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, TypeDeclarationSyntax node, CancellationToken cancellationToken)
+        {
+            return (ITypeSymbol)semanticModel.SemanticModelFor(node)
+                                             .GetDeclaredSymbol(node, cancellationToken);
+        }
+
         internal static ISymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
             return semanticModel.SemanticModelFor(node)

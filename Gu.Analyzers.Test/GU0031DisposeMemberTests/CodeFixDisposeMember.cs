@@ -416,24 +416,6 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task NotDisposingFieldWhenContainingTypeIsNotIDisposable()
-        {
-            var testCode = @"
-    using System;
-    using System.IO;
-
-    public sealed class Foo
-    {
-        ↓private readonly Stream stream = File.OpenRead(string.Empty);
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
-        }
-
-        [Test]
         public async Task NotDisposingPropertyWhenInitializedInline()
         {
             var testCode = @"

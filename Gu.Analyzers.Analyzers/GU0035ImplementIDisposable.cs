@@ -8,23 +8,23 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0031DisposeMember : DiagnosticAnalyzer
+    internal class GU0035ImplementIDisposable : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0031";
-        private const string Title = "Dispose member.";
-        private const string MessageFormat = "Dispose member.";
-        private const string Description = "Dispose the member as it is assigned with a created `IDisposable`s within the type.";
+        public const string DiagnosticId = "GU0035";
+        private const string Title = "Implement IDisposable.";
+        private const string MessageFormat = "Implement IDisposable.";
+        private const string Description = "The member is assigned with a created `IDisposable`s within the type. Implement IDisposable and dispose it.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+                                                                      id: DiagnosticId,
+                                                                      title: Title,
+                                                                      messageFormat: MessageFormat,
+                                                                      category: AnalyzerCategory.Correctness,
+                                                                      defaultSeverity: DiagnosticSeverity.Warning,
+                                                                      isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+                                                                      description: Description,
+                                                                      helpLinkUri: HelpLink);
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
@@ -48,7 +48,7 @@
 
             if (Disposable.IsAssignedWithCreatedDisposable(field, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
+                CheckThatIDisposalbeIsImplemented(context);
             }
         }
 
@@ -77,41 +77,19 @@
 
             if (Disposable.IsAssignedWithCreatedDisposable(property, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
+                CheckThatIDisposalbeIsImplemented(context);
             }
         }
 
-        private static void CheckThatMemberIsDisposed(SyntaxNodeAnalysisContext context)
+        private static void CheckThatIDisposalbeIsImplemented(SyntaxNodeAnalysisContext context)
         {
             var containingType = context.ContainingSymbol.ContainingType;
 
             IMethodSymbol disposeMethod;
             if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, out disposeMethod))
             {
-                return;
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
-
-            foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
-            {
-                using (var pooled = IdentifierNameWalker.Create(declaration))
-                {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
-                    {
-                        if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
-                        {
-                            continue;
-                        }
-
-                        var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
-                        if (ReferenceEquals(symbol, context.ContainingSymbol))
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
         }
     }
 }

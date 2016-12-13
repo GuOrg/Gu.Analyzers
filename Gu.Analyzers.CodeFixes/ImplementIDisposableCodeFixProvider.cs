@@ -23,7 +23,7 @@
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0031DisposeMember.DiagnosticId,
+            GU0035ImplementIDisposable.DiagnosticId,
             "CS0535");
 
         /////// <inheritdoc/>
@@ -40,9 +40,7 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (diagnostic.Id == "CS0535" &&
-                    !diagnostic.GetMessage(CultureInfo.InvariantCulture)
-                               .EndsWith("does not implement interface member 'IDisposable.Dispose()'"))
+                if (!IsSupportedDiagnostic(diagnostic))
                 {
                     continue;
                 }
@@ -60,9 +58,9 @@
                     continue;
                 }
 
-                var type = semanticModel.GetDeclaredSymbol(typeDeclaration, context.CancellationToken);
-                if (diagnostic.Id == GU0031DisposeMember.DiagnosticId &&
-                    Disposable.IsAssignableTo(type) &&
+                var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
+
+                if (Disposable.IsAssignableTo(type) &&
                     Disposable.BaseTypeHasVirtualDisposeMethod(type))
                 {
                     context.RegisterCodeFix(
@@ -87,6 +85,23 @@
                             "Implement IDisposable.",
                             cancellationToken =>
                                 ApplyImplementIDisposableSealedFixAsync(
+                                    context,
+                                    semanticModel,
+                                    cancellationToken,
+                                    syntaxRoot,
+                                    typeDeclaration),
+                            nameof(ImplementIDisposableCodeFixProvider)),
+                        diagnostic);
+                    continue;
+                }
+
+                if (type.IsAbstract)
+                {
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Implement IDisposable with virtual dispose method.",
+                            cancellationToken =>
+                                ApplyImplementIDisposableVirtualFixAsync(
                                     context,
                                     semanticModel,
                                     cancellationToken,
@@ -123,6 +138,22 @@
                         nameof(ImplementIDisposableCodeFixProvider)),
                     diagnostic);
             }
+        }
+
+        private static bool IsSupportedDiagnostic(Diagnostic diagnostic)
+        {
+            if (diagnostic.Id == GU0035ImplementIDisposable.DiagnosticId)
+            {
+                return true;
+            }
+
+            if (diagnostic.Id == "CS0535")
+            {
+                return diagnostic.GetMessage(CultureInfo.InvariantCulture)
+                                 .EndsWith("does not implement interface member 'IDisposable.Dispose()'");
+            }
+
+            return false;
         }
 
         private static Task<Document> ApplyOverrideDisposeFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
@@ -326,7 +357,7 @@
                     new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
                 var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
                     "ThrowIfDisposed",
-                    accessibility: Accessibility.Protected,
+                    accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,
                     statements: new[] { ifDisposedThrow });
 
                 MemberDeclarationSyntax method;

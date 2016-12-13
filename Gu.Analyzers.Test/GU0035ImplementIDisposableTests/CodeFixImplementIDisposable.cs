@@ -1,9 +1,8 @@
-﻿namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
+﻿namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.CodeAnalysis;
@@ -11,10 +10,10 @@
 
     using NUnit.Framework;
 
-    internal class CodeFixImplementIDisposable : CodeFixVerifier<GU0031DisposeMember, ImplementIDisposableCodeFixProvider>
+    internal class CodeFixImplementIDisposable : CodeFixVerifier<GU0035ImplementIDisposable, ImplementIDisposableCodeFixProvider>
     {
         [Test]
-        public async Task ImplementIDisposable()
+        public async Task ImplementIDisposable0()
         {
             var testCode = @"
 using System.IO;
@@ -23,10 +22,10 @@ public class Foo
 {
     ↓private readonly Stream stream = File.OpenRead(string.Empty);
 }";
-            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"using System;
@@ -60,6 +59,160 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ImplementIDisposable1()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 1, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableSealedClass()
+        {
+            var testCode = @"
+using System.IO;
+
+public sealed class Foo
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableAbstractClass()
+        {
+            var testCode = @"
+using System.IO;
+
+public abstract class Foo
+{
+    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public abstract class Foo : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ImplementIDisposableWhenInterfaceIsMissing()
         {
             var testCode = @"
@@ -73,10 +226,10 @@ public class Foo
     {
     }
 }";
-            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"using System;
@@ -326,10 +479,10 @@ public class Foo : BaseClass
 {
     ↓private readonly Stream stream = File.OpenRead(string.Empty);
 }";
-            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected, CancellationToken.None)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"
@@ -355,7 +508,7 @@ public class Foo : BaseClass
         base.Dispose(disposing);
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true)
                       .ConfigureAwait(false);
         }
 
@@ -370,7 +523,7 @@ public class Foo : ↓IDisposable
 }";
             var expected = this.CSharpDiagnostic("CS0535")
                                .WithLocationIndicated(ref testCode);
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"

@@ -46,7 +46,7 @@
                 var memberSymbol = MemberSymbol(member, semanticModel, context.CancellationToken);
                 IMethodSymbol disposeMethodSymbol;
                 MethodDeclarationSyntax disposeMethodDeclaration;
-                if (TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
+                if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
                 {
                     if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
                         disposeMethodSymbol.Parameters.Length == 0 &&
@@ -131,40 +131,6 @@
             }
 
             return Task.FromResult(context.Document);
-        }
-
-        private static bool TryGetDisposeMethod(ITypeSymbol type, out IMethodSymbol disposeMethod)
-        {
-            disposeMethod = null;
-            if (type == null)
-            {
-                return false;
-            }
-
-            var disposers = type.GetMembers("Dispose");
-            if (disposers.Length == 0)
-            {
-                return false;
-            }
-
-            if (disposers.Length == 1)
-            {
-                disposeMethod = disposers[0] as IMethodSymbol;
-                return disposeMethod != null;
-            }
-
-            if (disposers.Length == 2)
-            {
-                ISymbol temp;
-                if (disposers.TryGetSingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out temp))
-                {
-                    disposeMethod = temp as IMethodSymbol;
-                    return disposeMethod != null &&
-                           disposeMethod.Parameters[0].Type == KnownSymbol.Boolean;
-                }
-            }
-
-            return false;
         }
 
         private static StatementSyntax CreateDisposeStatement(ISymbol member)

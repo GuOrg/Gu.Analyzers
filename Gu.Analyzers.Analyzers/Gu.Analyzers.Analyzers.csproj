@@ -59,6 +59,7 @@
     <Compile Include="AnalyzerConstants.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposable.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposable.cs" />
+    <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
     <Compile Include="Helpers\Walkers\ConstructorWalker.cs" />

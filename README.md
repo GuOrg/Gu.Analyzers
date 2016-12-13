@@ -75,6 +75,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0034.md">GU0034</a></td>
   <td>Returntype should indicate that the value should be disposed.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0035.md">GU0035</a></td>
+  <td>Implement IDisposable.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
