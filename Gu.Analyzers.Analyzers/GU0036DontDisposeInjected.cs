@@ -36,6 +36,7 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
             context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(HandleUsing, SyntaxKind.UsingStatement);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
@@ -64,6 +65,34 @@
             if (!Disposable.IsAssignedWithCreatedDisposable(property, context.SemanticModel, context.CancellationToken))
             {
                 CheckThatMemberIsNotDisposed(context);
+            }
+        }
+
+        private static void HandleUsing(SyntaxNodeAnalysisContext context)
+        {
+            var usingStatement = (UsingStatementSyntax)context.Node;
+            if (usingStatement.Expression is IdentifierNameSyntax)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
+                return;
+            }
+
+            if (usingStatement.Declaration != null)
+            {
+                foreach (var variableDeclarator in usingStatement.Declaration.Variables)
+                {
+                    if (variableDeclarator.Initializer == null)
+                    {
+                        continue;
+                    }
+
+                    var value = variableDeclarator.Initializer.Value;
+                    if (!Disposable.IsPotentialCreation(value, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, value.GetLocation()));
+                        return;
+                    }
+                }
             }
         }
 

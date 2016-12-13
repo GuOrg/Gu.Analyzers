@@ -94,5 +94,43 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task UsingStream1()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            using (File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task UsingStream2()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

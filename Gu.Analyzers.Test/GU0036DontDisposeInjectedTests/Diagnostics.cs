@@ -88,5 +88,55 @@
             await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task UsingField1()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    private readonly IDisposable disposable;
+
+    public Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+        using (↓disposable)
+        {
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task UsingField2()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    private readonly IDisposable disposable;
+
+    public Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+        using (var meh = ↓disposable)
+        {
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
     }
 }
