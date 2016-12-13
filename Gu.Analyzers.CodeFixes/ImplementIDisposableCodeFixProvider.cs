@@ -17,8 +17,6 @@
     [Shared]
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
-        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
-        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
         private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
 
         /// <inheritdoc/>
@@ -88,7 +86,7 @@
                                     context,
                                     semanticModel,
                                     cancellationToken,
-                                    syntaxRoot,
+                                    (CompilationUnitSyntax)syntaxRoot,
                                     typeDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider)),
                         diagnostic);
@@ -105,7 +103,7 @@
                                     context,
                                     semanticModel,
                                     cancellationToken,
-                                    syntaxRoot,
+                                     (CompilationUnitSyntax)syntaxRoot,
                                     typeDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider)),
                         diagnostic);
@@ -120,7 +118,7 @@
                                 context,
                                 semanticModel,
                                 cancellationToken,
-                                syntaxRoot,
+                                 (CompilationUnitSyntax)syntaxRoot,
                                 typeDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider)),
                     diagnostic);
@@ -133,7 +131,7 @@
                                 context,
                                 semanticModel,
                                 cancellationToken,
-                                syntaxRoot,
+                                 (CompilationUnitSyntax)syntaxRoot,
                                 typeDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider)),
                     diagnostic);
@@ -160,12 +158,12 @@
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            SyntaxNode updated = typeDeclaration;
+            TypeDeclarationSyntax updated = typeDeclaration;
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
-                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
+                updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     name: "Dispose",
@@ -189,24 +187,24 @@
                 }
                 else
                 {
-                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                    updated = (TypeDeclarationSyntax)syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
             }
 
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(typeDeclaration, updated)));
         }
 
-        private static Task<Document> ApplyImplementIDisposableVirtualFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
+        private static Task<Document> ApplyImplementIDisposableVirtualFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, CompilationUnitSyntax syntaxRoot, TypeDeclarationSyntax typeDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            SyntaxNode updated = typeDeclaration;
+            TypeDeclarationSyntax updated = typeDeclaration;
 
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
-                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
+                updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     "Dispose",
@@ -226,7 +224,7 @@
                 }
                 else
                 {
-                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                    updated = (TypeDeclarationSyntax)syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
 
                 var virtualDisposeMethod = syntaxGenerator.MethodDeclaration(
@@ -254,40 +252,30 @@
                 }
                 else
                 {
-                    updated = syntaxGenerator.AddMembers(updated, virtualDisposeMethod);
+                    updated = (TypeDeclarationSyntax)syntaxGenerator.AddMembers(updated, virtualDisposeMethod);
                 }
 
-                updated = ((TypeDeclarationSyntax)updated).WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
+                updated = updated.WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
             }
 
-            if (!Disposable.IsAssignableTo(type))
-            {
-                updated = syntaxGenerator.AddInterfaceType(updated, IDisposableInterface);
-            }
-
-            var newRoot = (CompilationUnitSyntax)syntaxRoot.ReplaceNode(typeDeclaration, updated);
-            UsingDirectiveSyntax @using;
-            if (!newRoot.Usings.TryGetSingle(x => x.Name.ToString() == "System", out @using))
-            {
-                newRoot = newRoot.Usings.Any()
-                    ? newRoot.InsertNodesBefore(newRoot.Usings.First(), new[] { UsingSystem })
-                    : newRoot.AddUsings(UsingSystem);
-            }
+            updated = updated.WithIDisposableInterface(syntaxGenerator, type);
+            var newRoot = syntaxRoot.ReplaceNode(typeDeclaration, updated);
+            newRoot = newRoot.WithUsingSystem();
 
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
         }
 
-        private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
+        private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, CompilationUnitSyntax syntaxRoot, TypeDeclarationSyntax typeDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            SyntaxNode updated = typeDeclaration;
+            TypeDeclarationSyntax updated = typeDeclaration;
 
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
-                updated = ((TypeDeclarationSyntax)updated).WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
+                updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
                     "Dispose",
@@ -311,31 +299,21 @@
                 }
                 else
                 {
-                    updated = syntaxGenerator.AddMembers(updated, disposeMethod);
+                    updated = (TypeDeclarationSyntax)syntaxGenerator.AddMembers(updated, disposeMethod);
                 }
 
-                updated = ((TypeDeclarationSyntax)updated).WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
-            }
-
-            if (!Disposable.IsAssignableTo(type))
-            {
-                updated = syntaxGenerator.AddInterfaceType(updated, IDisposableInterface);
+                updated = updated.WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
             }
 
             if (!IsSealed(typeDeclaration))
             {
-                updated = syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
-                updated = MakeSealedRewriter.Default.Visit(updated);
+                updated = (TypeDeclarationSyntax)syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
+                updated = (TypeDeclarationSyntax)MakeSealedRewriter.Default.Visit(updated);
             }
 
-            var newRoot = (CompilationUnitSyntax)syntaxRoot.ReplaceNode(typeDeclaration, updated);
-            UsingDirectiveSyntax @using;
-            if (!newRoot.Usings.TryGetSingle(x => x.Name.ToString() == "System", out @using))
-            {
-                newRoot = newRoot.Usings.Any()
-                    ? newRoot.InsertNodesBefore(newRoot.Usings.First(), new[] { UsingSystem })
-                    : newRoot.AddUsings(UsingSystem);
-            }
+            updated = updated.WithIDisposableInterface(syntaxGenerator, type);
+            var newRoot = syntaxRoot.ReplaceNode(typeDeclaration, updated);
+            newRoot = newRoot.WithUsingSystem();
 
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
         }

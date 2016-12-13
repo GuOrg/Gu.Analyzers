@@ -113,14 +113,69 @@ public class Foo : IDisposable
         }
 
         [Test]
-        public async Task ImplementIDisposableSealedClass()
+        public async Task ImplementIDisposableSealedClassUsingsInside()
+        {
+            var testCode = @"
+namespace Tests
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace Tests
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ImplementIDisposableSealedClassUsingsOutside()
         {
             var testCode = @"
 using System.IO;
-
-public sealed class Foo
+namespace Tests
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    public sealed class Foo
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    }
 }";
             var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
@@ -130,27 +185,29 @@ public sealed class Foo
 
             var fixedCode = @"using System;
 using System.IO;
-
-public sealed class Foo : IDisposable
+namespace Tests
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed;
-
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        if (this.disposed)
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public void Dispose()
         {
-            return;
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
         }
 
-        this.disposed = true;
-    }
-
-    private void ThrowIfDisposed()
-    {
-        if (this.disposed)
+        private void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";

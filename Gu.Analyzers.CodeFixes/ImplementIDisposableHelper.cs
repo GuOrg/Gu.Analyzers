@@ -7,7 +7,10 @@
 
     internal static class ImplementIDisposableHelper
     {
-        internal static SyntaxNode WithDisposedField(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
+        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
+
+        internal static TypeDeclarationSyntax WithDisposedField(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
         {
             var disposedFieldName = usesUnderscoreNames
                                         ? "_disposed"
@@ -33,10 +36,80 @@
                     return typeDeclaration.InsertNodesBefore(field, new[] { disposedField });
                 }
 
-                return syntaxGenerator.AddMembers(typeDeclaration, disposedField);
+                return (TypeDeclarationSyntax)syntaxGenerator.AddMembers(typeDeclaration, disposedField);
             }
 
             return typeDeclaration;
+        }
+
+        internal static TypeDeclarationSyntax WithThrowIfDisposed(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
+        {
+            IMethodSymbol existsingMethod;
+            if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
+            {
+                var ifDisposedThrow = syntaxGenerator.IfStatement(
+                    SyntaxFactory.ParseExpression(usesUnderscoreNames ? "_disposed" : "this.disposed"),
+                    new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
+                var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
+                    "ThrowIfDisposed",
+                    accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,
+                    statements: new[] { ifDisposedThrow });
+
+                MemberDeclarationSyntax method;
+                if (typeDeclaration.Members.TryGetLast(
+                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
+                                       out method))
+                {
+                    return typeDeclaration.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
+                }
+
+                return (TypeDeclarationSyntax)syntaxGenerator.AddMembers(typeDeclaration, throwIfDisposedMethod);
+            }
+
+            return typeDeclaration;
+        }
+
+        internal static TypeDeclarationSyntax WithIDisposableInterface(this TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator, ITypeSymbol type)
+        {
+            if (!Disposable.IsAssignableTo(type))
+            {
+                return (TypeDeclarationSyntax)syntaxGenerator.AddInterfaceType(typeDeclaration, IDisposableInterface);
+            }
+
+            return typeDeclaration;
+        }
+
+        internal static CompilationUnitSyntax WithUsingSystem(this CompilationUnitSyntax syntaxRoot)
+        {
+            var @namespace = syntaxRoot.Members.FirstOrDefault() as NamespaceDeclarationSyntax;
+            if (@namespace == null)
+            {
+                if (syntaxRoot.Usings.HasUsingSystem())
+                {
+                    return syntaxRoot;
+                }
+
+                return syntaxRoot.Usings.Any()
+                           ? syntaxRoot.InsertNodesBefore(syntaxRoot.Usings.First(), new[] { UsingSystem })
+                           : syntaxRoot.AddUsings(UsingSystem);
+            }
+
+            if (@namespace.Usings.HasUsingSystem() || syntaxRoot.Usings.HasUsingSystem())
+            {
+                return syntaxRoot;
+            }
+
+            if (@namespace.Usings.Any())
+            {
+                return syntaxRoot.ReplaceNode(@namespace, @namespace.InsertNodesBefore(@namespace.Usings.First(), new[] { UsingSystem }));
+            }
+
+            if (syntaxRoot.Usings.Any())
+            {
+                return syntaxRoot.InsertNodesBefore(syntaxRoot.Usings.First(), new[] { UsingSystem });
+            }
+
+            return syntaxRoot.ReplaceNode(@namespace, @namespace.AddUsings(UsingSystem));
         }
 
         internal static IfStatementSyntax IfDisposedReturn(this SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
@@ -75,33 +148,6 @@
             return SyntaxFactory.ParseStatement("this.disposed = true;");
         }
 
-        internal static SyntaxNode WithThrowIfDisposed(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
-        {
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
-            {
-                var ifDisposedThrow = syntaxGenerator.IfStatement(
-                    SyntaxFactory.ParseExpression(usesUnderscoreNames ? "_disposed" : "this.disposed"),
-                    new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
-                var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
-                    "ThrowIfDisposed",
-                    accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,
-                    statements: new[] { ifDisposedThrow });
-
-                MemberDeclarationSyntax method;
-                if (typeDeclaration.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
-                                       out method))
-                {
-                    return typeDeclaration.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
-                }
-
-                return syntaxGenerator.AddMembers(typeDeclaration, throwIfDisposedMethod);
-            }
-
-            return typeDeclaration;
-        }
-
         internal static bool UsesUnderscoreNames(this TypeDeclarationSyntax type)
         {
             foreach (var member in type.Members)
@@ -118,6 +164,19 @@
                     {
                         return true;
                     }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool HasUsingSystem(this SyntaxList<UsingDirectiveSyntax> usings)
+        {
+            foreach (var @using in usings)
+            {
+                if (@using.Name.ToString() == "System")
+                {
+                    return true;
                 }
             }
 
