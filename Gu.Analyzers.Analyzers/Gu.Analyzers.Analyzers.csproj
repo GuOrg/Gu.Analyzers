@@ -66,7 +66,7 @@
     <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
-    <Compile Include="Helpers\KnownSymbols\Disposable.cs" />
+    <Compile Include="Helpers\Disposable.cs" />
     <Compile Include="Helpers\KnownSymbols\DisposableType.cs" />
     <Compile Include="Helpers\KnownSymbols\KnownSymbol.cs" />
     <Compile Include="Helpers\KnownSymbols\BaseTypes\NamespaceParts.cs" />
@@ -97,7 +97,8 @@
     <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
     <Compile Include="Helpers\Walkers\ReturnExpressionsWalker.cs" />
     <Compile Include="Helpers\Walkers\InvocationWalker.cs" />
-    <Compile Include="Helpers\Walkers\Pool.cs" />
+    <Compile Include="Helpers\Pooled\Pool.cs" />
+    <Compile Include="Helpers\Pooled\SetPool.cs" />
     <Compile Include="HelpLink.cs" />
     <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedType.cs" />
     <Compile Include="NoCodeFixAttribute.cs" />

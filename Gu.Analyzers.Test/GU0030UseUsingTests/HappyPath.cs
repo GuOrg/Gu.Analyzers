@@ -300,5 +300,27 @@ public static class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task HandlesRecursion()
+        {
+            var testCode = @"
+    using System;
+
+    public static class Foo
+    {
+        public static void Bar()
+        {
+            var disposable = Forever();
+        }
+
+        private static IDisposable Forever()
+        {
+            return Forever();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

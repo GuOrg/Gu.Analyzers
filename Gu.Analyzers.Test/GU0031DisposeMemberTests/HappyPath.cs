@@ -510,5 +510,24 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task HandlesRecursion()
+        {
+            var testCode = @"
+    using System;
+
+    public class Foo
+    {
+        private readonly IDisposable foo = Forever();
+
+        private static IDisposable Forever()
+        {
+            return Forever();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

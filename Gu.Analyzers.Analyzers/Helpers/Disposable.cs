@@ -52,123 +52,10 @@ namespace Gu.Analyzers
         /// </summary>
         internal static bool IsPotentialCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposable == null)
+            using (var pooled = SetPool<ExpressionSyntax>.Create())
             {
-                return false;
+                return IsPotentialCreation(disposable, semanticModel, cancellationToken, pooled.Item);
             }
-
-            if (disposable.IsKind(SyntaxKind.CoalesceExpression))
-            {
-                var binaryExpression = (BinaryExpressionSyntax)disposable;
-                return IsPotentialCreation(binaryExpression.Left, semanticModel, cancellationToken) ||
-                       IsPotentialCreation(binaryExpression.Right, semanticModel, cancellationToken);
-            }
-
-            var conditional = disposable as ConditionalExpressionSyntax;
-            if (conditional != null)
-            {
-                return IsPotentialCreation(conditional.WhenTrue, semanticModel, cancellationToken) ||
-                       IsPotentialCreation(conditional.WhenFalse, semanticModel, cancellationToken);
-            }
-
-            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            if (disposable is ObjectCreationExpressionSyntax)
-            {
-                return IsAssignableTo(symbol.ContainingType);
-            }
-
-            if (symbol is IFieldSymbol)
-            {
-                return false;
-            }
-
-            var methodSymbol = symbol as IMethodSymbol;
-            if (methodSymbol != null)
-            {
-                if (methodSymbol.MetadataName == "GetEnumerator")
-                {
-                    return false;
-                }
-
-                MethodDeclarationSyntax methodDeclaration;
-                if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
-                {
-                    using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
-                    {
-                        foreach (var returnValue in pooled.Item.ReturnValues)
-                        {
-                            if (IsPotentialCreation(returnValue, semanticModel, cancellationToken))
-                            {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    }
-                }
-
-                if (methodSymbol.ContainingType == KnownSymbol.Enumerable)
-                {
-                    return false;
-                }
-
-                return IsAssignableTo(methodSymbol.ReturnType);
-            }
-
-            var property = symbol as IPropertySymbol;
-            if (property != null)
-            {
-                if (property == KnownSymbol.PasswordBox.SecurePassword)
-                {
-                    return true;
-                }
-
-                PropertyDeclarationSyntax propertyDeclaration;
-                if (property.TryGetSingleDeclaration(cancellationToken, out propertyDeclaration))
-                {
-                    if (propertyDeclaration.ExpressionBody != null)
-                    {
-                        return IsPotentialCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken);
-                    }
-
-                    AccessorDeclarationSyntax getter;
-                    if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
-                    {
-                        using (var pooled = ReturnExpressionsWalker.Create(getter))
-                        {
-                            foreach (var returnValue in pooled.Item.ReturnValues)
-                            {
-                                if (IsPotentialCreation(returnValue, semanticModel, cancellationToken))
-                                {
-                                    return true;
-                                }
-                            }
-
-                            return false;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
-            var local = symbol as ILocalSymbol;
-            if (local != null)
-            {
-                VariableDeclaratorSyntax variable;
-                if (local.TryGetSingleDeclaration(cancellationToken, out variable) &&
-                    variable.Initializer != null)
-                {
-                    return IsPotentialCreation(variable.Initializer.Value, semanticModel, cancellationToken);
-                }
-            }
-
-            return false;
         }
 
         internal static bool IsAssignableTo(ITypeSymbol type)
@@ -213,7 +100,7 @@ namespace Gu.Analyzers
 
                 return (disposeMethod.Parameters.Length == 0 &&
                         disposeMethod.DeclaredAccessibility == Accessibility.Public) ||
-                       (disposeMethod.Parameters.Length == 1 && 
+                       (disposeMethod.Parameters.Length == 1 &&
                         disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
             }
 
@@ -266,6 +153,132 @@ namespace Gu.Analyzers
                 if (Disposable.IsPotentialCreation(assignment, semanticModel, cancellationToken))
                 {
                     return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsPotentialCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ExpressionSyntax> @checked)
+        {
+            if (!@checked.Add(disposable))
+            {
+                return false;
+            }
+
+            if (disposable == null)
+            {
+                return false;
+            }
+
+            if (disposable.IsKind(SyntaxKind.CoalesceExpression))
+            {
+                var binaryExpression = (BinaryExpressionSyntax)disposable;
+                return IsPotentialCreation(binaryExpression.Left, semanticModel, cancellationToken, @checked) ||
+                       IsPotentialCreation(binaryExpression.Right, semanticModel, cancellationToken, @checked);
+            }
+
+            var conditional = disposable as ConditionalExpressionSyntax;
+            if (conditional != null)
+            {
+                return IsPotentialCreation(conditional.WhenTrue, semanticModel, cancellationToken, @checked) ||
+                       IsPotentialCreation(conditional.WhenFalse, semanticModel, cancellationToken, @checked);
+            }
+
+            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            if (disposable is ObjectCreationExpressionSyntax)
+            {
+                return IsAssignableTo(symbol.ContainingType);
+            }
+
+            if (symbol is IFieldSymbol)
+            {
+                return false;
+            }
+
+            var methodSymbol = symbol as IMethodSymbol;
+            if (methodSymbol != null)
+            {
+                if (methodSymbol.MetadataName == "GetEnumerator")
+                {
+                    return false;
+                }
+
+                MethodDeclarationSyntax methodDeclaration;
+                if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
+                {
+                    using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
+                    {
+                        foreach (var returnValue in pooled.Item.ReturnValues)
+                        {
+                            if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                }
+
+                if (methodSymbol.ContainingType == KnownSymbol.Enumerable)
+                {
+                    return false;
+                }
+
+                return IsAssignableTo(methodSymbol.ReturnType);
+            }
+
+            var property = symbol as IPropertySymbol;
+            if (property != null)
+            {
+                if (property == KnownSymbol.PasswordBox.SecurePassword)
+                {
+                    return true;
+                }
+
+                PropertyDeclarationSyntax propertyDeclaration;
+                if (property.TryGetSingleDeclaration(cancellationToken, out propertyDeclaration))
+                {
+                    if (propertyDeclaration.ExpressionBody != null)
+                    {
+                        return IsPotentialCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, @checked);
+                    }
+
+                    AccessorDeclarationSyntax getter;
+                    if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
+                    {
+                        using (var pooled = ReturnExpressionsWalker.Create(getter))
+                        {
+                            foreach (var returnValue in pooled.Item.ReturnValues)
+                            {
+                                if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            var local = symbol as ILocalSymbol;
+            if (local != null)
+            {
+                VariableDeclaratorSyntax variable;
+                if (local.TryGetSingleDeclaration(cancellationToken, out variable) &&
+                    variable.Initializer != null)
+                {
+                    return IsPotentialCreation(variable.Initializer.Value, semanticModel, cancellationToken, @checked);
                 }
             }
 

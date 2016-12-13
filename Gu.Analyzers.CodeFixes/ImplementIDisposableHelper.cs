@@ -116,9 +116,7 @@
         {
             if (usesUnderscoreNames)
             {
-                return
-                    (IfStatementSyntax)
-                    syntaxGenerator.IfStatement(
+                return (IfStatementSyntax)syntaxGenerator.IfStatement(
                         SyntaxFactory.ParseExpression("_disposed"),
                         new[] { SyntaxFactory.ReturnStatement() });
             }
@@ -130,9 +128,7 @@
 
         internal static IfStatementSyntax IfDisposing(this SyntaxGenerator syntaxGenerator)
         {
-            return
-                (IfStatementSyntax)
-                syntaxGenerator.IfStatement(
+            return (IfStatementSyntax)syntaxGenerator.IfStatement(
                     SyntaxFactory.ParseExpression("disposing"),
                     new EmptyStatementSyntax[0]);
         }
