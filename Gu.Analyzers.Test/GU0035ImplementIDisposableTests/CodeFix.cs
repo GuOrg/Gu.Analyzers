@@ -10,7 +10,7 @@
 
     using NUnit.Framework;
 
-    internal class CodeFixImplementIDisposable : CodeFixVerifier<GU0035ImplementIDisposable, ImplementIDisposableCodeFixProvider>
+    internal class CodeFix : CodeFixVerifier<GU0035ImplementIDisposable, ImplementIDisposableCodeFixProvider>
     {
         [Test]
         public async Task ImplementIDisposable0()
@@ -102,6 +102,14 @@ public class Foo
 
     public int Value { get; }
 
+    public int this[int value]
+    {
+        get
+        {
+            return value;
+        }
+    }
+
     protected virtual void Bar()
     {
     }
@@ -129,6 +137,14 @@ public class Foo : IDisposable
     }
 
     public int Value { get; }
+
+    public int this[int value]
+    {
+        get
+        {
+            return value;
+        }
+    }
 
     public void Dispose()
     {

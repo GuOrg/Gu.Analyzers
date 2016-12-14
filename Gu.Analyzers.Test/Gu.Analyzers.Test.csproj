@@ -57,7 +57,7 @@
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\Diagnostics.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.cs" />
-    <Compile Include="GU0035ImplementIDisposableTests\CodeFixImplementIDisposable.cs" />
+    <Compile Include="GU0035ImplementIDisposableTests\CodeFix.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposableTests\Diagnostics.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposableTests\HappyPath.cs" />
