@@ -150,7 +150,7 @@ namespace Gu.Analyzers
         {
             foreach (var assignment in assignments)
             {
-                if (Disposable.IsPotentialCreation(assignment, semanticModel, cancellationToken))
+                if (IsPotentialCreation(assignment, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -274,6 +274,46 @@ namespace Gu.Analyzers
                     variable.Initializer != null)
                 {
                     return IsPotentialCreation(variable.Initializer.Value, semanticModel, cancellationToken, @checked);
+                }
+            }
+
+            var identifier = disposable as IdentifierNameSyntax;
+            var ctor = disposable.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            if (identifier != null && ctor != null)
+            {
+                var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
+                IParameterSymbol parameter;
+                if (ctorSymbol.DeclaredAccessibility == Accessibility.Private && ctorSymbol.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter))
+                {
+                    var index = ctorSymbol.Parameters.IndexOf(parameter);
+                    var type = ctor.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+                    foreach (var member in type.Members)
+                    {
+                        var otherCtor = member as ConstructorDeclarationSyntax;
+                        if (otherCtor == null || otherCtor == ctor)
+                        {
+                            continue;
+                        }
+
+                        if (otherCtor.Initializer == null)
+                        {
+                            return false;
+                        }
+
+                        var chainedCtorSymbol = semanticModel.GetSymbolSafe(otherCtor.Initializer, cancellationToken);
+                        if (!ReferenceEquals(chainedCtorSymbol, ctorSymbol))
+                        {
+                            return false;
+                        }
+
+                        var ctorArg = otherCtor.Initializer.ArgumentList.Arguments[index].Expression;
+                        if (!IsPotentialCreation(ctorArg, semanticModel, cancellationToken, @checked))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
                 }
             }
 

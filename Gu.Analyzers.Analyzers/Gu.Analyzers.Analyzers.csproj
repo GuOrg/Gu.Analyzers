@@ -63,7 +63,7 @@
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
-    <Compile Include="Helpers\Walkers\ConstructorWalker.cs" />
+    <Compile Include="Helpers\Walkers\ConstructorAssignmentsWalker.cs" />
     <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />

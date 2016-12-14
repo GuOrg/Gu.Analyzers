@@ -96,6 +96,45 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
         }
 
         [Test]
+        public async Task InjectingIntoPrivateCtor()
+        {
+            var disposableCode = @"
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    public Foo()
+        : this(new Disposable())
+    {
+    }
+
+    private Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyHappyPathAsync(disposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task UsingStream1()
         {
             var testCode = @"

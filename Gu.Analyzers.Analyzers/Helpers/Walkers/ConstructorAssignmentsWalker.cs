@@ -7,12 +7,12 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ConstructorWalker : CSharpSyntaxWalker
+    internal sealed class ConstructorAssignmentsWalker : CSharpSyntaxWalker
     {
         internal readonly Dictionary<ParameterSyntax, string> ParameterNameMap = new Dictionary<ParameterSyntax, string>();
 
-        private static readonly Pool<ConstructorWalker> Cache = new Pool<ConstructorWalker>(
-            () => new ConstructorWalker(),
+        private static readonly Pool<ConstructorAssignmentsWalker> Cache = new Pool<ConstructorAssignmentsWalker>(
+            () => new ConstructorAssignmentsWalker(),
             x =>
             {
                 x.ParameterNameMap.Clear();
@@ -25,11 +25,11 @@
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
-        private ConstructorWalker()
+        private ConstructorAssignmentsWalker()
         {
         }
 
-        public static Pool<ConstructorWalker>.Pooled Create(
+        public static Pool<ConstructorAssignmentsWalker>.Pooled Create(
             ConstructorDeclarationSyntax constructor,
             SemanticModel semanticModel,
             CancellationToken cancellationToken)

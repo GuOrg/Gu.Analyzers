@@ -50,7 +50,7 @@
             var parameter = syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
                                       .FirstAncestorOrSelf<ParameterSyntax>();
             var constructorDeclarationSyntax = parameter.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            using (var pooled = ConstructorWalker.Create(constructorDeclarationSyntax, semanticModel, context.CancellationToken))
+            using (var pooled = ConstructorAssignmentsWalker.Create(constructorDeclarationSyntax, semanticModel, context.CancellationToken))
             {
                 foreach (var kvp in pooled.Item.ParameterNameMap)
                 {

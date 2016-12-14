@@ -45,7 +45,7 @@
                 return;
             }
 
-            using (var pooled = ConstructorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
+            using (var pooled = ConstructorAssignmentsWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
             {
                 foreach (var kvp in pooled.Item.ParameterNameMap)
                 {
