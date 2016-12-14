@@ -666,6 +666,60 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ImplementIDisposableWithProperty()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public Foo()
+    {
+    }
+
+    ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private bool disposed;
+
+    public Foo()
+    {
+    }
+
+    public Stream Stream { get; } = File.OpenRead(string.Empty);
+
+    public void Dispose()
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task OverrideDispose()
         {
             var baseCode = @"
