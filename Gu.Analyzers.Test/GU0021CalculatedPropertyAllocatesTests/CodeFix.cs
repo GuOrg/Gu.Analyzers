@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -34,7 +33,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 public class Foo
@@ -92,7 +91,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 public class Foo
@@ -147,7 +146,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 public class Foo
@@ -199,7 +198,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 public class Foo
@@ -248,7 +247,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 public class Foo
@@ -291,7 +290,7 @@ namespace Test
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace Test
@@ -333,7 +332,7 @@ namespace Test
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace Test
@@ -382,7 +381,7 @@ namespace Test
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace Test
@@ -436,7 +435,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
@@ -470,7 +469,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
@@ -501,7 +500,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
 
@@ -531,7 +530,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
 
@@ -567,7 +566,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
@@ -604,7 +603,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
@@ -641,7 +640,7 @@ public class Foo
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Calculated property allocates reference type.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected }, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }

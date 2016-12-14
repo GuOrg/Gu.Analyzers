@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
 
     using NUnit.Framework;
@@ -105,7 +104,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -152,7 +151,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -198,7 +197,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -244,7 +243,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -285,7 +284,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
             var fixedCode = @"
 using System;
 using System.IO;
@@ -322,7 +321,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -359,7 +358,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -397,7 +396,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -434,7 +433,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -471,7 +470,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -508,7 +507,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -545,7 +544,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -587,7 +586,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -640,7 +639,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -693,7 +692,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -757,7 +756,7 @@ public class Foo : IDisposable
             var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None)
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"
@@ -862,7 +861,7 @@ public class Foo : BaseClass
             var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected, CancellationToken.None)
+            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"
@@ -891,6 +890,138 @@ public class Foo : BaseClass
 }";
             await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
                       .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task CtorPassingCreatedIntoPrivateCtor()
+        {
+            var disposableCode = @"
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable;
+
+    public Foo()
+        : this(new Disposable())
+    {
+    }
+
+    private Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    public Foo()
+        : this(new Disposable())
+    {
+    }
+
+    private Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+          .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task FactoryPassingCreatedIntoPrivateCtor()
+        {
+            var disposableCode = @"
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable;
+
+    private Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public static Foo Create()
+    {
+        return new Foo(new Disposable());
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    private Foo(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public static Foo Create()
+    {
+        return new Foo(new Disposable());
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+          .ConfigureAwait(false);
         }
     }
 }

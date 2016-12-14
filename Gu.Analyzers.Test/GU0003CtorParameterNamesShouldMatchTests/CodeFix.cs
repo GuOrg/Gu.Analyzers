@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
 
     using NUnit.Framework;
@@ -32,7 +31,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo
@@ -86,7 +85,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo
@@ -148,7 +147,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref fooCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Bar : Foo
@@ -183,7 +182,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo
@@ -226,7 +225,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo
@@ -274,7 +273,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref fooCode)
                                .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Bar : Foo

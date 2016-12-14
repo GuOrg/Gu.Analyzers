@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -26,7 +25,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Assigning made to same, did you mean to assign something else?");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -46,7 +45,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Assigning made to same, did you mean to assign something else?");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
     }
 }

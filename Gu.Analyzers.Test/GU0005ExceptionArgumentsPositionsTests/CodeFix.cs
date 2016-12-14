@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -25,7 +24,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use correct argument positions.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
     using System;

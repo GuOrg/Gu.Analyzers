@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -23,7 +22,7 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -49,7 +48,7 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -81,7 +80,7 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -111,7 +110,7 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -149,7 +148,7 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, barCode, testCode }, expected, CancellationToken.None).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, barCode, testCode }, expected).ConfigureAwait(false);
         }
     }
 }
