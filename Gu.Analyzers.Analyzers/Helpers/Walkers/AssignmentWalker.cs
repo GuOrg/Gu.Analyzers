@@ -26,17 +26,6 @@
             return pooled;
         }
 
-        public static Pool<AssignmentWalker>.Pooled Create(IReadOnlyList<SyntaxNode> nodes)
-        {
-            var pooled = Cache.GetOrCreate();
-            foreach (var node in nodes)
-            {
-                pooled.Item.Visit(node);
-            }
-
-            return pooled;
-        }
-
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             this.assignments.Add(node);

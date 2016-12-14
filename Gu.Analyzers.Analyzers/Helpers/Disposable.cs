@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -166,7 +167,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (disposable == null)
+            if (disposable == null || disposable is AnonymousFunctionExpressionSyntax)
             {
                 return false;
             }
@@ -204,25 +205,42 @@ namespace Gu.Analyzers
             var methodSymbol = symbol as IMethodSymbol;
             if (methodSymbol != null)
             {
-                MethodDeclarationSyntax methodDeclaration;
-                if (methodSymbol.TryGetSingleDeclaration(cancellationToken, out methodDeclaration))
-                {
-                    using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
-                    {
-                        foreach (var returnValue in pooled.Item.ReturnValues)
-                        {
-                            if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
-                            {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    }
-                }
-
                 if (methodSymbol.ContainingType == KnownSymbol.Enumerable)
                 {
+                    return false;
+                }
+
+                if (methodSymbol.IsAbstract || methodSymbol.IsVirtual)
+                {
+                    using (var pooled = MethodImplementationWalker.Create(methodSymbol, semanticModel, cancellationToken))
+                    {
+                        if (pooled.Item.Implementations.Any())
+                        {
+                            foreach (var implementingDeclaration in pooled.Item.Implementations)
+                            {
+                                if (IsPotentialCreation(implementingDeclaration, semanticModel, cancellationToken, @checked))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
+                    }
+
+                    return IsAssignableTo(methodSymbol.ReturnType);
+                }
+
+                if (methodSymbol.DeclaringSyntaxReferences.Length > 0)
+                {
+                    foreach (var declaration in methodSymbol.Declarations(cancellationToken))
+                    {
+                        if (IsPotentialCreation((MethodDeclarationSyntax)declaration, semanticModel, cancellationToken, @checked))
+                        {
+                            return true;
+                        }
+                    }
+
                     return false;
                 }
 
@@ -318,6 +336,22 @@ namespace Gu.Analyzers
             }
 
             return false;
+        }
+
+        private static bool IsPotentialCreation(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ExpressionSyntax> @checked)
+        {
+            using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
+            {
+                foreach (var returnValue in pooled.Item.ReturnValues)
+                {
+                    if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }
