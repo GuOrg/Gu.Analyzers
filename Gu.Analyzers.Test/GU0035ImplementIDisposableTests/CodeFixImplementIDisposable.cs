@@ -21,6 +21,20 @@ using System.IO;
 public class Foo
 {
     ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public Foo()
+    {
+    }
+
+    public int Value { get; }
+
+    protected virtual void Bar()
+    {
+    }
+
+    private void Meh()
+    {
+    }
 }";
             var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
@@ -36,6 +50,12 @@ public sealed class Foo : IDisposable
     private readonly Stream stream = File.OpenRead(string.Empty);
     private bool disposed;
 
+    public Foo()
+    {
+    }
+
+    public int Value { get; }
+
     public void Dispose()
     {
         if (this.disposed)
@@ -46,12 +66,20 @@ public sealed class Foo : IDisposable
         this.disposed = true;
     }
 
+    private void Bar()
+    {
+    }
+
     private void ThrowIfDisposed()
     {
         if (this.disposed)
         {
             throw new ObjectDisposedException(GetType().FullName);
         }
+    }
+
+    private void Meh()
+    {
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0, numberOfFixAllIterations: 2)
@@ -67,6 +95,20 @@ using System.IO;
 public class Foo
 {
     ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public Foo()
+    {
+    }
+
+    public int Value { get; }
+
+    protected virtual void Bar()
+    {
+    }
+
+    private void Meh()
+    {
+    }
 }";
             var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
@@ -81,6 +123,12 @@ public class Foo : IDisposable
 {
     private readonly Stream stream = File.OpenRead(string.Empty);
     private bool disposed;
+
+    public Foo()
+    {
+    }
+
+    public int Value { get; }
 
     public void Dispose()
     {
@@ -100,12 +148,20 @@ public class Foo : IDisposable
         }
     }
 
+    protected virtual void Bar()
+    {
+    }
+
     protected void ThrowIfDisposed()
     {
         if (this.disposed)
         {
             throw new ObjectDisposedException(GetType().FullName);
         }
+    }
+
+    private void Meh()
+    {
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 1, numberOfFixAllIterations: 2)

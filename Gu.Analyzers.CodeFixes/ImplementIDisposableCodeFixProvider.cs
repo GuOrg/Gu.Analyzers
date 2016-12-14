@@ -179,7 +179,7 @@
                     });
 
                 SyntaxNode method;
-                if (typeDeclaration.Members.TryGetLast(
+                if (updated.Members.TryGetLast(
                                        x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
                                        out method))
                 {
@@ -212,13 +212,13 @@
                     statements: new[] { SyntaxFactory.ParseStatement(usesUnderscoreNames ? "Dispose(true);" : "this.Dispose(true);") });
 
                 MemberDeclarationSyntax method;
-                if (typeDeclaration.Members.TryGetLast(
+                if (updated.Members.TryGetLast(
                                        x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
                                        out method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
                 }
-                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                else if (updated.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
                 {
                     updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
                 }
@@ -240,13 +240,13 @@
                             syntaxGenerator.IfDisposing(),
                         });
 
-                if (typeDeclaration.Members.TryGetLast(
+                if (updated.Members.TryGetLast(
                                        x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
                                        out method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { virtualDisposeMethod });
                 }
-                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                else if (updated.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
                 {
                     updated = updated.InsertNodesBefore(method, new[] { virtualDisposeMethod });
                 }
@@ -287,13 +287,13 @@
                     });
 
                 MemberDeclarationSyntax method;
-                if (typeDeclaration.Members.TryGetLast(
+                if (updated.Members.TryGetLast(
                                        x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
                                        out method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
                 }
-                else if (typeDeclaration.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
+                else if (updated.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
                 {
                     updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
                 }
