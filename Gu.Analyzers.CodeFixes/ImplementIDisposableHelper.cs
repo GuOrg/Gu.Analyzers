@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers
+﻿// ReSharper disable InconsistentNaming
+namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;

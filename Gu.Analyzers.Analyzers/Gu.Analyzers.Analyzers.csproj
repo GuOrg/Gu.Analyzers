@@ -97,6 +97,7 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\VariableDeclaratorSyntaxExt.cs" />
     <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
+    <Compile Include="Helpers\Walkers\PropertyImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\ReturnExpressionsWalker.cs" />
     <Compile Include="Helpers\Walkers\InvocationWalker.cs" />
     <Compile Include="Helpers\Pooled\Pool.cs" />

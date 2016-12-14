@@ -255,22 +255,15 @@ namespace Gu.Analyzers
                     return true;
                 }
 
-                PropertyDeclarationSyntax propertyDeclaration;
-                if (property.TryGetSingleDeclaration(cancellationToken, out propertyDeclaration))
+                if (property.IsAbstract || property.IsVirtual)
                 {
-                    if (propertyDeclaration.ExpressionBody != null)
+                    using (var pooled = PropertyImplementationWalker.Create(property, semanticModel, cancellationToken))
                     {
-                        return IsPotentialCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, @checked);
-                    }
-
-                    AccessorDeclarationSyntax getter;
-                    if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
-                    {
-                        using (var pooled = ReturnExpressionsWalker.Create(getter))
+                        if (pooled.Item.Implementations.Any())
                         {
-                            foreach (var returnValue in pooled.Item.ReturnValues)
+                            foreach (var implementingDeclaration in pooled.Item.Implementations)
                             {
-                                if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
+                                if (IsPotentialCreation(implementingDeclaration, semanticModel, cancellationToken, @checked))
                                 {
                                     return true;
                                 }
@@ -278,6 +271,16 @@ namespace Gu.Analyzers
 
                             return false;
                         }
+                    }
+
+                    return false;
+                }
+
+                foreach (var propertyDeclaration in property.Declarations(cancellationToken))
+                {
+                    if (IsPotentialCreation((PropertyDeclarationSyntax)propertyDeclaration, semanticModel, cancellationToken, @checked))
+                    {
+                        return true;
                     }
                 }
 
@@ -352,6 +355,31 @@ namespace Gu.Analyzers
 
                 return false;
             }
+        }
+
+        private static bool IsPotentialCreation(PropertyDeclarationSyntax propertyDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ExpressionSyntax> @checked)
+        {
+            if (propertyDeclaration.ExpressionBody != null)
+            {
+                return IsPotentialCreation(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, @checked);
+            }
+
+            AccessorDeclarationSyntax getter;
+            if (propertyDeclaration.TryGetGetAccessorDeclaration(out getter))
+            {
+                using (var pooled = ReturnExpressionsWalker.Create(getter))
+                {
+                    foreach (var returnValue in pooled.Item.ReturnValues)
+                    {
+                        if (IsPotentialCreation(returnValue, semanticModel, cancellationToken, @checked))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

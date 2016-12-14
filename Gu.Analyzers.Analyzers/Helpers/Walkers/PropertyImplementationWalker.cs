@@ -6,35 +6,35 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class MethodImplementationWalker : CSharpSyntaxWalker
+    internal sealed class PropertyImplementationWalker : CSharpSyntaxWalker
     {
-        private static readonly Pool<MethodImplementationWalker> Cache = new Pool<MethodImplementationWalker>(
-            () => new MethodImplementationWalker(),
+        private static readonly Pool<PropertyImplementationWalker> Cache = new Pool<PropertyImplementationWalker>(
+            () => new PropertyImplementationWalker(),
             x =>
             {
                 x.implementations.Clear();
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
-                x.method = null;
+                x.property = null;
             });
 
-        private readonly List<MethodDeclarationSyntax> implementations = new List<MethodDeclarationSyntax>();
+        private readonly List<PropertyDeclarationSyntax> implementations = new List<PropertyDeclarationSyntax>();
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
-        private IMethodSymbol method;
+        private IPropertySymbol property;
 
-        private MethodImplementationWalker()
+        private PropertyImplementationWalker()
         {
         }
 
-        public IReadOnlyList<MethodDeclarationSyntax> Implementations => this.implementations;
+        public IReadOnlyList<PropertyDeclarationSyntax> Implementations => this.implementations;
 
-        public static Pool<MethodImplementationWalker>.Pooled Create(IMethodSymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<PropertyImplementationWalker>.Pooled Create(IPropertySymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Cache.GetOrCreate();
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.method = symbol;
+            pooled.Item.property = symbol;
             foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
                 pooled.Item.Visit(tree.GetRoot(cancellationToken));
@@ -43,14 +43,14 @@
             return pooled;
         }
 
-        public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
+        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
-            if (node.Identifier.ValueText == this.method.Name)
+            if (node.Identifier.ValueText == this.property.Name)
             {
                 var symbol = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                var forInterfaceMember = symbol.ContainingType.FindImplementationForInterfaceMember(this.method);
-                if (ReferenceEquals(this.method, symbol) ||
-                    ReferenceEquals(this.method, symbol.OverriddenMethod) ||
+                var forInterfaceMember = symbol.ContainingType.FindImplementationForInterfaceMember(this.property);
+                if (ReferenceEquals(this.property, symbol) ||
+                    ReferenceEquals(this.property, symbol.OverriddenProperty) ||
                     ReferenceEquals(symbol, forInterfaceMember))
                 {
                     this.implementations.Add(node);
