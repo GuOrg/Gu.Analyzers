@@ -41,6 +41,11 @@
         private static void HandleReturn(SyntaxNodeAnalysisContext context)
         {
             var symbol = context.ContainingSymbol;
+            if (IsIgnored(symbol))
+            {
+                return;
+            }
+
             if (Disposable.IsAssignableTo(MemberType(symbol)))
             {
                 return;
@@ -61,6 +66,11 @@
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
             var symbol = context.ContainingSymbol;
+            if (IsIgnored(symbol))
+            {
+                return;
+            }
+
             if (Disposable.IsAssignableTo(MemberType(symbol)))
             {
                 return;
@@ -76,6 +86,18 @@
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, arrowClause.Expression.GetLocation()));
             }
+        }
+
+        private static bool IsIgnored(ISymbol symbol)
+        {
+            var method = symbol as IMethodSymbol;
+            if (method != null)
+            {
+                return symbol.MetadataName == "GetEnumerator" ||
+                       symbol.MetadataName == "System.Collections.IEnumerable.GetEnumerator";
+            }
+
+            return false;
         }
 
         private static ITypeSymbol MemberType(ISymbol member) =>

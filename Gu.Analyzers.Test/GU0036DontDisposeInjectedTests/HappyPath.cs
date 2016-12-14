@@ -132,5 +132,25 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task UsingEnumerator()
+        {
+            var testCode = @"
+    using System.Collections.Generic;
+
+    public static class Ext
+    {
+        public static TSource Foo<TSource>(this IEnumerable<TSource> source)
+        {
+            using (var e = source.GetEnumerator())
+            {
+                return default(TSource);
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
