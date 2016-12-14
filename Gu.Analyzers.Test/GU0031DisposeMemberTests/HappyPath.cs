@@ -529,5 +529,45 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task InjectedListOfInt()
+        {
+            var testCode = @"
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        private readonly List<int> ints;
+
+        public Foo(List<int> ints)
+        {
+            this.ints = ints;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task InjectedListOfT()
+        {
+            var testCode = @"
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo<T>
+    {
+        private readonly List<T> values;
+
+        public Foo(List<T> values)
+        {
+            this.values = values;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
