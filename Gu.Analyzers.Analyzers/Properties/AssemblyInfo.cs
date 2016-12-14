@@ -15,9 +15,9 @@ using System.Runtime.InteropServices;
 [assembly: CLSCompliant(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("0.1.9.11")]
-[assembly: AssemblyFileVersion("0.1.9.11")]
-[assembly: AssemblyInformationalVersion("0.1.9.11-dev")]
+[assembly: AssemblyVersion("0.1.9.12")]
+[assembly: AssemblyFileVersion("0.1.9.12")]
+[assembly: AssemblyInformationalVersion("0.1.9.12-dev")]
 
 [assembly: InternalsVisibleTo("Gu.Analyzers.CodeFixes")]
 [assembly: InternalsVisibleTo("Gu.Analyzers.Test")]
