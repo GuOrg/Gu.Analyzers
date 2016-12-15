@@ -510,5 +510,24 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task FactoryMethodCallingPrivateCtor()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        private readonly bool value;
+
+        private Foo(bool value)
+        {
+            this.value = value;
+        }
+
+        public static Foo Create() => new Foo(true);
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

@@ -306,6 +306,11 @@ namespace Gu.Analyzers
                 IParameterSymbol parameter;
                 if (ctorSymbol.DeclaredAccessibility == Accessibility.Private && ctorSymbol.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter))
                 {
+                    if (!IsAssignableTo(parameter.Type))
+                    {
+                        return false;
+                    }
+
                     var index = ctorSymbol.Parameters.IndexOf(parameter);
                     var type = ctor.FirstAncestorOrSelf<TypeDeclarationSyntax>();
                     foreach (var member in type.Members)
