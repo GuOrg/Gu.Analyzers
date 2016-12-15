@@ -322,5 +322,22 @@ public static class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task AssignAssemblyLoadToLocal()
+        {
+            var testCode = @"
+    using System.Reflection;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            var assembly = Assembly.Load(string.Empty);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
