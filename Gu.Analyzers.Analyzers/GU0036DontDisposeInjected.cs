@@ -129,7 +129,27 @@
                         var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
                         if (ReferenceEquals(symbol, context.ContainingSymbol))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, identifier.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? identifier.GetLocation()));
+                            using (var invocations = InvocationWalker.Create(declaration))
+                            {
+                                foreach (var invocation in invocations.Item.Invocations)
+                                {
+                                    var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
+                                    if (method != KnownSymbol.IDisposable.Dispose)
+                                    {
+                                        continue;
+                                    }
+
+                                    ExpressionSyntax invokee;
+                                    if (invocation.TryFindInvokee(out invokee))
+                                    {
+                                        if (ReferenceEquals(invokee, identifier) ||
+                                            ReferenceEquals((invokee as MemberAccessExpressionSyntax)?.Name, identifier))
+                                        {
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, identifier.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? identifier.GetLocation()));
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

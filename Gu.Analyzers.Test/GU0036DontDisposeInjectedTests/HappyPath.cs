@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
     internal class HappyPath : HappyPathVerifier<GU0036DontDisposeInjected>
     {
         [Test]
-        public async Task NotIDisposable()
+        public async Task InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
     using System;
@@ -26,7 +26,7 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
         }
 
         [Test]
-        public async Task NotDisposingField()
+        public async Task InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
     using System;
@@ -42,6 +42,30 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
 
         public void Dispose()
         {
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private object meh;
+
+        public Foo(object meh)
+        {
+            this.meh = meh;
+        }
+
+        public void Dispose()
+        {
+            meh = null;
         }
     }";
             await this.VerifyHappyPathAsync(testCode)
