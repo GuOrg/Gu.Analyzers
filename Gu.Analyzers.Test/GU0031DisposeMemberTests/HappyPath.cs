@@ -393,6 +393,33 @@ public sealed class Foo
         }
 
         [Test]
+        public async Task IgnoredWhenBackingFieldWithMethodSettingPropertyToNull()
+        {
+            var testCode = @"
+using System.IO;
+
+public sealed class Foo
+{
+    private Stream stream;
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        set { this.stream = value; }
+    }
+
+    public void Meh()
+    {
+        var temp = this.Stream;
+        this.Stream = null;
+        this.stream = temp;
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnoreFieldThatIsNotDisposable()
         {
             var testCode = @"
