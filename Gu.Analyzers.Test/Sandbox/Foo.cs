@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Test.Sandbox
+﻿// ReSharper disable All
+namespace Gu.Analyzers.Test.Sandbox
 {
     using System.Reflection;
 

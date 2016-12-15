@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -60,7 +59,7 @@
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose member.",
-                                _ => ApplyDisposeMemberPublicFixAsync(context, semanticModel, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                _ => ApplyDisposeMemberPublicFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
                                 nameof(DisposeMemberCodeFixProvider)),
                             diagnostic);
                         continue;
@@ -72,7 +71,7 @@
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose member.",
-                                _ => ApplyDisposeMemberProtectedFixAsync(context, semanticModel, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                _ => ApplyDisposeMemberProtectedFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
                                 nameof(DisposeMemberCodeFixProvider)),
                             diagnostic);
                     }
@@ -82,12 +81,11 @@
 
         private static Task<Document> ApplyDisposeMemberPublicFixAsync(
             CodeFixContext context,
-            SemanticModel semanticModel,
             SyntaxNode syntaxRoot,
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member, semanticModel, context.CancellationToken);
+            var newDisposeStatement = CreateDisposeStatement(member);
             var statements = CreateStatements(disposeMethod, newDisposeStatement);
             if (disposeMethod.Body != null)
             {
@@ -108,12 +106,11 @@
 
         private static Task<Document> ApplyDisposeMemberProtectedFixAsync(
             CodeFixContext context,
-            SemanticModel semanticModel,
             SyntaxNode syntaxRoot,
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member, semanticModel, context.CancellationToken);
+            var newDisposeStatement = CreateDisposeStatement(member);
             if (disposeMethod.Body != null)
             {
                 foreach (var statement in disposeMethod.Body.Statements)
@@ -140,7 +137,7 @@
             return Task.FromResult(context.Document);
         }
 
-        private static StatementSyntax CreateDisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static StatementSyntax CreateDisposeStatement(ISymbol member)
         {
             var prefix = member.Name[0] == '_' ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))

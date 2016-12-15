@@ -327,17 +327,17 @@ public static class Foo
         public async Task AssignAssemblyLoadToLocal()
         {
             var testCode = @"
-    using System.Reflection;
+using System.Reflection;
 
-    public class Foo
-    {
-        public void Bar()
-        {
-            var assembly = Assembly.Load(string.Empty);
-        }
-    }";
+public class Foo
+{
+public void Bar()
+{
+    var assembly = Assembly.Load(string.Empty);
+}
+}";
             await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+                        .ConfigureAwait(false);
         }
     }
 }
