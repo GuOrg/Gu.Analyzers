@@ -143,7 +143,6 @@
   <ItemGroup>
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">

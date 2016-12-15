@@ -63,6 +63,7 @@
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
+    <Compile Include="Helpers\Pooled\ListPool.cs" />
     <Compile Include="Helpers\Walkers\ConstructorAssignmentsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
