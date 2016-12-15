@@ -47,7 +47,7 @@
                 return;
             }
 
-            if (!Disposable.IsAssignedWithCreatedDisposable(field, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyAssignedWithCreatedDisposable(field, context.SemanticModel, context.CancellationToken))
             {
                 CheckThatMemberIsNotDisposed(context);
             }
@@ -62,7 +62,7 @@
                 return;
             }
 
-            if (!Disposable.IsAssignedWithCreatedDisposable(property, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyAssignedWithCreatedDisposable(property, context.SemanticModel, context.CancellationToken))
             {
                 CheckThatMemberIsNotDisposed(context);
             }
