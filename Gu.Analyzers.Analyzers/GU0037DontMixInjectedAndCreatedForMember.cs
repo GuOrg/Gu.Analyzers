@@ -1,19 +1,18 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0031DisposeMember : DiagnosticAnalyzer
+    internal class GU0037DontMixInjectedAndCreatedForMember : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0031";
-        private const string Title = "Dispose member.";
-        private const string MessageFormat = "Dispose member.";
-        private const string Description = "Dispose the member as it is assigned with a created `IDisposable`s within the type.";
+        public const string DiagnosticId = "GU0037";
+        private const string Title = "Don't assign member with injected and created disposables.";
+        private const string MessageFormat = "Don't assign member with injected and created disposables.";
+        private const string Description = "Don't assign member with injected and created disposables. It creates a confusing ownership situation.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -27,7 +26,8 @@
             helpLinkUri: HelpLink);
 
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+            ImmutableArray.Create(Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -41,14 +41,22 @@
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
             var field = (IFieldSymbol)context.ContainingSymbol;
-            if (field.IsStatic)
+            if (field.IsStatic || field.IsConst)
             {
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken))
+            if (field.DeclaredAccessibility != Accessibility.Private &&
+                !field.IsReadOnly &&
+                Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                return;
+            }
+
+            if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
         }
 
@@ -75,43 +83,18 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken))
+            if (property.SetMethod != null &&
+                property.SetMethod.DeclaredAccessibility != Accessibility.Private &&
+                Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
-            }
-        }
-
-        private static void CheckThatMemberIsDisposed(SyntaxNodeAnalysisContext context)
-        {
-            var containingType = context.ContainingSymbol.ContainingType;
-
-            IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, out disposeMethod))
-            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 return;
             }
 
-            foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
+            if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
             {
-                using (var pooled = IdentifierNameWalker.Create(declaration))
-                {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
-                    {
-                        if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
-                        {
-                            continue;
-                        }
-
-                        var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
-                        if (ReferenceEquals(symbol, context.ContainingSymbol))
-                        {
-                            return;
-                        }
-                    }
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
-
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
         }
     }
 }

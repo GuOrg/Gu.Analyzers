@@ -46,7 +46,7 @@
                 return;
             }
 
-            if (Disposable.IsPotentiallyAssignedWithCreatedDisposable(field, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken))
             {
                 CheckThatIDisposalbeIsImplemented(context);
             }
@@ -75,7 +75,7 @@
                 return;
             }
 
-            if (Disposable.IsPotentiallyAssignedWithCreatedDisposable(property, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken))
             {
                 CheckThatIDisposalbeIsImplemented(context);
             }
