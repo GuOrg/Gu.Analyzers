@@ -11,14 +11,14 @@ namespace Gu.Analyzers
     {
         internal static bool IsAssignedWithCreatedDisposable(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = MemberAssignmentWalker.Create(field, semanticModel, cancellationToken))
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
             {
-                if (IsAnyADisposableCreation(pooled.Item.Assignments, semanticModel, cancellationToken))
+                if (IsAnyADisposableCreation(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
                     return true;
                 }
 
-                foreach (var assignment in pooled.Item.Assignments)
+                foreach (var assignment in pooled.Item.AssignedValues)
                 {
                     var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
@@ -37,9 +37,9 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignedWithCreatedDisposable(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = MemberAssignmentWalker.Create(property, semanticModel, cancellationToken))
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
-                if (IsAnyADisposableCreation(pooled.Item.Assignments, semanticModel, cancellationToken))
+                if (IsAnyADisposableCreation(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
                     return true;
                 }

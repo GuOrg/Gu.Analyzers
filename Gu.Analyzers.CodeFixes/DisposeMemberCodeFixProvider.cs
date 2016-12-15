@@ -43,7 +43,12 @@
                 }
 
                 var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                var memberSymbol = MemberSymbol(member, semanticModel, context.CancellationToken);
+                ISymbol memberSymbol;
+                if (!TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out memberSymbol))
+                {
+                    continue;
+                }
+
                 IMethodSymbol disposeMethodSymbol;
                 MethodDeclarationSyntax disposeMethodDeclaration;
                 if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
@@ -55,7 +60,7 @@
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose member.",
-                                _ => ApplyDisposeMemberPublicFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                _ => ApplyDisposeMemberPublicFixAsync(context, semanticModel, syntaxRoot, disposeMethodDeclaration, memberSymbol),
                                 nameof(DisposeMemberCodeFixProvider)),
                             diagnostic);
                         continue;
@@ -67,7 +72,7 @@
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose member.",
-                                _ => ApplyDisposeMemberProtectedFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
+                                _ => ApplyDisposeMemberProtectedFixAsync(context, semanticModel, syntaxRoot, disposeMethodDeclaration, memberSymbol),
                                 nameof(DisposeMemberCodeFixProvider)),
                             diagnostic);
                     }
@@ -77,11 +82,12 @@
 
         private static Task<Document> ApplyDisposeMemberPublicFixAsync(
             CodeFixContext context,
+            SemanticModel semanticModel,
             SyntaxNode syntaxRoot,
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member);
+            var newDisposeStatement = CreateDisposeStatement(member, semanticModel, context.CancellationToken);
             var statements = CreateStatements(disposeMethod, newDisposeStatement);
             if (disposeMethod.Body != null)
             {
@@ -102,11 +108,12 @@
 
         private static Task<Document> ApplyDisposeMemberProtectedFixAsync(
             CodeFixContext context,
+            SemanticModel semanticModel,
             SyntaxNode syntaxRoot,
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member);
+            var newDisposeStatement = CreateDisposeStatement(member, semanticModel, context.CancellationToken);
             if (disposeMethod.Body != null)
             {
                 foreach (var statement in disposeMethod.Body.Statements)
@@ -133,7 +140,7 @@
             return Task.FromResult(context.Document);
         }
 
-        private static StatementSyntax CreateDisposeStatement(ISymbol member)
+        private static StatementSyntax CreateDisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var prefix = member.Name[0] == '_' ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
@@ -143,8 +150,7 @@
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             }
 
-            var isReadonly = IsReadOnly(member);
-            if (isReadonly)
+            if (IsReadOnly(member))
             {
                 return SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
                                               .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
@@ -179,21 +185,25 @@
 
         private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
 
-        private static ISymbol MemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
             var field = member as FieldDeclarationSyntax;
-            if (field != null)
+            VariableDeclaratorSyntax fieldDeclarator;
+            if (field != null && field.Declaration.Variables.TryGetSingle(out fieldDeclarator))
             {
-                return semanticModel.GetDeclaredSymbol(field.Declaration.Variables.Single(), cancellationToken);
+                symbol = semanticModel.GetDeclaredSymbolSafe(fieldDeclarator, cancellationToken);
+                return symbol != null;
             }
 
             var property = member as PropertyDeclarationSyntax;
             if (property != null)
             {
-                return semanticModel.GetDeclaredSymbol(property, cancellationToken);
+                symbol = semanticModel.GetDeclaredSymbolSafe(property, cancellationToken);
+                return symbol != null;
             }
 
-            throw new InvalidOperationException($"Could not fins symbol for: {member}");
+            symbol = null;
+            return false;
         }
     }
 }

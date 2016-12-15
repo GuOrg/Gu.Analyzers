@@ -175,6 +175,59 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        [Explicit("Not fixing this.")]
+        public async Task NotDisposingFieldWhenConditionallyAssignedInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Stream stream;
+
+    public Foo(bool condition)
+    {
+        if(condition)
+        {
+            this.stream = File.OpenRead(string.Empty);
+        }
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo(bool condition)
+    {
+        if(condition)
+        {
+            this.stream = File.OpenRead(string.Empty);
+        }
+    }
+
+    public void Dispose()
+    {
+        this.stream?.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingFieldAssignedInCtorNullCoalescing()
         {
             var testCode = @"
