@@ -922,6 +922,38 @@ public class Foo : IDisposable
                       .ConfigureAwait(false);
         }
 
+        [Test]
+        public async Task FactoryMethodCallingPrivateCtorWithCreatedDisposable()
+        {
+            var disposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+            var testCode = @"
+using System;
+
+public sealed class Foo
+{
+    ↓private readonly IDisposable value;
+
+    private Foo(IDisposable value)
+    {
+        this.value = value;
+    }
+
+    public static Foo Create() => new Foo(new Disposable());
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
         {
             return base.GetCSharpDiagnosticAnalyzers()

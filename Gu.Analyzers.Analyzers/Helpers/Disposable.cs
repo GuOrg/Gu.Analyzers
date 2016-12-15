@@ -321,25 +321,29 @@ namespace Gu.Analyzers
                             continue;
                         }
 
-                        if (otherCtor.Initializer == null)
-                        {
-                            return false;
-                        }
-
-                        var chainedCtorSymbol = semanticModel.GetSymbolSafe(otherCtor.Initializer, cancellationToken);
-                        if (!ReferenceEquals(chainedCtorSymbol, ctorSymbol))
-                        {
-                            return false;
-                        }
-
                         var ctorArg = otherCtor.Initializer.ArgumentList.Arguments[index].Expression;
-                        if (!IsPotentialCreation(ctorArg, semanticModel, cancellationToken, @checked))
+                        if (IsPotentialCreation(ctorArg, semanticModel, cancellationToken, @checked))
                         {
-                            return false;
+                            return true;
                         }
                     }
 
-                    return true;
+                    using (var pooled = ObjectCreationWalker.Create(type))
+                    {
+                        foreach (var creation in pooled.Item.ObjectCreations)
+                        {
+                            if ((creation.Type as IdentifierNameSyntax)?.Identifier.ValueText == ctorSymbol.ContainingType.Name)
+                            {
+                                var ctorArg = creation.ArgumentList.Arguments[index].Expression;
+                                if (IsPotentialCreation(ctorArg, semanticModel, cancellationToken, @checked))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+
+                    return false;
                 }
             }
 

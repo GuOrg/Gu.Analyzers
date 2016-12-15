@@ -91,7 +91,7 @@ namespace Gu.Analyzers.Test
                     var col = codeLine.IndexOf(errorPositionIndicator);
                     if (col >= 0)
                     {
-                        Assert.AreEqual(-1, column, "Expected to find only one error indicator");
+                        Assert.AreEqual(-1, column, "Expected to find only one error indicated by ↓");
                         testCode[i] = testCode[i].Replace(new string(errorPositionIndicator, 1), string.Empty);
                         column = col + 1;
                         line = lineCount;
@@ -100,7 +100,7 @@ namespace Gu.Analyzers.Test
                 }
             }
 
-            Assert.AreNotEqual(-1, column, "Expected to find one error");
+            Assert.AreNotEqual(-1, column, "Expected to find one error indicated by ↓");
             var pos = new LinePosition(line, column);
             return new FileLinePositionSpan(fileName, pos, pos);
         }

@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
 
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0035ImplementIDisposable>
+    internal class HappyPathWhenDisposing : HappyPathVerifier<GU0035ImplementIDisposable>
     {
         [TestCase("this.stream.Dispose();")]
         [TestCase("this.stream?.Dispose();")]
@@ -506,25 +506,6 @@ public sealed class Foo
         }
 
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task FactoryMethodCallingPrivateCtor()
-        {
-            var testCode = @"
-    public class Foo
-    {
-        private readonly bool value;
-
-        private Foo(bool value)
-        {
-            this.value = value;
-        }
-
-        public static Foo Create() => new Foo(true);
     }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
