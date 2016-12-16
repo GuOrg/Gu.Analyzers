@@ -20,11 +20,11 @@ namespace Gu.Analyzers
             Cached
         }
 
-        internal static bool IsPotentiallyAssignedWithCreatedDisposable(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
             {
-                if (IsAnyADisposableCreation(pooled.Item.AssignedValues, semanticModel, cancellationToken))
+                if (IsAnyCreated(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -35,7 +35,7 @@ namespace Gu.Analyzers
                     if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                     {
                         var property = semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
-                        if (IsPotentiallyAssignedWithCreatedDisposable(property, semanticModel, cancellationToken))
+                        if (IsAssignedWithCreated(property, semanticModel, cancellationToken))
                         {
                             return true;
                         }
@@ -46,17 +46,33 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal static bool IsPotentiallyAssignedWithCreatedDisposable(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedWithCreated(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
-                if (IsAnyADisposableCreation(pooled.Item.AssignedValues, semanticModel, cancellationToken))
+                if (IsAnyCreated(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
                     return true;
                 }
             }
 
             return false;
+        }
+
+        internal static bool IsAssignedWithCreatedAndInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
+            {
+                return IsAssignedWithCreatedAndInjected(pooled.Item.AssignedValues, semanticModel, cancellationToken);
+            }
+        }
+
+        internal static bool IsAssignedWithCreatedAndInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+            {
+                return IsAssignedWithCreatedAndInjected(pooled.Item.AssignedValues, semanticModel, cancellationToken);
+            }
         }
 
         /// <summary>
@@ -167,13 +183,42 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsAnyADisposableCreation(IReadOnlyList<ExpressionSyntax> assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedWithCreatedAndInjected(IReadOnlyList<ExpressionSyntax> assignedValues, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            foreach (var assignment in assignments)
+            var anyCreated = false;
+            var anyInjected = false;
+            using (var pooledClassifications = Classification.Create(assignedValues, semanticModel, cancellationToken))
             {
-                if (IsPotentialCreation(assignment, semanticModel, cancellationToken))
+                foreach (var classification in pooledClassifications.Item)
                 {
-                    return true;
+                    if (classification.Source == Source.Created ||
+                        classification.Source == Source.PotentiallyCreated)
+                    {
+                        anyCreated = true;
+                    }
+
+                    if (classification.Source == Source.Injected ||
+                        classification.Source == Source.Cached)
+                    {
+                        anyInjected = true;
+                    }
+                }
+            }
+
+            return anyCreated && anyInjected;
+        }
+
+        private static bool IsAnyCreated(IReadOnlyList<ExpressionSyntax> assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = Classification.Create(assignments, semanticModel, cancellationToken))
+            {
+                foreach (var classification in pooled.Item)
+                {
+                    if (classification.Source == Source.Created ||
+                        classification.Source == Source.PotentiallyCreated)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -190,6 +235,20 @@ namespace Gu.Analyzers
             {
                 this.Source = source;
                 this.Node = node;
+            }
+
+            internal static Pool<List<Classification>>.Pooled Create(IReadOnlyList<ExpressionSyntax> disposables, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                using (var pooledSet = SetPool<ExpressionSyntax>.Create())
+                {
+                    var pooledList = ListPool<Classification>.Create();
+                    foreach (var disposable in disposables)
+                    {
+                        Check(disposable, semanticModel, cancellationToken, pooledSet.Item, pooledList.Item);
+                    }
+
+                    return pooledList;
+                }
             }
 
             internal static Pool<List<Classification>>.Pooled Create(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -215,7 +274,7 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                if (disposable == null || 
+                if (disposable == null ||
                     disposable is AnonymousFunctionExpressionSyntax ||
                     disposable is LiteralExpressionSyntax)
                 {
@@ -289,50 +348,101 @@ namespace Gu.Analyzers
                 }
 
                 var identifier = disposable as IdentifierNameSyntax;
-                var ctor = disposable.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-                if (identifier != null && ctor != null)
+                if (identifier != null)
                 {
-                    var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
-                    IParameterSymbol parameter;
-                    if (ctorSymbol.DeclaredAccessibility == Accessibility.Private && ctorSymbol.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter))
+                    var ctor = disposable.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+                    if (ctor != null)
                     {
-                        if (!IsAssignableTo(parameter.Type))
+                        CheckConstructor(disposable, semanticModel, cancellationToken, @checked, classifications, ctor, identifier);
+                        return;
+                    }
+
+                    if (identifier.Identifier.ValueText == "value")
+                    {
+                        var setter = disposable.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
+                        if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                         {
-                            classifications.Add(new Classification(Source.Injected, disposable));
+                            property = semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>(), cancellationToken);
+                            if (property.SetMethod != null)
+                            {
+                                if (property.SetMethod.DeclaredAccessibility == Accessibility.Private)
+                                {
+                                    using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+                                    {
+                                        foreach (var assignedValue in pooled.Item.AssignedValues)
+                                        {
+                                            Check(assignedValue, semanticModel, cancellationToken, @checked, classifications);
+                                        }
+                                    }
+
+                                    return;
+                                }
+
+                                var source = IsAssignableTo(property.Type)
+                                    ? Source.Injected
+                                    : Source.NotDisposable;
+                                classifications.Add(new Classification(source, disposable));
+                            }
+
                             return;
                         }
-
-                        var index = ctorSymbol.Parameters.IndexOf(parameter);
-                        var type = ctor.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                        foreach (var member in type.Members)
-                        {
-                            var otherCtor = member as ConstructorDeclarationSyntax;
-                            if (otherCtor == null || otherCtor == ctor)
-                            {
-                                continue;
-                            }
-
-                            var ctorArg = otherCtor.Initializer.ArgumentList.Arguments[index].Expression;
-                            Check(ctorArg, semanticModel, cancellationToken, @checked, classifications);
-                        }
-
-                        using (var pooled = ObjectCreationWalker.Create(type))
-                        {
-                            foreach (var creation in pooled.Item.ObjectCreations)
-                            {
-                                if ((creation.Type as IdentifierNameSyntax)?.Identifier.ValueText == ctorSymbol.ContainingType.Name)
-                                {
-                                    var ctorArg = creation.ArgumentList.Arguments[index].Expression;
-                                    Check(ctorArg, semanticModel, cancellationToken, @checked, classifications);
-                                }
-                            }
-                        }
-
-                        return;
                     }
                 }
 
                 classifications.Add(new Classification(Source.Injected, disposable));
+            }
+
+            private static void CheckConstructor(
+                ExpressionSyntax disposable,
+                SemanticModel semanticModel,
+                CancellationToken cancellationToken,
+                HashSet<ExpressionSyntax> @checked,
+                List<Classification> classifications,
+                ConstructorDeclarationSyntax ctor,
+                IdentifierNameSyntax identifier)
+            {
+                var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
+                IParameterSymbol parameter;
+                if (!ctorSymbol.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter))
+                {
+                    return;
+                }
+
+                if (ctorSymbol.DeclaredAccessibility == Accessibility.Private)
+                {
+                    var index = ctorSymbol.Parameters.IndexOf(parameter);
+                    var type = ctor.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+                    foreach (var member in type.Members)
+                    {
+                        var otherCtor = member as ConstructorDeclarationSyntax;
+                        if (otherCtor == null ||
+                            otherCtor == ctor)
+                        {
+                            continue;
+                        }
+
+                        var ctorArg = otherCtor.Initializer.ArgumentList.Arguments[index].Expression;
+                        Check(ctorArg, semanticModel, cancellationToken, @checked, classifications);
+                    }
+
+                    using (var pooled = ObjectCreationWalker.Create(type))
+                    {
+                        foreach (var creation in pooled.Item.ObjectCreations)
+                        {
+                            if ((creation.Type as IdentifierNameSyntax)?.Identifier.ValueText ==
+                                ctorSymbol.ContainingType.Name)
+                            {
+                                var ctorArg = creation.ArgumentList.Arguments[index].Expression;
+                                Check(ctorArg, semanticModel, cancellationToken, @checked, classifications);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+
+                var source = IsAssignableTo(parameter.Type) ? Source.Injected : Source.NotDisposable;
+                classifications.Add(new Classification(source, disposable));
             }
 
             private static void CheckMethod(
@@ -412,6 +522,15 @@ namespace Gu.Analyzers
                 {
                     classifications.Add(new Classification(Source.Created, disposable));
                     return;
+                }
+
+                if (property.SetMethod != null &&
+                    property.SetMethod.DeclaredAccessibility != Accessibility.Private)
+                {
+                    if (IsAssignableTo(property.Type))
+                    {
+                        classifications.Add(new Classification(Source.Injected, disposable));
+                    }
                 }
 
                 if (property.IsAbstract ||
