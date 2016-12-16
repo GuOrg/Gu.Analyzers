@@ -39,6 +39,32 @@
         }
 
         [Test]
+        public async Task InjectedViaMethod()
+        {
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private IDisposable disposable;
+
+    public void Meh(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public void Dispose()
+    {
+        ↓this.disposable.Dispose();
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingFieldInVirtualDispose()
         {
             var testCode = @"

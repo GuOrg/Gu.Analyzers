@@ -59,6 +59,45 @@ namespace Gu.Analyzers
             return false;
         }
 
+        internal static bool IsAssignedWithInjectedOrCached(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
+            {
+                if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
+                {
+                    return true;
+                }
+
+                foreach (var assignment in pooled.Item.AssignedValues)
+                {
+                    var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
+                    if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
+                    {
+                        var property = semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
+                        if (IsAssignedWithInjectedOrCached(property, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool IsAssignedWithInjectedOrCached(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+            {
+                if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         internal static bool IsAssignedWithCreatedAndInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
@@ -216,6 +255,23 @@ namespace Gu.Analyzers
                 {
                     if (classification.Source == Source.Created ||
                         classification.Source == Source.PotentiallyCreated)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsAnyInjectedOrCached(IReadOnlyList<ExpressionSyntax> assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = Classification.Create(assignments, semanticModel, cancellationToken))
+            {
+                foreach (var classification in pooled.Item)
+                {
+                    if (classification.Source == Source.Injected ||
+                        classification.Source == Source.Cached)
                     {
                         return true;
                     }
