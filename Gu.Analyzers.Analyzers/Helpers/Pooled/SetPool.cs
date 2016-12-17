@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    internal class SetPool<T>
+    internal static class SetPool<T>
     {
         private static readonly Pool<HashSet<T>> Pool = new Pool<HashSet<T>>(() => new HashSet<T>(), x => x.Clear());
 
