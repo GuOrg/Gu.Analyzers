@@ -957,15 +957,15 @@ public sealed class Foo
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
         {
             return base.GetCSharpDiagnosticAnalyzers()
-                       .Concat(new[] { DummyAnalyzer.Default });
+                       .Concat(new[] { CS0535Analyzer.Default });
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class DummyAnalyzer : DiagnosticAnalyzer
+        private class CS0535Analyzer : DiagnosticAnalyzer
         {
-            public static readonly DummyAnalyzer Default = new DummyAnalyzer();
+            public static readonly CS0535Analyzer Default = new CS0535Analyzer();
 
-            private DummyAnalyzer()
+            private CS0535Analyzer()
             {
             }
 

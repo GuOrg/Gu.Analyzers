@@ -9,7 +9,7 @@ namespace Gu.Analyzers
     internal static class ImplementIDisposableHelper
     {
         private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("IDisposable");
-        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System"));
 
         internal static TypeDeclarationSyntax WithDisposedField(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
         {
@@ -72,6 +72,18 @@ namespace Gu.Analyzers
 
         internal static TypeDeclarationSyntax WithIDisposableInterface(this TypeDeclarationSyntax typeDeclaration, SyntaxGenerator syntaxGenerator, ITypeSymbol type)
         {
+            var baseList = typeDeclaration.BaseList;
+            if (baseList != null)
+            {
+                foreach (var baseType in baseList.Types)
+                {
+                    if ((baseType.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true)
+                    {
+                        return typeDeclaration;
+                    }
+                }
+            }
+
             if (!Disposable.IsAssignableTo(type))
             {
                 return (TypeDeclarationSyntax)syntaxGenerator.AddInterfaceType(typeDeclaration, IDisposableInterface);
@@ -171,7 +183,7 @@ namespace Gu.Analyzers
         {
             foreach (var @using in usings)
             {
-                if (@using.Name.ToString() == "System")
+                if (@using.Name.IsEquivalentTo(UsingSystem.Name))
                 {
                     return true;
                 }
