@@ -3,7 +3,7 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
-    [System.Diagnostics.DebuggerDisplay("{FullName}")]
+    [System.Diagnostics.DebuggerDisplay("FullName: {FullName}")]
     internal class QualifiedType
     {
         internal readonly string FullName;

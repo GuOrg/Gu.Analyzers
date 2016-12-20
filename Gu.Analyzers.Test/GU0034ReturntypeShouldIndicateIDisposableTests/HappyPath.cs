@@ -372,5 +372,33 @@ public class Foo : IEnumerable<int>
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task ReturningAsyncTaskOfStream()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+using System.Threading.Tasks;
+
+internal static class Foo
+{
+    internal static async Task<Stream> ReadAsync(string file)
+    {
+	    var stream = new MemoryStream();
+	    using (var fileStream = File.OpenRead(file))
+	    {
+		    await fileStream.CopyToAsync(stream)
+						    .ConfigureAwait(false);
+	    }
+
+	    stream.Position = 0;
+	    return stream;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

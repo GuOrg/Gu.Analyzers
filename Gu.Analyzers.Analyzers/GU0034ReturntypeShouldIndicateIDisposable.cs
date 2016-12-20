@@ -46,7 +46,7 @@
                 return;
             }
 
-            if (Disposable.IsAssignableTo(MemberType(symbol)))
+            if (IsDisposableReturnType(MemberType(symbol)))
             {
                 return;
             }
@@ -71,7 +71,7 @@
                 return;
             }
 
-            if (Disposable.IsAssignableTo(MemberType(symbol)))
+            if (IsDisposableReturnType(MemberType(symbol)))
             {
                 return;
             }
@@ -86,6 +86,22 @@
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, arrowClause.Expression.GetLocation()));
             }
+        }
+
+        private static bool IsDisposableReturnType(ITypeSymbol type)
+        {
+            if (Disposable.IsAssignableTo(type))
+            {
+                return true;
+            }
+
+            if (type == KnownSymbol.Task)
+            {
+                var namedType = type as INamedTypeSymbol;
+                return namedType?.IsGenericType == true && Disposable.IsAssignableTo(namedType.TypeArguments[0]);
+            }
+
+            return false;
         }
 
         private static bool IsIgnored(ISymbol symbol)
