@@ -37,7 +37,11 @@
             pooled.Item.method = symbol;
             foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
-                pooled.Item.Visit(tree.GetRoot(cancellationToken));
+                SyntaxNode root;
+                if (tree.TryGetRoot(out root))
+                {
+                    pooled.Item.Visit(root);
+                }
             }
 
             return pooled;
