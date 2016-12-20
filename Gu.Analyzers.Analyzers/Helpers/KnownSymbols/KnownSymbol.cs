@@ -15,7 +15,7 @@ namespace Gu.Analyzers
 
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
 
-        internal static readonly QualifiedType Task = new QualifiedType("System.Threading.Tasks.Task");
+        internal static readonly TaskType Task = new TaskType();
         internal static readonly TextReaderType TextReader = new TextReaderType();
 
         internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");

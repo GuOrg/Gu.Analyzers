@@ -354,6 +354,13 @@ namespace Gu.Analyzers
                     return;
                 }
 
+                var awaitExpression = disposable as AwaitExpressionSyntax;
+                if (awaitExpression != null)
+                {
+                    Check(awaitExpression.Expression, semanticModel, cancellationToken, @checked, classifications);
+                    return;
+                }
+
                 var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
                 if (symbol == null)
                 {
@@ -512,6 +519,20 @@ namespace Gu.Analyzers
                 if (methodSymbol.ContainingType == KnownSymbol.Enumerable)
                 {
                     classifications.Add(new Classification(Source.Cached, disposable));
+                    return;
+                }
+
+                if (methodSymbol == KnownSymbol.Task.FromResult)
+                {
+                    var invocation = disposable as InvocationExpressionSyntax;
+                    ArgumentSyntax argument = null;
+                    if (invocation?.ArgumentList.Arguments.TryGetSingle(out argument) == true)
+                    {
+                        Check(argument.Expression, semanticModel, cancellationToken, @checked, classifications);
+                        return;
+                    }
+
+                    classifications.Add(new Classification(Source.Unknown, disposable));
                     return;
                 }
 

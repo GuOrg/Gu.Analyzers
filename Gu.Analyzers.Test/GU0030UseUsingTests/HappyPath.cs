@@ -339,5 +339,39 @@ public void Bar()
             await this.VerifyHappyPathAsync(testCode)
                         .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task Awaiting()
+        {
+            var testCode = @"
+using System.IO;
+using System.Threading.Tasks;
+  
+internal static class Foo
+{
+    internal static async Task Bar()
+    {
+        using (var stream = await ReadAsync(string.Empty))
+        {
+        }
+    }
+
+    internal static async Task<Stream> ReadAsync(string file)
+    {
+        var stream = new MemoryStream();
+        using (var fileStream = File.OpenRead(file))
+        {
+            await fileStream.CopyToAsync(stream)
+                            .ConfigureAwait(false);
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+            .ConfigureAwait(false);
+        }
     }
 }
