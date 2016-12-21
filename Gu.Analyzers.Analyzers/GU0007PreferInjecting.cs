@@ -88,6 +88,13 @@
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
+            if (context.SemanticModel == null ||
+                context.Node == null ||
+                context.Node.IsMissing)
+            {
+                return;
+            }
+
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
             if (objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
             {
@@ -108,6 +115,13 @@
 
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
+            if (context.SemanticModel == null ||
+                context.Node == null ||
+                context.Node.IsMissing)
+            {
+                return;
+            }
+
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
             var ctor = memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
             if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
@@ -182,7 +196,7 @@
 
         private static bool IsInjectionType(ITypeSymbol type)
         {
-            if (type == null ||
+            if (type?.ContainingNamespace == null ||
                 type.IsValueType ||
                 type.IsStatic)
             {
