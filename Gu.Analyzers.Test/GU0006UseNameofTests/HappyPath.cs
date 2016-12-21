@@ -45,5 +45,18 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresDebuggerDisplay()
+        {
+            var testCode = @"
+    [System.Diagnostics.DebuggerDisplay(""{Name}"")]
+    public class Foo
+    {
+        public string Name { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
