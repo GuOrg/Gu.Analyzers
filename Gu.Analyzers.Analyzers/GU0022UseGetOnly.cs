@@ -3,6 +3,7 @@
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -45,7 +46,33 @@
                 return;
             }
 
-            var propertySymbol = context.ContainingSymbol as IPropertySymbol;
+            var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
+            AccessorDeclarationSyntax setter;
+            if (!propertyDeclaration.TryGetSetAccessorDeclaration(out setter) ||
+                setter.Body != null)
+            {
+                return;
+            }
+
+            var propertySymbol = (IPropertySymbol)context.ContainingSymbol;
+            if (propertySymbol.SetMethod?.DeclaredAccessibility != Accessibility.Private)
+            {
+                return;
+            }
+
+            using (var pooled = MemberAssignmentWalker.AssignedValuesInType(propertySymbol, context.SemanticModel, context.CancellationToken))
+            {
+                foreach (var value in pooled.Item.AssignedValues)
+                {
+                    if (value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
+                        value.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(Descriptor, setter.GetLocation()));
         }
     }
 }
