@@ -79,7 +79,6 @@
                                 _ => ApplyRemoveSetterFixAsync(context, syntaxRoot, setter),
                                 nameof(UseGetOnlyCodeFixProvider)),
                             diagnostic);
-
                     }
                 }
             }

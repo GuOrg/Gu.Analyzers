@@ -34,13 +34,8 @@
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 14, 9)
                                 .WithMessage("Move property.");
-            var expected3 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Move property.");
-            var expected4 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2, expected3, expected4 }, CancellationToken.None).ConfigureAwait(false);
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo
@@ -144,13 +139,8 @@
             var expected2 = this.CSharpDiagnostic()
                                 .WithLocation("Foo.cs", 14, 9)
                                 .WithMessage("Move property.");
-            var expected3 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Move property.");
-            var expected4 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2, expected3, expected4 }, CancellationToken.None).ConfigureAwait(false);
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
     public class Foo

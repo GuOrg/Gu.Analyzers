@@ -187,7 +187,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 
         public int A => this.a;
 
-        public int B => this.a;
+        public int B => 2;
 
         public int C => this.a;
 
@@ -196,6 +196,46 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task Calculated()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public Foo(StringComparison stringComparison)
+    {
+        this.StringComparison = stringComparison;
+    }
+
+    public StringComparison StringComparison { get; }
+
+    public bool IsCurrentCulture => this.StringComparison == StringComparison.CurrentCulture;
+
+    public bool IsOrdinalIgnoreCase => this.StringComparison == StringComparison.OrdinalIgnoreCase;
+
+    public bool IsOrdinal
+    {
+        get
+        {
+            return this.StringComparison == StringComparison.Ordinal;
+        }
+    }
+
+    public bool IsInvariantCulture
+    {
+        get
+        {
+            return this.StringComparison == StringComparison.InvariantCulture;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
 
         [Test]
         public async Task StaticBeforeInstance()
