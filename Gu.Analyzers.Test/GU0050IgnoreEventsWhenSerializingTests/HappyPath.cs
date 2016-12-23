@@ -44,6 +44,8 @@ public class Foo
         public async Task IgnoredEventHandler()
         {
             var testCode = @"
+using System;
+
 [Serializable]
 public class Foo
 {
