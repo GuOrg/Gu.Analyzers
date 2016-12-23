@@ -64,8 +64,7 @@
             {
                 foreach (var value in pooled.Item.AssignedValues)
                 {
-                    if (value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
-                        value.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null)
+                    if (MeansPropertyIsMutable(value))
                     {
                         return;
                     }
@@ -73,6 +72,24 @@
             }
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, setter.GetLocation()));
+        }
+
+        private static bool MeansPropertyIsMutable(ExpressionSyntax assignedValue)
+        {
+            var assignment = assignedValue.Parent as AssignmentExpressionSyntax;
+            if (assignment?.Parent is ExpressionStatementSyntax &&
+                assignment.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
+            {
+                return false;
+            }
+
+            var propertyDeclaration = assignedValue.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+            if (propertyDeclaration != null)
+            {
+                return assignedValue.Parent != propertyDeclaration.Initializer;
+            }
+
+            return true;
         }
     }
 }

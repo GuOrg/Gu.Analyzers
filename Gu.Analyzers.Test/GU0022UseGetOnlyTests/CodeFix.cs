@@ -56,7 +56,7 @@ public class Foo
         }
 
         [Test]
-        public async Task InitializedInCtorAndInline()
+        public async Task InitializedInCtorAndPropertyInitializer()
         {
             var testCode = @"
 public class Foo

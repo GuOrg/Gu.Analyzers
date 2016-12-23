@@ -56,6 +56,10 @@
   <td>Calculated property allocates reference type.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0022.md">GU0022</a></td>
+  <td>Use get-only.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0030.md">GU0030</a></td>
   <td>Use using.</td>
 </tr>

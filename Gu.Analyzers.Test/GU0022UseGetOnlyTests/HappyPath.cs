@@ -49,5 +49,26 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task UpdatedInLambdaInCtor()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public Foo()
+    {
+        this.E += (_, __) => this.A = 5;
+    }
+
+    public event EventHandler E;
+
+    public int A { get; private set; }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
