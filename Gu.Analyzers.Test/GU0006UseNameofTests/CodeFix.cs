@@ -154,13 +154,98 @@
 
                 this.value = value;
                 this.OnPropertyChanged();
-                this.OnPropertyChanged(nameof(Squared));
+                this.OnPropertyChanged(nameof(this.Squared));
             }
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenRaisingPropertyChangedUnderscoreNames()
+        {
+            var testCode = @"
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+
+    public class Foo : INotifyPropertyChanged
+    {
+        private int _value;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int Squared => _value*_value;
+
+        public int Value
+        {
+            get
+            {
+                return _value;
+            }
+
+            set
+            {
+                if (value == _value)
+                {
+                    return;
+                }
+
+                _value = value;
+                OnPropertyChanged();
+                OnPropertyChanged(↓""Squared"");
+            }
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use nameof.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
+
+    public class Foo : INotifyPropertyChanged
+    {
+        private int _value;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public int Squared => _value*_value;
+
+        public int Value
+        {
+            get
+            {
+                return _value;
+            }
+
+            set
+            {
+                if (value == _value)
+                {
+                    return;
+                }
+
+                _value = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Squared));
+            }
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);

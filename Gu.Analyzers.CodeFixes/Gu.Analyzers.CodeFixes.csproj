@@ -49,6 +49,7 @@
     <Compile Include="InjectCodeFixProvider.cs" />
     <Compile Include="MoveArgumentCodeFixProvider.cs" />
     <Compile Include="NameArgumentsCodeFixProvider.cs" />
+    <Compile Include="Names.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenameConstructorArgumentsCodeFixProvider.cs" />
     <Compile Include="SortPropertiesCodeFixProvider.cs" />

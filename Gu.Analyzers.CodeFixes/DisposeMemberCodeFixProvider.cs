@@ -85,7 +85,7 @@
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member);
+            var newDisposeStatement = CreateDisposeStatement(member, disposeMethod.UsesUnderscoreNames());
             var statements = CreateStatements(disposeMethod, newDisposeStatement);
             if (disposeMethod.Body != null)
             {
@@ -110,7 +110,7 @@
             MethodDeclarationSyntax disposeMethod,
             ISymbol member)
         {
-            var newDisposeStatement = CreateDisposeStatement(member);
+            var newDisposeStatement = CreateDisposeStatement(member, disposeMethod.UsesUnderscoreNames());
             if (disposeMethod.Body != null)
             {
                 foreach (var statement in disposeMethod.Body.Statements)
@@ -137,9 +137,9 @@
             return Task.FromResult(context.Document);
         }
 
-        private static StatementSyntax CreateDisposeStatement(ISymbol member)
+        private static StatementSyntax CreateDisposeStatement(ISymbol member, bool usesUnderScoreNames)
         {
-            var prefix = member.Name[0] == '_' ? string.Empty : "this.";
+            var prefix = usesUnderScoreNames ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
             {
                 return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as IDisposable)?.Dispose();")

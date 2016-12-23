@@ -53,7 +53,7 @@
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
                         var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
-                                          IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
+                                         IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
 
                         var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
                         ConstructorDeclarationSyntax ctor;
@@ -108,11 +108,13 @@
             PropertyDeclarationSyntax property,
             ObjectCreationExpressionSyntax objectCreation)
         {
-            var member = SyntaxFactory.MemberAccessExpression(
-                SyntaxKind.SimpleMemberAccessExpression,
-                SyntaxFactory.ThisExpression(),
-                SyntaxFactory.Token(SyntaxKind.DotToken),
-                SyntaxFactory.IdentifierName(property.Identifier.ValueText));
+            var member = ctor.UsesUnderscoreNames()
+                ? (ExpressionSyntax) SyntaxFactory.IdentifierName(property.Identifier.ValueText)
+                : SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.ThisExpression(),
+                    SyntaxFactory.Token(SyntaxKind.DotToken),
+                    SyntaxFactory.IdentifierName(property.Identifier.ValueText));
             var assignment =
                 SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.AssignmentExpression(

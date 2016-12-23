@@ -61,6 +61,61 @@ public class Foo
         }
 
         [Test]
+        public async Task ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
+        {
+            var testCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        A = a;
+        B = b;
+        C = c;
+        D = d;
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar ↓=> new Foo(A, B, C, D);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Calculated property allocates reference type.");
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        A = a;
+        B = b;
+        C = c;
+        D = d;
+        Bar = new Foo(A, B, C, D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
@@ -157,7 +212,7 @@ public class Foo
         B = b;
         C = c;
         D = d;
-        this.Bar = new Foo(A, B, C, D);
+        Bar = new Foo(A, B, C, D);
     }
 
     public int A { get; }
@@ -263,7 +318,7 @@ public class Foo
         _b = b;
         _c = c;
         _d = d;
-        this.Bar = new Foo(_a, _b, _c, _d);
+        Bar = new Foo(_a, _b, _c, _d);
     }
 
     public Foo Bar { get; }

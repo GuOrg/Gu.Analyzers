@@ -157,28 +157,6 @@ namespace Gu.Analyzers
             return SyntaxFactory.ParseStatement("this.disposed = true;");
         }
 
-        internal static bool UsesUnderscoreNames(this TypeDeclarationSyntax type)
-        {
-            foreach (var member in type.Members)
-            {
-                var field = member as FieldDeclarationSyntax;
-                if (field == null)
-                {
-                    continue;
-                }
-
-                foreach (var variable in field.Declaration.Variables)
-                {
-                    if (variable.Identifier.ValueText.StartsWith("_"))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
         private static bool HasUsingSystem(this SyntaxList<UsingDirectiveSyntax> usings)
         {
             foreach (var @using in usings)
