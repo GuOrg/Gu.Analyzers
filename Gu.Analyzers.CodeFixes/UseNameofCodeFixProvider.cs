@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
@@ -41,17 +40,17 @@
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Use nameof",
-                        _ => ApplyFixAsync(context, syntaxRoot, argument),
+                        _ => ApplyFixAsync(context, syntaxRoot, argument, diagnostic.Properties.IsEmpty),
                         nameof(UseNameofCodeFixProvider)),
                     diagnostic);
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ArgumentSyntax argument)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ArgumentSyntax argument, bool islocal)
         {
             var text = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
             var identifierNameSyntax = SyntaxFactory.IdentifierName(text);
-            var expression = IsMember(argument, text) && !argument.UsesUnderscoreNames()
+            var expression = !islocal && !argument.UsesUnderscoreNames()
                 ? SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),
@@ -64,59 +63,6 @@
             var nameofInvocation = SyntaxFactory.InvocationExpression(NameofIdentifier, argumentList);
             var nameofArgument = SyntaxFactory.Argument(nameofInvocation);
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(argument, nameofArgument)));
-        }
-
-        private static bool IsMember(ArgumentSyntax argument, string text)
-        {
-            var parameterers = argument.FirstAncestorOrSelf<MethodDeclarationSyntax>()
-                                              ?.ParameterList ??
-                                      argument.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()
-                                              ?.ParameterList;
-            if (parameterers != null)
-            {
-                foreach (var parameterer in parameterers.Parameters)
-                {
-                    if (parameterer.Identifier.ValueText == text)
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            var typeDeclaration = argument.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-            if (typeDeclaration == null)
-            {
-                return false;
-            }
-
-            foreach (var member in typeDeclaration.Members)
-            {
-                var field = member as BaseFieldDeclarationSyntax;
-                if (field != null)
-                {
-                    foreach (var variable in field.Declaration.Variables)
-                    {
-                        if (variable.Identifier.ValueText == text)
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                var property = member as PropertyDeclarationSyntax;
-                if (property?.Identifier.ValueText == text)
-                {
-                    return true;
-                }
-
-                var method = member as MethodDeclarationSyntax;
-                if (method?.Identifier.ValueText == text)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

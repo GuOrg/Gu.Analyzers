@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -49,7 +50,24 @@
             ISymbol symbol;
             if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out symbol))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                if (symbol is IParameterSymbol ||
+                    symbol is ILocalSymbol)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                    return;
+                }
+
+                if (symbol is IFieldSymbol ||
+                    symbol is IEventSymbol ||
+                    symbol is IPropertySymbol ||
+                    symbol is IMethodSymbol)
+                {
+                    if (symbol.ContainingType == context.ContainingSymbol.ContainingType)
+                    {
+                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation(), properties));
+                    }
+                }
             }
         }
     }
