@@ -112,6 +112,100 @@
         }
 
         [Test]
+        public async Task WhenPrivateSetAfterPublicSet()
+        {
+            var testCode = @"
+public class Foo
+{
+    private int c;
+    private int d;
+
+    public int A { get; }
+
+    public int B
+    {
+        get
+        {
+            return this.A;
+        }
+    }
+
+    public int C
+    {
+        get
+        {
+            return this.c;
+        }
+        set
+        {
+            this.c = value;
+        }
+    }
+
+    public int D
+    {
+        get
+        {
+            return this.d;
+        }
+        private set
+        {
+            this.d = value;
+        }
+    }
+}";
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 17, 5)
+                               .WithMessage("Move property.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 29, 5)
+                                .WithMessage("Move property.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo
+{
+    private int c;
+    private int d;
+
+    public int A { get; }
+
+    public int B
+    {
+        get
+        {
+            return this.A;
+        }
+    }
+
+    public int D
+    {
+        get
+        {
+            return this.d;
+        }
+        private set
+        {
+            this.d = value;
+        }
+    }
+
+    public int C
+    {
+        get
+        {
+            return this.c;
+        }
+        set
+        {
+            this.c = value;
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenMutableBeforeGetOnlyFirstWithInitializers()
         {
             var testCode = @"
