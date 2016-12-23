@@ -63,6 +63,7 @@
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposable.cs" />
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
+    <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\TaskType.cs" />
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
