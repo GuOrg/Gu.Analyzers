@@ -23,7 +23,9 @@
                 SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
 
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0021CalculatedPropertyAllocates.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0021CalculatedPropertyAllocates.DiagnosticId,
+            GU0022UseGetOnly.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
@@ -44,26 +46,48 @@
                 }
 
                 var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                var objectCreation = GetObjectCreation(syntaxNode);
-                if (objectCreation != null)
+                if (diagnostic.Id == GU0021CalculatedPropertyAllocates.DiagnosticId)
                 {
-                    var arguments = objectCreation.ArgumentList.Arguments;
-                    var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
-                                      IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
+                    var objectCreation = GetObjectCreation(syntaxNode);
+                    if (objectCreation != null)
+                    {
+                        var arguments = objectCreation.ArgumentList.Arguments;
+                        var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
+                                          IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
 
-                    var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                    ConstructorDeclarationSyntax ctor;
-                    if (TryGetConstructor(property, out ctor))
+                        var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+                        ConstructorDeclarationSyntax ctor;
+                        if (TryGetConstructor(property, out ctor))
+                        {
+                            context.RegisterCodeFix(
+                                CodeAction.Create(
+                                    "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
+                                    _ => ApplyInitializeInCtorFixAsync(context, syntaxRoot, ctor, property, objectCreation),
+                                    nameof(UseGetOnlyCodeFixProvider)),
+                                diagnostic);
+                        }
+                    }
+                }
+                else if (diagnostic.Id == GU0022UseGetOnly.DiagnosticId)
+                {
+                    var setter = syntaxNode.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
+                    if (setter != null)
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
-                                "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                _ => ApplyFixAsync(context, syntaxRoot, ctor, property, objectCreation),
+                                "Use get-only",
+                                _ => ApplyRemoveSetterFixAsync(context, syntaxRoot, setter),
                                 nameof(UseGetOnlyCodeFixProvider)),
                             diagnostic);
+
                     }
                 }
             }
+        }
+
+        private static Task<Document> ApplyRemoveSetterFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, AccessorDeclarationSyntax setter)
+        {
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.RemoveNodes(new[] { setter }, SyntaxRemoveOptions.AddElasticMarker)));
         }
 
         private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
@@ -78,7 +102,7 @@
             return returnStatement?.Expression as ObjectCreationExpressionSyntax;
         }
 
-        private static Task<Document> ApplyFixAsync(
+        private static Task<Document> ApplyInitializeInCtorFixAsync(
             CodeFixContext context,
             SyntaxNode syntaxRoot,
             ConstructorDeclarationSyntax ctor,
