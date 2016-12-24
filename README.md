@@ -91,6 +91,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0037.md">GU0037</a></td>
   <td>Don't assign member with injected and created disposables.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0050.md">GU0050</a></td>
+  <td>Ignore events when serializing.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
+    using System;
     using System.Threading.Tasks;
 
     using NUnit.Framework;
@@ -35,6 +36,22 @@ public class Foo
     public int D { get; set; }
 
     public int E => A;
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoredEventSimple()
+        {
+            var testCode = @"
+using System;
+
+[Serializable]
+public class Foo
+{
+    [field:NonSerialized]
+    public event EventHandler SomeEvent;
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

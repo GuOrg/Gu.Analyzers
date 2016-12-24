@@ -1,25 +1,19 @@
-﻿using System;
-
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
+    using Microsoft.CodeAnalysis.Text;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
+    internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0050";
-
         private const string Title = "Ignore events when serializing.";
-
         private const string MessageFormat = "Ignore events when serializing.";
-
         private const string Description = "Ignore events when serializing.";
-
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -42,61 +36,84 @@ namespace Gu.Analyzers
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleEventField, SyntaxKind.EventFieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleEvent, SyntaxKind.EventDeclaration);
+            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
         }
 
         private static void HandleEventField(SyntaxNodeAnalysisContext context)
         {
-            var eventFieldDeclaration = (EventFieldDeclarationSyntax) context.Node;
-
             var type = context.ContainingSymbol.ContainingType;
-            if (type.GetAttributes().Any(x => x.AttributeClass == KnownSymbol.SerializableAttribute))
+            if (!HasSerializableAttribute(type))
             {
-                var attributes = eventFieldDeclaration.AttributeLists.SelectMany(s => s.Attributes);
-                var attributeInfo = attributes.Select(a => context.SemanticModel.GetSymbolInfo(a));
-                if (attributeInfo.Any(x => x.Symbol.ContainingType == KnownSymbol.NonSerializedAttribute))
-                {
-                    return;
-                }
-
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                return;
             }
+
+            var eventFieldDeclaration = (EventFieldDeclarationSyntax)context.Node;
+            foreach (var attributeList in eventFieldDeclaration.AttributeLists)
+            {
+                foreach (var attribute in attributeList.Attributes)
+                {
+                    if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") ==
+                        true)
+                    {
+                        var attributeType =
+                            context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
+                                   ?.ContainingType;
+                        if (attributeType != KnownSymbol.NonSerializedAttribute)
+                        {
+                            continue;
+                        }
+
+                        return;
+                    }
+                }
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(Descriptor, eventFieldDeclaration.GetLocation()));
         }
 
-        private static void HandleEvent(SyntaxNodeAnalysisContext context)
+        private static void HandleField(SyntaxNodeAnalysisContext context)
         {
-            var eventDeclaration = (EventDeclarationSyntax)context.Node;
+            var field = (IFieldSymbol)context.ContainingSymbol;
+            if (!field.Type.Is(KnownSymbol.EventHandler))
+            {
+                return;
+            }
 
-            // ensure the event doesn't have the non-serialized attribute
             var type = context.ContainingSymbol.ContainingType;
-            if (type.GetAttributes().Any(x => x.AttributeClass == KnownSymbol.SerializableAttribute))
+            if (!HasSerializableAttribute(type))
             {
-                var attributes = eventDeclaration.AttributeLists.SelectMany(s => s.Attributes);
-                var attributeInfo = attributes.Select(a => context.SemanticModel.GetSymbolInfo(a));
-                if (attributeInfo.Any(x => x.Symbol.ContainingType == KnownSymbol.NonSerializedAttribute))
+                return;
+            }
+
+            var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
+            foreach (var attributeList in fieldDeclaration.AttributeLists)
+            {
+                foreach (var attribute in attributeList.Attributes)
                 {
-                    return;
+                    if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") == true)
+                    {
+                        var attributeType = context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
+                                                                ?.ContainingType;
+                        if (attributeType != KnownSymbol.NonSerializedAttribute)
+                        {
+                            continue;
+                        }
+
+                        return;
+                    }
                 }
             }
 
-            // ensure the backing field doesn't have it
-            foreach (var accessor in eventDeclaration.AccessorList.Accessors)
-            {
-                var body = accessor?.Body;
-                if (body == null) { continue; }
+            context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldDeclaration.GetLocation()));
+        }
 
-                var backingField = ((AssignmentExpressionSyntax)((ExpressionStatementSyntax)body.Statements.First()).Expression).Left;
-                var backingFieldSymbol = context.SemanticModel.GetSymbolInfo(backingField).Symbol;
-                if (backingFieldSymbol == null) { continue; }
-
-                var attributes = backingFieldSymbol.GetAttributes();
-                if (attributes.Any(x => x.AttributeClass == KnownSymbol.NonSerializedAttribute))
-                {
-                    return;
-                }
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+        private static bool HasSerializableAttribute(INamedTypeSymbol type)
+        {
+            AttributeData serializableAttribute;
+            return type.GetAttributes()
+                       .TryGetFirst(
+                           x => x.AttributeClass == KnownSymbol.SerializableAttribute,
+                           out serializableAttribute);
         }
     }
 }

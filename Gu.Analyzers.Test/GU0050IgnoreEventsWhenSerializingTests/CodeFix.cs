@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0050IgnoreEventsWhenSerializing, UseGetOnlyCodeFixProvider>
+    internal class CodeFix : CodeFixVerifier<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>
     {
         [Test]
         public async Task NotIgnoredEvent()
@@ -23,7 +23,7 @@ public class Foo
         this.D = d;
     }
 
-    public event EventHandler SomeEvent;
+    ↓public event EventHandler SomeEvent;
 
     public int A { get; }
 
@@ -55,7 +55,7 @@ public class Foo
         this.D = d;
     }
 
-    [field:NonSerialized]
+    [field: NonSerialized]
     public event EventHandler SomeEvent;
 
     public int A { get; }
@@ -72,13 +72,87 @@ public class Foo
         }
 
         [Test]
-        public async Task NotIgnoredEventHandler()
+        public async Task NotIgnoredEventWithAttribute()
         {
+            var attributeCode = @"
+using System;
+class BarAttribute : Attribute
+{
+}";
             var testCode = @"
+using System;
+
 [Serializable]
 public class Foo
 {
-    private EventHandler someEvent;
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+    }
+
+    ↓[Bar]
+    public event EventHandler SomeEvent;
+
+    public int A { get; }
+
+    public int B { get; protected set;}
+
+    public int C { get; internal set; }
+
+    public int D { get; set; }
+
+    public int E => A;
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Ignore events when serializing.");
+
+            await this.VerifyCSharpDiagnosticAsync(new[] { attributeCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+[Serializable]
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+    }
+
+    [Bar]
+    [field: NonSerialized]
+    public event EventHandler SomeEvent;
+
+    public int A { get; }
+
+    public int B { get; protected set;}
+
+    public int C { get; internal set; }
+
+    public int D { get; set; }
+
+    public int E => A;
+}";
+            await this.VerifyCSharpFixAsync(new[] { attributeCode, testCode }, new[] { attributeCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotIgnoredEventHandler()
+        {
+            var testCode = @"
+using System;
+
+[Serializable]
+public class Foo
+{
+    ↓private EventHandler someEvent;
 
     public event EventHandler SomeEvent
     {
@@ -93,6 +167,8 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+using System;
+
 [Serializable]
 public class Foo
 {
