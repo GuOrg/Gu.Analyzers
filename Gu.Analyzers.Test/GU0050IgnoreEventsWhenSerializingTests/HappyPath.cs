@@ -1,6 +1,5 @@
 namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
-    using System;
     using System.Threading.Tasks;
 
     using NUnit.Framework;

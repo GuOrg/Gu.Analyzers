@@ -5,7 +5,6 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
-    using Microsoft.CodeAnalysis.Text;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer

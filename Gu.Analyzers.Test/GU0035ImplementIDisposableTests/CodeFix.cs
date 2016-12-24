@@ -961,6 +961,7 @@ public sealed class Foo
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
+        //// ReSharper disable once InconsistentNaming
         private class CS0535Analyzer : DiagnosticAnalyzer
         {
             public static readonly CS0535Analyzer Default = new CS0535Analyzer();
