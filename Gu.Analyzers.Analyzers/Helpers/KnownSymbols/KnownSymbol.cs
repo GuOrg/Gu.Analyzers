@@ -8,10 +8,13 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Boolean = Create("System.Boolean");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
+        internal static readonly QualifiedType SerializableAttribute = Create("System.SerializableAttribute");
+        internal static readonly QualifiedType NonSerializedAttribute = Create("System.NonSerializedAttribute");
         internal static readonly DisposableType IDisposable = new DisposableType();
         internal static readonly QualifiedType ArgumentException = Create("System.ArgumentException");
         internal static readonly QualifiedType ArgumentNullException = Create("System.ArgumentNullException");
         internal static readonly QualifiedType ArgumentOutOfRangeException = Create("System.ArgumentOutOfRangeException");
+        internal static readonly QualifiedType EventHandler = Create("System.EventHandler");
 
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
 

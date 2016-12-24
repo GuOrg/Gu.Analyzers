@@ -55,6 +55,8 @@
     <Compile Include="GU0008AvoidRelayPropertiesTests\HappyPath.cs" />
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
+    <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
+    <Compile Include="GU0050IgnoreEventsWhenSerializingTests\HappyPath.cs" />
     <Compile Include="GU0022UseGetOnlyTests\CodeFix.cs" />
     <Compile Include="GU0022UseGetOnlyTests\HappyPath.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\Diagnostics.cs" />

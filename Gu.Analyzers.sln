@@ -53,6 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0035.md = documentation\GU0035.md
 		documentation\GU0036.md = documentation\GU0036.md
 		documentation\GU0037.md = documentation\GU0037.md
+		documentation\GU0050.md = documentation\GU0050.md
 	EndProjectSection
 EndProject
 Global
