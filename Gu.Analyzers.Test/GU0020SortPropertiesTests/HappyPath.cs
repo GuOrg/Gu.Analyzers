@@ -236,7 +236,6 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
-
         [Test]
         public async Task StaticBeforeInstance()
         {

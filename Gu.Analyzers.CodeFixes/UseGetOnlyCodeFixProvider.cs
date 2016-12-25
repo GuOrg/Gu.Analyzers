@@ -109,7 +109,7 @@
             ObjectCreationExpressionSyntax objectCreation)
         {
             var member = ctor.UsesUnderscoreNames()
-                ? (ExpressionSyntax) SyntaxFactory.IdentifierName(property.Identifier.ValueText)
+                ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),

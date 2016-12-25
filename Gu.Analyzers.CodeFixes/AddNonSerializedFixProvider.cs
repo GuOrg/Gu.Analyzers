@@ -57,7 +57,6 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-
                 var field = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<FieldDeclarationSyntax>();
                 if (field != null)
                 {
