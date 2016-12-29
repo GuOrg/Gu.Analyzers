@@ -68,6 +68,17 @@
             base.VisitAssignmentExpression(node);
         }
 
+        public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
+        {
+            var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
+            if (this.symbol.Equals(operand))
+            {
+                this.assignedValues.Add(node.Operand);
+            }
+
+            base.VisitPostfixUnaryExpression(node);
+        }
+
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
             if (node.Initializer != null &&
