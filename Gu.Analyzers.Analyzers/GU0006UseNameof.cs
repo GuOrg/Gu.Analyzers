@@ -39,6 +39,11 @@
 
         private static void HandleArguments(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var argument = (ArgumentSyntax)context.Node;
             var literal = argument.Expression as LiteralExpressionSyntax;
             if (literal?.IsKind(SyntaxKind.StringLiteralExpression) != true)

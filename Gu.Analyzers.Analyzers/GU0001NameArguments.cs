@@ -41,6 +41,11 @@
 
         private static void HandleArguments(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var argumentListSyntax = (ArgumentListSyntax)context.Node;
             if (argumentListSyntax.Arguments.Count < 4)
             {

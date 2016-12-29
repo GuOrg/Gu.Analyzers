@@ -40,6 +40,11 @@
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var field = (IFieldSymbol)context.ContainingSymbol;
             if (field.IsStatic || field.IsConst)
             {
@@ -62,6 +67,11 @@
 
         private static void HandleProperty(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var property = (IPropertySymbol)context.ContainingSymbol;
             if (property.IsStatic ||
                 property.IsIndexer)

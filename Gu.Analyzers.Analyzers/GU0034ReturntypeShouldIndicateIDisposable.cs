@@ -40,6 +40,11 @@
 
         private static void HandleReturn(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var symbol = context.ContainingSymbol;
             if (IsIgnored(symbol))
             {
@@ -65,6 +70,11 @@
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var symbol = context.ContainingSymbol;
             if (IsIgnored(symbol))
             {

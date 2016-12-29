@@ -41,6 +41,11 @@
 
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
             if (objectCreation == null || CanIgnore(objectCreation))
             {
@@ -55,6 +60,11 @@
 
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var invocation = (InvocationExpressionSyntax)context.Node;
             if (invocation == null || CanIgnore(invocation, context.SemanticModel, context.CancellationToken))
             {

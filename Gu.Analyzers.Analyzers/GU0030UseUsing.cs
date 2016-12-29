@@ -39,6 +39,11 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
             VariableDeclaratorSyntax declarator;
             if (!variableDeclaration.Variables.TryGetSingle(out declarator))

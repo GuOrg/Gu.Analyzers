@@ -42,6 +42,11 @@
 
         private static void HandleConstructor(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
             var ctor = (IMethodSymbol)context.ContainingSymbol;
             if (!ctor.IsStatic && ctor.DeclaredAccessibility == Accessibility.Private)

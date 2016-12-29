@@ -40,6 +40,11 @@
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             if (!(context.Node.Parent is PropertyDeclarationSyntax))
             {
                 return;
@@ -63,6 +68,11 @@
 
         private static void HandleGet(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var getter = (AccessorDeclarationSyntax)context.Node;
             var property = (IPropertySymbol)((IMethodSymbol)context.ContainingSymbol).AssociatedSymbol;
             if (getter.Body == null || property.SetMethod != null)

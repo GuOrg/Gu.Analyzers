@@ -41,6 +41,11 @@
 
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var assignment = (AssignmentExpressionSyntax)context.Node;
             if (!Disposable.IsPotentialCreation(assignment.Right, context.SemanticModel, context.CancellationToken))
             {

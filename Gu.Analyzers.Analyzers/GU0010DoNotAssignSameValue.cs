@@ -38,6 +38,11 @@
 
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var assignment = (AssignmentExpressionSyntax)context.Node;
             if (assignment.IsMissing)
             {

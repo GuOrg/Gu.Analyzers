@@ -42,6 +42,11 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var property = (IPropertySymbol)context.ContainingSymbol;
             var neighbors = GetNeighbors((BasePropertyDeclarationSyntax)context.Node);
             if (neighbors.Before != null)

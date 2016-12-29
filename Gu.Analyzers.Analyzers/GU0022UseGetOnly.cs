@@ -39,9 +39,7 @@
 
         private static void HandleProperty(SyntaxNodeAnalysisContext context)
         {
-            if (context.SemanticModel == null ||
-                context.Node == null ||
-                context.Node.IsMissing)
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }

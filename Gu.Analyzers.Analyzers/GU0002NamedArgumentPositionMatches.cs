@@ -39,6 +39,11 @@
 
         private static void HandleArguments(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var argumentSyntax = (ArgumentListSyntax)context.Node;
             if (argumentSyntax.Arguments.Any(x => x.NameColon == null))
             {

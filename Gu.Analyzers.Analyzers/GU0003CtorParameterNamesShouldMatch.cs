@@ -39,6 +39,11 @@
 
         private static void HandleConstructor(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
             if (constructorDeclarationSyntax.ParameterList.Parameters.Count == 0)
             {

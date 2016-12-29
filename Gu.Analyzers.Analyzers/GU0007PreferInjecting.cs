@@ -88,9 +88,7 @@
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
-            if (context.SemanticModel == null ||
-                context.Node == null ||
-                context.Node.IsMissing)
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
@@ -115,9 +113,7 @@
 
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
-            if (context.SemanticModel == null ||
-                context.Node == null ||
-                context.Node.IsMissing)
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }

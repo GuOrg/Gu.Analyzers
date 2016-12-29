@@ -39,6 +39,11 @@
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)context.Node;
             if (objectCreationExpressionSyntax.IsMissing ||
                 objectCreationExpressionSyntax.ArgumentList == null ||

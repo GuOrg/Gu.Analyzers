@@ -40,6 +40,11 @@
 
         private static void HandleEventField(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var type = context.ContainingSymbol.ContainingType;
             if (!HasSerializableAttribute(type))
             {
@@ -72,6 +77,11 @@
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var field = (IFieldSymbol)context.ContainingSymbol;
             if (!field.Type.Is(KnownSymbol.EventHandler))
             {

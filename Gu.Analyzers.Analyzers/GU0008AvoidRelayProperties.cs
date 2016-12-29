@@ -39,6 +39,11 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var propertySymbol = (IPropertySymbol)context.ContainingSymbol;
             if (propertySymbol.IsStatic ||
                 propertySymbol.DeclaredAccessibility == Accessibility.Protected ||
