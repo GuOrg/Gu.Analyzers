@@ -22,6 +22,8 @@
         /// Create a <see cref="Document"/> from a string through creating a project that contains it.
         /// </summary>
         /// <param name="source">Classes in the form of a string.</param>
+        /// <param name="analyzers">The analyzers to use.</param>
+        /// <param name="disabledDiagnostics">The analyzers to suppress.</param>
         /// <returns>A <see cref="Document"/> created from the source string.</returns>
         public static Document CreateDocument(string source, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<string> disabledDiagnostics = null)
         {
@@ -33,6 +35,8 @@
         /// documents and spans of it.
         /// </summary>
         /// <param name="sources">Classes in the form of strings.</param>
+        /// <param name="analyzers">The analyzers to use.</param>
+        /// <param name="disabledDiagnostics">The analyzers to suppress.</param>
         /// <returns>A collection of <see cref="Document"/>s representing the sources.</returns>
         public static Document[] GetDocuments(string[] sources, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<string> disabledDiagnostics = null)
         {
@@ -51,13 +55,12 @@
         /// Create a project using the input strings as sources.
         /// </summary>
         /// <remarks>
-        /// <para>This method first creates a <see cref="Project"/> by calling <see cref="CreateProjectImpl"/>, and then
+        /// <para>This method first creates a <see cref="Project"/> and then
         /// applies compilation options to the project by calling <see cref="ApplyCompilationOptions"/>.</para>
         /// </remarks>
         /// <param name="sources">Classes in the form of strings.</param>
-        /// <param name="language">The language the source classes are in. Values may be taken from the
-        /// <see cref="LanguageNames"/> class.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
+        /// <param name="analyzers">The analyzers to use.</param>
+        /// <param name="disabledDiagnostics">The analyzers to suppress.</param>
         /// <returns>A <see cref="Project"/> created out of the <see cref="Document"/>s created from the source
         /// strings.</returns>
         public static Project CreateProject(string[] sources, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<string> disabledDiagnostics = null)
@@ -117,11 +120,13 @@
         /// </summary>
         /// <remarks>
         /// <para>The default implementation configures the project by enabling all supported diagnostics of analyzers
-        /// included in <see cref="GetCSharpDiagnosticAnalyzers"/> as well as <c>AD0001</c>. After configuring these
-        /// diagnostics, any diagnostic IDs indicated in <see cref="GetDisabledDiagnostics"/> are explictly supressed
+        /// included in <see cref="analyzers"/> as well as <c>AD0001</c>. After configuring these
+        /// diagnostics, any diagnostic IDs indicated in <see cref="disabledDiagnostics"/> are explictly supressed
         /// using <see cref="ReportDiagnostic.Suppress"/>.</para>
         /// </remarks>
         /// <param name="project">The project.</param>
+        /// <param name="analyzers">The analyzers to use.</param>
+        /// <param name="disabledDiagnostics">The analyzers to suppress.</param>
         /// <returns>The modified project.</returns>
         private static Project ApplyCompilationOptions(Project project, IEnumerable<DiagnosticAnalyzer> analyzers, IEnumerable<string> disabledDiagnostics)
         {
