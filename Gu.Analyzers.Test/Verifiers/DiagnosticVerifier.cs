@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 // ReSharper disable PossibleMultipleEnumeration
+// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Local
 namespace Gu.Analyzers.Test
 {
     using System;
@@ -76,7 +78,6 @@ namespace Gu.Analyzers.Test
         /// <param name="source">A class in the form of a string to run the analyzer on.</param>
         /// <param name="expected">A <see cref="DiagnosticResult"/>s describing the <see cref="Diagnostic"/> that should
         /// be reported by the analyzer for the specified source.</param>
-        /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected)
         {
@@ -93,7 +94,6 @@ namespace Gu.Analyzers.Test
         /// <param name="expected">A <see cref="DiagnosticResult"/>s describing the <see cref="Diagnostic"/> that should
         /// be reported by the analyzer for the specified source.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected, CancellationToken cancellationToken)
         {
@@ -110,7 +110,6 @@ namespace Gu.Analyzers.Test
         /// <param name="expected">A collection of <see cref="DiagnosticResult"/>s describing the
         /// <see cref="Diagnostic"/>s that should be reported by the analyzer for the specified source.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
@@ -127,7 +126,6 @@ namespace Gu.Analyzers.Test
         /// on.</param>
         /// <param name="expected">A <see cref="DiagnosticResult"/>s describing the <see cref="Diagnostic"/> that should
         /// be reported by the analyzer for the specified source.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected)
         {
@@ -144,7 +142,6 @@ namespace Gu.Analyzers.Test
         /// on.</param>
         /// <param name="expected">A collection of <see cref="DiagnosticResult"/>s describing the
         /// <see cref="Diagnostic"/>s that should be reported by the analyzer for the specified sources.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected)
         {
@@ -162,7 +159,6 @@ namespace Gu.Analyzers.Test
         /// <param name="expected">A <see cref="DiagnosticResult"/>s describing the <see cref="Diagnostic"/> that should
         /// be reported by the analyzer for the specified source.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected, CancellationToken cancellationToken)
         {
@@ -180,7 +176,6 @@ namespace Gu.Analyzers.Test
         /// <param name="expected">A collection of <see cref="DiagnosticResult"/>s describing the
         /// <see cref="Diagnostic"/>s that should be reported by the analyzer for the specified sources.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
@@ -447,12 +442,10 @@ namespace Gu.Analyzers.Test
         /// analyzer is run, then verifies each of them.
         /// </summary>
         /// <param name="sources">An array of strings to create source documents from to run the analyzers on.</param>
-        /// <param name="language">The language of the classes represented by the source strings.</param>
         /// <param name="analyzers">The analyzers to be run on the source code.</param>
         /// <param name="expected">A collection of <see cref="DiagnosticResult"/>s that should appear after the analyzer
         /// is run on the sources.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         private async Task VerifyDiagnosticsAsync(string[] sources, ImmutableArray<DiagnosticAnalyzer> analyzers, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
