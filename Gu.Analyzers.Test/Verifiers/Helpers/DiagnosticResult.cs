@@ -32,15 +32,8 @@ namespace Gu.Analyzers.Test
 
         public FileLinePositionSpan[] Spans
         {
-            get
-            {
-                return this.spans ?? (this.spans = new FileLinePositionSpan[] { });
-            }
-
-            set
-            {
-                this.spans = value;
-            }
+            get { return this.spans ?? (this.spans = new FileLinePositionSpan[] { }); }
+            set { this.spans = value; }
         }
 
         public DiagnosticSeverity Severity { get; set; }
@@ -97,13 +90,13 @@ namespace Gu.Analyzers.Test
 
         public DiagnosticResult WithLocationIndicated(ref string testCode)
         {
-            var pos = DiagnosticVerifier.GetErrorPosition(ref testCode);
+            var pos = CodeReader.GetErrorPosition(ref testCode);
             return this.AppendSpan(pos);
         }
 
         public DiagnosticResult WithLocationIndicated(string[] testCode)
         {
-            var pos = DiagnosticVerifier.GetErrorPosition(testCode);
+            var pos = CodeReader.GetErrorPosition(testCode);
             return this.AppendSpan(pos);
         }
 

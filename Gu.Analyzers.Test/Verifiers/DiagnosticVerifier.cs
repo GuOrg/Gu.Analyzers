@@ -73,46 +73,6 @@ namespace Gu.Analyzers.Test
 
         protected internal static DiagnosticResult[] EmptyDiagnosticResults { get; } = { };
 
-        public static FileLinePositionSpan GetErrorPosition(string[] testCode)
-        {
-            var fileNames = CreateFileNamesFromSources(testCode, "cs");
-            var line = 0;
-            var column = -1;
-            var fileName = string.Empty;
-
-            const char errorPositionIndicator = '↓';
-            for (var i = 0; i < testCode.Length; i++)
-            {
-                var source = testCode[i];
-                var lineCount = 0;
-                foreach (var codeLine in source.Lines())
-                {
-                    lineCount++;
-                    var col = codeLine.IndexOf(errorPositionIndicator);
-                    if (col >= 0)
-                    {
-                        Assert.AreEqual(-1, column, "Expected to find only one error indicated by ↓");
-                        testCode[i] = testCode[i].Replace(new string(errorPositionIndicator, 1), string.Empty);
-                        column = col + 1;
-                        line = lineCount;
-                        fileName = fileNames[i];
-                    }
-                }
-            }
-
-            Assert.AreNotEqual(-1, column, "Expected to find one error indicated by ↓");
-            var pos = new LinePosition(line, column);
-            return new FileLinePositionSpan(fileName, pos, pos);
-        }
-
-        public static FileLinePositionSpan GetErrorPosition(ref string testCode)
-        {
-            var sources = new[] { testCode };
-            var result = GetErrorPosition(sources);
-            testCode = sources[0];
-            return result;
-        }
-
         /// <summary>
         /// Verifies that the analyzer will properly handle an empty source.
         /// </summary>

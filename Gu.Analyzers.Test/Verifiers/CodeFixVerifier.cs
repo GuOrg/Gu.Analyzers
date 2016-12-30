@@ -8,7 +8,6 @@ namespace Gu.Analyzers.Test
     using System.Collections.Immutable;
     using System.Diagnostics;
     using System.Linq;
-    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -29,14 +28,7 @@ namespace Gu.Analyzers.Test
         [Test]
         public void NameMatchesExportedName()
         {
-            var codeFixProvider = this.GetCSharpCodeFixProvider();
-            if (codeFixProvider == null)
-            {
-                return;
-            }
-
-            var exportAttribute = codeFixProvider.GetType().GetCustomAttribute<ExportCodeFixProviderAttribute>();
-            Assert.AreEqual(codeFixProvider.GetType().Name, exportAttribute.Name);
+            CodeFixAssert.NameMatchesExportedName(this.GetCSharpCodeFixProvider());
         }
 
         /// <summary>
@@ -401,8 +393,8 @@ namespace Gu.Analyzers.Test
             for (var i = 0; i < updatedDocuments.Length; i++)
             {
                 var actual = await GetStringFromDocumentAsync(updatedDocuments[i], cancellationToken).ConfigureAwait(false);
-                var expectedCode = newSources[i].NormalizeNewLine();
-                var actualCode = actual.NormalizeNewLine();
+                var expectedCode = new CodeReader(newSources[i]);
+                var actualCode = new CodeReader(actual);
                 if (actualCode != expectedCode)
                 {
                     Console.WriteLine("Expected:");

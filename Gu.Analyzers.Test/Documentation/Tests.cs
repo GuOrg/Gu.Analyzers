@@ -70,18 +70,18 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            var expected = GetTable(CreateStub(descriptorInfo)).NormalizeNewLine();
-            DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName)).NormalizeNewLine();
+            var expected = new CodeReader(GetTable(CreateStub(descriptorInfo)));
+            DumpIfDebug(expected.ToString());
+            var actual = new CodeReader(GetTable(File.ReadAllText(descriptorInfo.DocFileName)));
             Assert.AreEqual(expected, actual);
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void ConfigSeverity(DescriptorInfo descriptorInfo)
         {
-            var expected = GetConfigSeverity(CreateStub(descriptorInfo)).NormalizeNewLine();
-            DumpIfDebug(expected);
-            var actual = GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName)).NormalizeNewLine();
+            var expected = new CodeReader(GetConfigSeverity(CreateStub(descriptorInfo)));
+            DumpIfDebug(expected.ToString());
+            var actual = new CodeReader(GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName)));
             Assert.AreEqual(expected, actual);
         }
 
@@ -109,9 +109,9 @@
 
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
-            var expected = builder.ToString().NormalizeNewLine();
-            DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md"))).NormalizeNewLine();
+            var expected = new CodeReader(builder.ToString());
+            DumpIfDebug(expected.ToString());
+            var actual = new CodeReader(GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md"))));
             Assert.AreEqual(expected, actual);
         }
 
