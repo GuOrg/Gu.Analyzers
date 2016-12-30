@@ -23,24 +23,9 @@ namespace Gu.Analyzers.Test
             }
         }
 
-        protected async Task VerifyHappyPathAsync(string testCode)
+        protected async Task VerifyHappyPathAsync(params string[] testCode)
         {
             await DiagnosticVerifier.VerifyCSharpDiagnosticAsync(testCode, Test.DiagnosticVerifier.EmptyDiagnosticResults, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        protected async Task VerifyHappyPathAsync(string testCode1, string testCode2)
-        {
-            await DiagnosticVerifier.VerifyCSharpDiagnosticAsync(new[] { testCode1, testCode2 }, Test.DiagnosticVerifier.EmptyDiagnosticResults, CancellationToken.None).ConfigureAwait(false);
-        }
-
-        protected async Task VerifyHappyPathAsync(string[] testCode)
-        {
-            await DiagnosticVerifier.VerifyCSharpDiagnosticAsync(testCode, Test.DiagnosticVerifier.EmptyDiagnosticResults).ConfigureAwait(false);
-        }
-
-        protected async Task VerifyHappyPathAsync(string[] testCode, string[] filenames)
-        {
-            await DiagnosticVerifier.VerifyCSharpDiagnosticAsync(testCode, Test.DiagnosticVerifier.EmptyDiagnosticResults, CancellationToken.None, filenames).ConfigureAwait(false);
         }
     }
 }

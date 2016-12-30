@@ -22,55 +22,6 @@ namespace Gu.Analyzers.Test
     /// </summary>
     public abstract partial class DiagnosticVerifier
     {
-        private const int DefaultIndentationSize = 4;
-        private const int DefaultTabSize = 4;
-        private const bool DefaultUseTabs = false;
-
-        public DiagnosticVerifier()
-        {
-            this.IndentationSize = DefaultIndentationSize;
-            this.TabSize = DefaultTabSize;
-            this.UseTabs = DefaultUseTabs;
-        }
-
-        /// <summary>
-        /// Gets or sets the value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.IndentationSize"/> to apply to the test
-        /// workspace.
-        /// </summary>
-        /// <value>
-        /// The value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.IndentationSize"/> to apply to the test workspace.
-        /// </value>
-        public int IndentationSize
-        {
-            get;
-            protected set;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.UseTabs"/> option is applied to the
-        /// test workspace.
-        /// </summary>
-        /// <value>
-        /// The value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.UseTabs"/> to apply to the test workspace.
-        /// </value>
-        public bool UseTabs
-        {
-            get;
-            protected set;
-        }
-
-        /// <summary>
-        /// Gets or sets the value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.TabSize"/> to apply to the test workspace.
-        /// </summary>
-        /// <value>
-        /// The value of the <see cref="Microsoft.CodeAnalysis.Formatting.FormattingOptions.TabSize"/> to apply to the test workspace.
-        /// </value>
-        public int TabSize
-        {
-            get;
-            protected set;
-        }
-
         protected internal static DiagnosticResult[] EmptyDiagnosticResults { get; } = { };
 
         /// <summary>
@@ -127,9 +78,9 @@ namespace Gu.Analyzers.Test
         /// be reported by the analyzer for the specified source.</param>
         /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected, string filename = null)
+        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected)
         {
-            return this.VerifyCSharpDiagnosticAsync(source, new[] { expected }, CancellationToken.None, filename);
+            return this.VerifyCSharpDiagnosticAsync(source, new[] { expected }, CancellationToken.None);
         }
 
         /// <summary>
@@ -144,9 +95,9 @@ namespace Gu.Analyzers.Test
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected, CancellationToken cancellationToken, string filename = null)
+        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult expected, CancellationToken cancellationToken)
         {
-            return this.VerifyCSharpDiagnosticAsync(source, new[] { expected }, cancellationToken, filename);
+            return this.VerifyCSharpDiagnosticAsync(source, new[] { expected }, cancellationToken);
         }
 
         /// <summary>
@@ -161,9 +112,9 @@ namespace Gu.Analyzers.Test
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="filename">The filename or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult[] expected, CancellationToken cancellationToken, string filename = null)
+        public Task VerifyCSharpDiagnosticAsync(string source, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
-            return this.VerifyDiagnosticsAsync(new[] { source }, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, cancellationToken, filename != null ? new[] { filename } : null);
+            return this.VerifyDiagnosticsAsync(new[] { source }, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, cancellationToken);
         }
 
         /// <summary>
@@ -178,9 +129,9 @@ namespace Gu.Analyzers.Test
         /// be reported by the analyzer for the specified source.</param>
         /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected, string[] filenames = null)
+        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected)
         {
-            return this.VerifyDiagnosticsAsync(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), new[] { expected }, CancellationToken.None, filenames);
+            return this.VerifyDiagnosticsAsync(sources, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), new[] { expected }, CancellationToken.None);
         }
 
         /// <summary>
@@ -195,9 +146,9 @@ namespace Gu.Analyzers.Test
         /// <see cref="Diagnostic"/>s that should be reported by the analyzer for the specified sources.</param>
         /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected, string[] filenames = null)
+        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected)
         {
-            return this.VerifyDiagnosticsAsync(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, CancellationToken.None, filenames);
+            return this.VerifyDiagnosticsAsync(sources, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, CancellationToken.None);
         }
 
         /// <summary>
@@ -213,9 +164,9 @@ namespace Gu.Analyzers.Test
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected, CancellationToken cancellationToken, string[] filenames = null)
+        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult expected, CancellationToken cancellationToken)
         {
-            return this.VerifyDiagnosticsAsync(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), new[] { expected }, cancellationToken, filenames);
+            return this.VerifyDiagnosticsAsync(sources, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), new[] { expected }, cancellationToken);
         }
 
         /// <summary>
@@ -231,9 +182,9 @@ namespace Gu.Analyzers.Test
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected, CancellationToken cancellationToken, string[] filenames = null)
+        public Task VerifyCSharpDiagnosticAsync(string[] sources, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
-            return this.VerifyDiagnosticsAsync(sources, LanguageNames.CSharp, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, cancellationToken, filenames);
+            return this.VerifyDiagnosticsAsync(sources, this.GetCSharpDiagnosticAnalyzers().ToImmutableArray(), expected, cancellationToken);
         }
 
         /// <summary>
@@ -503,27 +454,27 @@ namespace Gu.Analyzers.Test
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
         /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        private async Task VerifyDiagnosticsAsync(string[] sources, string language, ImmutableArray<DiagnosticAnalyzer> analyzers, DiagnosticResult[] expected, CancellationToken cancellationToken, string[] filenames)
+        private async Task VerifyDiagnosticsAsync(string[] sources, ImmutableArray<DiagnosticAnalyzer> analyzers, DiagnosticResult[] expected, CancellationToken cancellationToken)
         {
-            VerifyDiagnosticResults(await this.GetSortedDiagnosticsAsync(sources, language, analyzers, cancellationToken, filenames).ConfigureAwait(false), analyzers, expected);
+            VerifyDiagnosticResults(await this.GetSortedDiagnosticsAsync(sources, analyzers, cancellationToken).ConfigureAwait(false), analyzers, expected);
 
-            // If filenames is null we want to test for exclusions too
-            if (filenames == null)
-            {
-                // Also check if the analyzer honors exclusions
-                if (expected.Any(IsSubjectToExclusion))
-                {
-                    // Diagnostics reported by the compiler and analyzer diagnostics which don't have a location will
-                    // still be reported. We also insert a new line at the beginning so we have to move all diagnostic
-                    // locations which have a specific position down by one line.
-                    var expectedResults = expected
-                        .Where(x => !IsSubjectToExclusion(x))
-                        .Select(x => x.WithLineOffset(1))
-                        .ToArray();
+            ////// If filenames is null we want to test for exclusions too
+            ////if (filenames == null)
+            ////{
+            ////    // Also check if the analyzer honors exclusions
+            ////    if (expected.Any(IsSubjectToExclusion))
+            ////    {
+            ////        // Diagnostics reported by the compiler and analyzer diagnostics which don't have a location will
+            ////        // still be reported. We also insert a new line at the beginning so we have to move all diagnostic
+            ////        // locations which have a specific position down by one line.
+            ////        var expectedResults = expected
+            ////            .Where(x => !IsSubjectToExclusion(x))
+            ////            .Select(x => x.WithLineOffset(1))
+            ////            .ToArray();
 
-                    VerifyDiagnosticResults(await this.GetSortedDiagnosticsAsync(sources.Select(x => " // <auto-generated>\r\n" + x).ToArray(), language, analyzers, cancellationToken, null).ConfigureAwait(false), analyzers, expectedResults);
-                }
-            }
+            ////        VerifyDiagnosticResults(await this.GetSortedDiagnosticsAsync(sources.Select(x => " // <auto-generated>\r\n" + x).ToArray(), analyzers, cancellationToken, null).ConfigureAwait(false), analyzers, expectedResults);
+            ////    }
+            ////}
         }
     }
 }
