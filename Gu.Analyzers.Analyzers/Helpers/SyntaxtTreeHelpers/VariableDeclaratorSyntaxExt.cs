@@ -28,6 +28,19 @@
                 {
                     return true;
                 }
+
+                var objectCreation = returnValue as ObjectCreationExpressionSyntax;
+                if (objectCreation != null)
+                {
+                    foreach (var argument in objectCreation.ArgumentList.Arguments)
+                    {
+                        var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                        if (symbol.Equals(arg))
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
 
             return false;

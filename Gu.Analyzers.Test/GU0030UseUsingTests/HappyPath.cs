@@ -373,5 +373,45 @@ internal static class Foo
             await this.VerifyHappyPathAsync(testCode)
             .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task FactoryMethod()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Disposal : IDisposable
+{
+	private Stream stream;
+
+	public Disposal() :
+		this(File.OpenRead(string.Empty))
+	{
+	}
+
+	private Disposal(Stream stream)
+	{
+		this.stream = stream;
+	}
+
+	public static Disposal CreateNew()
+	{
+		Stream stream = File.OpenRead(string.Empty);
+		return new Disposal(stream);
+	}
+
+	public void Dispose()
+	{
+		if (stream != null)
+		{
+			stream.Dispose();
+			stream = null;
+		}
+	}
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
