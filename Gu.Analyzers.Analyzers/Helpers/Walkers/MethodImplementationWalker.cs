@@ -37,6 +37,11 @@
             pooled.Item.method = symbol;
             foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
+                if (tree.FilePath.EndsWith(".g.cs"))
+                {
+                    continue;
+                }
+
                 SyntaxNode root;
                 if (tree.TryGetRoot(out root))
                 {
