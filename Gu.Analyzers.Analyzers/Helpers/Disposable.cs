@@ -324,14 +324,15 @@ namespace Gu.Analyzers
                 HashSet<ExpressionSyntax> @checked,
                 List<Classification> classifications)
             {
-                if (!@checked.Add(disposable))
+                if (!@checked.Add(disposable) ||
+                    disposable == null ||
+                    disposable.IsMissing)
                 {
                     classifications.Add(new Classification(Source.Unknown, disposable));
                     return;
                 }
 
-                if (disposable == null ||
-                    disposable is AnonymousFunctionExpressionSyntax ||
+                if (disposable is AnonymousFunctionExpressionSyntax ||
                     disposable is LiteralExpressionSyntax)
                 {
                     classifications.Add(new Classification(Source.NotDisposable, disposable));
