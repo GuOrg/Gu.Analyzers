@@ -124,11 +124,8 @@ namespace Gu.Analyzers.Test
         /// <see cref="Document"/>.
         /// </summary>
         /// <param name="sources">Classes in the form of strings.</param>
-        /// <param name="language">The language the source classes are in. Values may be taken from the
-        /// <see cref="LanguageNames"/> class.</param>
         /// <param name="analyzers">The analyzers to be run on the sources.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <param name="filenames">The filenames or null if the default filename should be used</param>
         /// <returns>A collection of <see cref="Diagnostic"/>s that surfaced in the source code, sorted by
         /// <see cref="Diagnostic.Location"/>.</returns>
         private Task<ImmutableArray<Diagnostic>> GetSortedDiagnosticsAsync(string[] sources, ImmutableArray<DiagnosticAnalyzer> analyzers, CancellationToken cancellationToken)
