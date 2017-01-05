@@ -297,5 +297,26 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task Generic()
+        {
+            var factoryCode = @"
+    public class Factory
+    {
+        public static T Create<T>() where T : new() => new T();
+    }";
+
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            Factory.Create<int>();
+        }
+    }";
+            await this.VerifyHappyPathAsync(factoryCode, testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

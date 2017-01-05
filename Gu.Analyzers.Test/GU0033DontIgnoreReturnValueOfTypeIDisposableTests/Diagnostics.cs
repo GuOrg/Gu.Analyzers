@@ -150,5 +150,80 @@ public sealed class Foo
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
             await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, barCode, testCode }, expected).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task Generic()
+        {
+            var interfaceCode = @"
+    using System;
+    public interface IDisposable<T> : IDisposable
+    {
+    }";
+
+            var disposableCode = @"
+    public sealed class Disposable<T> : IDisposable<T>
+    {
+        public void Dispose()
+        {
+        }
+    }";
+
+            var factoryCode = @"
+    public class Factory
+    {
+        public static IDisposable<T> Create<T>() => new Disposable<T>();
+    }";
+
+            var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            ↓Factory.Create<int>();
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { interfaceCode, disposableCode, factoryCode, testCode }, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        [Explicit("Fix later.")]
+        public async Task ConstrainedGeneric()
+        {
+            var factoryCode = @"
+using System;
+
+public class Factory
+{
+    public static T Create<T>() where T : IDisposable, new() => new T();
+}";
+
+            var disposableCode = @"
+using System;
+
+public sealed class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            ↓Factory.Create<Disposable>();
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { factoryCode, disposableCode, testCode }, expected).ConfigureAwait(false);
+        }
     }
 }

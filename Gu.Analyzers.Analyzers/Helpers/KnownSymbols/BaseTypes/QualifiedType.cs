@@ -3,6 +3,7 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
+    // ReSharper disable once UseNameofExpression
     [System.Diagnostics.DebuggerDisplay("FullName: {FullName}")]
     internal class QualifiedType
     {
