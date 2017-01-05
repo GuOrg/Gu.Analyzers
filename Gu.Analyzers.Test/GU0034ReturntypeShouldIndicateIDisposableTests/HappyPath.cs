@@ -229,6 +229,29 @@ public class Foo
         }
 
         [Test]
+        public async Task IndexerReturningObject()
+        {
+            var testCode = @"
+public class Foo
+{
+    public void Bar()
+    {
+        var meh = this[0];
+    }
+
+    public object this[int index]
+    {
+        get
+        {
+            return new object();
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task GenericMethod()
         {
             var testCode = @"

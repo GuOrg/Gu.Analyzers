@@ -26,6 +26,33 @@ public sealed class Foo
         }
 
         [Test]
+        public async Task IndexerReturningObject()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Bar()
+    {
+        var meh = this[0];
+    }
+
+    public object this[int index]
+    {
+        get
+        {
+            return ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Returntype should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ReturnFileOpenReadAsObjectExpressionBody()
         {
             var testCode = @"
