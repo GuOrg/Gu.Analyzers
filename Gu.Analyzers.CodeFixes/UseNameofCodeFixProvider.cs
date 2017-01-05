@@ -26,7 +26,8 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                     .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
@@ -40,17 +41,17 @@
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Use nameof",
-                        _ => ApplyFixAsync(context, syntaxRoot, argument, diagnostic.Properties.IsEmpty),
+                        _ => ApplyFixAsync(context, syntaxRoot, semanticModel, argument, diagnostic.Properties.IsEmpty),
                         nameof(UseNameofCodeFixProvider)),
                     diagnostic);
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ArgumentSyntax argument, bool islocal)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SemanticModel semanticModel, ArgumentSyntax argument, bool islocal)
         {
             var text = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
             var identifierNameSyntax = SyntaxFactory.IdentifierName(text);
-            var expression = !islocal && !argument.UsesUnderscoreNames()
+            var expression = !islocal && !argument.UsesUnderscoreNames(semanticModel, context.CancellationToken)
                 ? SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),

@@ -1,11 +1,13 @@
 ﻿namespace Gu.Analyzers
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -21,7 +23,7 @@
             ImmutableArray.Create(GU0031DisposeMember.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => BacthFixer.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -32,86 +34,95 @@
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
 
+            var usesUnderscoreNames = syntaxRoot.UsesUnderscoreNames(semanticModel, context.CancellationToken);
+
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
+                var fix = CreateFix(diagnostic, syntaxRoot, semanticModel, context.CancellationToken, usesUnderscoreNames);
+                if (fix.DisposeStatement != null)
                 {
-                    continue;
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Dispose member.",
+                            _ => Task.FromResult(context.Document.WithSyntaxRoot(ApplyFix(syntaxRoot, fix))),
+                            nameof(DisposeMemberCodeFixProvider)),
+                        diagnostic);
                 }
+            }
+        }
 
-                var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                ISymbol memberSymbol;
-                if (!TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out memberSymbol))
-                {
-                    continue;
-                }
+        private static Fix CreateFix(Diagnostic diagnostic, SyntaxNode syntaxRoot, SemanticModel semanticModel, CancellationToken cancellationToken, bool usesUnderscoreNames)
+        {
+            var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
+            if (string.IsNullOrEmpty(token.ValueText) ||
+                token.IsMissing)
+            {
+                return default(Fix);
+            }
 
-                IMethodSymbol disposeMethodSymbol;
+            var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+            ISymbol memberSymbol;
+            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out memberSymbol))
+            {
+                return default(Fix);
+            }
+
+            IMethodSymbol disposeMethodSymbol;
+            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
+            {
                 MethodDeclarationSyntax disposeMethodDeclaration;
-                if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
+                if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
+                    disposeMethodSymbol.Parameters.Length == 0 &&
+                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
                 {
-                    if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
-                        disposeMethodSymbol.Parameters.Length == 0 &&
-                        disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
-                    {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Dispose member.",
-                                _ => ApplyDisposeMemberPublicFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
-                                nameof(DisposeMemberCodeFixProvider)),
-                            diagnostic);
-                        continue;
-                    }
+                    var disposeStatement = CreateDisposeStatement(memberSymbol, usesUnderscoreNames);
+                    return new Fix(disposeStatement, disposeMethodDeclaration);
+                }
 
-                    if (disposeMethodSymbol.Parameters.Length == 1 &&
-                        disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                if (disposeMethodSymbol.Parameters.Length == 1 &&
+                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
+                {
+                    var parameterType = semanticModel.GetTypeInfoSafe(disposeMethodDeclaration.ParameterList.Parameters[0]?.Type, cancellationToken).Type;
+                    if (parameterType == KnownSymbol.Boolean)
                     {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Dispose member.",
-                                _ => ApplyDisposeMemberProtectedFixAsync(context, syntaxRoot, disposeMethodDeclaration, memberSymbol),
-                                nameof(DisposeMemberCodeFixProvider)),
-                            diagnostic);
+                        var disposeStatement = CreateDisposeStatement(memberSymbol, usesUnderscoreNames);
+                        return new Fix(disposeStatement, disposeMethodDeclaration);
                     }
                 }
             }
+
+            return default(Fix);
         }
 
-        private static Task<Document> ApplyDisposeMemberPublicFixAsync(
-            CodeFixContext context,
-            SyntaxNode syntaxRoot,
-            MethodDeclarationSyntax disposeMethod,
-            ISymbol member)
+        private static SyntaxNode ApplyFix(SyntaxNode syntaxRoot, Fix fix)
         {
-            var newDisposeStatement = CreateDisposeStatement(member, disposeMethod.UsesUnderscoreNames());
-            var statements = CreateStatements(disposeMethod, newDisposeStatement);
-            if (disposeMethod.Body != null)
+            var disposeMethod = syntaxRoot.GetCurrentNode(fix.DisposeMethod) ?? fix.DisposeMethod;
+            if (disposeMethod == null)
             {
-                var updatedBody = disposeMethod.Body.WithStatements(statements);
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody)));
+                return syntaxRoot;
             }
 
-            if (disposeMethod.ExpressionBody != null)
+            if (disposeMethod.Modifiers.Any(SyntaxKind.PublicKeyword) && disposeMethod.ParameterList.Parameters.Count == 0)
             {
-                var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
-                                             .WithExpressionBody(null)
-                                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
-                return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(disposeMethod, newMethod)));
+                var statements = CreateStatements(disposeMethod, fix.DisposeStatement);
+                if (disposeMethod.Body != null)
+                {
+                    var updatedBody = disposeMethod.Body.WithStatements(statements);
+                    return syntaxRoot.ReplaceNode(disposeMethod.Body, updatedBody);
+                }
+
+                if (disposeMethod.ExpressionBody != null)
+                {
+                    var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
+                                                 .WithExpressionBody(null)
+                                                 .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
+                    return syntaxRoot.ReplaceNode(disposeMethod, newMethod);
+                }
+
+                return syntaxRoot;
             }
 
-            return Task.FromResult(context.Document);
-        }
-
-        private static Task<Document> ApplyDisposeMemberProtectedFixAsync(
-            CodeFixContext context,
-            SyntaxNode syntaxRoot,
-            MethodDeclarationSyntax disposeMethod,
-            ISymbol member)
-        {
-            var newDisposeStatement = CreateDisposeStatement(member, disposeMethod.UsesUnderscoreNames());
-            if (disposeMethod.Body != null)
+            if (disposeMethod.ParameterList.Parameters.Count == 1 && disposeMethod.Body != null)
             {
                 foreach (var statement in disposeMethod.Body.Statements)
                 {
@@ -126,15 +137,15 @@
                         var block = ifStatement.Statement as BlockSyntax;
                         if (block != null)
                         {
-                            var statements = block.Statements.Add(newDisposeStatement);
+                            var statements = block.Statements.Add(fix.DisposeStatement);
                             var newBlock = block.WithStatements(statements);
-                            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(block, newBlock)));
+                            return syntaxRoot.ReplaceNode(block, newBlock);
                         }
                     }
                 }
             }
 
-            return Task.FromResult(context.Document);
+            return syntaxRoot;
         }
 
         private static StatementSyntax CreateDisposeStatement(ISymbol member, bool usesUnderScoreNames)
@@ -201,6 +212,89 @@
 
             symbol = null;
             return false;
+        }
+
+        private struct Fix
+        {
+            internal readonly StatementSyntax DisposeStatement;
+            internal readonly MethodDeclarationSyntax DisposeMethod;
+
+            public Fix(StatementSyntax disposeStatement, MethodDeclarationSyntax disposeMethod)
+            {
+                this.DisposeStatement = disposeStatement;
+                this.DisposeMethod = disposeMethod;
+            }
+        }
+
+        private class BacthFixer : FixAllProvider
+        {
+            public static readonly BacthFixer Default = new BacthFixer();
+            private static readonly ImmutableArray<FixAllScope> SupportedFixAllScopes = ImmutableArray.Create(FixAllScope.Document);
+
+            private BacthFixer()
+            {
+            }
+
+            public override IEnumerable<FixAllScope> GetSupportedFixAllScopes()
+            {
+                return SupportedFixAllScopes;
+            }
+
+            [SuppressMessage("ReSharper", "RedundantCaseLabel", Justification = "Mute R#")]
+            public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
+            {
+                switch (fixAllContext.Scope)
+                {
+                    case FixAllScope.Document:
+                        return Task.FromResult(CodeAction.Create(
+                            "Dispose member.",
+                            _ => FixDocumentAsync(fixAllContext),
+                            this.GetType().Name));
+                    case FixAllScope.Project:
+                    case FixAllScope.Solution:
+                    case FixAllScope.Custom:
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            private static async Task<Document> FixDocumentAsync(FixAllContext context)
+            {
+                var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
+                                              .ConfigureAwait(false);
+                var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                                 .ConfigureAwait(false);
+                var usesUnderscoreNames = syntaxRoot.UsesUnderscoreNames(semanticModel, context.CancellationToken);
+
+                var diagnostics = await context.GetDocumentDiagnosticsAsync(context.Document).ConfigureAwait(false);
+                var fixes = new List<Fix>();
+                foreach (var diagnostic in diagnostics)
+                {
+                    var fix = CreateFix(diagnostic, syntaxRoot, semanticModel, context.CancellationToken, usesUnderscoreNames);
+                    if (fix.DisposeStatement != null)
+                    {
+                        fixes.Add(fix);
+                    }
+                }
+
+                if (fixes.Count == 0)
+                {
+                    return context.Document;
+                }
+
+                if (fixes.Count == 1)
+                {
+                    return context.Document.WithSyntaxRoot(ApplyFix(syntaxRoot, fixes[0]));
+                }
+
+                var tracking = syntaxRoot.TrackNodes(fixes.Select(x => x.DisposeMethod));
+                foreach (var fix in fixes)
+                {
+                    tracking = ApplyFix(tracking, fix);
+                }
+
+                return context.Document.WithSyntaxRoot(tracking);
+            }
         }
     }
 }

@@ -88,7 +88,7 @@
                                     cancellationToken,
                                     (CompilationUnitSyntax)syntaxRoot,
                                     typeDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider)),
+                            nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                         diagnostic);
                     continue;
                 }
@@ -105,7 +105,7 @@
                                     cancellationToken,
                                      (CompilationUnitSyntax)syntaxRoot,
                                     typeDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider)),
+                            nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                         diagnostic);
                     continue;
                 }
@@ -162,7 +162,7 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
@@ -203,7 +203,7 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(
@@ -274,7 +274,7 @@
             IMethodSymbol existsingMethod;
             if (!type.TryGetMethod("Dispose", out existsingMethod))
             {
-                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames();
+                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
 
                 var disposeMethod = syntaxGenerator.MethodDeclaration(

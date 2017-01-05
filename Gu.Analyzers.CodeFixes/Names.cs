@@ -1,81 +1,137 @@
 namespace Gu.Analyzers
 {
+    using System;
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class Names
     {
-        internal static bool UsesUnderscoreNames(this SyntaxNode node)
+        public enum Result
         {
-            var typeDeclarationSyntax = node.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-            if (typeDeclarationSyntax == null)
-            {
-                return false;
-            }
+            Unknown,
+            Yes,
+            No,
+            Mixed
+        }
 
-            foreach (var member in typeDeclarationSyntax.Members)
+        internal static bool UsesUnderscoreNames(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = Walker.Create(node, semanticModel, cancellationToken))
             {
-                var field = member as FieldDeclarationSyntax;
-                if (field == null ||
-                    field.Modifiers.Any(SyntaxKind.StaticKeyword) ||
-                    !field.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                {
-                    continue;
-                }
-
-                foreach (var variable in field.Declaration.Variables)
-                {
-                    return variable.Identifier.ValueText.StartsWith("_");
-                }
-            }
-
-            using (var pooled = UsesThisWalker.Create(typeDeclarationSyntax))
-            {
-                return pooled.Item.UsesThis == false;
+                return pooled.Item.UsesUnderScore == Result.Yes || pooled.Item.UsesThis == Result.No;
             }
         }
 
-        internal sealed class UsesThisWalker : CSharpSyntaxWalker
+        internal sealed class Walker : CSharpSyntaxWalker
         {
-            private static readonly Pool<UsesThisWalker> Cache = new Pool<UsesThisWalker>(
-                () => new UsesThisWalker(),
+            private static readonly Pool<Walker> Cache = new Pool<Walker>(
+                () => new Walker(),
                 x =>
                 {
-                    x.usesThis = false;
-                    x.noThis = false;
+                    x.UsesThis = Result.Unknown;
+                    x.UsesUnderScore = Result.Unknown;
+                    x.semanticModel = null;
+                    x.cancellationToken = CancellationToken.None;
                 });
 
-            private bool usesThis;
-            private bool noThis;
+            private SemanticModel semanticModel;
+            private CancellationToken cancellationToken;
 
-            private UsesThisWalker()
+            private Walker()
             {
             }
 
-            public bool? UsesThis
-            {
-                get
-                {
-                    if (this.usesThis == this.noThis)
-                    {
-                        return null;
-                    }
+            public Result UsesThis { get; private set; }
 
-                    if (this.usesThis && !this.noThis)
-                    {
-                        return true;
-                    }
+            public Result UsesUnderScore { get; private set; }
 
-                    return false;
-                }
-            }
-
-            public static Pool<UsesThisWalker>.Pooled Create(SyntaxNode node)
+            public static Pool<Walker>.Pooled Create(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var pooled = Cache.GetOrCreate();
+                while (node.Parent != null)
+                {
+                    node = node.Parent;
+                }
+
+                pooled.Item.semanticModel = semanticModel;
+                pooled.Item.cancellationToken = cancellationToken;
                 pooled.Item.Visit(node);
                 return pooled;
+            }
+
+            public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
+            {
+                if (!node.IsMissing &&
+                    !node.Modifiers.Any(SyntaxKind.StaticKeyword) &&
+                     node.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    foreach (var variable in node.Declaration.Variables)
+                    {
+                        var name = variable.Identifier.ValueText;
+                        if (name.StartsWith("_"))
+                        {
+                            switch (this.UsesUnderScore)
+                            {
+                                case Result.Unknown:
+                                    this.UsesUnderScore = Result.Yes;
+                                    break;
+                                case Result.Yes:
+                                    break;
+                                case Result.No:
+                                    this.UsesUnderScore = Result.Mixed;
+                                    break;
+                                case Result.Mixed:
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        }
+                        else
+                        {
+                            switch (this.UsesUnderScore)
+                            {
+                                case Result.Unknown:
+                                    this.UsesUnderScore = Result.No;
+                                    break;
+                                case Result.Yes:
+                                    this.UsesUnderScore = Result.Mixed;
+                                    break;
+                                case Result.No:
+                                    break;
+                                case Result.Mixed:
+                                    break;
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                        }
+                    }
+                }
+
+                base.VisitFieldDeclaration(node);
+            }
+
+            public override void VisitThisExpression(ThisExpressionSyntax node)
+            {
+                switch (this.UsesThis)
+                {
+                    case Result.Unknown:
+                        this.UsesThis = Result.Yes;
+                        break;
+                    case Result.Yes:
+                        break;
+                    case Result.No:
+                        this.UsesThis = Result.Mixed;
+                        break;
+                    case Result.Mixed:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                base.VisitThisExpression(node);
             }
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
@@ -111,12 +167,43 @@ namespace Gu.Analyzers
 
                 if ((expression as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax)
                 {
-                    this.usesThis = true;
+                    switch (this.UsesThis)
+                    {
+                        case Result.Unknown:
+                            this.UsesThis = Result.Yes;
+                            break;
+                        case Result.Yes:
+                            break;
+                        case Result.No:
+                            this.UsesThis = Result.Mixed;
+                            break;
+                        case Result.Mixed:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
 
                 if (expression is IdentifierNameSyntax)
                 {
-                    this.noThis = true;
+                    if (this.semanticModel.GetSymbolSafe(expression, this.cancellationToken)?.IsStatic == false)
+                    {
+                        switch (this.UsesThis)
+                        {
+                            case Result.Unknown:
+                                this.UsesThis = Result.No;
+                                break;
+                            case Result.Yes:
+                                this.UsesThis = Result.Mixed;
+                                break;
+                            case Result.No:
+                                break;
+                            case Result.Mixed:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
                 }
             }
         }
