@@ -34,7 +34,13 @@ namespace Gu.Analyzers
                     var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                     {
-                        var property = semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
+                        var basePropertyDeclarationSyntax = setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>();
+                        if (basePropertyDeclarationSyntax == null)
+                        {
+                            return false;
+                        }
+
+                        var property = semanticModel.GetDeclaredSymbolSafe(basePropertyDeclarationSyntax, cancellationToken);
                         if (IsAssignedWithCreated(property, semanticModel, cancellationToken))
                         {
                             return true;
@@ -426,8 +432,8 @@ namespace Gu.Analyzers
                         var setter = disposable.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                         if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                         {
-                            property = semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>(), cancellationToken);
-                            if (property.SetMethod != null)
+                            property = semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>(), cancellationToken);
+                            if (property?.SetMethod != null)
                             {
                                 if (property.SetMethod.DeclaredAccessibility == Accessibility.Private)
                                 {
