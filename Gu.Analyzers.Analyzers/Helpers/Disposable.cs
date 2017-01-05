@@ -466,8 +466,8 @@ namespace Gu.Analyzers
                 IdentifierNameSyntax identifier)
             {
                 var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
-                IParameterSymbol parameter;
-                if (!ctorSymbol.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter))
+                IParameterSymbol parameter = null;
+                if (ctorSymbol?.Parameters.TryGetSingle(x => x.Name == identifier.Identifier.ValueText, out parameter) != true)
                 {
                     return;
                 }
@@ -479,7 +479,7 @@ namespace Gu.Analyzers
                     foreach (var member in type.Members)
                     {
                         var otherCtor = member as ConstructorDeclarationSyntax;
-                        if (otherCtor == null ||
+                        if (otherCtor?.Initializer == null ||
                             otherCtor == ctor)
                         {
                             continue;
@@ -628,23 +628,30 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                foreach (var propertyDeclaration in property.Declarations(cancellationToken))
+                foreach (var declaration in property.Declarations(cancellationToken))
                 {
-                    CheckProperty((PropertyDeclarationSyntax)propertyDeclaration, semanticModel, cancellationToken, @checked, classifications);
+                    var propertyDeclaration = declaration as BasePropertyDeclarationSyntax;
+                    if (propertyDeclaration != null)
+                    {
+                        CheckProperty(propertyDeclaration, semanticModel, cancellationToken, @checked, classifications);
+                    }
+
                     return;
                 }
             }
 
             private static void CheckProperty(
-                PropertyDeclarationSyntax propertyDeclaration,
+                BasePropertyDeclarationSyntax propertyDeclaration,
                 SemanticModel semanticModel,
                 CancellationToken cancellationToken,
                 HashSet<ExpressionSyntax> @checked,
                 List<Classification> classifications)
             {
-                if (propertyDeclaration.ExpressionBody != null)
+                var expressionBody = (propertyDeclaration as PropertyDeclarationSyntax)?.ExpressionBody ??
+                                     (propertyDeclaration as IndexerDeclarationSyntax)?.ExpressionBody;
+                if (expressionBody != null)
                 {
-                    Check(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, @checked, classifications);
+                    Check(expressionBody.Expression, semanticModel, cancellationToken, @checked, classifications);
                     return;
                 }
 

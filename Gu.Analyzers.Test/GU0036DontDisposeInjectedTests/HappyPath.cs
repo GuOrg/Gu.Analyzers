@@ -49,6 +49,44 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
         }
 
         [Test]
+        public async Task InjectedInClassThatIsIDisposableManyCtors()
+        {
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    public Foo(IDisposable disposable)
+        : this(disposable, ""meh"")
+    {
+    }
+
+    public Foo(IDisposable disposable, IDisposable gah, int meh)
+        : this(disposable, meh)
+    {
+    }
+
+    private Foo(IDisposable disposable, int meh)
+        : this(disposable, meh.ToString())
+    {
+    }
+
+    private Foo(IDisposable disposable, string meh)
+    {
+        this.disposable = disposable;
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
         {
             var testCode = @"
