@@ -55,6 +55,8 @@
     <Compile Include="GU0008AvoidRelayPropertiesTests\HappyPath.cs" />
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
+    <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFixAll.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\HappyPath.cs" />
     <Compile Include="GU0022UseGetOnlyTests\CodeFix.cs" />
@@ -70,7 +72,7 @@
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposableTests\HappyPath.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\Diagnostics.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.cs" />
-    <Compile Include="GU0031DisposeMemberTests\CodeFixDisposeMember.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFix.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFix.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.cs" />

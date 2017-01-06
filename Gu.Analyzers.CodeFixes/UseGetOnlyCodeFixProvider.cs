@@ -62,8 +62,8 @@
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                    _ => ApplyInitializeInCtorFixAsync(context, syntaxRoot, ctor, property, objectCreation),
-                                    nameof(UseGetOnlyCodeFixProvider)),
+                                    _ => ApplyInitializeInCtorFixAsync(context, syntaxRoot, semanticModel, ctor, property, objectCreation),
+                                    nameof(UseGetOnlyCodeFixProvider) + "UNSAFE"),
                                 diagnostic);
                         }
                     }
@@ -104,11 +104,12 @@
         private static Task<Document> ApplyInitializeInCtorFixAsync(
             CodeFixContext context,
             SyntaxNode syntaxRoot,
+            SemanticModel semanticModel,
             ConstructorDeclarationSyntax ctor,
             PropertyDeclarationSyntax property,
             ObjectCreationExpressionSyntax objectCreation)
         {
-            var member = ctor.UsesUnderscoreNames()
+            var member = ctor.UsesUnderscoreNames(semanticModel, context.CancellationToken)
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
