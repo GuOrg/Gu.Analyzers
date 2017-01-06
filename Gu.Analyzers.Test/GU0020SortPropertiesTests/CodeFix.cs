@@ -56,7 +56,7 @@
 
         public int A { get; set; }
     }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, codeFixIndex: 0).ConfigureAwait(false);
         }
 
         [Test]

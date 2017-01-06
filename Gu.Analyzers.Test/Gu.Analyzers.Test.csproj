@@ -57,6 +57,7 @@
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFixAll.cs" />
+    <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\HappyPath.cs" />
     <Compile Include="GU0022UseGetOnlyTests\CodeFix.cs" />
