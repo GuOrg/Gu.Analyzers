@@ -8,6 +8,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Boolean = Create("System.Boolean");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
+        internal static readonly QualifiedType Func = Create("System.Func");
         internal static readonly QualifiedType SerializableAttribute = Create("System.SerializableAttribute");
         internal static readonly QualifiedType NonSerializedAttribute = Create("System.NonSerializedAttribute");
         internal static readonly DisposableType IDisposable = new DisposableType();
@@ -20,7 +21,7 @@ namespace Gu.Analyzers
 
         internal static readonly TaskType Task = new TaskType();
         internal static readonly TextReaderType TextReader = new TextReaderType();
-
+        internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();

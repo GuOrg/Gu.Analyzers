@@ -21,7 +21,7 @@ public sealed class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Returntype should indicate that the value should be disposed.");
+                               .WithMessage("Return type should indicate that the value should be disposed.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -48,7 +48,7 @@ public class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Returntype should indicate that the value should be disposed.");
+                               .WithMessage("Return type should indicate that the value should be disposed.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -65,7 +65,7 @@ public sealed class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Returntype should indicate that the value should be disposed.");
+                               .WithMessage("Return type should indicate that the value should be disposed.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -82,7 +82,32 @@ public sealed class Foo
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Returntype should indicate that the value should be disposed.");
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task Lambda()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+internal static class Foo
+{
+    internal static void Bar()
+    {
+        Func<object> f = () =>
+        {
+	        var file = System.IO.File.OpenRead(null);
+	        return ↓file;
+        };
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
     }

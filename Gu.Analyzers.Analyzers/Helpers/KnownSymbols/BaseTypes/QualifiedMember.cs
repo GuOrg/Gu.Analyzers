@@ -27,8 +27,9 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            return left.Name == right.Name &&
-                   left.ContainingType == right.ContainingType;
+            return (left.Name == right.Name &&
+                   left.ContainingType == right.ContainingType) ||
+                   left.Name.IsParts(right.ContainingType.FullName, ".", right.Name);
         }
 
         public static bool operator !=(T left, QualifiedMember<T> right) => !(left == right);

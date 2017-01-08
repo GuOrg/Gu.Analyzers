@@ -377,6 +377,27 @@ public class Foo : IEnumerable<int>
         }
 
         [Test]
+        public async Task IEnumerableOfIntSimple()
+        {
+            var testCode = @"
+using System.Collections;
+using System.Collections.Generic;
+
+public class Foo : IEnumerable
+{
+    private readonly List<int> ints = new List<int>();
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return this.ints.GetEnumerator();
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IEnumerableOfIntExpressionBodies()
         {
             var testCode = @"
@@ -417,6 +438,29 @@ internal static class Foo
 
 	    stream.Position = 0;
 	    return stream;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task Lambda()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+internal static class Foo
+{
+    internal static void Bar()
+    {
+        Func<IDisposable> f = () =>
+        {
+	        var file = System.IO.File.OpenRead(null);
+	        return file;
+        };
     }
 }";
 

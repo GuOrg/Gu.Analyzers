@@ -10,9 +10,9 @@
     internal class GU0034ReturntypeShouldIndicateIDisposable : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0034";
-        private const string Title = "Returntype should indicate that the value should be disposed.";
-        private const string MessageFormat = "Returntype should indicate that the value should be disposed.";
-        private const string Description = "Returntype should indicate that the value should be disposed.";
+        private const string Title = "Return type should indicate that the value should be disposed.";
+        private const string MessageFormat = "Return type should indicate that the value should be disposed.";
+        private const string Description = "Return type should indicate that the value should be disposed.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -34,11 +34,11 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleReturn, SyntaxKind.ReturnStatement);
+            context.RegisterSyntaxNodeAction(HandleReturnValue, SyntaxKind.ReturnStatement);
             context.RegisterSyntaxNodeAction(HandleArrow, SyntaxKind.ArrowExpressionClause);
         }
 
-        private static void HandleReturn(SyntaxNodeAnalysisContext context)
+        private static void HandleReturnValue(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -51,7 +51,7 @@
                 return;
             }
 
-            if (IsDisposableReturnType(MemberType(symbol)))
+            if (IsDisposableReturnType(ReturnType(context)))
             {
                 return;
             }
@@ -62,10 +62,7 @@
                 return;
             }
 
-            if (Disposable.IsPotentialCreation(returnStatement.Expression, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnStatement.Expression.GetLocation()));
-            }
+            HandleReturnValue(context, returnStatement.Expression);
         }
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
@@ -81,7 +78,7 @@
                 return;
             }
 
-            if (IsDisposableReturnType(MemberType(symbol)))
+            if (IsDisposableReturnType(ReturnType(context)))
             {
                 return;
             }
@@ -92,14 +89,24 @@
                 return;
             }
 
-            if (Disposable.IsPotentialCreation(arrowClause.Expression, context.SemanticModel, context.CancellationToken))
+            HandleReturnValue(context, arrowClause.Expression);
+        }
+
+        private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
+        {
+            if (Disposable.IsPotentialCreation(returnValue, context.SemanticModel, context.CancellationToken))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, arrowClause.Expression.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnValue.GetLocation()));
             }
         }
 
         private static bool IsDisposableReturnType(ITypeSymbol type)
         {
+            if (type == null)
+            {
+                return false;
+            }
+
             if (Disposable.IsAssignableTo(type))
             {
                 return true;
@@ -111,6 +118,12 @@
                 return namedType?.IsGenericType == true && Disposable.IsAssignableTo(namedType.TypeArguments[0]);
             }
 
+            if (type == KnownSymbol.Func)
+            {
+                var namedType = type as INamedTypeSymbol;
+                return namedType?.IsGenericType == true && Disposable.IsAssignableTo(namedType.TypeArguments[namedType.TypeArguments.Length - 1]);
+            }
+
             return false;
         }
 
@@ -119,16 +132,24 @@
             var method = symbol as IMethodSymbol;
             if (method != null)
             {
-                return symbol.MetadataName == "GetEnumerator" ||
-                       symbol.MetadataName == "System.Collections.IEnumerable.GetEnumerator";
+                return method == KnownSymbol.IEnumerable.GetEnumerator;
             }
 
             return false;
         }
 
-        private static ITypeSymbol MemberType(ISymbol member) =>
-            (member as IMethodSymbol)?.ReturnType ??
-            (member as IFieldSymbol)?.Type ??
-            (member as IPropertySymbol)?.Type;
+        private static ITypeSymbol ReturnType(SyntaxNodeAnalysisContext context)
+        {
+            var anonymousFunction = context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
+            if (anonymousFunction != null)
+            {
+                var method = context.SemanticModel.GetSymbolSafe(anonymousFunction, context.CancellationToken) as IMethodSymbol;
+                return method?.ReturnType;
+            }
+
+            return (context.ContainingSymbol as IMethodSymbol)?.ReturnType ??
+                   (context.ContainingSymbol as IFieldSymbol)?.Type ??
+                   (context.ContainingSymbol as IPropertySymbol)?.Type;
+        }
     }
 }
