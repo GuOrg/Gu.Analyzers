@@ -18,9 +18,6 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0007PreferInjecting.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
-
-        /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

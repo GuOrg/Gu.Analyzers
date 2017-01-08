@@ -47,12 +47,11 @@
                 return;
             }
 
-            var property = (IPropertySymbol)context.ContainingSymbol;
-            var neighbors = GetNeighbors((BasePropertyDeclarationSyntax)context.Node);
+            var property = (BasePropertyDeclarationSyntax)context.Node;
+            var neighbors = GetNeighbors(property);
             if (neighbors.Before != null)
             {
-                var other = context.SemanticModel.GetDeclaredSymbolSafe(neighbors.Before, context.CancellationToken);
-                if (PropertyPositionComparer.Default.Compare(other, property) > 0)
+                if (PropertyPositionComparer.Default.Compare(neighbors.Before, property) > 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
@@ -60,15 +59,14 @@
 
             if (neighbors.After != null)
             {
-                var other = context.SemanticModel.GetDeclaredSymbolSafe(neighbors.After, context.CancellationToken);
-                if (PropertyPositionComparer.Default.Compare(other, property) < 0)
+                if (PropertyPositionComparer.Default.Compare(neighbors.After, property) < 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
             }
         }
 
-        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
+        internal static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
         {
             var typeDeclaration = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
             if (typeDeclaration == null)
@@ -119,87 +117,36 @@
             }
         }
 
-        internal sealed class SortedProperties
-        {
-            private static readonly Pool<SortedProperties> Cache = new Pool<SortedProperties>(
-                () => new SortedProperties(),
-                x =>
-                {
-                    x.documentOrder.Clear();
-
-                    x.sorted.Clear();
-                });
-
-            private readonly List<IPropertySymbol> documentOrder = new List<IPropertySymbol>();
-            private readonly List<IPropertySymbol> sorted = new List<IPropertySymbol>();
-
-            private SortedProperties()
-            {
-            }
-
-            public IReadOnlyList<IPropertySymbol> Sorted => this.sorted;
-
-            public bool IsSorted
-            {
-                get
-                {
-                    for (var i = 0; i < this.documentOrder.Count; i++)
-                    {
-                        if (!ReferenceEquals(this.documentOrder[i], this.sorted[i]))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-            }
-
-            public static Pool<SortedProperties>.Pooled Create(ITypeSymbol type)
-            {
-                var pooled = Cache.GetOrCreate();
-                pooled.Item.documentOrder.AddRange(type.GetMembers().OfType<IPropertySymbol>());
-                pooled.Item.sorted.AddRange(pooled.Item.documentOrder);
-                pooled.Item.sorted.Sort(PropertyPositionComparer.Default);
-                return pooled;
-            }
-
-            public bool IsAtCorrectPosition(IPropertySymbol property)
-            {
-                return this.documentOrder.IndexOf(property) == this.sorted.IndexOf(property);
-            }
-
-            public int IndexOfSorted(IPropertySymbol property)
-            {
-                return this.sorted.IndexOf(property);
-            }
-        }
-
-        internal class PropertyPositionComparer : IComparer<IPropertySymbol>
+        internal class PropertyPositionComparer : IComparer<BasePropertyDeclarationSyntax>
         {
             public static readonly PropertyPositionComparer Default = new PropertyPositionComparer();
 
-            public int Compare(IPropertySymbol x, IPropertySymbol y)
+            public int Compare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y)
             {
-                int result;
-                if (TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Public, out result) ||
-                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Internal, out result) ||
-                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Protected, out result) ||
-                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Private, out result) ||
-                    TryCompare(x, y, p => p.IsStatic, out result) ||
-                    TryCompare(x, y, p => !p.IsIndexer, out result))
+                AccessorDeclarationSyntax xSetter;
+                if (!x.TryGetSetAccessorDeclaration(out xSetter))
                 {
-                    return result;
+                    xSetter = null;
                 }
 
-                var xDeclaration = (BasePropertyDeclarationSyntax)x.DeclaringSyntaxReferences[0].GetSyntax();
-                var yDeclaration = (BasePropertyDeclarationSyntax)y.DeclaringSyntaxReferences[0].GetSyntax();
-                if (TryCompare(xDeclaration, yDeclaration, IsGetOnly, out result) ||
-                    TryCompare(xDeclaration, yDeclaration, IsCalculated, out result) ||
-                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Private, out result) ||
-                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Protected, out result) ||
-                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result) ||
-                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Public, out result))
+                AccessorDeclarationSyntax ySetter;
+                if (!y.TryGetSetAccessorDeclaration(out ySetter))
+                {
+                    ySetter = null;
+                }
+
+                int result;
+                if (TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PublicKeyword), out result) ||
+                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.InternalKeyword), out result) ||
+                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.ProtectedKeyword), out result) ||
+                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PrivateKeyword), out result) ||
+                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.StaticKeyword), out result) ||
+                    TryCompare(x, y, p => !(p is IndexerDeclarationSyntax), out result) ||
+                    TryCompare(x, y, IsGetOnly, out result) ||
+                    TryCompare(x, y, IsCalculated, out result) ||
+                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.PrivateKeyword) == true, out result) ||
+                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true, out result) ||
+                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.InternalKeyword) == true, out result))
                 {
                     return result;
                 }
@@ -207,12 +154,7 @@
                 return 0;
             }
 
-            private static bool TryCompare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, Func<BasePropertyDeclarationSyntax, bool> criteria, out int result)
-            {
-                return TryCompare(criteria(x), criteria(y), out result);
-            }
-
-            private static bool TryCompare(IPropertySymbol x, IPropertySymbol y, Func<IPropertySymbol, bool> criteria, out int result)
+            private static bool TryCompare<T>(T x, T y, Func<T, bool> criteria, out int result)
             {
                 return TryCompare(criteria(x), criteria(y), out result);
             }
@@ -238,18 +180,14 @@
             private static bool IsGetOnly(BasePropertyDeclarationSyntax property)
             {
                 AccessorDeclarationSyntax getter;
-                if (property.TryGetGetAccessorDeclaration(out getter) && getter.Body == null)
+                if (!property.TryGetGetAccessorDeclaration(out getter) ||
+                    getter.Body != null)
                 {
-                    AccessorDeclarationSyntax _;
-                    if (property.TryGetSetAccessorDeclaration(out _))
-                    {
-                        return false;
-                    }
-
-                    return true;
+                    return false;
                 }
 
-                return false;
+                AccessorDeclarationSyntax _;
+                return !property.TryGetSetAccessorDeclaration(out _);
             }
 
             private static bool IsCalculated(BasePropertyDeclarationSyntax property)
