@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Helpers
+﻿namespace Gu.Analyzers
 {
     using System.Diagnostics;
 
