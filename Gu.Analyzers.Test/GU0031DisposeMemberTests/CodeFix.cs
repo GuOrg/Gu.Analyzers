@@ -6,6 +6,16 @@
 
     internal class CodeFix : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [Test]
         public async Task NotDisposingPrivateReadonlyFieldInDisposeMethod()
         {
@@ -45,12 +55,6 @@ public sealed class Foo : IDisposable
         [Test]
         public async Task NotDisposingFieldAssignedInExpressionBody()
         {
-            var disposableCode = @"
-using System;
-class Disposable : IDisposable {
-    public void Dispose() { }
-}";
-
             var testCode = @"
 using System;
 class Foo : IDisposable
@@ -64,7 +68,7 @@ class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;
@@ -77,7 +81,7 @@ class Foo : IDisposable
         _disposable?.Dispose();
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }).ConfigureAwait(false);
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
         }
 
         [Test]
@@ -1075,6 +1079,82 @@ public sealed class Foo : IDisposable
 }";
             await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
           .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
+        {
+            var subclassCode = @"
+public sealed class Bar : Disposable
+{
+}";
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Bar bar = new Bar();
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] {DisposableCode, subclassCode, testCode}, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Bar bar = new Bar();
+
+    public void Dispose()
+    {
+        this.bar.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
+        {
+            var subclassCode = @"
+public sealed class Bar<T> : Disposable
+{
+}";
+            var testCode = @"
+using System;
+
+public sealed class Foo<T> : IDisposable
+{
+    ↓private readonly Bar<T> bar = new Bar<T>();
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo<T> : IDisposable
+{
+    private readonly Bar<T> bar = new Bar<T>();
+
+    public void Dispose()
+    {
+        this.bar.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
         }
     }
 }

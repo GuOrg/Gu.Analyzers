@@ -596,5 +596,56 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DisposingPropertyInBase()
+        {
+            var fooCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
+    private bool disposed;
+
+    public void Dispose()
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            this.Stream.Dispose();
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(this.GetType().FullName);
+        }
+    }
+}";
+
+            var barCode = @"
+using System.IO;
+
+public class Bar : Foo
+{
+    public override Stream Stream { get; }
+}";
+            await this.VerifyHappyPathAsync(fooCode, barCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
