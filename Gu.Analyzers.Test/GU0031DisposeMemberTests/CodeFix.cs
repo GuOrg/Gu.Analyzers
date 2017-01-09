@@ -1196,7 +1196,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] {DisposableCode, subclassCode, testCode}, expected).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 using System;

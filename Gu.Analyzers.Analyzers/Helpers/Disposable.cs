@@ -567,7 +567,11 @@ namespace Gu.Analyzers
                     {
                         foreach (var declaration in methodSymbol.Declarations(cancellationToken))
                         {
-                            CheckMethod((BaseMethodDeclarationSyntax)declaration, semanticModel, cancellationToken, @checked, classifications);
+                            var methodDeclaration = declaration as BaseMethodDeclarationSyntax;
+                            if (methodDeclaration != null)
+                            {
+                                CheckMethod(methodDeclaration, semanticModel, cancellationToken, @checked, classifications);
+                            }
                         }
                     }
                 }
