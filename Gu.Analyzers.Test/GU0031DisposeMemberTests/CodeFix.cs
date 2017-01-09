@@ -952,16 +952,6 @@ public class Foo : BaseClass
         [Test]
         public async Task CtorPassingCreatedIntoPrivateCtor()
         {
-            var disposableCode = @"
-    using System;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }";
-
             var testCode = @"
 using System;
 
@@ -986,7 +976,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"
@@ -1011,23 +1001,13 @@ public sealed class Foo : IDisposable
         this.disposable.Dispose();
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
           .ConfigureAwait(false);
         }
 
         [Test]
         public async Task FactoryPassingCreatedIntoPrivateCtor()
         {
-            var disposableCode = @"
-    using System;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }";
-
             var testCode = @"
 using System;
 
@@ -1052,7 +1032,7 @@ public sealed class Foo : IDisposable
             var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
                       .ConfigureAwait(false);
 
             var fixedCode = @"
@@ -1077,7 +1057,121 @@ public sealed class Foo : IDisposable
         this.disposable.Dispose();
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { disposableCode, testCode }, new[] { disposableCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
+          .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ExtensionMethodFactoryAssigningInCtor()
+        {
+            var factoryCode = @"
+using System;
+
+public static class Factory
+{
+    public static IDisposable AsDisposable(this object value)
+    {
+        return new Disposable();
+    }
+}";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable;
+
+    private Foo(object value)
+    {
+        this.disposable = value.AsDisposable();
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, factoryCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    private Foo(object value)
+    {
+        this.disposable = value.AsDisposable();
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
+          .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task GenericExtensionMethodFactoryAssigningInCtor()
+        {
+            var factoryCode = @"
+using System;
+
+public static class Factory
+{
+    public static IDisposable AsDisposable<T>(this T value)
+    {
+        return new Disposable();
+    }
+}";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable;
+
+    private Foo(object value)
+    {
+        this.disposable = value.AsDisposable();
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, factoryCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    private Foo(object value)
+    {
+        this.disposable = value.AsDisposable();
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
           .ConfigureAwait(false);
         }
 

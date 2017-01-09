@@ -64,6 +64,7 @@
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
+    <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\TaskType.cs" />
