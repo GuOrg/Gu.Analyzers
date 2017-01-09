@@ -66,7 +66,7 @@
             }
         }
 
-        internal static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
+        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
         {
             var typeDeclaration = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
             if (typeDeclaration == null)
@@ -105,7 +105,7 @@
             return new Neighbors(before, after);
         }
 
-        internal struct Neighbors
+        private struct Neighbors
         {
             internal readonly BasePropertyDeclarationSyntax Before;
             internal readonly BasePropertyDeclarationSyntax After;

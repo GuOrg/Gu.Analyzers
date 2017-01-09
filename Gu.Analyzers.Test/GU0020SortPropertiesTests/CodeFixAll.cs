@@ -149,6 +149,5 @@ public class Foo
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
                       .ConfigureAwait(false);
         }
-
     }
 }
