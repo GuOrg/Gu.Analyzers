@@ -318,5 +318,78 @@ public class Foo
             await this.VerifyHappyPathAsync(factoryCode, testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task Operator()
+        {
+            var mehCode = @"
+    public class Meh
+    {
+        public static Meh operator +(Meh left, Meh right) => new Meh();
+    }";
+
+            var testCode = @"
+    public class Foo
+    {
+        public object Bar()
+        {
+            var meh1 = new Meh();
+            var meh2 = new Meh();
+            return meh1 + meh2;
+        }
+    }";
+            await this.VerifyHappyPathAsync(mehCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task OperatorNestedCall()
+        {
+            var mehCode = @"
+    public class Meh
+    {
+        public static Meh operator +(Meh left, Meh right) => new Meh();
+    }";
+
+            var testCode = @"
+    public class Foo
+    {
+        public object Bar()
+        {
+            var meh1 = new Meh();
+            var meh2 = new Meh();
+            return Add(new Meh(), new Meh());
+        }
+
+        public object Add(Meh meh1, Meh meh2)
+        {
+            return meh1 + meh2;
+        }
+    }";
+            await this.VerifyHappyPathAsync(mehCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task OperatorEquals()
+        {
+            var mehCode = @"
+    public class Meh
+    {
+    }";
+
+            var testCode = @"
+    public class Foo
+    {
+        public bool Bar()
+        {
+            var meh1 = new Meh();
+            var meh2 = new Meh();
+            return meh1 == meh2;
+        }
+    }";
+            await this.VerifyHappyPathAsync(mehCode, testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

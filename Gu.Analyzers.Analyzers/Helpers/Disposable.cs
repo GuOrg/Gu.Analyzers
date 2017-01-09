@@ -567,7 +567,7 @@ namespace Gu.Analyzers
                     {
                         foreach (var declaration in methodSymbol.Declarations(cancellationToken))
                         {
-                            CheckMethod((MethodDeclarationSyntax)declaration, semanticModel, cancellationToken, @checked, classifications);
+                            CheckMethod((BaseMethodDeclarationSyntax)declaration, semanticModel, cancellationToken, @checked, classifications);
                         }
                     }
                 }
@@ -579,7 +579,7 @@ namespace Gu.Analyzers
             }
 
             private static void CheckMethod(
-                MethodDeclarationSyntax methodDeclaration,
+                BaseMethodDeclarationSyntax methodDeclaration,
                 SemanticModel semanticModel,
                 CancellationToken cancellationToken,
                 HashSet<ExpressionSyntax> @checked,
