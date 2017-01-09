@@ -98,10 +98,6 @@
                 .AddMetadataReference(projectId, MetadataReferences.CorlibReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemCoreReference)
-                .AddMetadataReference(projectId, MetadataReferences.PresentationCoreReference)
-                .AddMetadataReference(projectId, MetadataReferences.PresentationFrameworkReference)
-                .AddMetadataReference(projectId, MetadataReferences.WindowsBaseReference)
-                .AddMetadataReference(projectId, MetadataReferences.SystemXamlReference)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbolsReference)
                 .AddMetadataReference(projectId, MetadataReferences.CodeAnalysisReference);
 
