@@ -60,6 +60,70 @@
         }
 
         [Test]
+        public async Task WhenMutableBeforeGetOnlyFirstWithNamespaces()
+        {
+            var testCode = @"
+namespace Test
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; set; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+    }
+}";
+
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 16, 9)
+                               .WithMessage("Move property.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 18, 9)
+                                .WithMessage("Move property.");
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace Test
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+
+        public int A { get; set; }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, codeFixIndex: 0).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenMutableBeforeGetOnlyLast()
         {
             var testCode = @"

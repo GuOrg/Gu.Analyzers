@@ -154,12 +154,17 @@
             {
                 sortedNode = null;
                 var member = node as MemberDeclarationSyntax;
-                if (member == null || member is TypeDeclarationSyntax)
+                if (member == null || member is TypeDeclarationSyntax || member is NamespaceDeclarationSyntax)
                 {
                     return false;
                 }
 
                 var type = member.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+                if (type == null)
+                {
+                    return false;
+                }
+
                 List<MemberDeclarationSyntax> sortedMembers;
                 if (this.sorted.Item.TryGetValue(type, out sortedMembers))
                 {
