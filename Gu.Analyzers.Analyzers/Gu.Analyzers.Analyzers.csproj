@@ -67,6 +67,7 @@
     <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableType.cs" />
+    <Compile Include="Helpers\KnownSymbols\StringType.cs" />
     <Compile Include="Helpers\KnownSymbols\TaskType.cs" />
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
@@ -86,7 +87,7 @@
     <Compile Include="Helpers\KnownSymbols\BaseTypes\QualifiedProperty.cs" />
     <Compile Include="Helpers\KnownSymbols\PasswordBoxType.cs" />
     <Compile Include="Helpers\KnownSymbols\StringBuilderType.cs" />
-    <Compile Include="Helpers\KnownSymbols\StringType.cs" />
+    <Compile Include="Helpers\KnownSymbols\SerialDisposableType.cs" />
     <Compile Include="Helpers\SemanticModelExt.cs" />
     <Compile Include="Helpers\StringHelper.cs" />
     <Compile Include="Helpers\SymbolHelpers\FieldSymbolExt.cs" />

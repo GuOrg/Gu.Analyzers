@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0031DisposeMember>
+    internal partial class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
         [TestCase("this.stream.Dispose();")]
         [TestCase("this.stream?.Dispose();")]

@@ -98,6 +98,7 @@
                 .AddMetadataReference(projectId, MetadataReferences.CorlibReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemCoreReference)
+                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveReference)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbolsReference)
                 .AddMetadataReference(projectId, MetadataReferences.CodeAnalysisReference);
 

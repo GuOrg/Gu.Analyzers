@@ -33,5 +33,15 @@ namespace Gu.Analyzers
         }
 
         public static bool operator !=(T left, QualifiedMember<T> right) => !(left == right);
+
+        public static bool operator ==(ISymbol left, QualifiedMember<T> right)
+        {
+            return left is T && (T)left == right;
+        }
+
+        public static bool operator !=(ISymbol left, QualifiedMember<T> right)
+        {
+            return !(left == right);
+        }
     }
 }

@@ -24,6 +24,9 @@ namespace Gu.Analyzers
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
+
+        internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
+
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
 
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();

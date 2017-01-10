@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
+    internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
         [Test]
         public async Task DisposingVariable()

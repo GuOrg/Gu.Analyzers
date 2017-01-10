@@ -52,13 +52,17 @@
                 return;
             }
 
-            var symbol = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
+            var left = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
+            if (left == KnownSymbol.SerialDisposable.Disposable)
+            {
+                return;
+            }
 
-            var localSymbol = symbol as ILocalSymbol;
+            var localSymbol = left as ILocalSymbol;
             if (localSymbol != null)
             {
                 if (!IsVariableAssignedBefore(localSymbol, assignment, context.SemanticModel, context.CancellationToken) ||
-                    IsDisposedBeforeAssignment(symbol, assignment))
+                    IsDisposedBeforeAssignment(left, assignment))
                 {
                     return;
                 }
@@ -69,7 +73,7 @@
 
             if (assignment.FirstAncestorOrSelf<MethodDeclarationSyntax>() != null)
             {
-                if (IsDisposedBeforeAssignment(symbol, assignment))
+                if (IsDisposedBeforeAssignment(left, assignment))
                 {
                     return;
                 }
