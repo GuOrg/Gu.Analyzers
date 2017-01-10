@@ -35,7 +35,7 @@
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.method = symbol;
-            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+            foreach (var tree in semanticModel.Compilation.AllSyntaxTrees())
             {
                 if (tree.FilePath.EndsWith(".g.cs"))
                 {
@@ -57,6 +57,11 @@
             if (node.Identifier.ValueText == this.method.Name)
             {
                 var symbol = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
+                if (symbol == null)
+                {
+                    return;
+                }
+
                 var forInterfaceMember = symbol.ContainingType.FindImplementationForInterfaceMember(this.method);
                 if (ReferenceEquals(this.method, symbol) ||
                     ReferenceEquals(this.method, symbol.OverriddenMethod) ||
