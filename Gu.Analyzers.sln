@@ -56,6 +56,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0050.md = documentation\GU0050.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Vsix", "Gu.Analyzers.Vsix\Gu.Analyzers.Vsix.csproj", "{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
