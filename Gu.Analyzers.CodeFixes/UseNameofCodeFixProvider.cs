@@ -41,17 +41,17 @@
                 context.RegisterCodeFix(
                     CodeAction.Create(
                         "Use nameof",
-                        _ => ApplyFixAsync(context, syntaxRoot, semanticModel, argument, diagnostic.Properties.IsEmpty),
+                        _ => ApplyFixAsync(context, syntaxRoot, semanticModel, argument, !diagnostic.Properties.IsEmpty),
                         nameof(UseNameofCodeFixProvider)),
                     diagnostic);
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SemanticModel semanticModel, ArgumentSyntax argument, bool islocal)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SemanticModel semanticModel, ArgumentSyntax argument, bool isMember)
         {
             var text = ((LiteralExpressionSyntax)argument.Expression).Token.ValueText;
             var identifierNameSyntax = SyntaxFactory.IdentifierName(text);
-            var expression = !islocal && !argument.UsesUnderscoreNames(semanticModel, context.CancellationToken)
+            var expression = isMember && !argument.UsesUnderscoreNames(semanticModel, context.CancellationToken)
                 ? SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),

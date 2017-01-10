@@ -56,7 +56,8 @@
             if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out symbol))
             {
                 if (symbol is IParameterSymbol ||
-                    symbol is ILocalSymbol)
+                    symbol is ILocalSymbol ||
+                    symbol.IsStatic)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                     return;

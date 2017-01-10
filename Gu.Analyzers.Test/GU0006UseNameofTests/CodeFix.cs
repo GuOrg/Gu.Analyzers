@@ -167,6 +167,75 @@
         }
 
         [Test]
+        public async Task WhenRaisingStaticPropertyChanged()
+        {
+            var testCode = @"
+    using System;
+    using System.ComponentModel;
+
+    public static class Foo
+    {
+        private static string name;
+
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+
+        public static string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                if (value == name)
+                {
+                    return;
+                }
+
+                name = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(↓""Name""));
+            }
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use nameof.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    using System;
+    using System.ComponentModel;
+
+    public static class Foo
+    {
+        private static string name;
+
+        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+
+        public static string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                if (value == name)
+                {
+                    return;
+                }
+
+                name = value;
+                StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(Name)));
+            }
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
