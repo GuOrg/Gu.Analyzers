@@ -157,13 +157,13 @@
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">
       <ItemGroup>
-        <Reference Include="Microsoft.CodeAnalysis.Workspaces">
-          <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common\lib\net45\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
+        <Reference Include="Microsoft.CodeAnalysis.Workspaces.Desktop">
+          <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common\lib\net45\Microsoft.CodeAnalysis.Workspaces.Desktop.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
-        <Reference Include="Microsoft.CodeAnalysis.Workspaces.Desktop">
-          <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common\lib\net45\Microsoft.CodeAnalysis.Workspaces.Desktop.dll</HintPath>
+        <Reference Include="Microsoft.CodeAnalysis.Workspaces">
+          <HintPath>..\packages\Microsoft.CodeAnalysis.Workspaces.Common\lib\net45\Microsoft.CodeAnalysis.Workspaces.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
