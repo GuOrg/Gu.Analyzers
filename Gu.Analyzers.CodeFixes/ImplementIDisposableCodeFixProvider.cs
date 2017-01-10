@@ -24,9 +24,6 @@
             GU0035ImplementIDisposable.DiagnosticId,
             "CS0535");
 
-        /////// <inheritdoc/>
-        //// public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
-
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
@@ -120,7 +117,7 @@
                                 cancellationToken,
                                  (CompilationUnitSyntax)syntaxRoot,
                                 typeDeclaration),
-                        nameof(ImplementIDisposableCodeFixProvider)),
+                        nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                     diagnostic);
 
                 context.RegisterCodeFix(
@@ -133,7 +130,7 @@
                                 cancellationToken,
                                  (CompilationUnitSyntax)syntaxRoot,
                                 typeDeclaration),
-                        nameof(ImplementIDisposableCodeFixProvider)),
+                        nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                     diagnostic);
             }
         }
