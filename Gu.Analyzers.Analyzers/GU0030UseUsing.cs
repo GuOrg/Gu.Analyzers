@@ -112,11 +112,23 @@
                 }
 
                 var objectCreation = returnValue as ObjectCreationExpressionSyntax;
-                if (objectCreation != null)
+                if (objectCreation?.ArgumentList != null)
                 {
                     foreach (var argument in objectCreation.ArgumentList.Arguments)
                     {
                         var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                        if (symbol.Equals(arg))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                if (objectCreation?.Initializer != null)
+                {
+                    foreach (var argument in objectCreation.Initializer.Expressions)
+                    {
+                        var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
                         if (symbol.Equals(arg))
                         {
                             return true;

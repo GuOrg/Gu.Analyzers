@@ -99,6 +99,7 @@
                 .AddMetadataReference(projectId, MetadataReferences.SystemReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemCoreReference)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveReference)
+                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfacesReference)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbolsReference)
                 .AddMetadataReference(projectId, MetadataReferences.CodeAnalysisReference);
 

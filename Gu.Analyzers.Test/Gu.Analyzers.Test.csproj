@@ -51,6 +51,7 @@
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
+    <Compile Include="GU0030UseUsingTests\HappyPath.Returns.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFixAll.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPathRx.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
