@@ -5,7 +5,6 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
 
     internal partial class HappyPath
     {
-
         [Test]
         public async Task WhenDisposableIsReturnedMethodSimple()
         {

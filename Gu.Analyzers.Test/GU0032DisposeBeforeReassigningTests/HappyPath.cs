@@ -25,6 +25,25 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
 
+        [Test]
+        public async Task OutParameter()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
         [TestCase("Stream stream;")]
         [TestCase("Stream stream = null;")]
         [TestCase("var stream = (Stream)null;")]

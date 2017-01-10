@@ -42,7 +42,132 @@ public class Foo
         }
 
         [Test]
-        [Explicit("Not sure I'll bother to support this.")]
+        public async Task AssigningViaOutParameter()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Update()
+        {
+            var stream = File.OpenRead(string.Empty);
+            ↓TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Update()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stram?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AssigningOutParameterTwice()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            ↓stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task RefParameter()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public bool TryGetStream(ref Stream stream)
+    {
+        ↓stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public bool TryGetStream(ref Stream stream)
+    {
+        stream?.Dispose();
+        stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
+        }
+
+        [Test]
+        [Explicit("Fix?")]
         public async Task NotDisposingFieldInCtor()
         {
             var testCode = @"

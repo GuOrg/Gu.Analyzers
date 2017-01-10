@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    // ReSharper disable once InconsistentNaming
     internal class IEnumerableType : QualifiedType
     {
         internal readonly QualifiedMethod GetEnumerator;

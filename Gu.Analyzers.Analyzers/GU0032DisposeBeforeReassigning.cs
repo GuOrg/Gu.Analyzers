@@ -58,10 +58,9 @@
                 return;
             }
 
-            var localSymbol = left as ILocalSymbol;
-            if (localSymbol != null)
+            if (left is ILocalSymbol || left is IParameterSymbol)
             {
-                if (!IsVariableAssignedBefore(localSymbol, assignment, context.SemanticModel, context.CancellationToken) ||
+                if (!IsVariableAssignedBefore(left, assignment, context.SemanticModel, context.CancellationToken) ||
                     IsDisposedBeforeAssignment(left, assignment))
                 {
                     return;
@@ -82,8 +81,14 @@
             }
         }
 
-        private static bool IsVariableAssignedBefore(ILocalSymbol symbol, AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsVariableAssignedBefore(ISymbol symbol, AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            var parameter = symbol as IParameterSymbol;
+            if (parameter?.RefKind == RefKind.Ref)
+            {
+                return true;
+            }
+
             VariableDeclaratorSyntax declarator;
             if (symbol.TryGetSingleDeclaration(cancellationToken, out declarator))
             {
