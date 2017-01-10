@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -67,14 +68,17 @@
                         return;
                     }
 
-                    ExpressionSyntax _;
-                    if (declarator.IsReturned(context.SemanticModel, context.CancellationToken, out _))
+                    if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
 
-                    AssignmentExpressionSyntax assignment;
-                    if (declarator.IsAssigned(context.SemanticModel, context.CancellationToken, out assignment))
+                    if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
+                    if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
@@ -82,6 +86,109 @@
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
             }
+        }
+
+        private static bool IsReturned(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (variable == null)
+            {
+                return false;
+            }
+
+            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
+            ExpressionSyntax returnValue = null;
+            if (block?.TryGetReturnExpression(out returnValue) == true)
+            {
+                var returned = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
+                if (symbol.Equals(returned))
+                {
+                    return true;
+                }
+
+                var objectCreation = returnValue as ObjectCreationExpressionSyntax;
+                if (objectCreation != null)
+                {
+                    foreach (var argument in objectCreation.ArgumentList.Arguments)
+                    {
+                        var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                        if (symbol.Equals(arg))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsAssignedToFieldOrProperty(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (variable == null)
+            {
+                return false;
+            }
+
+            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
+            AssignmentExpressionSyntax assignment = null;
+            if (block?.TryGetAssignment(symbol, semanticModel, cancellationToken, out assignment) == true)
+            {
+                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                return left is IFieldSymbol || left is IPropertySymbol;
+            }
+
+            return false;
+        }
+
+        private static bool IsAddedToFieldOrProperty(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (variable == null)
+            {
+                return false;
+            }
+
+            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
+            if (symbol == null)
+            {
+                return false;
+            }
+
+            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
+            using (var pooledInvocations = InvocationWalker.Create(block))
+            {
+                foreach (var invocation in pooledInvocations.Item.Invocations)
+                {
+                    var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
+                    if (method?.Name == "Add")
+                    {
+                        using (var pooledIdentifiers = IdentifierNameWalker.Create(invocation.ArgumentList))
+                        {
+                            foreach (var identifierName in pooledIdentifiers.Item.IdentifierNames)
+                            {
+                                var argSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
+                                if (symbol.Equals(argSymbol))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

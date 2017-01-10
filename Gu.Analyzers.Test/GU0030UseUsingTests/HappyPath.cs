@@ -85,7 +85,6 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         }
 
         [Test]
-        [Explicit("meh")]
         public async Task DontUseUsingWhenAddingLocalVariableToFieldList()
         {
             var testCode = @"
@@ -226,6 +225,24 @@ public static class Foo
         {
             var stream = File.OpenRead(string.Empty);
             return stream;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenStreamIsReturnedInStreamReaderMethodBody()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static StreamReader Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return new StreamReader(stream);
         }
     }";
             await this.VerifyHappyPathAsync(testCode)

@@ -105,7 +105,6 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\SimpleMemberAccessesWalker.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
-    <Compile Include="Helpers\SyntaxtTreeHelpers\VariableDeclaratorSyntaxExt.cs" />
     <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
     <Compile Include="Helpers\Walkers\ObjectCreationWalker.cs" />
     <Compile Include="Helpers\Walkers\PropertyImplementationWalker.cs" />
