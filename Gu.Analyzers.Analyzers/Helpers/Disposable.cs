@@ -385,6 +385,12 @@ namespace Gu.Analyzers
                     return;
                 }
 
+                var argument = disposable.Parent as ArgumentSyntax;
+                if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) == true)
+                {
+                    CheckOutParameter(argument, semanticModel, cancellationToken, @checked, classifications);
+                }
+
                 if (symbol is IFieldSymbol)
                 {
                     classifications.Add(new Classification(Source.Cached, disposable));
@@ -459,14 +465,54 @@ namespace Gu.Analyzers
                     }
                 }
 
-                var parameter = symbol as IParameterSymbol;
-                if (parameter != null)
+                if (symbol is IParameterSymbol)
                 {
                     classifications.Add(new Classification(Source.Injected, disposable));
-                    return;
                 }
 
                 classifications.Add(new Classification(Source.Unknown, disposable));
+            }
+
+            private static void CheckOutParameter(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ExpressionSyntax> @checked, List<Classification> classifications)
+            {
+                var invocation = argument.FirstAncestorOrSelf<InvocationExpressionSyntax>();
+                var method = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                if (invocation == null || method == null)
+                {
+                    classifications.Add(new Classification(Source.Unknown, argument.Expression));
+                    return;
+                }
+
+                if (method.ContainingType == KnownSymbol.IDictionary)
+                {
+                    classifications.Add(new Classification(Source.Cached, argument.Expression));
+                    return;
+                }
+
+                foreach (var declaration in method.Declarations(cancellationToken))
+                {
+                    var methodDeclaration = declaration as MethodDeclarationSyntax;
+                    ParameterSyntax parameter = null;
+                    if (methodDeclaration?.TryGetMatchingParameter(argument, out parameter) == true)
+                    {
+                        var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
+                        using (var pooled = MemberAssignmentWalker.AssignedValuesInScope(parameterSymbol, methodDeclaration, semanticModel, cancellationToken))
+                        {
+                            foreach (var assignedValue in pooled.Item.AssignedValues)
+                            {
+                                Check(assignedValue, semanticModel, cancellationToken, @checked,classifications);
+                            }
+
+                            return;
+                        }
+                    }
+                }
+
+                var source = IsAssignableTo(semanticModel.GetTypeInfoSafe(argument.Expression, cancellationToken).Type)
+                                 ? Source.PotentiallyCreated
+                                 : Source.NotDisposable;
+                classifications.Add(new Classification(source, argument.Expression));
+                return;
             }
 
             private static void CheckConstructor(

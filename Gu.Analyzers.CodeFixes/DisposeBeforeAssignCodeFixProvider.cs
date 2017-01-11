@@ -39,30 +39,60 @@
                     continue;
                 }
 
-                var assignment = (AssignmentExpressionSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (!(assignment.Parent is ExpressionStatementSyntax && assignment.Parent.Parent is BlockSyntax))
+                var assignment = syntaxRoot.FindNode(diagnostic.Location.SourceSpan) as AssignmentExpressionSyntax;
+                if (assignment != null)
                 {
+                    if (!(assignment.Parent is ExpressionStatementSyntax && assignment.Parent.Parent is BlockSyntax))
+                    {
+                        continue;
+                    }
+
+                    StatementSyntax diposeStatement;
+                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Dispose before assigning.",
+                                cancellationToken =>
+                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, assignment, diposeStatement),
+                                nameof(DisposeBeforeAssignCodeFixProvider)),
+                            diagnostic);
+                    }
+
                     continue;
                 }
 
-                StatementSyntax diposeStatement;
-                if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
+                var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ArgumentSyntax>();
+                if (argument != null)
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Dispose before assigning.",
-                            cancellationToken =>
-                                    ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, assignment, diposeStatement),
-                            nameof(DisposeBeforeAssignCodeFixProvider)),
-                        diagnostic);
+                    StatementSyntax diposeStatement;
+                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out diposeStatement))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Dispose before assigning.",
+                                cancellationToken =>
+                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, argument, diposeStatement),
+                                nameof(DisposeBeforeAssignCodeFixProvider)),
+                            diagnostic);
+                    }
+
+                    continue;
                 }
             }
         }
 
-        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, AssignmentExpressionSyntax assignment, StatementSyntax disposeStatement)
+        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
         {
-            var block = assignment.Parent.Parent as BlockSyntax;
-            var newBlock = block.InsertNodesBefore(assignment.Parent, new[] { disposeStatement });
+            var block = assignment.FirstAncestorOrSelf<BlockSyntax>();
+            var statement = assignment.FirstAncestorOrSelf<StatementSyntax>();
+            if (block == null ||
+                statement == null)
+            {
+                return Task.FromResult(context.Document);
+            }
+
+            var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(block, newBlock)));
         }
 
@@ -83,7 +113,7 @@
                 return true;
             }
 
-            if (IsAlwaysAssigned(symbol, assignment))
+            if (IsAlwaysAssigned(symbol))
             {
                 result = SyntaxFactory.ParseStatement($"{assignment.Left}.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
@@ -97,8 +127,39 @@
             return true;
         }
 
+        private static bool TryCreateDisposeStatement(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
+        {
+            var symbol = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+            if (symbol == null)
+            {
+                result = null;
+                return false;
+            }
+
+            if (!Disposable.IsAssignableTo(MemberType(symbol)))
+            {
+                result = SyntaxFactory.ParseStatement($"({argument.Expression} as IDisposable)?.Dispose();")
+                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                return true;
+            }
+
+            if (IsAlwaysAssigned(symbol))
+            {
+                result = SyntaxFactory.ParseStatement($"{argument.Expression}.Dispose();")
+                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                return true;
+            }
+
+            result = SyntaxFactory.ParseStatement($"{argument.Expression}?.Dispose();")
+                                .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+            return true;
+        }
+
         // ReSharper disable once UnusedParameter.Local
-        private static bool IsAlwaysAssigned(ISymbol member, AssignmentExpressionSyntax assignment)
+        private static bool IsAlwaysAssigned(ISymbol member)
         {
             var symbol = member as ILocalSymbol;
             if (symbol == null)

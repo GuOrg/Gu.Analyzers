@@ -6,7 +6,6 @@
 
     internal partial class CodeFix
     {
-        [Explicit]
         internal class RefAndOut : NestedCodeFixVerifier<CodeFix>
         {
             [Test]
@@ -22,7 +21,7 @@ public class Foo
 
     public void Update()
     {
-        ↓TryGetStream(out stream);
+        TryGetStream(↓out stream);
     }
 
     public bool TryGetStream(out Stream stream)
@@ -64,24 +63,24 @@ public class Foo
             public async Task AssigningVariableViaOutParameterBefore()
             {
                 var testCode = @"
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
-    public class Foo
+public class Foo
+{
+    public void Update()
     {
-        public void Update()
-        {
-            Stream stream;
-            TryGetStream(out stream);
-            ↓stream = File.OpenRead(string.Empty);
-        }
+        Stream stream;
+        TryGetStream(out stream);
+        ↓stream = File.OpenRead(string.Empty);
+    }
 
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }";
+    public bool TryGetStream(out Stream stream)
+    {
+        stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
 
                 var expected = this.CSharpDiagnostic()
                                    .WithLocationIndicated(ref testCode)
@@ -89,25 +88,25 @@ public class Foo
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
-    public class Foo
+public class Foo
+{
+    public void Update()
     {
-        public void Update()
-        {
-            Stream stream;
-            TryGetStream(out stream);
-            stream?:Dispose();
-            stream = File.OpenRead(string.Empty);
-        }
+        Stream stream;
+        TryGetStream(out stream);
+        stream?.Dispose();
+        stream = File.OpenRead(string.Empty);
+    }
 
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }";
+    public bool TryGetStream(out Stream stream)
+    {
+        stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
                 await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
             }
 
@@ -115,23 +114,23 @@ public class Foo
             public async Task AssigningVariableViaOutParameterAfter()
             {
                 var testCode = @"
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
-    public class Foo
+public class Foo
+{
+    public void Update()
     {
-        public void Update()
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            ↓TryGetStream(out stream);
-        }
+        Stream stream = File.OpenRead(string.Empty);
+        TryGetStream(↓out stream);
+    }
 
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }";
+    public bool TryGetStream(out Stream stream)
+    {
+        stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
 
                 var expected = this.CSharpDiagnostic()
                                    .WithLocationIndicated(ref testCode)
@@ -139,24 +138,24 @@ public class Foo
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
-    public class Foo
+public class Foo
+{
+    public void Update()
     {
-        public void Update()
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            stram?.Dispose();
-            TryGetStream(out stream);
-        }
+        Stream stream = File.OpenRead(string.Empty);
+        stream?.Dispose();
+        TryGetStream(out stream);
+    }
 
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }";
+    public bool TryGetStream(out Stream stream)
+    {
+        stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
                 await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
             }
 

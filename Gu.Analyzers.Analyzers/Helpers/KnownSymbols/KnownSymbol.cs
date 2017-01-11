@@ -16,6 +16,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ArgumentNullException = Create("System.ArgumentNullException");
         internal static readonly QualifiedType ArgumentOutOfRangeException = Create("System.ArgumentOutOfRangeException");
         internal static readonly QualifiedType EventHandler = Create("System.EventHandler");
+        internal static readonly QualifiedType IDictionary = Create("System.Collections.IDictionary");
 
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
 

@@ -57,7 +57,9 @@
     <Compile Include="GU0031DisposeMemberTests\HappyPathRx.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFix.RefOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
-    <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPathRx.cs" />
+    <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.RefAndOut.cs" />
+    <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Rx.cs" />
+    <Compile Include="Verifiers\IHappyPathVerifier.cs" />
     <Compile Include="Verifiers\NestedCodeFixVerifier.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\HappyPath.cs" />
@@ -117,12 +119,13 @@
     <Compile Include="Verifiers\DiagnosticVerifier.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier.Helper.cs" />
     <Compile Include="Verifiers\DiagnosticVerifier{TAnalyzer}.cs" />
-    <Compile Include="Verifiers\HappyPathVerifier.cs" />
+    <Compile Include="Verifiers\HappyPathVerifier{TAnalyzer}.cs" />
     <Compile Include="Verifiers\Helpers\DiagnosticResult.cs" />
     <Compile Include="Verifiers\Helpers\DiagnosticResultLocation.cs" />
     <Compile Include="Verifiers\Helpers\MetadataReferences.cs" />
     <Compile Include="Verifiers\Helpers\TestDiagnosticProvider.cs" />
     <Compile Include="Verifiers\Helpers\TestXmlReferenceResolver.cs" />
+    <Compile Include="Verifiers\NestedHappyPathVerifier.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="paket.references" />

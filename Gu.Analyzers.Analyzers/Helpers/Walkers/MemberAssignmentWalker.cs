@@ -42,19 +42,7 @@
 
         public static Pool<MemberAssignmentWalker>.Pooled AssignedValuesInScope(ISymbol member, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var field = member as IFieldSymbol;
-            if (field != null)
-            {
-                return CreateCore(field, new[] { scope }, semanticModel, cancellationToken);
-            }
-
-            var property = member as IPropertySymbol;
-            if (property != null)
-            {
-                return CreateCore(property, new[] { scope }, semanticModel, cancellationToken);
-            }
-
-            return null;
+            return CreateCore(member, new[] { scope }, semanticModel, cancellationToken);
         }
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)

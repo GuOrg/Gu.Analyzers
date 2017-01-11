@@ -1,21 +1,36 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
-
-    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class PropertyDeclarationSyntaxExt
     {
-        [Obsolete("Remove")]
-        internal static string Name(this PropertyDeclarationSyntax property)
+        internal static bool TryGetMatchingParameter(this MethodDeclarationSyntax method, ArgumentSyntax argument, out ParameterSyntax parameter)
         {
-            return property?.Identifier.ValueText;
-        }
+            parameter = null;
+            if (argument == null ||
+                method?.ParameterList == null)
+            {
+                return false;
+            }
 
-        internal static SyntaxToken Identifier(this PropertyDeclarationSyntax property)
-        {
-            return property.Identifier;
+            if (argument.NameColon == null)
+            {
+                var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
+                                      .Arguments.IndexOf(argument);
+                parameter = method.ParameterList.Parameters[index];
+                return true;
+            }
+
+            foreach (var canditate in method.ParameterList.Parameters)
+            {
+                if (canditate.Identifier.ValueText == argument.NameColon.Name.Identifier.ValueText)
+                {
+                    parameter = canditate;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

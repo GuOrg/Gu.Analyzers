@@ -148,7 +148,7 @@
                         var symbol = semanticModel.GetDeclaredSymbolSafe(propertyDeclarationSyntax, cancellationToken);
                         if (symbol.IsReadOnly && symbol.IsStatic == isStatic && propertyDeclarationSyntax.Initializer == null)
                         {
-                            yield return propertyDeclarationSyntax.Identifier().ValueText;
+                            yield return propertyDeclarationSyntax.Identifier.ValueText;
                         }
                     }
                 }

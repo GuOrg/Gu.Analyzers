@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
+﻿namespace Gu.Analyzers.Test
 {
     using System.Threading;
     using System.Threading.Tasks;
