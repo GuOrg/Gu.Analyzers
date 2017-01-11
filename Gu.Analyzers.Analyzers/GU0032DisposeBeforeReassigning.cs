@@ -37,6 +37,7 @@
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
+            context.RegisterSyntaxNodeAction(HandleInvocation, SyntaxKind.InvocationExpression);
         }
 
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)
@@ -61,7 +62,7 @@
             if (left is ILocalSymbol || left is IParameterSymbol)
             {
                 if (!IsVariableAssignedBefore(left, assignment, context.SemanticModel, context.CancellationToken) ||
-                    IsDisposedBeforeAssignment(left, assignment))
+                    IsDisposedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     return;
                 }
@@ -72,12 +73,66 @@
 
             if (assignment.FirstAncestorOrSelf<MethodDeclarationSyntax>() != null)
             {
-                if (IsDisposedBeforeAssignment(left, assignment))
+                if (IsDisposedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     return;
                 }
 
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
+            }
+        }
+
+        private static void HandleInvocation(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            var invocation = (InvocationExpressionSyntax)context.Node;
+            if (invocation.ArgumentList == null ||
+                invocation.ArgumentList.Arguments.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var argument in invocation.ArgumentList.Arguments)
+            {
+                if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
+                {
+                    if (!Disposable.IsPotentialCreation(argument.Expression, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
+                    var argSymbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
+                    if (argSymbol == KnownSymbol.SerialDisposable.Disposable)
+                    {
+                        return;
+                    }
+
+                    if (argSymbol is ILocalSymbol || argSymbol is IParameterSymbol)
+                    {
+                        if (!IsVariableAssignedBefore(argSymbol, argument, context.SemanticModel, context.CancellationToken) ||
+                            IsDisposedBefore(argSymbol, invocation, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
+
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                        return;
+                    }
+
+                    if (invocation.FirstAncestorOrSelf<MethodDeclarationSyntax>() != null)
+                    {
+                        if (IsDisposedBefore(argSymbol, invocation, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
+
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                    }
+                }
             }
         }
 
@@ -107,7 +162,7 @@
                         return false;
                     }
 
-                    if (previousAssignment.Left == assignment.Left)
+                    if (symbol.Equals(semanticModel.GetSymbolSafe(assignment.Left, cancellationToken)))
                     {
                         if (Disposable.IsPotentialCreation(assignment.Right, semanticModel, cancellationToken))
                         {
@@ -120,7 +175,46 @@
             return false;
         }
 
-        private static bool IsDisposedBeforeAssignment(ISymbol symbol, AssignmentExpressionSyntax assignment)
+        private static bool IsVariableAssignedBefore(ISymbol symbol, ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var parameter = symbol as IParameterSymbol;
+            if (parameter?.RefKind == RefKind.Ref)
+            {
+                return true;
+            }
+
+            VariableDeclaratorSyntax declarator;
+            if (symbol.TryGetSingleDeclaration(cancellationToken, out declarator))
+            {
+                if (Disposable.IsPotentialCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
+                {
+                    return true;
+                }
+            }
+
+            using (var pooled = AssignmentWalker.Create(argument.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var previousAssignment in pooled.Item.Assignments)
+                {
+                    if (previousAssignment.SpanStart >= argument.SpanStart)
+                    {
+                        return false;
+                    }
+
+                    if (symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
+                    {
+                        if (Disposable.IsPotentialCreation(argument.Expression, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
@@ -131,6 +225,12 @@
                         break;
                     }
 
+                    var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                    if (invokedSymbol?.Name != "Dispose")
+                    {
+                        continue;
+                    }
+
                     var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
                     if (statement != null)
                     {
@@ -138,7 +238,7 @@
                         {
                             foreach (var identifierName in pooledStatement.Item.IdentifierNames)
                             {
-                                if (identifierName?.Identifier.ValueText == symbol.Name)
+                                if (symbol.Equals(semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
                                 {
                                     return true;
                                 }

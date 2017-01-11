@@ -6,7 +6,7 @@
 
     internal static class CompilationExt
     {
-        internal static IEnumerable<SyntaxTree> AllSyntaxTrees(this Compilation compilation, HashSet<Compilation> @checked = null)
+        internal static IEnumerable<SyntaxTree> AllNestedSyntaxTrees(this Compilation compilation, HashSet<Compilation> @checked = null)
         {
             if (@checked?.Add(compilation) == false)
             {
@@ -27,7 +27,7 @@
                     {
                         using (var pooled = SetPool<Compilation>.Create())
                         {
-                            foreach (var syntaxTree in compilationReference.Compilation.AllSyntaxTrees(pooled.Item))
+                            foreach (var syntaxTree in compilationReference.Compilation.AllNestedSyntaxTrees(pooled.Item))
                             {
                                 yield return syntaxTree;
                             }
@@ -35,7 +35,7 @@
                     }
                     else
                     {
-                        foreach (var syntaxTree in compilationReference.Compilation.AllSyntaxTrees(@checked))
+                        foreach (var syntaxTree in compilationReference.Compilation.AllNestedSyntaxTrees(@checked))
                         {
                             yield return syntaxTree;
                         }

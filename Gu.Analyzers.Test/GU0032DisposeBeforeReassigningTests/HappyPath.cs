@@ -26,6 +26,25 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         }
 
         [Test]
+        public async Task DisposingParameter()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public void Bar(Stream stream)
+    {
+        stream = File.OpenRead(string.Empty);
+        stream?.Dispose();
+        stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task OutParameter()
         {
             var testCode = @"

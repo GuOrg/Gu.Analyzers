@@ -112,6 +112,7 @@
         private static ITypeSymbol MemberType(ISymbol member) =>
             (member as IFieldSymbol)?.Type ??
             (member as IPropertySymbol)?.Type ??
-            (member as ILocalSymbol)?.Type;
+            (member as ILocalSymbol)?.Type ??
+            (member as IParameterSymbol)?.Type;
     }
 }

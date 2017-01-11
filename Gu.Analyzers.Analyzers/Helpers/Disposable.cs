@@ -459,7 +459,14 @@ namespace Gu.Analyzers
                     }
                 }
 
-                classifications.Add(new Classification(Source.Injected, disposable));
+                var parameter = symbol as IParameterSymbol;
+                if (parameter != null)
+                {
+                    classifications.Add(new Classification(Source.Injected, disposable));
+                    return;
+                }
+
+                classifications.Add(new Classification(Source.Unknown, disposable));
             }
 
             private static void CheckConstructor(
