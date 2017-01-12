@@ -149,28 +149,14 @@
             VariableDeclaratorSyntax declarator;
             if (symbol.TryGetSingleDeclaration(cancellationToken, out declarator))
             {
+                if (ReferenceEquals(declarator, assignment.FirstAncestorOrSelf<VariableDeclaratorSyntax>()))
+                {
+                    return false;
+                }
+
                 if (Disposable.IsPotentialCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
                 {
                     return true;
-                }
-            }
-
-            using (var pooled = AssignmentWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
-            {
-                foreach (var previousAssignment in pooled.Item.Assignments)
-                {
-                    if (previousAssignment.SpanStart >= assignment.SpanStart)
-                    {
-                        continue;
-                    }
-
-                    if (symbol.Equals(semanticModel.GetSymbolSafe(previousAssignment.Left, cancellationToken)))
-                    {
-                        if (Disposable.IsPotentialCreation(previousAssignment.Right, semanticModel, cancellationToken))
-                        {
-                            return true;
-                        }
-                    }
                 }
             }
 
@@ -180,18 +166,37 @@
                 return false;
             }
 
-            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            using (var pooled = AssignmentWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
-                foreach (var previousInvocation in pooled.Item.Invocations)
+                foreach (var otherAssignment in pooled.Item.Assignments)
                 {
-                    if (previousInvocation.SpanStart >= statement.SpanStart ||
-                        previousInvocation.ArgumentList == null ||
-                        previousInvocation.ArgumentList.Arguments.Count == 0)
+                    if (!IsBefore(otherAssignment, statement))
                     {
                         continue;
                     }
 
-                    foreach (var argument in previousInvocation.ArgumentList.Arguments)
+                    if (symbol.Equals(semanticModel.GetSymbolSafe(otherAssignment.Left, cancellationToken)))
+                    {
+                        if (Disposable.IsPotentialCreation(otherAssignment.Right, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var invocation in pooled.Item.Invocations)
+                {
+                    if (!IsBefore(invocation, statement) ||
+                        invocation.ArgumentList == null ||
+                        invocation.ArgumentList.Arguments.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    foreach (var argument in invocation.ArgumentList.Arguments)
                     {
                         if (!argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
                         {
@@ -218,9 +223,9 @@
             {
                 foreach (var invocation in pooled.Item.Invocations)
                 {
-                    if (invocation.SpanStart > assignment.SpanStart)
+                    if (!IsBefore(invocation, assignment))
                     {
-                        break;
+                        continue;
                     }
 
                     var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
@@ -232,11 +237,12 @@
                     var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
                     if (statement != null)
                     {
-                        using (var pooledStatement = IdentifierNameWalker.Create(statement))
+                        using (var pooledNames = IdentifierNameWalker.Create(statement))
                         {
-                            foreach (var identifierName in pooledStatement.Item.IdentifierNames)
+                            foreach (var identifierName in pooledNames.Item.IdentifierNames)
                             {
-                                if (symbol.Equals(semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
+                                var otherSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
+                                if (symbol.Equals(otherSymbol))
                                 {
                                     return true;
                                 }
@@ -244,6 +250,41 @@
                         }
                     }
                 }
+            }
+
+            return false;
+        }
+
+        private static bool IsBefore(SyntaxNode node, SyntaxNode other)
+        {
+            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
+            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
+            if (statement == null ||
+                otherStatement == null)
+            {
+                return false;
+            }
+
+            if (statement.SpanStart >= otherStatement.SpanStart)
+            {
+                return false;
+            }
+
+            var block = node.FirstAncestor<BlockSyntax>();
+            var otherblock = other.FirstAncestor<BlockSyntax>();
+            if (block == null || otherblock == null)
+            {
+                return false;
+            }
+
+            while (otherblock != null)
+            {
+                if (ReferenceEquals(block, otherblock))
+                {
+                    return true;
+                }
+
+                otherblock = otherblock.FirstAncestor<BlockSyntax>();
             }
 
             return false;

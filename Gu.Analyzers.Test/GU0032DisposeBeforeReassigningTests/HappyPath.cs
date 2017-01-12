@@ -6,6 +6,24 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
     internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
         [Test]
+        public async Task CreateVariable()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            var stream = File.OpenRead(string.Empty);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingVariable()
         {
             var testCode = @"
@@ -26,6 +44,59 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         }
 
         [Test]
+        public async Task AssigningInIfElse()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        Stream stream;
+        if (true)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+        else
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
+        public async Task DisposeBeforeAssigningInIfElse(string dispose)
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        Stream stream = File.OpenRead(string.Empty);
+        if (true)
+        {
+            stream.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+        else
+        {
+            stream.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingParameter()
         {
             var testCode = @"
@@ -41,6 +112,32 @@ public class Foo
         stream = File.OpenRead(string.Empty);
     }
 }";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task OutParameterInCtor()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public Foo()
+        {
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }";
+
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
 

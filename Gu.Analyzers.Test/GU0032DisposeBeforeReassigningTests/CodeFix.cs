@@ -79,6 +79,57 @@ public class Foo
         }
 
         [Test]
+        public async Task AssigningInIfElse()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        Stream stream = File.OpenRead(string.Empty);
+        if (true)
+        {
+            stream.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+        else
+        {
+            ↓stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        Stream stream = File.OpenRead(string.Empty);
+        if (true)
+        {
+            stream.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+        else
+        {
+            stream?.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         [Explicit("Fix?")]
         public async Task NotDisposingFieldInCtor()
         {
