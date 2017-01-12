@@ -58,7 +58,6 @@
     <Compile Include="UseNameofCodeFixProvider.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="paket.references" />
     <None Include="paket.template" />
     <None Include="Gu.Analyzers.CodeFixes.ruleset" />

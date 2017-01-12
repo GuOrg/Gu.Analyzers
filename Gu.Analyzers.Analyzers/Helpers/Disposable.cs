@@ -500,7 +500,7 @@ namespace Gu.Analyzers
                         {
                             foreach (var assignedValue in pooled.Item.AssignedValues)
                             {
-                                Check(assignedValue, semanticModel, cancellationToken, @checked,classifications);
+                                Check(assignedValue, semanticModel, cancellationToken, @checked, classifications);
                             }
 
                             return;
@@ -512,7 +512,6 @@ namespace Gu.Analyzers
                                  ? Source.PotentiallyCreated
                                  : Source.NotDisposable;
                 classifications.Add(new Classification(source, argument.Expression));
-                return;
             }
 
             private static void CheckConstructor(
