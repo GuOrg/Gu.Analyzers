@@ -76,8 +76,6 @@
                                 nameof(DisposeBeforeAssignCodeFixProvider)),
                             diagnostic);
                     }
-
-                    continue;
                 }
             }
         }
