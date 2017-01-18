@@ -50,9 +50,15 @@
 
         internal static bool IsSameType(this ITypeSymbol first, ITypeSymbol other)
         {
-            if (first == null || other == null)
+            if (first == null ||
+                other == null)
             {
                 return false;
+            }
+
+            if (first.IsDefinition ^ other.IsDefinition)
+            {
+                return IsSameType(first.OriginalDefinition, other.OriginalDefinition);
             }
 
             return first.Equals(other);
@@ -135,18 +141,21 @@
 
         internal static bool Is(this ITypeSymbol type, ITypeSymbol other)
         {
-            var otherNamedType = other as INamedTypeSymbol;
-            while (type?.BaseType != null)
+            if (other.IsInterface())
             {
-                var namedType = type as INamedTypeSymbol;
-                if (namedType?.IsGenericType == true)
+                foreach (var @interface in type.AllInterfaces)
                 {
-                    if (IsSameType(namedType.OriginalDefinition, otherNamedType))
+                    if (IsSameType(@interface, other))
                     {
                         return true;
                     }
                 }
 
+                return false;
+            }
+
+            while (type?.BaseType != null)
+            {
                 if (IsSameType(type, other))
                 {
                     return true;
@@ -156,6 +165,11 @@
             }
 
             return false;
+        }
+
+        internal static bool IsInterface(this ITypeSymbol type)
+        {
+            return type != KnownSymbol.Object && type.BaseType == null;
         }
     }
 }
