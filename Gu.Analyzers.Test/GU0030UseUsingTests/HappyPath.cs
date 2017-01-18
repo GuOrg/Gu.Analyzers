@@ -5,6 +5,33 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0030UseUsing>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+        [Test]
+        public async Task WhenDisposingVariable()
+        {
+            var testCode = @"
+public class Foo
+{
+    public void Meh()
+    {
+        var item = new Disposable();
+        item.Dispose();
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
         [Test]
         public async Task UsingFileStream()
         {
@@ -306,6 +333,32 @@ public class Disposal : IDisposable
 	}
 }";
             await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        [Explicit("")]
+        public async Task BuildCollectionThenAssignField()
+        {
+            var testCode = @"
+public class Foo
+{
+    private Disposable[] disposables;
+
+    public Foo()
+    {
+        var items = new Disposable[2];
+        for (var i = 0; i < 2; i++)
+        {
+            var item = new Disposable();
+            items[i] = item;
+        }
+
+        this.disposables = items;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
     }

@@ -83,6 +83,11 @@
                         return;
                     }
 
+                    if (IsDisposedAfter(symbol, declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                 }
             }
@@ -201,6 +206,70 @@
             }
 
             return false;
+        }
+
+        private static bool IsDisposedAfter(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var invocation in pooled.Item.Invocations)
+                {
+                    if (!IsAfter(invocation, assignment))
+                    {
+                        continue;
+                    }
+
+                    var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                    if (invokedSymbol?.Name != "Dispose")
+                    {
+                        continue;
+                    }
+
+                    var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
+                    if (statement != null)
+                    {
+                        using (var pooledNames = IdentifierNameWalker.Create(statement))
+                        {
+                            foreach (var identifierName in pooledNames.Item.IdentifierNames)
+                            {
+                                var otherSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
+                                if (symbol.Equals(otherSymbol))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsAfter(SyntaxNode node, SyntaxNode other)
+        {
+            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
+            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
+            if (statement == null ||
+                otherStatement == null)
+            {
+                return false;
+            }
+
+            if (statement.SpanStart <= otherStatement.SpanStart)
+            {
+                return false;
+            }
+
+            var block = node.FirstAncestor<BlockSyntax>();
+            var otherblock = other.FirstAncestor<BlockSyntax>();
+
+            if (block == null || otherblock == null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(block, otherblock);
         }
     }
 }
