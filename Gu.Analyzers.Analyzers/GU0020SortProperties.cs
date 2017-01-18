@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,8 +49,14 @@
                 return;
             }
 
-            var property = (BasePropertyDeclarationSyntax)context.Node;
-            var neighbors = GetNeighbors(property);
+            var property = context.ContainingSymbol as IPropertySymbol;
+            if (property == null)
+            {
+                return;
+            }
+
+            var basePropertyDeclaration = (BasePropertyDeclarationSyntax)context.Node;
+            var neighbors = GetNeighbors(basePropertyDeclaration, context.SemanticModel, context.CancellationToken);
             if (neighbors.Before != null)
             {
                 if (PropertyPositionComparer.Default.Compare(neighbors.Before, property) > 0)
@@ -66,7 +74,7 @@
             }
         }
 
-        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
+        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var typeDeclaration = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
             if (typeDeclaration == null)
@@ -102,56 +110,59 @@
                 }
             }
 
-            return new Neighbors(before, after);
+            return new Neighbors(semanticModel.GetDeclaredSymbolSafe(before, cancellationToken), semanticModel.GetDeclaredSymbolSafe(after, cancellationToken));
         }
 
         private struct Neighbors
         {
-            internal readonly BasePropertyDeclarationSyntax Before;
-            internal readonly BasePropertyDeclarationSyntax After;
+#pragma warning disable RS1008 // Avoid storing per-compilation data into the fields of a diagnostic analyzer.
+            internal readonly IPropertySymbol Before;
+            internal readonly IPropertySymbol After;
+#pragma warning restore RS1008 // Avoid storing per-compilation data into the fields of a diagnostic analyzer.
 
-            public Neighbors(BasePropertyDeclarationSyntax before, BasePropertyDeclarationSyntax after)
+            public Neighbors(IPropertySymbol before, IPropertySymbol after)
             {
                 this.Before = before;
                 this.After = after;
             }
         }
 
-        internal class PropertyPositionComparer : IComparer<BasePropertyDeclarationSyntax>
+        internal class PropertyPositionComparer : IComparer<IPropertySymbol>
         {
             public static readonly PropertyPositionComparer Default = new PropertyPositionComparer();
 
-            public int Compare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y)
+            public int Compare(IPropertySymbol x, IPropertySymbol y)
             {
-                AccessorDeclarationSyntax xSetter;
-                if (!x.TryGetSetAccessorDeclaration(out xSetter))
-                {
-                    xSetter = null;
-                }
-
-                AccessorDeclarationSyntax ySetter;
-                if (!y.TryGetSetAccessorDeclaration(out ySetter))
-                {
-                    ySetter = null;
-                }
-
                 int result;
-                if (TryCompare(x, y, p => !(p is IndexerDeclarationSyntax), out result) ||
-                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PublicKeyword), out result) ||
-                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.InternalKeyword), out result) ||
-                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.ProtectedKeyword), out result) ||
-                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PrivateKeyword), out result) ||
-                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.StaticKeyword), out result) ||
+                if (TryCompare(x, y, p => !p.IsIndexer, out result) ||
+                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Public, out result) ||
+                    TryCompare(x, y, p => IsExplicit(p, Accessibility.Public), out result) ||
+                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Internal, out result) ||
+                    TryCompare(x, y, p => IsExplicit(p, Accessibility.Internal), out result) ||
+                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Protected, out result) ||
+                    TryCompare(x, y, p => p.DeclaredAccessibility == Accessibility.Private, out result) ||
+                    TryCompare(x, y, p => p.IsStatic, out result) ||
                     TryCompare(x, y, IsGetOnly, out result) ||
                     TryCompare(x, y, IsCalculated, out result) ||
-                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.PrivateKeyword) == true, out result) ||
-                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true, out result) ||
-                    TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.InternalKeyword) == true, out result))
+                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Private, out result) ||
+                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Protected, out result) ||
+                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result))
                 {
                     return result;
                 }
 
                 return 0;
+            }
+
+            private static bool IsExplicit(IPropertySymbol property, Accessibility accessibility)
+            {
+                IPropertySymbol interfaceProperty;
+                if (property.ExplicitInterfaceImplementations.TryGetSingle(out interfaceProperty))
+                {
+                    return interfaceProperty.DeclaredAccessibility == accessibility;
+                }
+
+                return false;
             }
 
             private static bool TryCompare<T>(T x, T y, Func<T, bool> criteria, out int result)
@@ -177,34 +188,68 @@
                 return true;
             }
 
-            private static bool IsGetOnly(BasePropertyDeclarationSyntax property)
+            private static bool IsGetOnly(IPropertySymbol property)
             {
+                BasePropertyDeclarationSyntax declaration;
+                if (!TryGetDeclaration(property, out declaration))
+                {
+                    return false;
+                }
+
                 AccessorDeclarationSyntax getter;
-                if (!property.TryGetGetAccessorDeclaration(out getter) ||
+                if (!TryGetGetter(declaration, out getter) ||
                     getter.Body != null)
                 {
                     return false;
                 }
 
                 AccessorDeclarationSyntax _;
-                return !property.TryGetSetAccessorDeclaration(out _);
+                return !TryGetSetter(declaration, out _);
             }
 
-            private static bool IsCalculated(BasePropertyDeclarationSyntax property)
+            private static bool IsCalculated(IPropertySymbol property)
             {
+                BasePropertyDeclarationSyntax declaration;
+                if (!TryGetDeclaration(property, out declaration))
+                {
+                    return false;
+                }
+
                 AccessorDeclarationSyntax _;
-                if (property.TryGetSetAccessorDeclaration(out _))
+                if (TryGetSetter(declaration, out _))
                 {
                     return false;
                 }
 
                 AccessorDeclarationSyntax getter;
-                if (property.TryGetGetAccessorDeclaration(out getter) && getter.Body != null)
+                if (TryGetGetter(declaration, out getter) && getter.Body != null)
                 {
                     return true;
                 }
 
-                return (property as PropertyDeclarationSyntax)?.ExpressionBody != null;
+                return (declaration as PropertyDeclarationSyntax)?.ExpressionBody != null;
+            }
+
+            private static bool TryGetGetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax getter)
+            {
+                return declaration.TryGetGetAccessorDeclaration(out getter);
+            }
+
+            private static bool TryGetSetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax setter)
+            {
+                return declaration.TryGetSetAccessorDeclaration(out setter);
+            }
+
+            private static bool TryGetDeclaration(IPropertySymbol property, out BasePropertyDeclarationSyntax declaration)
+            {
+                if (property.DeclaringSyntaxReferences.Length != 1)
+                {
+                    declaration = null;
+                    return false;
+                }
+
+                declaration = (BasePropertyDeclarationSyntax)property.DeclaringSyntaxReferences[0].GetSyntax();
+                return declaration != null;
             }
         }
     }

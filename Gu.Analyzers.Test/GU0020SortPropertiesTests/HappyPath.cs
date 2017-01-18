@@ -32,6 +32,26 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         }
 
         [Test]
+        public async Task ExplicitImplementation()
+        {
+            var interfaceCode = @"    
+    interface IValue
+    {
+        object Value { get; }
+    }";
+
+            var testCode = @"
+    public class Foo : IValue
+    {
+        public int Value { get; } = 5;
+
+        object IValue.Value { get; } = 5;
+    }";
+            await this.VerifyHappyPathAsync(interfaceCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task Mutables()
         {
             var testCode = @"

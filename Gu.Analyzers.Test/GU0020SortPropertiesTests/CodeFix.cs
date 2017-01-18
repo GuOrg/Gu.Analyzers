@@ -7,6 +7,41 @@
     internal class CodeFix : CodeFixVerifier<GU0020SortProperties, SortPropertiesCodeFixProvider>
     {
         [Test]
+        public async Task ExplicitImplementation()
+        {
+            var interfaceCode = @"    
+    interface IValue
+    {
+        object Value { get; }
+    }";
+
+            var testCode = @"
+    public class Foo : IValue
+    {
+        private int Value { get; } = 5;
+
+        object IValue.Value { get; } = 5;
+    }";
+            var expected1 = this.CSharpDiagnostic()
+                               .WithLocation("Foo.cs", 4, 9)
+                               .WithMessage("Move property.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 6, 9)
+                                .WithMessage("Move property.");
+
+            await this.VerifyCSharpDiagnosticAsync(new[] { interfaceCode, testCode }, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo : IValue
+    {
+        object IValue.Value { get; } = 5;
+
+        private int Value { get; } = 5;
+    }";
+            await this.VerifyCSharpFixAsync(new[] { interfaceCode, testCode }, new[] { interfaceCode, fixedCode }, codeFixIndex: 0).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
