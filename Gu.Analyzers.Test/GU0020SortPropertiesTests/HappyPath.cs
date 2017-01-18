@@ -237,6 +237,20 @@ public class Foo
         }
 
         [Test]
+        public async Task InternalBeforePublicIndexer()
+        {
+            var testCode = @"
+public class Foo
+{
+    internal int Value { get; set; }
+
+    public int this[int index] => index;
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task StaticBeforeInstance()
         {
             var testCode = @"

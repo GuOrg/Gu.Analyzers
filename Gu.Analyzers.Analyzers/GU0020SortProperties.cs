@@ -136,12 +136,12 @@
                 }
 
                 int result;
-                if (TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PublicKeyword), out result) ||
+                if (TryCompare(x, y, p => !(p is IndexerDeclarationSyntax), out result) ||
+                    TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PublicKeyword), out result) ||
                     TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.InternalKeyword), out result) ||
                     TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.ProtectedKeyword), out result) ||
                     TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.PrivateKeyword), out result) ||
                     TryCompare(x, y, p => p.Modifiers.Any(SyntaxKind.StaticKeyword), out result) ||
-                    TryCompare(x, y, p => !(p is IndexerDeclarationSyntax), out result) ||
                     TryCompare(x, y, IsGetOnly, out result) ||
                     TryCompare(x, y, IsCalculated, out result) ||
                     TryCompare(xSetter, ySetter, p => p?.Modifiers.Any(SyntaxKind.PrivateKeyword) == true, out result) ||
