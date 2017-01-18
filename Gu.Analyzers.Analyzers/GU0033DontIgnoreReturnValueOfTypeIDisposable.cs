@@ -90,7 +90,8 @@
 
         private static bool MustBeHandled(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (node.Parent is AnonymousFunctionExpressionSyntax)
+            if (node.Parent is AnonymousFunctionExpressionSyntax ||
+                node.Parent is UsingStatementSyntax)
             {
                 return false;
             }
