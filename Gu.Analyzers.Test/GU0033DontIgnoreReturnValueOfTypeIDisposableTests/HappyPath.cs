@@ -222,7 +222,6 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
                       .ConfigureAwait(false);
         }
 
-
         [Test]
         public async Task AllowPassingIntoStreamReader()
         {

@@ -28,6 +28,35 @@ public class Foo
         }
 
         [Test]
+        public async Task Using()
+        {
+            var testCode = @"
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+
+    public static class Foo
+    {
+        public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            using (cancellationToken.Register(s => ((TaskCompletionSource<bool>)s).TrySetResult(true), tcs))
+            {
+                if (task != await Task.WhenAny(task, tcs.Task).ConfigureAwait(false))
+                {
+                    throw new OperationCanceledException(cancellationToken);
+                }
+            }
+
+            return await task.ConfigureAwait(false);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task RealisticExtensionMethodClass()
         {
             var testCode = @"
