@@ -275,6 +275,92 @@ class Goof : IDisposable {
         }
 
         [Test]
+        public async Task DisposingPropertyInBaseClass()
+        {
+            var baseClassCode = @"
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        public abstract Stream Stream { get; }
+        
+        public void Dispose()
+        {
+            this.Stream.Dispose();
+        }
+    }";
+
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : FooBase
+    {
+        public override Stream Stream { get; } = File.OpenRead(string.Empty);
+    }";
+
+            await this.VerifyHappyPathAsync(baseClassCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingPropertyInVirtualDisposeInBaseClass()
+        {
+            var baseClassCode = @"
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        private bool disposed;
+
+        public abstract Stream Stream { get; }
+        
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.Stream?.Dispose();
+            }
+        }
+    }";
+
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public sealed class Foo : FooBase
+    {
+        public override Stream Stream { get; } = File.OpenRead(string.Empty);
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(baseClassCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnorePassedInViaCtor1()
         {
             var testCode = @"

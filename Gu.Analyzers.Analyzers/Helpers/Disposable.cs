@@ -158,7 +158,7 @@ namespace Gu.Analyzers
                    type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
         }
 
-        internal static bool TryGetDisposeMethod(ITypeSymbol type, out IMethodSymbol disposeMethod)
+        internal static bool TryGetDisposeMethod(ITypeSymbol type, bool recursive, out IMethodSymbol disposeMethod)
         {
             disposeMethod = null;
             if (type == null)
@@ -169,6 +169,12 @@ namespace Gu.Analyzers
             var disposers = type.GetMembers("Dispose");
             if (disposers.Length == 0)
             {
+                var baseType = type.BaseType;
+                if (recursive && IsAssignableTo(baseType))
+                {
+                    return TryGetDisposeMethod(baseType, true, out disposeMethod);
+                }
+
                 return false;
             }
 

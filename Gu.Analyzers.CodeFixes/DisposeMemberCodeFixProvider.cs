@@ -68,7 +68,7 @@
             }
 
             IMethodSymbol disposeMethodSymbol;
-            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, out disposeMethodSymbol))
+            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, false, out disposeMethodSymbol))
             {
                 MethodDeclarationSyntax disposeMethodDeclaration;
                 if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&

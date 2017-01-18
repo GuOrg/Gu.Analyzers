@@ -125,7 +125,7 @@
             var containingType = context.ContainingSymbol.ContainingType;
 
             IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, out disposeMethod))
+            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, true, out disposeMethod))
             {
                 return;
             }

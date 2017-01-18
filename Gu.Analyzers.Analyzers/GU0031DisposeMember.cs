@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -53,7 +54,10 @@
 
             if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
+                if (!IsMemberDisposed(field, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
         }
 
@@ -87,41 +91,61 @@
 
             if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken))
             {
-                CheckThatMemberIsDisposed(context);
+                if (!IsMemberDisposed(property, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
         }
 
-        private static void CheckThatMemberIsDisposed(SyntaxNodeAnalysisContext context)
+        private static bool IsMemberDisposed(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var containingType = context.ContainingSymbol.ContainingType;
-
+            var containingType = member.ContainingType;
             IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, out disposeMethod))
+            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, true, out disposeMethod))
             {
-                return;
+                return false;
             }
 
-            foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
+            return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+        }
+
+        private static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            foreach (var declaration in disposeMethod.Declarations(cancellationToken))
             {
                 using (var pooled = IdentifierNameWalker.Create(declaration))
                 {
                     foreach (var identifier in pooled.Item.IdentifierNames)
                     {
-                        if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
+                        var memberAccess = identifier.Parent as MemberAccessExpressionSyntax;
+                        if (memberAccess?.Expression is BaseExpressionSyntax)
+                        {
+                            var baseMethod = semanticModel.GetSymbolSafe(identifier, cancellationToken) as IMethodSymbol;
+                            if (baseMethod?.Name == "Dispose")
+                            {
+                                if (IsMemberDisposed(member, baseMethod, semanticModel, cancellationToken))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (identifier.Identifier.ValueText != member.Name)
                         {
                             continue;
                         }
 
-                        var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
-                        if (ReferenceEquals(symbol, context.ContainingSymbol))
+                        var symbol = semanticModel.GetSymbolSafe(identifier, cancellationToken);
+                        if (member.Equals(symbol) || (member as IPropertySymbol)?.OverriddenProperty?.Equals(symbol) == true)
                         {
-                            return;
+                            return true;
                         }
                     }
                 }
             }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+            return false;
         }
     }
 }
