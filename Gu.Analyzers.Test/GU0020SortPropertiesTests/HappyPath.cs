@@ -54,7 +54,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         }
 
         [Test]
-        public async Task ExplicitImplementation()
+        public async Task ExplicitImplementationGetOnly()
         {
             var interfaceCode = @"    
     interface IValue
@@ -68,6 +68,26 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public int Value { get; } = 5;
 
         object IValue.Value { get; } = 5;
+    }";
+            await this.VerifyHappyPathAsync(interfaceCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ExplicitImplementationIndexer()
+        {
+            var interfaceCode = @"    
+    interface IValue
+    {
+        object this[int index] { get; }
+    }";
+
+            var testCode = @"
+    public class Foo : IValue
+    {
+        public int this[int index] => index;
+
+        object IValue.this[int index] => index;
     }";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
