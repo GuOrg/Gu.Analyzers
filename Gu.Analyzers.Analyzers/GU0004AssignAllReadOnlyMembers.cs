@@ -143,7 +143,11 @@
                     }
 
                     var propertyDeclaration = member as PropertyDeclarationSyntax;
-                    if (propertyDeclaration != null && propertyDeclaration.ExpressionBody == null)
+                    AccessorDeclarationSyntax getter;
+                    if (propertyDeclaration != null &&
+                        propertyDeclaration.ExpressionBody == null &&
+                        propertyDeclaration.TryGetGetAccessorDeclaration(out getter) &&
+                        getter.Body == null)
                     {
                         var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
                         if (property.IsReadOnly &&
