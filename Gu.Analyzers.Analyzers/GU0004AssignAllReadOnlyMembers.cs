@@ -15,7 +15,7 @@
     {
         public const string DiagnosticId = "GU0004";
         private const string Title = "Assign all readonly members.";
-        private const string MessageFormat = "Assign all readonly members.";
+        private const string MessageFormat = "The following readonly members are not assigned: {0}.";
         private const string Description = "Assign all readonly members.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
@@ -58,7 +58,7 @@
             {
                 if (pooled.Item.Unassigned.Any())
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, constructorDeclarationSyntax.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, constructorDeclarationSyntax.GetLocation(), string.Join(", ", pooled.Item.Unassigned)));
                 }
             }
         }

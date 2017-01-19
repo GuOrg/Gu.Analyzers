@@ -23,7 +23,7 @@
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assign all readonly members.");
+                               .WithMessage("The following readonly members are not assigned: B.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -44,7 +44,7 @@
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assign all readonly members.");
+                               .WithMessage("The following readonly members are not assigned: b.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -65,7 +65,7 @@
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assign all readonly members.");
+                               .WithMessage("The following readonly members are not assigned: B.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -87,7 +87,7 @@
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assign all readonly members.");
+                               .WithMessage("The following readonly members are not assigned: B.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
     }
