@@ -148,8 +148,7 @@
                     TryCompare(x, y, IsCalculated, out result) ||
                     TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Private, out result) ||
                     TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Protected, out result) ||
-                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result) ||
-                    TryCompare(x, y, p => !IsExplicitImplementation(p), out result))
+                    TryCompare(x, y, p => p.SetMethod?.DeclaredAccessibility == Accessibility.Internal, out result))
                 {
                     return result;
                 }
@@ -166,17 +165,6 @@
                 }
 
                 return property.DeclaredAccessibility == accessibility;
-            }
-
-            private static bool IsExplicitImplementation(IPropertySymbol property)
-            {
-                IPropertySymbol interfaceProperty;
-                if (property.ExplicitInterfaceImplementations.TryGetSingle(out interfaceProperty))
-                {
-                    return true;
-                }
-
-                return false;
             }
 
             private static bool TryCompare<T>(T x, T y, Func<T, bool> criteria, out int result)
