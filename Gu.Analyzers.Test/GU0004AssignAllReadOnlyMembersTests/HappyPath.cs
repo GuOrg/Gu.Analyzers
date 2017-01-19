@@ -239,5 +239,43 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoreAbstract()
+        {
+            var testCode = @"
+    public abstract class Foo
+    {
+        protected Foo(int value)
+        {
+            this.Value = value;
+        }
+
+        public int Value { get; }
+
+        public abstract int OtherValue { get; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreIndexer()
+        {
+            var testCode = @"
+    public abstract class Foo
+    {
+        protected Foo(int value)
+        {
+            this.Value = value;
+        }
+
+        public int Value { get; }
+
+        public int this[int index] => index;
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

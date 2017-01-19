@@ -125,30 +125,33 @@
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
-                    var fieldDeclarationSyntax = member as FieldDeclarationSyntax;
-                    if (fieldDeclarationSyntax != null)
+                    var fieldDeclaration = member as FieldDeclarationSyntax;
+                    if (fieldDeclaration != null)
                     {
-                        var declaration = fieldDeclarationSyntax.Declaration;
+                        var declaration = fieldDeclaration.Declaration;
                         VariableDeclaratorSyntax variable;
                         if (declaration.Variables.TryGetSingle(out variable))
                         {
-                            var symbol = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-                            if (symbol.IsReadOnly && symbol.IsStatic == isStatic && variable.Initializer == null)
+                            var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
+                            if (field.IsReadOnly && field.IsStatic == isStatic && variable.Initializer == null)
                             {
-                                yield return symbol.Name;
+                                yield return field.Name;
                             }
                         }
 
                         continue;
                     }
 
-                    var propertyDeclarationSyntax = member as PropertyDeclarationSyntax;
-                    if (propertyDeclarationSyntax != null && propertyDeclarationSyntax.ExpressionBody == null)
+                    var propertyDeclaration = member as PropertyDeclarationSyntax;
+                    if (propertyDeclaration != null && propertyDeclaration.ExpressionBody == null)
                     {
-                        var symbol = semanticModel.GetDeclaredSymbolSafe(propertyDeclarationSyntax, cancellationToken);
-                        if (symbol.IsReadOnly && symbol.IsStatic == isStatic && propertyDeclarationSyntax.Initializer == null)
+                        var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
+                        if (property.IsReadOnly &&
+                            property.IsStatic == isStatic &&
+                            !property.IsAbstract &&
+                            propertyDeclaration.Initializer == null)
                         {
-                            yield return propertyDeclarationSyntax.Identifier.ValueText;
+                            yield return propertyDeclaration.Identifier.ValueText;
                         }
                     }
                 }
