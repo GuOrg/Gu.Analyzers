@@ -43,7 +43,7 @@
                 }
 
                 var property = (BasePropertyDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (property == null)
+                if (!property.IsPropertyOrIndexer())
                 {
                     continue;
                 }
@@ -75,8 +75,8 @@
             {
                 foreach (var member in type.Members)
                 {
-                    var property = member as PropertyDeclarationSyntax;
-                    if (property != null)
+                    var property = member as BasePropertyDeclarationSyntax;
+                    if (property.IsPropertyOrIndexer())
                     {
                         this.Sort(property, semanticModel, cancellationToken);
                     }
@@ -119,13 +119,13 @@
                     }
 
                     var otherPropertyDeclaration = member as BasePropertyDeclarationSyntax;
-                    if (otherPropertyDeclaration == null)
+                    if (otherPropertyDeclaration == null || !otherPropertyDeclaration.IsPropertyOrIndexer())
                     {
                         continue;
                     }
 
-                    var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
-                    var otherProperty = semanticModel.GetDeclaredSymbolSafe(otherPropertyDeclaration, cancellationToken);
+                    var property = (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
+                    var otherProperty = (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(otherPropertyDeclaration, cancellationToken);
                     if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(property, otherProperty) == 0 &&
                         fromIndex < i)
                     {

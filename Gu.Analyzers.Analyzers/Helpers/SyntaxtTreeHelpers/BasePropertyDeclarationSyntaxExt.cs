@@ -6,6 +6,11 @@
 
     internal static class BasePropertyDeclarationSyntaxExt
     {
+        internal static bool IsPropertyOrIndexer(this BasePropertyDeclarationSyntax declaration)
+        {
+            return declaration is PropertyDeclarationSyntax || declaration is IndexerDeclarationSyntax;
+        }
+
         internal static bool TryGetGetAccessorDeclaration(this BasePropertyDeclarationSyntax property, out AccessorDeclarationSyntax result)
         {
             return TryGetAccessorDeclaration(property, SyntaxKind.GetAccessorDeclaration, out result);

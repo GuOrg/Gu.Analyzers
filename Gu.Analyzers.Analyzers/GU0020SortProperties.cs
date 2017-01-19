@@ -88,7 +88,8 @@
             foreach (var member in typeDeclaration.Members)
             {
                 var declaration = member as BasePropertyDeclarationSyntax;
-                if (declaration == null)
+                if (declaration == null ||
+                    !declaration.IsPropertyOrIndexer())
                 {
                     continue;
                 }
@@ -110,7 +111,7 @@
                 }
             }
 
-            return new Neighbors(semanticModel.GetDeclaredSymbolSafe(before, cancellationToken), semanticModel.GetDeclaredSymbolSafe(after, cancellationToken));
+            return new Neighbors((IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(before, cancellationToken), (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(after, cancellationToken));
         }
 
         private struct Neighbors

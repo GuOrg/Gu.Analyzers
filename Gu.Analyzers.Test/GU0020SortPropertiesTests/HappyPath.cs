@@ -6,6 +6,28 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     internal class HappyPath : HappyPathVerifier<GU0020SortProperties>
     {
         [Test]
+        public async Task WithCustomEvent()
+        {
+            var testCode = @"
+    using System;
+
+    public class Foo
+    {
+        private EventHandler someEvent;
+
+        public event EventHandler SomeEvent
+        {
+            add { this.someEvent += value; }
+            remove { this.someEvent -= value; }
+        }
+
+        public int Value { get; set; }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task GetOnlies()
         {
             var testCode = @"

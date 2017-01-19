@@ -40,7 +40,12 @@ namespace Gu.Analyzers
                             return false;
                         }
 
-                        var property = semanticModel.GetDeclaredSymbolSafe(basePropertyDeclarationSyntax, cancellationToken);
+                        var property = semanticModel.GetDeclaredSymbolSafe(basePropertyDeclarationSyntax, cancellationToken) as IPropertySymbol;
+                        if (property == null)
+                        {
+                            return false;
+                        }
+
                         if (IsAssignedWithCreated(property, semanticModel, cancellationToken))
                         {
                             return true;
@@ -444,7 +449,7 @@ namespace Gu.Analyzers
                         var setter = disposable.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                         if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
                         {
-                            property = semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>(), cancellationToken);
+                            property = semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>(), cancellationToken) as IPropertySymbol;
                             if (property?.SetMethod != null)
                             {
                                 if (property.SetMethod.DeclaredAccessibility == Accessibility.Private)

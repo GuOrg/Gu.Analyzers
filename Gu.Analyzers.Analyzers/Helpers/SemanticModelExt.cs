@@ -31,7 +31,19 @@
                                                ?.GetDeclaredSymbol(node, cancellationToken);
         }
 
-        internal static IPropertySymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, BasePropertyDeclarationSyntax node, CancellationToken cancellationToken)
+        internal static ISymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, BasePropertyDeclarationSyntax node, CancellationToken cancellationToken)
+        {
+            return semanticModel.SemanticModelFor(node)
+                                ?.GetDeclaredSymbol(node, cancellationToken);
+        }
+
+        internal static IPropertySymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, PropertyDeclarationSyntax node, CancellationToken cancellationToken)
+        {
+            return (IPropertySymbol)semanticModel.SemanticModelFor(node)
+                                                 ?.GetDeclaredSymbol(node, cancellationToken);
+        }
+
+        internal static IPropertySymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, IndexerDeclarationSyntax node, CancellationToken cancellationToken)
         {
             return (IPropertySymbol)semanticModel.SemanticModelFor(node)
                                                  ?.GetDeclaredSymbol(node, cancellationToken);
