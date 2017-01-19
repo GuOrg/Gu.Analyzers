@@ -74,11 +74,14 @@
 
         private static bool MeansPropertyIsMutable(ExpressionSyntax assignedValue)
         {
-            var assignment = assignedValue.Parent as AssignmentExpressionSyntax;
-            if (assignment?.Parent is ExpressionStatementSyntax &&
-                assignment.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
+            if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
             {
-                return false;
+                if (assignedValue.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() != null)
+                {
+                    return true;
+                }
+
+                return !IsAssigningMember(assignedValue);
             }
 
             var propertyDeclaration = assignedValue.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
@@ -88,6 +91,34 @@
             }
 
             return true;
+        }
+
+        private static bool IsAssigningMember(ExpressionSyntax assignedValue)
+        {
+            var assignment = assignedValue.Parent as AssignmentExpressionSyntax;
+            if (assignment != null)
+            {
+                if (assignment.Left is IdentifierNameSyntax ||
+                    (assignment.Left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
+                    (assignment.Left as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
+                {
+                    return true;
+                }
+            }
+
+            var operand = (assignedValue.Parent as PostfixUnaryExpressionSyntax)?.Operand ??
+                                   (assignedValue.Parent as PrefixUnaryExpressionSyntax)?.Operand;
+            if (operand != null)
+            {
+                if (operand is IdentifierNameSyntax ||
+                    (operand as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
+                    (operand as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

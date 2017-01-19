@@ -7,15 +7,15 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     {
         public static readonly UpdateItem[] UpdateSource =
         {
-            new UpdateItem("int", "this.A++;"),
-            new UpdateItem("int", "this.A--;"),
-            new UpdateItem("int", "this.A+=a;"),
-            new UpdateItem("int", "this.A-=a;"),
-            new UpdateItem("int", "this.A*=a;"),
-            new UpdateItem("int", "this.A/=a;"),
-            new UpdateItem("int", "this.A%=a;"),
-            new UpdateItem("int", "this.A = a;"),
-            new UpdateItem("bool", "this.A|=a;"),
+            new UpdateItem("int", "A++;"),
+            new UpdateItem("int", "A--;"),
+            new UpdateItem("int", "A+=a;"),
+            new UpdateItem("int", "A-=a;"),
+            new UpdateItem("int", "A*=a;"),
+            new UpdateItem("int", "A/=a;"),
+            new UpdateItem("int", "A%=a;"),
+            new UpdateItem("int", "A = a;"),
+            new UpdateItem("bool", "A|=a;"),
         };
 
         [Test]
@@ -47,7 +47,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         }
 
         [TestCaseSource(nameof(UpdateSource))]
-        public async Task UpdatedInMethod(UpdateItem data)
+        public async Task UpdatedInMethodThis(UpdateItem data)
         {
             var testCode = @"
 public class Foo
@@ -59,7 +59,26 @@ public class Foo
         this.A = a;
     }
 }";
-            testCode = testCode.AssertReplace("this.A = a;", data.Update)
+            testCode = testCode.AssertReplace("A = a;", data.Update)
+                               .AssertReplace("int", data.Type);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCaseSource(nameof(UpdateSource))]
+        public async Task UpdatedInMethodUnderscoreNames(UpdateItem data)
+        {
+            var testCode = @"
+public class Foo
+{
+    public int A { get; private set; }
+
+    public void Update(int a)
+    {
+        A = a;
+    }
+}";
+            testCode = testCode.AssertReplace("A = a;", data.Update)
                                .AssertReplace("int", data.Type);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -82,6 +101,25 @@ public class Foo
 
     public int A { get; private set; }
 }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCaseSource(nameof(UpdateSource))]
+        public async Task UpdatingOtherInstanceInCtor(UpdateItem data)
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public Foo(Foo previous, int a)
+        {
+            previous.A = a;
+        }
+
+        public int A { get; private set; }
+    }";
+            testCode = testCode.AssertReplace("A = a;", data.Update)
+                               .AssertReplace("int", data.Type);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
