@@ -370,6 +370,60 @@
         }
 
         [Test]
+        public async Task WhenStaticNameofInstance2()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public static readonly string Name = Bar(↓""Value"");
+
+        public int Value { get; set; }
+
+        public static string Bar(string meh) => meh;
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use nameof.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo
+    {
+        public static readonly string Name = Bar(nameof(Value));
+
+        public int Value { get; set; }
+
+        public static string Bar(string meh) => meh;
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenStaticNameofInstance3()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public static readonly string Name = string.Format(↓""Value"");
+
+        public int Value { get; set; }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use nameof.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo
+    {
+        public static readonly string Name = string.Format(nameof(Value));
+
+        public int Value { get; set; }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
