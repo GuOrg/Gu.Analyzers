@@ -62,8 +62,7 @@
                 SyntaxFactory.SingletonSeparatedList(
                     SyntaxFactory.Argument(expression)));
             var nameofInvocation = SyntaxFactory.InvocationExpression(NameofIdentifier, argumentList);
-            var nameofArgument = SyntaxFactory.Argument(nameofInvocation);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(argument, nameofArgument)));
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(argument, argument.WithExpression(nameofInvocation))));
         }
     }
 }

@@ -406,7 +406,13 @@
     {
         public static readonly string Name = string.Format(↓""Value"");
 
-        public int Value { get; set; }
+        private int value;
+
+        public int Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -418,7 +424,13 @@
     {
         public static readonly string Name = string.Format(nameof(Value));
 
-        public int Value { get; set; }
+        private int value;
+
+        public int Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
     }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }

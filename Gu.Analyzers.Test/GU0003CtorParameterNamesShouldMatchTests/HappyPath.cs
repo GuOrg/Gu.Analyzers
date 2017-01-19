@@ -257,5 +257,25 @@
     }";
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoredWhenAssigningWeakReferenceTarget()
+        {
+            var testCode = @"
+    using System;
+    using System.Text;
+
+    public class Foo
+    {
+        private readonly WeakReference wr = new WeakReference(null);
+
+        public Foo(StringBuilder builder)
+        {
+            this.wr.Target = builder;
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

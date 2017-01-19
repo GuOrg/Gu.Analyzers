@@ -73,7 +73,6 @@
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
     <Compile Include="Helpers\Pooled\ListPool.cs" />
     <Compile Include="Helpers\SymbolHelpers\CompilationExt.cs" />
-    <Compile Include="Helpers\Walkers\ConstructorAssignmentsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
