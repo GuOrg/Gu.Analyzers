@@ -21,7 +21,7 @@
             messageFormat: MessageFormat,
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
             description: Description,
             helpLinkUri: HelpLink);
 
