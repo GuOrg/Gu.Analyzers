@@ -57,7 +57,8 @@
             {
                 if (symbol is IParameterSymbol ||
                     symbol is ILocalSymbol ||
-                    symbol.IsStatic)
+                    symbol.IsStatic ||
+                    context.ContainingSymbol.IsStatic)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                     return;

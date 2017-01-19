@@ -331,6 +331,45 @@
         }
 
         [Test]
+        public async Task WhenStaticNameofInstance()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public int Value { get; set; }
+
+        public static void Bar()
+        {
+            Bar(↓""Value"");
+        }
+
+        public static void Bar(string meh)
+        {
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use nameof.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Foo
+    {
+        public int Value { get; set; }
+
+        public static void Bar()
+        {
+            Bar(nameof(Value));
+        }
+
+        public static void Bar(string meh)
+        {
+        }
+    }";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
