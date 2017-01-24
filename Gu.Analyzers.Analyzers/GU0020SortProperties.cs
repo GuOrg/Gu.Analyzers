@@ -229,7 +229,8 @@
                     return true;
                 }
 
-                return (declaration as PropertyDeclarationSyntax)?.ExpressionBody != null;
+                return (declaration as PropertyDeclarationSyntax)?.ExpressionBody != null ||
+                       (declaration as IndexerDeclarationSyntax)?.ExpressionBody != null;
             }
 
             private static bool TryGetGetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax getter)
