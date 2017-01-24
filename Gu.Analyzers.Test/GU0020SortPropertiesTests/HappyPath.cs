@@ -94,7 +94,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         }
 
         [Test]
-        public async Task ExplicitImplementationGetSetIndexer()
+        public async Task ExplicitGetSetIndexerAndGetOnlyIndexer()
         {
             var interfaceCode = @"    
     interface IValue
@@ -111,6 +111,36 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         {
             get { return this[index]; }
             set { return; }
+        }
+    }";
+            await this.VerifyHappyPathAsync(interfaceCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ExplicitGetSetIndexerAndGetSetIndexer()
+        {
+            var interfaceCode = @"    
+    interface IValue
+    {
+        int this[int index] { get; set; }
+    }";
+
+            var testCode = @"
+    public class Foo : IValue
+    {
+        private int meh;
+
+        public int this[int index]
+        {
+            get { return this.meh; }
+            set { this.meh = index; }
+        }
+
+        int IValue.this[int index]
+        {
+            get { return this.meh; }
+            set { this.meh = index; }
         }
     }";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
