@@ -29,7 +29,7 @@ namespace Gu.Analyzers
 
             var containingType = member.ContainingType;
             IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, true, out disposeMethod))
+            if (!IsAssignableTo(containingType) || !TryGetDisposeMethod(containingType, true, out disposeMethod))
             {
                 return false;
             }
