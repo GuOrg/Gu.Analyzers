@@ -112,36 +112,68 @@
             var argument = node.Parent as ArgumentSyntax;
             if (argument != null)
             {
-                return !IsAssignedToDisposedFieldOrProperty(argument, semanticModel, cancellationToken);
+                ISymbol member;
+                if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out member) &&
+                    member != null)
+                {
+                    if (Disposable.IsMemberDisposed(member, semanticModel, cancellationToken))
+                    {
+                        return false;
+                    }
+
+                    IMethodSymbol ctor;
+                    if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor) &&
+                        ctor.ContainingType != member.ContainingType)
+                    {
+                        IMethodSymbol disposeMethod;
+                        if (Disposable.TryGetDisposeMethod(ctor.ContainingType, false, out disposeMethod))
+                        {
+                            return Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                        }
+                    }
+
+                    return true;
+                }
             }
 
             return false;
         }
 
-        private static bool IsAssignedToDisposedFieldOrProperty(
-            ArgumentSyntax argument,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken)
+        private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
         {
             var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
             if (objectCreation != null)
             {
-                var ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
-                return IsAssignedToDisposedFieldOrProperty(argument, ctor, semanticModel, cancellationToken);
+                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
+                return ctor != null;
             }
 
             var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
             if (initializer != null)
             {
-                var ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken) as IMethodSymbol;
-                return IsAssignedToDisposedFieldOrProperty(argument, ctor, semanticModel, cancellationToken);
+                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken) as IMethodSymbol;
+                return ctor != null;
             }
 
+            ctor = null;
             return false;
         }
 
-        private static bool IsAssignedToDisposedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member)
         {
+            IMethodSymbol ctor;
+            if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor))
+            {
+                return TryGetAssignedFieldOrProperty(argument, ctor, semanticModel, cancellationToken, out member);
+            }
+
+            member = null;
+            return false;
+        }
+
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member)
+        {
+            member = null;
             if (method == null)
             {
                 return false;
@@ -171,11 +203,11 @@
                 AssignmentExpressionSyntax assignment;
                 if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out assignment))
                 {
-                    var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-                    if (left is IFieldSymbol ||
-                        left is IPropertySymbol)
+                    member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                    if (member is IFieldSymbol ||
+                        member is IPropertySymbol)
                     {
-                        return Disposable.IsMemberDisposed(left, semanticModel, cancellationToken);
+                        return true;
                     }
                 }
 
@@ -188,7 +220,7 @@
                         if (parameterSymbol.Equals(argSymbol))
                         {
                             var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken) as IMethodSymbol;
-                            return IsAssignedToDisposedFieldOrProperty(arg, chained, semanticModel, cancellationToken);
+                            return TryGetAssignedFieldOrProperty(arg, chained, semanticModel, cancellationToken, out member);
                         }
                     }
                 }
