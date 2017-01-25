@@ -73,6 +73,12 @@
 
         private static bool TryGetIndexOfParameter(IMethodSymbol method, string name, out int index)
         {
+            if (method == null)
+            {
+                index = -1;
+                return false;
+            }
+
             for (var i = 0; i < method.Parameters.Length; i++)
             {
                 if (method.Parameters[i].Name == name)
