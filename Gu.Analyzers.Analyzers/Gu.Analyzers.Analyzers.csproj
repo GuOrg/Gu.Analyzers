@@ -100,7 +100,7 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\FieldDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\Walkers\IdentifierNameWalker.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\InvocationExpressionSyntaxExt.cs" />
-    <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
+    <Compile Include="Helpers\SyntaxtTreeHelpers\BaseMethodDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\SimpleMemberAccessesWalker.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />

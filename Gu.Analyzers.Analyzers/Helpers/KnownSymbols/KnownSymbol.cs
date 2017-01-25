@@ -22,6 +22,7 @@ namespace Gu.Analyzers
 
         internal static readonly TaskType Task = new TaskType();
         internal static readonly TextReaderType TextReader = new TextReaderType();
+        internal static readonly QualifiedType StreamReader = new QualifiedType("System.IO.StreamReader");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");

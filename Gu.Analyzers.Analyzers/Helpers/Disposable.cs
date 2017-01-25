@@ -20,6 +20,23 @@ namespace Gu.Analyzers
             Cached
         }
 
+        internal static bool IsMemberDisposed(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!(member is IFieldSymbol || member is IPropertySymbol))
+            {
+                return false;
+            }
+
+            var containingType = member.ContainingType;
+            IMethodSymbol disposeMethod;
+            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, true, out disposeMethod))
+            {
+                return false;
+            }
+
+            return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+        }
+
         internal static bool IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
@@ -291,6 +308,44 @@ namespace Gu.Analyzers
                         classification.Source == Source.Cached)
                     {
                         return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            foreach (var declaration in disposeMethod.Declarations(cancellationToken))
+            {
+                using (var pooled = IdentifierNameWalker.Create(declaration))
+                {
+                    foreach (var identifier in pooled.Item.IdentifierNames)
+                    {
+                        var memberAccess = identifier.Parent as MemberAccessExpressionSyntax;
+                        if (memberAccess?.Expression is BaseExpressionSyntax)
+                        {
+                            var baseMethod = semanticModel.GetSymbolSafe(identifier, cancellationToken) as IMethodSymbol;
+                            if (baseMethod?.Name == "Dispose")
+                            {
+                                if (IsMemberDisposed(member, baseMethod, semanticModel, cancellationToken))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (identifier.Identifier.ValueText != member.Name)
+                        {
+                            continue;
+                        }
+
+                        var symbol = semanticModel.GetSymbolSafe(identifier, cancellationToken);
+                        if (member.Equals(symbol) || (member as IPropertySymbol)?.OverriddenProperty?.Equals(symbol) == true)
+                        {
+                            return true;
+                        }
                     }
                 }
             }

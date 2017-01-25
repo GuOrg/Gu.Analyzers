@@ -5,6 +5,82 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
 
     internal class HappyPath : HappyPathVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+        [Test]
+        public async Task ChainedCtor()
+        {
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    public Foo()
+        : this(new Disposable())
+    {
+    }
+
+    private Foo(IDisposable disposable)
+    {
+        this.Disposable = disposable;
+    }
+
+    public IDisposable Disposable { get; }
+
+    public void Dispose()
+    {
+        this.Disposable.Dispose();
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ChainedCtors()
+        {
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly int meh;
+
+    public Foo()
+        : this(new Disposable())
+    {
+    }
+
+    private Foo(IDisposable disposable)
+        : this(disposable, 1)
+    {
+    }
+
+    private Foo(IDisposable disposable, int meh)
+    {
+        this.meh = meh;
+        this.Disposable = disposable;
+    }
+
+    public IDisposable Disposable { get; }
+
+    public void Dispose()
+    {
+        this.Disposable.Dispose();
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
         [Test]
         public async Task RealisticExtensionMethodClass()
         {

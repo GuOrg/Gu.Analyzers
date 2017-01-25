@@ -6,6 +6,30 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
     internal class HappyPath : HappyPathVerifier<GU0011DontIgnoreReturnValue>
     {
         [Test]
+        public async Task ChainedCtor()
+        {
+            var testCode = @"
+using System.Text;
+
+public class Foo
+{
+    public Foo()
+        : this(new StringBuilder())
+    {
+    }
+
+    private Foo(StringBuilder builder)
+    {
+        this.Builder = builder;
+    }
+
+    public StringBuilder Builder { get; }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task RealisticClass()
         {
             var testCode = @"

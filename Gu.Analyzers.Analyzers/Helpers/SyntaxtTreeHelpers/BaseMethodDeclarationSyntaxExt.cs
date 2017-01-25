@@ -2,9 +2,9 @@
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class PropertyDeclarationSyntaxExt
+    internal static class BaseMethodDeclarationSyntaxExt
     {
-        internal static bool TryGetMatchingParameter(this MethodDeclarationSyntax method, ArgumentSyntax argument, out ParameterSyntax parameter)
+        internal static bool TryGetMatchingParameter(this BaseMethodDeclarationSyntax method, ArgumentSyntax argument, out ParameterSyntax parameter)
         {
             parameter = null;
             if (argument == null ||

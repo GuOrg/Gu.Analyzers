@@ -11,9 +11,13 @@
     internal class GU0033DontIgnoreReturnValueOfTypeIDisposable : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0033";
+
         private const string Title = "Don't ignore returnvalue of type IDisposable.";
+
         private const string MessageFormat = "Don't ignore returnvalue of type IDisposable.";
+
         private const string Description = "Don't ignore returnvalue of type IDisposable.";
+
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -72,7 +76,8 @@
             }
 
             var symbol = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
-            if (symbol == null || symbol.ReturnsVoid)
+            if (symbol == null ||
+                symbol.ReturnsVoid)
             {
                 return;
             }
@@ -88,7 +93,10 @@
             }
         }
 
-        private static bool MustBeHandled(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool MustBeHandled(
+            SyntaxNode node,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken)
         {
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
                 node.Parent is UsingStatementSyntax)
@@ -101,26 +109,89 @@
                 return !(node.Parent is ReturnStatementSyntax);
             }
 
-            if (node.Parent is ArgumentSyntax)
-            {
-                var objectCreation = node.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
-                var symbol = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
-                if (symbol?.ContainingType == KnownSymbol.TextReader)
-                {
-                    return false;
-                }
-            }
-
-            var argument = node.FirstAncestorOrSelf<ArgumentSyntax>();
+            var argument = node.Parent as ArgumentSyntax;
             if (argument != null)
             {
-                var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
-                if ((objectCreation?.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("Reader") == true)
+                return !IsAssignedToDisposedFieldOrProperty(argument, semanticModel, cancellationToken);
+            }
+
+            return false;
+        }
+
+        private static bool IsAssignedToDisposedFieldOrProperty(
+            ArgumentSyntax argument,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken)
+        {
+            var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
+            if (objectCreation != null)
+            {
+                var ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
+                return IsAssignedToDisposedFieldOrProperty(argument, ctor, semanticModel, cancellationToken);
+            }
+
+            var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+            if (initializer != null)
+            {
+                var ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken) as IMethodSymbol;
+                return IsAssignedToDisposedFieldOrProperty(argument, ctor, semanticModel, cancellationToken);
+            }
+
+            return false;
+        }
+
+        private static bool IsAssignedToDisposedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (method == null)
+            {
+                return false;
+            }
+
+            if (method.ContainingType == KnownSymbol.SerialDisposable ||
+                method.ContainingType.Is(KnownSymbol.StreamReader))
+            {
+                return true;
+            }
+
+            foreach (var declaration in method.Declarations(cancellationToken))
+            {
+                var methodDeclaration = declaration as BaseMethodDeclarationSyntax;
+                if (methodDeclaration == null)
                 {
-                    return false;
+                    continue;
                 }
 
-                return true;
+                ParameterSyntax paremeter;
+                if (!methodDeclaration.TryGetMatchingParameter(argument, out paremeter))
+                {
+                    continue;
+                }
+
+                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
+                AssignmentExpressionSyntax assignment;
+                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out assignment))
+                {
+                    var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                    if (left is IFieldSymbol ||
+                        left is IPropertySymbol)
+                    {
+                        return Disposable.IsMemberDisposed(left, semanticModel, cancellationToken);
+                    }
+                }
+
+                var ctor = declaration as ConstructorDeclarationSyntax;
+                if (ctor?.Initializer != null)
+                {
+                    foreach (var arg in ctor.Initializer.ArgumentList.Arguments)
+                    {
+                        var argSymbol = semanticModel.GetSymbolSafe(arg.Expression, cancellationToken);
+                        if (parameterSymbol.Equals(argSymbol))
+                        {
+                            var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken) as IMethodSymbol;
+                            return IsAssignedToDisposedFieldOrProperty(arg, chained, semanticModel, cancellationToken);
+                        }
+                    }
+                }
             }
 
             return false;
