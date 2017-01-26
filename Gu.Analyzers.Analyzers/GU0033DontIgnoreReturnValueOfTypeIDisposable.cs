@@ -121,14 +121,18 @@
                         return false;
                     }
 
-                    IMethodSymbol ctor;
-                    if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor) &&
-                        ctor.ContainingType != member.ContainingType)
+                    var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+                    if (initializer != null)
                     {
-                        IMethodSymbol disposeMethod;
-                        if (Disposable.TryGetDisposeMethod(ctor.ContainingType, false, out disposeMethod))
+                        var ctor = semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) as IMethodSymbol;
+                        if (ctor != null &&
+                            ctor.ContainingType != member.ContainingType)
                         {
-                            return Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                            IMethodSymbol disposeMethod;
+                            if (Disposable.TryGetDisposeMethod(ctor.ContainingType, false, out disposeMethod))
+                            {
+                                return Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                            }
                         }
                     }
 

@@ -82,7 +82,7 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task ChainedBaseCtorDisposedInThis()
+        public async Task ChainedCtorCallsBaseCtorDisposedInThis()
         {
             var baseCode = @"
 using System;
@@ -143,6 +143,87 @@ public sealed class Foo : FooBase
         if (disposing)
         {
             this.Disposable.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, baseCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ChainedBaseCtorDisposedInThis()
+        {
+            var baseCode = @"
+using System;
+
+public class FooBase : IDisposable
+{
+    private readonly object disposable;
+    private bool disposed;
+
+    protected FooBase(IDisposable disposable)
+    {
+        this.disposable = disposable;
+    }
+
+    public object Bar
+    {
+        get
+        {
+            this.ThrowIfDisposed();
+            return this.disposable;
+        }
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(this.GetType().FullName);
+        }
+    }
+}";
+
+            var testCode = @"
+using System;
+
+public sealed class Foo : FooBase
+{
+    private bool disposed;
+
+    public Foo()
+        : base(new Disposable())
+    {
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            (this.Bar as IDisposable)?.Dispose();
         }
 
         base.Dispose(disposing);
