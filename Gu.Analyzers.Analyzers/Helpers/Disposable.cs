@@ -599,6 +599,11 @@ namespace Gu.Analyzers
                 if (ctorSymbol.DeclaredAccessibility == Accessibility.Private)
                 {
                     var index = ctorSymbol.Parameters.IndexOf(parameter);
+                    if (index < 0)
+                    {
+                        return;
+                    }
+
                     var type = ctor.FirstAncestorOrSelf<TypeDeclarationSyntax>();
                     foreach (var member in type.Members)
                     {
