@@ -604,6 +604,7 @@ namespace Gu.Analyzers
                     {
                         var otherCtor = member as ConstructorDeclarationSyntax;
                         if (otherCtor?.Initializer == null ||
+                            otherCtor.Initializer.ArgumentList.Arguments.Count == 0 ||
                             otherCtor == ctor)
                         {
                             continue;

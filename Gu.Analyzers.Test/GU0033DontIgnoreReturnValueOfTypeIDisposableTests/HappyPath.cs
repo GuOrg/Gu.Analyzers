@@ -422,6 +422,43 @@ public sealed class Foo : FooBase
         }
 
         [Test]
+        public async Task ReturningAssigning()
+        {
+            var fooCode = @"
+using System;
+
+public class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    public Foo(IDisposable disposable)
+        :this()
+    {
+        this.disposable = disposable;
+    }
+
+    public Foo()
+    {
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            var testCode = @"
+public class Meh
+{
+    public Foo Bar()
+    {
+        return new Foo(new Disposable());
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task Using()
         {
             var testCode = @"
