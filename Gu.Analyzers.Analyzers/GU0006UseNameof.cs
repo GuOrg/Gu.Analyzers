@@ -57,18 +57,20 @@
             {
                 if (symbol is IParameterSymbol ||
                     symbol is ILocalSymbol ||
-                    symbol.IsStatic ||
-                    context.ContainingSymbol.IsStatic)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
-                    return;
-                }
-
-                if (symbol is IFieldSymbol ||
+                    symbol is IFieldSymbol ||
                     symbol is IEventSymbol ||
                     symbol is IPropertySymbol ||
                     symbol is IMethodSymbol)
                 {
+                    if (symbol is IParameterSymbol ||
+                        symbol is ILocalSymbol ||
+                        symbol.IsStatic ||
+                        context.ContainingSymbol.IsStatic)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                        return;
+                    }
+
                     if (symbol.ContainingType == context.ContainingSymbol.ContainingType)
                     {
                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });

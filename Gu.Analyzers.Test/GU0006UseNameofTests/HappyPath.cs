@@ -58,5 +58,52 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresTypeName()
+        {
+            var testCode = @"
+    using System;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            this.Meh(""Exception"");
+        }
+
+        public void Meh(string value)
+        {
+            throw new ArgumentException(nameof(value), value);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoresNamespaceName()
+        {
+            var testCode = @"
+namespace Test
+{
+    using System;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            this.Meh(""Test"");
+        }
+
+        public void Meh(string value)
+        {
+            throw new ArgumentException(nameof(value), value);
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
