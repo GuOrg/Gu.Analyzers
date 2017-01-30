@@ -153,6 +153,63 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignedWithInjectedOrCached(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (property == null || property.IsStatic)
+            {
+                return false;
+            }
+
+            if (property.DeclaredAccessibility != Accessibility.Private &&
+                property.SetMethod != null &&
+                property.SetMethod.DeclaredAccessibility != Accessibility.Private)
+            {
+                return true;
+            }
+
+            foreach (var declaration in property.Declarations(cancellationToken))
+            {
+                var propertyDeclaration = declaration as PropertyDeclarationSyntax;
+                if (propertyDeclaration == null)
+                {
+                    continue;
+                }
+
+                using (var pooledReturns = ReturnExpressionsWalker.Create(propertyDeclaration))
+                {
+                    foreach (var returnValue in pooledReturns.Item.ReturnValues)
+                    {
+                        var symbol = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
+                        var field = symbol as IFieldSymbol;
+                        if (field != null)
+                        {
+                            if (property.ContainingType.Is(field.ContainingType))
+                            {
+                                return IsAssignedWithInjectedOrCached(field, semanticModel, cancellationToken);
+                            }
+
+                            return true;
+                        }
+
+                        var propertySymbol = symbol as IPropertySymbol;
+                        if (property.Equals(propertySymbol))
+                        {
+                            return false;
+                        }
+
+                        if (propertySymbol != null)
+                        {
+                            if (property.ContainingType.Is(propertySymbol.ContainingType))
+                            {
+                                return IsAssignedWithInjectedOrCached(propertySymbol, semanticModel, cancellationToken);
+                            }
+
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
+            }
+
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
                 if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
