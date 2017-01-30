@@ -710,6 +710,13 @@ namespace Gu.Analyzers
                     return;
                 }
 
+                if (methodSymbol.ContainingType.Is(KnownSymbol.IDictionary) ||
+                    methodSymbol.ContainingType.Name == "ConditionalWeakTable`2")
+                {
+                    classifications.Add(new Classification(Source.Cached, disposable));
+                    return;
+                }
+
                 if (methodSymbol == KnownSymbol.Task.FromResult)
                 {
                     var invocation = disposable as InvocationExpressionSyntax;

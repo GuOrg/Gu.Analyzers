@@ -126,6 +126,14 @@
 
         internal static bool Is(this ITypeSymbol type, QualifiedType qualifiedType)
         {
+            foreach (var @interface in type.AllInterfaces)
+            {
+                if (@interface == qualifiedType)
+                {
+                    return true;
+                }
+            }
+
             while (type != null)
             {
                 if (type == qualifiedType)

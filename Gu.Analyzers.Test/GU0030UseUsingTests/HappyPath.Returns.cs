@@ -5,10 +5,12 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
 
     internal partial class HappyPath
     {
-        [Test]
-        public async Task WhenDisposableIsReturnedMethodSimple()
+        public class Returns : NestedHappyPathVerifier<HappyPath>
         {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedMethodSimple()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
@@ -18,14 +20,14 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             return File.OpenRead(string.Empty);
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenDisposableIsReturnedMethodBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedMethodBody()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
@@ -36,14 +38,14 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             return stream;
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenStreamIsReturnedInStreamReaderMethodBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenStreamIsReturnedInStreamReaderMethodBody()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
@@ -54,14 +56,14 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             return new StreamReader(stream);
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenStreamIsReturnedInCompositeDisposableMethodBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenStreamIsReturnedInCompositeDisposableMethodBody()
+            {
+                var testCode = @"
 using System.IO;
 using System.Reactive.Disposables;
 
@@ -73,28 +75,28 @@ public static class Foo
         return new CompositeDisposable { stream };
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenDisposableIsReturnedMethodExpressionBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedMethodExpressionBody()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar() => File.OpenRead(string.Empty);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenDisposableIsReturnedPropertySimple()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedPropertySimple()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
@@ -107,14 +109,14 @@ public static class Foo
             }
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenDisposableIsReturnedPropertyBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedPropertyBody()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
@@ -128,22 +130,23 @@ public static class Foo
             }
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenDisposableIsReturnedPropertyExpressionBody()
-        {
-            var testCode = @"
+            [Test]
+            public async Task WhenDisposableIsReturnedPropertyExpressionBody()
+            {
+                var testCode = @"
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar => File.OpenRead(string.Empty);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
         }
     }
 }
