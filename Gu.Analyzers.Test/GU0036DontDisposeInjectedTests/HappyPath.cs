@@ -235,6 +235,40 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task UsingAwaitedStream()
+        {
+            var testCode = @"
+using System.IO;
+using System.Threading.Tasks;
+
+public static class Foo
+{
+    public static async Task<long> Bar()
+    {
+        using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
+        {
+            return stream.Length;
+        }
+    }
+
+    private static async Task<MemoryStream> ReadAsync(string fileName)
+    {
+        var stream = new MemoryStream();
+        using (var fileStream = File.OpenRead(fileName))
+        {
+            await fileStream.CopyToAsync(stream)
+                            .ConfigureAwait(false);
+        }
+
+        stream.Position = 0;
+        return stream;
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task UsingEnumerator()
         {
             var testCode = @"

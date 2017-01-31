@@ -487,7 +487,23 @@ namespace Gu.Analyzers
                 var awaitExpression = disposable as AwaitExpressionSyntax;
                 if (awaitExpression != null)
                 {
-                    Check(awaitExpression.Expression, semanticModel, cancellationToken, @checked, classifications);
+                    var awaitedDisposable = awaitExpression.Expression;
+                    var invocation = awaitedDisposable as InvocationExpressionSyntax;
+                    if (invocation != null)
+                    {
+                        var awaitedSymbol = semanticModel.GetSymbolSafe(awaitedDisposable, cancellationToken);
+                        if (awaitedSymbol.Name == "ConfigureAwait")
+                        {
+                            awaitedDisposable = invocation.Expression;
+                            var memberAccess = awaitedDisposable as MemberAccessExpressionSyntax;
+                            if (memberAccess != null)
+                            {
+                                awaitedDisposable = memberAccess.Expression;
+                            }
+                        }
+                    }
+
+                    Check(awaitedDisposable, semanticModel, cancellationToken, @checked, classifications);
                     return;
                 }
 
