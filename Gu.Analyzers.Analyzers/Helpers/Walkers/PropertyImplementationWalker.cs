@@ -35,7 +35,7 @@
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.property = symbol;
-            foreach (var tree in semanticModel.Compilation.AllNestedSyntaxTrees())
+            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
                 if (tree.FilePath.EndsWith(".g.cs"))
                 {

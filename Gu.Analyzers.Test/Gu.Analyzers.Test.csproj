@@ -59,6 +59,7 @@
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.RefAndOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Rx.cs" />
+    <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Using.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />
     <Compile Include="Verifiers\NestedCodeFixVerifier.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />

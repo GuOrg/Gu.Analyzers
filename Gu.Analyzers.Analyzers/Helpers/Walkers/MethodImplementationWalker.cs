@@ -35,17 +35,20 @@
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.method = symbol;
-            foreach (var tree in semanticModel.Compilation.AllNestedSyntaxTrees())
+            if (symbol != null)
             {
-                if (tree.FilePath.EndsWith(".g.cs"))
+                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
-                    continue;
-                }
+                    if (tree.FilePath.EndsWith(".g.cs"))
+                    {
+                        continue;
+                    }
 
-                SyntaxNode root;
-                if (tree.TryGetRoot(out root))
-                {
-                    pooled.Item.Visit(root);
+                    SyntaxNode root;
+                    if (tree.TryGetRoot(out root))
+                    {
+                        pooled.Item.Visit(root);
+                    }
                 }
             }
 
@@ -57,19 +60,40 @@
             if (node.Identifier.ValueText == this.method.Name)
             {
                 var symbol = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                if (symbol == null)
+                if (symbol == null || symbol.IsStatic)
                 {
                     return;
                 }
 
-                var forInterfaceMember = symbol.ContainingType.FindImplementationForInterfaceMember(this.method);
-                if (ReferenceEquals(this.method, symbol) ||
-                    ReferenceEquals(this.method, symbol.OverriddenMethod) ||
-                    ReferenceEquals(symbol, forInterfaceMember))
+                if (this.IsMatch(symbol))
                 {
                     this.implementations.Add(node);
                 }
             }
+        }
+
+        private bool IsMatch(IMethodSymbol other)
+        {
+            if (this.method.Equals(other) ||
+                this.method.Equals(other.OverriddenMethod))
+            {
+                return true;
+            }
+
+            var forInterfaceMember = other.ContainingType.FindImplementationForInterfaceMember(this.method);
+            if (forInterfaceMember != null &&
+                other.Equals(forInterfaceMember))
+            {
+                return true;
+            }
+
+            if (this.method.OriginalDefinition != null &&
+                this.method.OriginalDefinition.Equals(other))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

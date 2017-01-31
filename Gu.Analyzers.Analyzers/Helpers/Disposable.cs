@@ -753,19 +753,11 @@ namespace Gu.Analyzers
                     {
                         using (var pooled = MethodImplementationWalker.Create(methodSymbol, semanticModel, cancellationToken))
                         {
-                            if (pooled.Item.Implementations.Any())
+                            foreach (var implementingDeclaration in pooled.Item.Implementations)
                             {
-                                foreach (var implementingDeclaration in pooled.Item.Implementations)
-                                {
-                                    CheckMethod(implementingDeclaration, semanticModel, cancellationToken, @checked, classifications);
-                                }
-
-                                return;
+                                CheckMethod(implementingDeclaration, semanticModel, cancellationToken, @checked, classifications);
                             }
                         }
-
-                        var source = IsAssignableTo(methodSymbol.ReturnType) ? Source.PotentiallyCreated : Source.NotDisposable;
-                        classifications.Add(new Classification(source, disposable));
                     }
                     else
                     {
@@ -795,6 +787,21 @@ namespace Gu.Analyzers
             {
                 using (var pooled = ReturnExpressionsWalker.Create(methodDeclaration))
                 {
+                    if (pooled.Item.ReturnValues.Count == 0)
+                    {
+                        var methodSymbol = semanticModel.GetDeclaredSymbolSafe(methodDeclaration, cancellationToken) as IMethodSymbol;
+                        if (methodSymbol == null)
+                        {
+                            return;
+                        }
+
+                        var source = IsAssignableTo(methodSymbol.ReturnType)
+                                         ? Source.PotentiallyCreated
+                                         : Source.NotDisposable;
+                        classifications.Add(new Classification(source, methodDeclaration));
+                        return;
+                    }
+
                     foreach (var returnValue in pooled.Item.ReturnValues)
                     {
                         Check(returnValue, semanticModel, cancellationToken, @checked, classifications);
