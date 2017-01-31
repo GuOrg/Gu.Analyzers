@@ -4,6 +4,7 @@
 namespace Gu.Analyzers.Test
 {
     using System.Text;
+
     using NUnit.Framework;
 
     /// <summary>
