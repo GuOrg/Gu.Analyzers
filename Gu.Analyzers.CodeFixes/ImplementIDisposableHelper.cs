@@ -50,7 +50,7 @@ namespace Gu.Analyzers
             {
                 var ifDisposedThrow = syntaxGenerator.IfStatement(
                     SyntaxFactory.ParseExpression(usesUnderscoreNames ? "_disposed" : "this.disposed"),
-                    new[] { SyntaxFactory.ParseStatement("throw new ObjectDisposedException(GetType().FullName);") });
+                    new[] { SyntaxFactory.ParseStatement($"throw new ObjectDisposedException({(usesUnderscoreNames ? string.Empty : "this.")}GetType().FullName);") });
                 var throwIfDisposedMethod = syntaxGenerator.MethodDeclaration(
                     "ThrowIfDisposed",
                     accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,

@@ -74,7 +74,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 
@@ -172,7 +172,7 @@ public class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 
@@ -228,7 +228,7 @@ namespace Tests
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -278,7 +278,7 @@ namespace Tests
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -379,7 +379,7 @@ public abstract class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -511,7 +511,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -557,7 +557,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -607,7 +607,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -657,7 +657,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -711,7 +711,7 @@ public sealed class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
@@ -914,7 +914,7 @@ public class Foo : IDisposable
     {
         if (this.disposed)
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }";
