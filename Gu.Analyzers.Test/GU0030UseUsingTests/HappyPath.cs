@@ -309,5 +309,61 @@ public class Foo
             await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task IgnoresRecursiveProperty()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public IDisposable RecursiveProperty => RecursiveProperty;
+    public IDisposable RecursiveMethod() => RecursiveMethod();
+
+    public void Meh()
+    {
+        var item = RecursiveProperty;
+
+        using(var item = RecursiveProperty)
+        {
+        }
+
+        using(RecursiveProperty)
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoresRecursiveMethod()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public IDisposable RecursiveProperty => RecursiveProperty;
+    public IDisposable RecursiveMethod() => RecursiveMethod();
+
+    public void Meh()
+    {
+        var meh = RecursiveMethod();
+
+        using(var item = RecursiveMethod())
+        {
+        }
+
+        using(RecursiveMethod())
+        {
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

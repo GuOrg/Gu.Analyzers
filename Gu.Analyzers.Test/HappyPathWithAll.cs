@@ -45,11 +45,29 @@ public class Disposable : IDisposable
 public class Foo
 {
     public Disposable RecursiveProperty => RecursiveProperty;
+    public Disposable RecursiveMethod() => RecursiveMethod();
 
     public void Meh()
     {
-        var item = new Disposable();
-        item.Dispose();
+        using(var item = new Disposable())
+        {
+        }
+
+        using(var item = RecursiveProperty)
+        {
+        }
+
+        using(RecursiveProperty)
+        {
+        }
+
+        using(var item = RecursiveMethod())
+        {
+        }
+
+        using(RecursiveMethod())
+        {
+        }
     }
 }";
             await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode }, EmptyDiagnosticResults).ConfigureAwait(false);
