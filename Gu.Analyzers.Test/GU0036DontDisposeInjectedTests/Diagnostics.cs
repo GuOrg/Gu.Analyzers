@@ -325,5 +325,37 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task InjectedSingleAssignmentDisposable()
+        {
+            var testCode = @"
+namespace Gu.Reactive
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly SingleAssignmentDisposable disposable;
+
+        protected Foo(SingleAssignmentDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            ↓this.disposable.Dispose();
+        }
+     }
+}";
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
     }
 }

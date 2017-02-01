@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0037DontMixInjectedAndCreatedForMemberTests
+﻿namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
 {
     using System.Threading.Tasks;
 
@@ -6,7 +6,7 @@
 
     internal partial class HappyPath
     {
-        public class Rx : NestedHappyPathVerifier<GU0036DontDisposeInjectedTests.HappyPath>
+        public class Rx : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
             public async Task SingleAssignmentDisposable()
