@@ -49,10 +49,13 @@ public class Disposable : IDisposable
             var fooCode = @"
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Reactive.Disposables;
 
-public class Foo
+public class Foo : IDisposable
 {
     private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+    private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
 
     private IDisposable meh1;
     private IDisposable meh2;
@@ -62,11 +65,14 @@ public class Foo
     {
         this.meh1 = this.RecursiveProperty;
         this.meh2 = this.RecursiveMethod();
+        this.subscription.Disposable = File.OpenRead(string.Empty);
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
     public Disposable RecursiveProperty => RecursiveProperty;
+
+    public IDisposable Disposable => subscription.Disposable;
 
     public bool IsDirty
     {
@@ -110,6 +116,11 @@ public class Foo
         using (RecursiveMethod())
         {
         }
+    }
+
+    public void Dispose()
+    {
+        this.subscription.Dispose();
     }
 }";
 

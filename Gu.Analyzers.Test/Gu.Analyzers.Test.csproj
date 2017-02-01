@@ -69,6 +69,7 @@
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Using.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
+    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="ReproBox.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />

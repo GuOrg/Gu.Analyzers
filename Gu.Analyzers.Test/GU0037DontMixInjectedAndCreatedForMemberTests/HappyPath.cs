@@ -125,7 +125,6 @@ public sealed class Foo
         public Foo()
         {
             this.stream = File.OpenRead(string.Empty);
-            this.Stream = File.OpenRead(string.Empty);
         }
 
         public Stream Stream

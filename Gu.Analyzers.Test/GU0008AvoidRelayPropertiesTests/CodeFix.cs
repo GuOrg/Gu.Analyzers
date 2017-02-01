@@ -7,16 +7,16 @@
     {
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]
-        public async Task WhenReturningPropertyOfField(string getter)
+        public async Task WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
 public class Foo
 {
     private readonly Bar bar;
 
-    public Foo()
+    public Foo(Bar bar)
     {
-        this.bar = new Bar();
+        this.bar = bar;
     }
 
     ↓public int Value
@@ -39,17 +39,18 @@ public class Bar
             await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
         }
 
-        [Test]
-        public async Task WhenReturningPropertyOfFieldExpressionBody()
+        [TestCase("this.bar.Value;")]
+        [TestCase("bar.Value;")]
+        public async Task WhenReturningPropertyOfFieldExpressionBody(string body)
         {
             var fooCode = @"
 public class Foo
 {
     private readonly Bar bar;
 
-    public Foo()
+    public Foo(Bar bar)
     {
-        this.bar = new Bar();
+        this.bar = bar;
     }
 
     ↓public int Value => this.bar.Value;
@@ -59,6 +60,7 @@ public class Bar
 {
     public int Value { get; }
 }";
+            fooCode = fooCode.AssertReplace("this.bar.Value;", body);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref fooCode)
                                .WithMessage("Avoid relay properties.");

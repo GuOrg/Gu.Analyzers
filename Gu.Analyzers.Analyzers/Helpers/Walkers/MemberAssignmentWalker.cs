@@ -54,7 +54,7 @@
 
                     var propertySymbol = s as IPropertySymbol;
                     if (propertySymbol?.IsReadOnly == false &&
-                        propertySymbol.DeclaredAccessibility != Accessibility.Private)
+                        propertySymbol.SetMethod.DeclaredAccessibility != Accessibility.Private)
                     {
                         return true;
                     }
@@ -152,10 +152,18 @@
         {
             if (node.IsKind(SyntaxKind.GetAccessorDeclaration))
             {
-                this.isSamplingRetunValues = true;
-                base.VisitAccessorDeclaration(node);
-                this.isSamplingRetunValues = false;
-                return;
+                var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+                if (propertyDeclaration != null)
+                {
+                    var property = this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken);
+                    if (this.symbols.Contains(property))
+                    {
+                        this.isSamplingRetunValues = true;
+                        base.VisitAccessorDeclaration(node);
+                        this.isSamplingRetunValues = false;
+                        return;
+                    }
+                }
             }
 
             base.VisitAccessorDeclaration(node);

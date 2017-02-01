@@ -1,6 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,17 +54,17 @@
                 return;
             }
 
-            if (IsRelayProperty((PropertyDeclarationSyntax)context.Node))
+            if (IsRelayProperty((PropertyDeclarationSyntax)context.Node, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
         }
 
-        private static bool IsRelayProperty(PropertyDeclarationSyntax property)
+        private static bool IsRelayProperty(PropertyDeclarationSyntax property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (property.ExpressionBody != null)
             {
-                return IsRelayReturn(property.ExpressionBody.Expression);
+                return IsRelayReturn(property.ExpressionBody.Expression, semanticModel, cancellationToken);
             }
 
             AccessorDeclarationSyntax getter;
@@ -76,14 +78,14 @@
                 StatementSyntax statement;
                 if (getter.Body.Statements.TryGetSingle(out statement))
                 {
-                    return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression);
+                    return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression, semanticModel, cancellationToken);
                 }
             }
 
             return false;
         }
 
-        private static bool IsRelayReturn(ExpressionSyntax expression)
+        private static bool IsRelayReturn(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (expression == null || !expression.IsKind(SyntaxKind.SimpleMemberAccessExpression))
             {
@@ -91,6 +93,13 @@
             }
 
             var memberAccess = (MemberAccessExpressionSyntax)expression;
+            var member = semanticModel.GetSymbolSafe(memberAccess.Expression, cancellationToken);
+            if (member == null ||
+                !IsInjected(member, semanticModel, cancellationToken))
+            {
+                return false;
+            }
+
             if (memberAccess.Expression is IdentifierNameSyntax &&
                 memberAccess.Name is IdentifierNameSyntax)
             {
@@ -101,6 +110,51 @@
                 memberAccess.Name is IdentifierNameSyntax)
             {
                 return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsInjected(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var field = member as IFieldSymbol;
+            if (field != null)
+            {
+                using (var walker = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
+                {
+                    foreach (var assignedValue in walker.Item.AssignedValues)
+                    {
+                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        {
+                            continue;
+                        }
+
+                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            var property = member as IPropertySymbol;
+            if (property != null)
+            {
+                using (var walker = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+                {
+                    foreach (var assignedValue in walker.Item.AssignedValues)
+                    {
+                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        {
+                            continue;
+                        }
+
+                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
 
             return false;

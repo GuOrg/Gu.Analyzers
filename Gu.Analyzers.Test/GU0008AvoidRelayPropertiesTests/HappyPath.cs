@@ -39,5 +39,63 @@ public class Foo
             await this.VerifyHappyPathAsync(fooCode)
                       .ConfigureAwait(false);
         }
+
+        [TestCase("return this.bar.Value;")]
+        [TestCase("return bar.Value;")]
+        public async Task WhenReturningPropertyOfInjectedField(string getter)
+        {
+            var fooCode = @"
+public class Foo
+{
+    private readonly Bar bar;
+
+    public Foo(Bar bar)
+    {
+        this.bar = new Bar();
+    }
+
+    public int Value
+    { 
+        get
+        {
+            return this.bar.Value;
+        }
+    }
+}";
+            var barCode = @"
+public class Bar
+{
+    public int Value { get; }
+}";
+            fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
+            await this.VerifyHappyPathAsync(fooCode, barCode)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("this.bar.Value;")]
+        [TestCase("bar.Value;")]
+        public async Task WhenReturningPropertyOfInjectedFieldExpressionBody(string getter)
+        {
+            var fooCode = @"
+public class Foo
+{
+    private readonly Bar bar;
+
+    public Foo(Bar bar)
+    {
+        this.bar = new Bar();
+    }
+
+    public int Value => this.bar.Value;
+}";
+            var barCode = @"
+public class Bar
+{
+    public int Value { get; }
+}";
+            fooCode = fooCode.AssertReplace("this.bar.Value;", getter);
+            await this.VerifyHappyPathAsync(fooCode, barCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
