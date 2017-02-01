@@ -90,8 +90,8 @@
 
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var symbol = (IMethodSymbol)semanticModel.GetSymbolSafe(invocation, cancellationToken);
-            if (symbol == null || symbol.ReturnsVoid)
+            var method = (IMethodSymbol)semanticModel.GetSymbolSafe(invocation, cancellationToken);
+            if (method == null || method.ReturnsVoid)
             {
                 return true;
             }
@@ -104,19 +104,21 @@
             if (invocation.Parent is ExpressionStatementSyntax &&
                 invocation.Parent.Parent is BlockSyntax)
             {
-                if (symbol == KnownSymbol.StringBuilder.Append ||
-                    symbol == KnownSymbol.StringBuilder.AppendLine ||
-                    symbol == KnownSymbol.StringBuilder.AppendFormat)
+                if (method == KnownSymbol.StringBuilder.Append ||
+                    method == KnownSymbol.StringBuilder.AppendLine ||
+                    method == KnownSymbol.StringBuilder.AppendFormat ||
+                    method == KnownSymbol.IList.Add ||
+                    method == KnownSymbol.IList.Remove)
                 {
                     return true;
                 }
 
                 MethodDeclarationSyntax declaration;
-                if (symbol.TryGetSingleDeclaration(cancellationToken, out declaration))
+                if (method.TryGetSingleDeclaration(cancellationToken, out declaration))
                 {
                     using (var pooled = ReturnExpressionsWalker.Create(declaration))
                     {
-                        if (symbol.IsExtensionMethod)
+                        if (method.IsExtensionMethod)
                         {
                             var identifier = declaration.ParameterList.Parameters[0].Identifier;
                             foreach (var returnValue in pooled.Item.ReturnValues)
@@ -129,22 +131,20 @@
 
                             return true;
                         }
-                        else
-                        {
-                            foreach (var returnValue in pooled.Item.ReturnValues)
-                            {
-                                if (!returnValue.IsKind(SyntaxKind.ThisExpression))
-                                {
-                                    return false;
-                                }
-                            }
 
-                            return true;
+                        foreach (var returnValue in pooled.Item.ReturnValues)
+                        {
+                            if (!returnValue.IsKind(SyntaxKind.ThisExpression))
+                            {
+                                return false;
+                            }
                         }
+
+                        return true;
                     }
                 }
 
-                return symbol.ReturnsVoid;
+                return method.ReturnsVoid;
             }
 
             return true;

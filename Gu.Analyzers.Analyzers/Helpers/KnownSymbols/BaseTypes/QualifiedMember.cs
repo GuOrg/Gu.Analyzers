@@ -1,8 +1,11 @@
 #pragma warning disable 660,661 // using a hack with operator overloads
 namespace Gu.Analyzers
 {
+    using System.Diagnostics;
+
     using Microsoft.CodeAnalysis;
 
+    [DebuggerDisplay("{ContainingType.FullName,nq}.{Name,nq}")]
     internal class QualifiedMember<T>
         where T : ISymbol
     {
@@ -27,9 +30,23 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            return (left.Name == right.Name &&
-                   left.ContainingType == right.ContainingType) ||
-                   left.Name.IsParts(right.ContainingType.FullName, ".", right.Name);
+            if (left.Name == right.Name &&
+                left.ContainingType == right.ContainingType)
+            {
+                return true;
+            }
+
+            var interfaceMember = left.ContainingType.FindImplementationForInterfaceMember(left);
+            if (interfaceMember != null)
+            {
+                if (interfaceMember.Name == right.Name &&
+                    interfaceMember.ContainingType == right.ContainingType)
+                {
+                    return true;
+                }
+            }
+
+            return left.Name.IsParts(right.ContainingType.FullName, ".", right.Name);
         }
 
         public static bool operator !=(T left, QualifiedMember<T> right) => !(left == right);

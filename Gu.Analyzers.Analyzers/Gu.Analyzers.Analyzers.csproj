@@ -67,6 +67,7 @@
     <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableType.cs" />
+    <Compile Include="Helpers\KnownSymbols\IListType.cs" />
     <Compile Include="Helpers\KnownSymbols\StringBuilderType.cs" />
     <Compile Include="Helpers\KnownSymbols\StringType.cs" />
     <Compile Include="Helpers\KnownSymbols\TaskType.cs" />

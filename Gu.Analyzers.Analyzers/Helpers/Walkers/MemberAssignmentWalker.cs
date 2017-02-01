@@ -137,7 +137,10 @@
                     var returnedSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
                     if (returnedSymbol != null)
                     {
-                        this.symbols.Add(returnedSymbol);
+                        if (this.symbols.Add(returnedSymbol))
+                        {
+                            return;
+                        }
                     }
                 }
             }
@@ -165,7 +168,10 @@
                 var returnedSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
                 if (returnedSymbol != null)
                 {
-                    this.symbols.Add(returnedSymbol);
+                    if (this.symbols.Add(returnedSymbol))
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -189,13 +195,13 @@
             pooled.Item.symbol = symbol;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.symbols.Add(symbol);
+            pooled.Item.symbols.Add(symbol).IgnoreReturnValue();
 
             var count = 0;
             while (count != pooled.Item.symbols.Count)
             {
                 pooled.Item.assignedValues.Clear();
-                // ReSharper disable once PossibleMultipleEnumeration
+                //// ReSharper disable once PossibleMultipleEnumeration
                 foreach (var node in nodes)
                 {
                     pooled.Item.Visit(node);
@@ -215,7 +221,7 @@
                 var property = this.semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
                 if (property?.SetMethod != null)
                 {
-                    this.symbols.Add(property);
+                    this.symbols.Add(property).IgnoreReturnValue();
                 }
             }
         }
