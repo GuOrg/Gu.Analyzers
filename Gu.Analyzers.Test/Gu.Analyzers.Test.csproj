@@ -50,6 +50,7 @@
     <Compile Include="GU0008AvoidRelayPropertiesTests\HappyPath.cs" />
     <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
+    <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Cached.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Recursion.cs" />
