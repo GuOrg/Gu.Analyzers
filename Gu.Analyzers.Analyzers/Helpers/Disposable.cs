@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -127,24 +128,27 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignedWithInjectedOrCached(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (field == null || field.IsStatic)
+            {
+                return false;
+            }
+
+            if (field.Type.IsValueType &&
+                !IsAssignableTo(field.Type))
+            {
+                return false;
+            }
+
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
             {
-                if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
+                if (pooled.Item.IsPotentiallyAssignedFromOutside)
                 {
                     return true;
                 }
 
-                foreach (var assignment in pooled.Item.AssignedValues)
+                if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
-                    var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
-                    if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
-                    {
-                        var property = semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
-                        if (IsAssignedWithInjectedOrCached(property, semanticModel, cancellationToken))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
 
@@ -153,7 +157,14 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignedWithInjectedOrCached(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (property == null || property.IsStatic)
+            if (property == null ||
+                property.IsStatic)
+            {
+                return false;
+            }
+
+            if (property.Type.IsValueType &&
+                !IsAssignableTo(property.Type))
             {
                 return false;
             }
@@ -165,53 +176,13 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            foreach (var declaration in property.Declarations(cancellationToken))
-            {
-                var propertyDeclaration = declaration as PropertyDeclarationSyntax;
-                if (propertyDeclaration == null)
-                {
-                    continue;
-                }
-
-                using (var pooledReturns = ReturnExpressionsWalker.Create(propertyDeclaration))
-                {
-                    foreach (var returnValue in pooledReturns.Item.ReturnValues)
-                    {
-                        var symbol = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
-                        var field = symbol as IFieldSymbol;
-                        if (field != null)
-                        {
-                            if (property.ContainingType.Is(field.ContainingType))
-                            {
-                                return IsAssignedWithInjectedOrCached(field, semanticModel, cancellationToken);
-                            }
-
-                            return true;
-                        }
-
-                        var propertySymbol = symbol as IPropertySymbol;
-                        if (property.Equals(propertySymbol))
-                        {
-                            return false;
-                        }
-
-                        if (propertySymbol != null)
-                        {
-                            if (property.ContainingType.Is(propertySymbol.ContainingType))
-                            {
-                                return IsAssignedWithInjectedOrCached(propertySymbol, semanticModel, cancellationToken);
-                            }
-
-                            return true;
-                        }
-
-                        return false;
-                    }
-                }
-            }
-
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
+                if (pooled.Item.IsPotentiallyAssignedFromOutside)
+                {
+                    return true;
+                }
+
                 if (IsAnyInjectedOrCached(pooled.Item.AssignedValues, semanticModel, cancellationToken))
                 {
                     return true;
@@ -371,6 +342,7 @@ namespace Gu.Analyzers
             return false;
         }
 
+        [Obsolete("Check if potentially assigned from outside")]
         private static bool IsAssignedWithCreatedAndInjected(IReadOnlyList<ExpressionSyntax> assignedValues, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var anyCreated = false;

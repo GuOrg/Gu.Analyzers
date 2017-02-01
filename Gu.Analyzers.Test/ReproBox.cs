@@ -8,8 +8,10 @@ namespace Gu.Analyzers.Test
 
     using NUnit.Framework;
 
+    [Explicit]
     public class ReproBox : DiagnosticVerifier
     {
+        // ReSharper disable once UnusedMember.Local
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
             typeof(Gu.Analyzers.KnownSymbol).Assembly.GetTypes()
                                             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
@@ -23,7 +25,7 @@ namespace Gu.Analyzers.Test
             Assert.Pass();
         }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
+        ////[TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
         {
             var iDirtyTrackerCode = @"namespace Gu.State
@@ -550,7 +552,7 @@ namespace Gu.State
             Console.WriteLine(analyzer);
             this.analyzers.Clear();
             this.analyzers.Add(analyzer);
-            Assert.ThrowsAsync<AssertionException>(() => this.VerifyCSharpDiagnosticAsync(new[] { iDirtyTrackerCode, dirtyTrackerCode, dirtyTrackerNodeCode }, EmptyDiagnosticResults));
+            Assert.ThrowsAsync<AssertionException>(() => this.VerifyCSharpDiagnosticAsync(new[] { iDirtyTrackerCode, dirtyTrackerCode, dirtyTrackerNodeCode }, EmptyDiagnosticResults)).IgnoreReturnValue();
         }
 
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()

@@ -17,6 +17,9 @@
         {
         }
 
+        /// <summary>
+        /// Gets a list with all <see cref="AssignmentExpressionSyntax"/> in the scope.
+        /// </summary>
         public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
 
         public static Pool<AssignmentWalker>.Pooled Create(SyntaxNode node)

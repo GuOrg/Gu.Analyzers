@@ -48,11 +48,15 @@ public class Disposable : IDisposable
 
             var fooCode = @"
 using System;
+using System.ComponentModel;
 
 public class Foo
 {
+    private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+
     private IDisposable meh1;
     private IDisposable meh2;
+    private bool isDirty;
 
     public Foo()
     {
@@ -60,7 +64,28 @@ public class Foo
         this.meh2 = this.RecursiveMethod();
     }
 
+    public event PropertyChangedEventHandler PropertyChanged;
+
     public Disposable RecursiveProperty => RecursiveProperty;
+
+    public bool IsDirty
+    {
+        get
+        {
+            return this.isDirty;
+        }
+
+        private set
+        {
+            if (value == this.isDirty)
+            {
+                return;
+            }
+
+            this.isDirty = value;
+            this.PropertyChanged?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+        }
+    }
 
     public Disposable RecursiveMethod() => RecursiveMethod();
 

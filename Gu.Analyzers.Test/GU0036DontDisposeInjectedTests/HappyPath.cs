@@ -195,5 +195,50 @@ public sealed class Foo : IDisposable
             await this.VerifyHappyPathAsync(disposableCode, testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task BoolProperty()
+        {
+            var testCode = @"
+    using System;
+    using System.ComponentModel;
+
+    public sealed class Foo : IDisposable
+    {
+        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+        private bool isDirty;
+
+        public Foo()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool IsDirty
+        {
+            get
+            {
+                return this.isDirty;
+            }
+
+            private set
+            {
+                if (value == this.isDirty)
+                {
+                    return;
+                }
+
+                this.isDirty = value;
+                this.PropertyChanged?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+            }
+        }
+
+        public void Dispose()
+        {
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
