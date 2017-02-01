@@ -324,7 +324,7 @@ public class Foo
     {
         var item = RecursiveProperty;
 
-        using(var item = RecursiveProperty)
+        using(var meh = RecursiveProperty)
         {
         }
 

@@ -257,6 +257,26 @@ namespace Gu.Analyzers
             return false;
         }
 
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        internal static bool IsPotentiallyCachedOrInjected(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = Classification.Create(disposable, semanticModel, cancellationToken))
+            {
+                foreach (var classification in pooled.Item)
+                {
+                    if (classification.Source == Source.Cached ||
+                        classification.Source == Source.Injected)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
         internal static bool IsAssignableTo(ITypeSymbol type)
         {
             if (type == null)

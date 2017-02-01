@@ -86,15 +86,10 @@
             }
 
             var usingStatement = (UsingStatementSyntax)context.Node;
-            if (usingStatement.Expression is IdentifierNameSyntax)
+            if (usingStatement.Expression is InvocationExpressionSyntax ||
+                usingStatement.Expression is IdentifierNameSyntax)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
-                return;
-            }
-
-            if (usingStatement.Expression is InvocationExpressionSyntax)
-            {
-                if (!Disposable.IsPotentialCreation(usingStatement.Expression, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsPotentiallyCachedOrInjected(usingStatement.Expression, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
                     return;
@@ -111,7 +106,7 @@
                     }
 
                     var value = variableDeclarator.Initializer.Value;
-                    if (!Disposable.IsPotentialCreation(value, context.SemanticModel, context.CancellationToken))
+                    if (Disposable.IsPotentiallyCachedOrInjected(value, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, value.GetLocation()));
                         return;

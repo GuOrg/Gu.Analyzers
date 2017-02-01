@@ -38,7 +38,7 @@ namespace Gu.Analyzers.Test
         }
 
         [Test]
-        public void IdMatches()
+        public virtual void IdMatches()
         {
             var diagnosticAnalyzer = this.GetCSharpDiagnosticAnalyzers().First();
             StringAssert.StartsWith(diagnosticAnalyzer.SupportedDiagnostics.Single().Id, diagnosticAnalyzer.GetType().Name);

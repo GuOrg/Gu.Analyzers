@@ -18,6 +18,11 @@ namespace Gu.Analyzers.Test
             Assert.Pass($"Count: {this.GetCSharpDiagnosticAnalyzers().Count()}");
         }
 
+        public override void IdMatches()
+        {
+            Assert.Pass();
+        }
+
         ////[Explicit("Temporarily ignore")]
         [Test]
         public async Task SomewhatRealisticSample()
@@ -42,30 +47,42 @@ public class Disposable : IDisposable
 }";
 
             var fooCode = @"
+using System;
+
 public class Foo
 {
+    private IDisposable meh1;
+    private IDisposable meh2;
+
+    public Foo()
+    {
+        this.meh1 = this.RecursiveProperty;
+        this.meh2 = this.RecursiveMethod();
+    }
+
     public Disposable RecursiveProperty => RecursiveProperty;
+
     public Disposable RecursiveMethod() => RecursiveMethod();
 
     public void Meh()
     {
-        using(var item = new Disposable())
+        using (var item = new Disposable())
         {
         }
 
-        using(var item = RecursiveProperty)
+        using (var item = RecursiveProperty)
         {
         }
 
-        using(RecursiveProperty)
+        using (RecursiveProperty)
         {
         }
 
-        using(var item = RecursiveMethod())
+        using (var item = RecursiveMethod())
         {
         }
 
-        using(RecursiveMethod())
+        using (RecursiveMethod())
         {
         }
     }
