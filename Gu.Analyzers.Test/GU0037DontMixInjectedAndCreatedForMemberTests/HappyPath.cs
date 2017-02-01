@@ -309,5 +309,40 @@ public sealed class Foo : IDisposable
             testCode = testCode.AssertReplace("private set", setter);
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task GenericTypeWithPropertyAndIndexer()
+        {
+            var testCode = @"
+    using System.Collections.Generic;
+
+    public sealed class Foo<T>
+    {
+        private T value;
+        private List<T> values = new List<T>();
+
+        public T Value
+        {
+            get { return this.value; }
+            private set { this.value = value; }
+        }
+
+
+        /// <inheritdoc/>
+        public T this[int index]
+        {
+            get
+            {
+                return this.values[index];
+            }
+
+            set
+            {
+                this.values[index] = value;
+            }
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
     }
 }

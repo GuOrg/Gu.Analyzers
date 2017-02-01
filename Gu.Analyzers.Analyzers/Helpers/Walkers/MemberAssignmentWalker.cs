@@ -226,7 +226,7 @@
             var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
             if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
             {
-                var property = this.semanticModel.GetDeclaredSymbol(setter.FirstAncestorOrSelf<PropertyDeclarationSyntax>());
+                var property = this.semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>(), this.cancellationToken) as IPropertySymbol;
                 if (property?.SetMethod != null)
                 {
                     this.symbols.Add(property).IgnoreReturnValue();

@@ -68,7 +68,13 @@ public class Foo : IDisposable
         this.subscription.Disposable = File.OpenRead(string.Empty);
     }
 
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler PropertyChanged
+    {
+        add { this.PropertyChangedCore += value; }
+        remove { this.PropertyChangedCore -= value; }
+    }
+
+    private event PropertyChangedEventHandler PropertyChangedCore;
 
     public Disposable RecursiveProperty => RecursiveProperty;
 
@@ -89,7 +95,7 @@ public class Foo : IDisposable
             }
 
             this.isDirty = value;
-            this.PropertyChanged?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+            this.PropertyChangedCore?.Invoke(this, IsDirtyPropertyChangedEventArgs);
         }
     }
 

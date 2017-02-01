@@ -28,51 +28,209 @@ namespace Gu.Analyzers.Test
         ////[TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
         {
-            var iDirtyTrackerCode = @"namespace Gu.State
+            var testCode = @"
+namespace Gu.Reactive
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Runtime.CompilerServices;
+    using Gu.Reactive.Internals;
 
-    /// <summary>A tracker that tracks the difference between tow instances.</summary>
-    public interface IDirtyTracker : INotifyPropertyChanged, IDisposable
+    /// <summary>
+    /// A synchronized view of a collection that supports two way bindings.
+    /// </summary>
+    [DebuggerTypeProxy(typeof(CollectionDebugView<>))]
+    [DebuggerDisplay(""Count = {Count}"")]
+    public abstract class SynchronizedEditableView<T> : IList, IList<T>, IUpdater, IRefreshAble, IDisposable, INotifyPropertyChanged, INotifyCollectionChanged
     {
-        /// <summary>Gets the settings specifying how tracking and equality is performed.</summary>
-        PropertiesSettings Settings { get; }
+        private readonly object syncRoot;
 
-        /// <summary>Gets a value indicating whether there is a difference between x and y.</summary>
-        bool IsDirty { get; }
-
-        /// <summary>Gets the difference between x and y. This is a mutable value.</summary>
-        ValueDiff Diff { get; }
-    }
-}";
-            var dirtyTrackerCode = @"namespace Gu.State
-{
-    using System.ComponentModel;
-
-    internal sealed class DirtyTracker : IDirtyTracker
-    {
-        private static readonly PropertyChangedEventArgs DiffPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(Diff));
-        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
-
-        private readonly IRefCounted<DirtyTrackerNode> node;
+        private object isUpdatingSourceItem;
         private bool disposed;
 
-        internal DirtyTracker(INotifyPropertyChanged x, INotifyPropertyChanged y, PropertiesSettings settings)
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""SynchronizedEditableView{T}""/> class.
+        /// </summary>
+        protected SynchronizedEditableView(IList<T> source)
+            : this(source, source)
         {
-            this.Settings = settings;
-            this.node = DirtyTrackerNode.GetOrCreate(x, y, settings, true);
-            this.node.Value.PropertyChanged += this.OnNodeChanged;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""SynchronizedEditableView{T}""/> class.
+        /// </summary>
+        protected SynchronizedEditableView(IList<T> source, IEnumerable<T> sourceItems)
+        {
+            Ensure.NotNull(source, nameof(source));
+            this.Source = source;
+            this.syncRoot = (this.Source as ICollection)?.SyncRoot ?? new object();
+            this.Tracker = new CollectionSynchronizer<T>(sourceItems);
+        }
 
-        public PropertiesSettings Settings { get; }
+        /// <inheritdoc/>
+        public virtual event PropertyChangedEventHandler PropertyChanged;
 
-        public bool IsDirty => this.node.Value.IsDirty;
+        /// <inheritdoc/>
+        public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
-        public ValueDiff Diff => this.node.Value.Diff;
+        /// <inheritdoc/>
+        public int Count => this.Tracker.Current.Count;
 
+        /// <inheritdoc/>
+        public bool IsReadOnly => false;
+
+        /// <inheritdoc/>
+        object ICollection.SyncRoot => this.syncRoot;
+
+        /// <inheritdoc/>
+        bool ICollection.IsSynchronized => (this.Source as ICollection)?.IsSynchronized == true;
+
+        /// <inheritdoc/>
+        bool IList.IsFixedSize => false;
+
+        /// <inheritdoc/>
+        object IUpdater.CurrentlyUpdatingSourceItem => this.isUpdatingSourceItem;
+
+        /// <summary>
+        /// The source collection.
+        /// </summary>
+        protected IList<T> Source { get; }
+
+        /// <summary>
+        /// The <see cref=""CollectionSynchronizer{T}""/> that keeps this in sync with <see cref=""Source""/>
+        /// </summary>
+        protected CollectionSynchronizer<T> Tracker { get; }
+
+        /// <summary>
+        /// The <see cref=""PropertyChangedEventHandler""/>
+        /// </summary>
+        protected PropertyChangedEventHandler PropertyChangedEventHandler => this.PropertyChanged;
+
+        /// <summary>
+        /// The <see cref=""NotifyCollectionChangedEventHandler""/>
+        /// </summary>
+        protected NotifyCollectionChangedEventHandler NotifyCollectionChangedEventHandler => this.CollectionChanged;
+
+        /// <inheritdoc/>
+        public T this[int index]
+        {
+            get
+            {
+                return this.Tracker.Current[index];
+            }
+
+            set
+            {
+                var sourceIndex = this.Source.IndexOf(this.Tracker.Current[index]);
+                this.Source[sourceIndex] = value;
+            }
+        }
+
+        /// <inheritdoc/>
+        object IList.this[int index]
+        {
+            get
+            {
+                return this[index];
+            }
+
+            set
+            {
+                var old = this[index];
+                this.isUpdatingSourceItem = old;
+                this[index] = (T)value;
+                this.RefreshNow(Diff.CreateReplaceEventArgs(value, old, index));
+                this.isUpdatingSourceItem = null;
+            }
+        }
+
+        /// <inheritdoc/>
+        public IEnumerator<T> GetEnumerator() => this.Tracker.Current.GetEnumerator();
+
+        /// <inheritdoc/>
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        /// <inheritdoc/>
+        public void Add(T item) => this.Source.Add(item);
+
+        /// <inheritdoc/>
+        public void Clear() => this.Source.Clear();
+
+        /// <inheritdoc/>
+        public bool Contains(T item) => this.Tracker.Contains(item);
+
+        /// <inheritdoc/>
+        public int IndexOf(T value) => this.Tracker.IndexOf(value);
+
+        /// <inheritdoc/>
+        public void Insert(int index, T value) => this.InsertCore(index, value);
+
+        /// <inheritdoc/>
+        public bool Remove(T item)
+        {
+            var result = this.Source.Remove(item);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public void RemoveAt(int index)
+        {
+            this.RemoveAtCore(index);
+        }
+
+        /// <inheritdoc/>
+        public void CopyTo(T[] array, int arrayIndex) => this.Tracker.CopyTo(array, arrayIndex);
+
+        /// <inheritdoc/>
+        int IList.Add(object value)
+        {
+            // IList.Add happens when a new row is added in DataGrid, we need to notify here to avoid out of sync exception.
+            this.isUpdatingSourceItem = value;
+            ((IList)this.Source).Add(value); // Adding to inner
+            this.RefreshNow(Diff.CreateAddEventArgs(value, this.Count));
+            this.isUpdatingSourceItem = null;
+            var index = this.Tracker.LastIndexOf((T)value);
+            return index;
+        }
+
+        /// <inheritdoc/>
+        bool IList.Contains(object value) => this.Tracker.Contains(value);
+
+        /// <inheritdoc/>
+        int IList.IndexOf(object value) => this.Tracker.IndexOf(value);
+
+        /// <inheritdoc/>
+        void IList.Insert(int index, object value)
+        {
+            this.isUpdatingSourceItem = value;
+            this.Insert(index, (T)value);
+            this.RefreshNow(Diff.CreateAddEventArgs(value, index));
+            this.isUpdatingSourceItem = null;
+        }
+
+        /// <inheritdoc/>
+        void IList.Remove(object value)
+        {
+            var index = this.IndexOf((T)value);
+            if (index < 0)
+            {
+                return;
+            }
+
+            this.isUpdatingSourceItem = value;
+            this.RemoveAtCore(index);
+            this.RefreshNow(Diff.CreateRemoveEventArgs(value, index));
+            this.isUpdatingSourceItem = null;
+        }
+
+        /// <inheritdoc/>
+        void ICollection.CopyTo(Array array, int index) => this.Tracker.CopyTo(array, index);
+
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (this.disposed)
@@ -81,470 +239,69 @@ namespace Gu.Analyzers.Test
             }
 
             this.disposed = true;
-            this.node.Value.PropertyChanged -= this.OnNodeChanged;
-            this.node.Dispose();
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        private void OnNodeChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(DirtyTrackerNode.Diff))
-            {
-                this.PropertyChanged?.Invoke(this, DiffPropertyChangedEventArgs);
-            }
-            else if (e.PropertyName == nameof(DirtyTrackerNode.IsDirty))
-            {
-                this.PropertyChanged?.Invoke(this, IsDirtyPropertyChangedEventArgs);
-            }
-            else
-            {
-                throw Throw.ShouldNeverGetHereException($""Expected property name {nameof(DirtyTrackerNode.Diff)} || {nameof(DirtyTrackerNode.IsDirty)}"");
-            }
-        }
-    }
-}";
-
-            var dirtyTrackerNodeCode = @"
-namespace Gu.State
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
-
-    internal sealed class DirtyTrackerNode : IDirtyTracker, IInitialize<DirtyTrackerNode>, ITrackerNode<DirtyTrackerNode>
-    {
-        private static readonly PropertyChangedEventArgs DiffPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(Diff));
-        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
-
-        private readonly IRefCounted<ReferencePair> refCountedPair;
-        private readonly IRefCounted<RootChanges> xNode;
-        private readonly IRefCounted<RootChanges> yNode;
-        private readonly IBorrowed<ChildNodes<DirtyTrackerNode>> children;
-        private readonly IRefCounted<DiffBuilder> refcountedDiffBuilder;
-
-        private bool isDirty;
+        /// <inheritdoc/>
+        public abstract void Refresh();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref=""DirtyTrackerNode""/> class.
-        /// A call to Initialize is needed after the ctor due to that we need to fetch child nodes and the graph can contain self
+        /// Pass null as scheduler here, change came from the ui thread.
         /// </summary>
-        private DirtyTrackerNode(IRefCounted<ReferencePair> refCountedPair, PropertiesSettings settings, bool isRoot)
+        protected abstract void RefreshNow(NotifyCollectionChangedEventArgs change);
+
+        /// <summary>
+        /// Refreshes the view. May be deferred if there is a buffer time.
+        /// </summary>
+        protected abstract void Refresh(IReadOnlyList<NotifyCollectionChangedEventArgs> changes);
+
+        /// <summary>
+        /// Protected implementation of Dispose pattern.
+        /// </summary>
+        /// <param name=""disposing"">true: safe to free managed resources</param>
+        protected virtual void Dispose(bool disposing)
         {
-            this.refCountedPair = refCountedPair;
-            var x = refCountedPair.Value.X;
-            var y = refCountedPair.Value.Y;
-            this.children = ChildNodes<DirtyTrackerNode>.Borrow();
-            this.xNode = RootChanges.GetOrCreate(x, settings, isRoot);
-            this.yNode = RootChanges.GetOrCreate(y, settings, isRoot);
-            this.xNode.Value.PropertyChange += this.OnTrackedPropertyChange;
-            this.yNode.Value.PropertyChange += this.OnTrackedPropertyChange;
-
-            this.IsTrackingCollectionItems = Is.Enumerable(x, y) &&
-                                 !settings.IsImmutable(x.GetType().GetItemType()) &&
-                                 !settings.IsImmutable(y.GetType().GetItemType());
-
-            if (Is.NotifyingCollections(x, y))
-            {
-                this.xNode.Value.Add += this.OnTrackedAdd;
-                this.xNode.Value.Remove += this.OnTrackedRemove;
-                this.xNode.Value.Replace += this.OnTrackedReplace;
-                this.xNode.Value.Move += this.OnTrackedMove;
-                this.xNode.Value.Reset += this.OnTrackedReset;
-
-                this.yNode.Value.Add += this.OnTrackedAdd;
-                this.yNode.Value.Remove += this.OnTrackedRemove;
-                this.yNode.Value.Replace += this.OnTrackedReplace;
-                this.yNode.Value.Move += this.OnTrackedMove;
-                this.yNode.Value.Reset += this.OnTrackedReset;
-            }
-
-            var builder = DiffBuilder.GetOrCreate(x, y, settings);
-            builder.Value.UpdateDiffs(x, y, settings);
-            builder.Value.Refresh();
-            this.refcountedDiffBuilder = builder;
-            this.isDirty = !this.Builder.IsEmpty;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public event EventHandler<TrackerChangedEventArgs<DirtyTrackerNode>> Changed;
-
-        public PropertiesSettings Settings => this.xNode.Value.Settings;
-
-        public bool IsDirty
+        /// <summary>
+        /// Throws an <see cref=""ObjectDisposedException""/> if the instance is disposed.
+        /// </summary>
+        protected void ThrowIfDisposed()
         {
-            get
+            if (this.disposed)
             {
-                return this.isDirty;
-            }
-
-            private set
-            {
-                if (value == this.isDirty)
-                {
-                    return;
-                }
-
-                this.isDirty = value;
-                this.PropertyChanged?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
 
-        public ValueDiff Diff => this.Builder?.CreateValueDiffOrNull();
-
-        internal object X => this.xNode.Value.Source;
-
-        internal object Y => this.yNode.Value.Source;
-
-        private bool IsTrackingCollectionItems { get; }
-
-        private DiffBuilder Builder => this.refcountedDiffBuilder?.Value;
-
-        private IList XList => (IList)this.X;
-
-        private IList YList => (IList)this.Y;
-
-        private IReadOnlyCollection<PropertyInfo> TrackProperties => this.xNode.Value.TrackProperties;
-
-        private ChildNodes<DirtyTrackerNode> Children => this.children.Value;
-
-        public void Dispose()
+        /// <summary>
+        /// Calls <see cref=""OnPropertyChanged(PropertyChangedEventArgs)""/>
+        /// </summary>
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            this.xNode.Value.PropertyChange -= this.OnTrackedPropertyChange;
-            this.xNode.Value.Add -= this.OnTrackedAdd;
-            this.xNode.Value.Remove -= this.OnTrackedRemove;
-            this.xNode.Value.Remove -= this.OnTrackedRemove;
-            this.xNode.Value.Move -= this.OnTrackedMove;
-            this.xNode.Value.Reset -= this.OnTrackedReset;
-            this.xNode.Dispose();
-
-            this.yNode.Value.PropertyChange -= this.OnTrackedPropertyChange;
-            this.yNode.Value.Add -= this.OnTrackedAdd;
-            this.yNode.Value.Remove -= this.OnTrackedRemove;
-            this.yNode.Value.Remove -= this.OnTrackedRemove;
-            this.yNode.Value.Move -= this.OnTrackedMove;
-            this.yNode.Value.Reset -= this.OnTrackedReset;
-            this.yNode.Dispose();
-
-            this.children.Dispose();
-            this.refCountedPair.Dispose();
-            this.refcountedDiffBuilder.Dispose();
+            this.OnPropertyChanged(new PropertyChangedEventArgs(propertyName));
         }
 
-        // Initialize is needed here as we can't get recursive trackers in the ctor
-        // Call the ctor like new DirtyTrackerNode(pair, settings).Initialize()
-        DirtyTrackerNode IInitialize<DirtyTrackerNode>.Initialize()
+        /// <summary>
+        /// Raise PropertyChanged event to any listeners.
+        /// Properties/methods modifying this <see cref=""SynchronizedEditableView{T}""/> will raise
+        /// a property changed event through this virtual method.
+        /// </summary>
+        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
         {
-            foreach (var propertyInfo in this.TrackProperties)
-            {
-                this.UpdatePropertyChildNode(propertyInfo);
-            }
-
-            if (this.IsTrackingCollectionItems)
-            {
-                for (var i = 0; i < Math.Max(this.XList.Count, this.YList.Count); i++)
-                {
-                    this.UpdateIndexChildNode(i);
-                }
-            }
-
-            return this;
+            this.PropertyChanged?.Invoke(this, e);
         }
 
-        internal static IRefCounted<DirtyTrackerNode> GetOrCreate(object x, object y, PropertiesSettings settings, bool isRoot)
+        private void RemoveAtCore(int index)
         {
-            Debug.Assert(x != null, ""Cannot track null"");
-            Debug.Assert(x is INotifyPropertyChanged || x is INotifyCollectionChanged, ""Must notify"");
-            Debug.Assert(y != null, ""Cannot track null"");
-            Debug.Assert(y is INotifyPropertyChanged || y is INotifyCollectionChanged, ""Must notify"");
-            return TrackerCache.GetOrAdd(
-                x,
-                y,
-                settings,
-                pair => new DirtyTrackerNode(pair, settings, isRoot));
+            this.Source.Remove(this.Tracker.Current[index]);
         }
 
-        internal IEnumerable<DirtyTrackerNode> AllChildNodes()
+        private void InsertCore(int index, T value)
         {
-            using (var borrow = ReferenceSetPool<DirtyTrackerNode>.Borrow())
-            {
-                return this.AllChildNodes(borrow.Value);
-            }
-        }
-
-        private static bool IsTrackablePair(object x, object y, PropertiesSettings settings)
-        {
-            if (IsNullOrMissing(x) || IsNullOrMissing(y))
-            {
-                return false;
-            }
-
-            if (x.GetType() != y.GetType())
-            {
-                return false;
-            }
-
-            return !settings.IsImmutable(x.GetType()) && !settings.IsImmutable(y.GetType());
-        }
-
-        private static bool IsNullOrMissing(object x)
-        {
-            return x == null || x == PaddedPairs.MissingItem;
-        }
-
-        private IEnumerable<DirtyTrackerNode> AllChildNodes(HashSet<DirtyTrackerNode> @checked)
-        {
-            foreach (var node in this.Children.AllChildren())
-            {
-                if (!@checked.Add(node))
-                {
-                    continue;
-                }
-
-                yield return node;
-                foreach (var child in node.AllChildNodes(@checked))
-                {
-                    yield return child;
-                }
-            }
-        }
-
-        private void OnTrackedPropertyChange(object sender, PropertyChangeEventArgs e)
-        {
-            this.UpdatePropertyChildNode(e.PropertyInfo);
-            //// we create the builder after subscribing so no guarantee that we have a builder if an event fires before the ctor is finished.
-            if (this.Builder == null ||
-                this.Settings.IsIgnoringProperty(e.PropertyInfo))
-            {
-                return;
-            }
-
-            this.Builder.UpdateMemberDiff(this.X, this.Y, e.PropertyInfo, this.Settings);
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void UpdatePropertyChildNode(PropertyInfo propertyInfo)
-        {
-            if (this.Settings.IsIgnoringProperty(propertyInfo))
-            {
-                return;
-            }
-
-            if (this.TrackProperties.Contains(propertyInfo) &&
-               (this.Settings.ReferenceHandling == ReferenceHandling.Structural))
-            {
-                var getter = this.Settings.GetOrCreateGetterAndSetter(propertyInfo);
-                var xValue = getter.GetValue(this.X);
-                var yValue = getter.GetValue(this.Y);
-                IRefCounted<DirtyTrackerNode> node;
-                if (this.TrCreateChild(xValue, yValue, out node))
-                {
-                    using (node)
-                    {
-                        var childNode = ChildNodes<DirtyTrackerNode>.CreateChildNode(this, node.Value, propertyInfo);
-                        childNode.Changed += this.OnChildNodeChanged;
-                        this.Children.SetValue(propertyInfo, childNode.UnsubscribeAndDispose(x => x.Changed -= this.OnChildNodeChanged));
-                    }
-                }
-                else
-                {
-                    this.Children.Remove(propertyInfo);
-                }
-            }
-        }
-
-        private void OnTrackedAdd(object sender, AddEventArgs e)
-        {
-            for (int i = e.Index; i < Math.Max(this.XList.Count, this.YList.Count); i++)
-            {
-                this.UpdateIndexChildNode(i);
-                this.UpdateIndexDiff(i);
-            }
-
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void OnTrackedRemove(object sender, RemoveEventArgs e)
-        {
-            for (int i = e.Index; i <= Math.Max(this.XList.Count, this.YList.Count); i++)
-            {
-                this.UpdateIndexChildNode(i);
-                this.UpdateIndexDiff(i);
-            }
-
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void OnTrackedReplace(object sender, ReplaceEventArgs e)
-        {
-            this.UpdateIndexChildNode(e.Index);
-            this.UpdateIndexDiff(e.Index);
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void OnTrackedMove(object sender, MoveEventArgs e)
-        {
-            for (int i = Math.Min(e.FromIndex, e.ToIndex); i <= Math.Max(e.FromIndex, e.ToIndex); i++)
-            {
-                this.UpdateIndexChildNode(i);
-                this.UpdateIndexDiff(i);
-            }
-
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void OnTrackedReset(object sender, ResetEventArgs e)
-        {
-            this.Builder?.ClearIndexDiffs();
-            using (var borrowed = ListPool<IUnsubscriber<IChildNode<DirtyTrackerNode>>>.Borrow())
-            {
-                var max = Math.Max(this.XList.Count, this.YList.Count);
-                for (var i = 0; i < max; i++)
-                {
-                    this.UpdateIndexDiff(i);
-
-                    var childNode = this.CreateChildNode(i);
-                    if (childNode != null)
-                    {
-                        borrowed.Value.Add(childNode);
-                    }
-                }
-
-                this.Children.Reset(borrowed.Value);
-            }
-
-            this.TryRefreshAndNotify(e);
-        }
-
-        private void UpdateIndexChildNode(int index)
-        {
-            var childNode = this.CreateChildNode(index);
-            if (childNode != null)
-            {
-                this.Children.Replace(index, childNode);
-            }
-            else
-            {
-                this.Children.Remove(index);
-            }
-        }
-
-        private IUnsubscriber<IChildNode<DirtyTrackerNode>> CreateChildNode(int index)
-        {
-            if (!this.IsTrackingCollectionItems)
-            {
-                return null;
-            }
-
-            var xValue = this.XList.ElementAtOrMissing(index);
-            var yValue = this.YList.ElementAtOrMissing(index);
-
-            IRefCounted<DirtyTrackerNode> node;
-            if (this.TrCreateChild(xValue, yValue, out node))
-            {
-                using (node)
-                {
-                    var childNode = ChildNodes<DirtyTrackerNode>.CreateChildNode(this, node.Value, index);
-                    childNode.Changed += this.OnChildNodeChanged;
-                    return childNode.UnsubscribeAndDispose(x => x.Changed -= this.OnChildNodeChanged);
-                }
-            }
-
-            return null;
-        }
-
-        private void UpdateIndexDiff(int index)
-        {
-            // we create the builder after subscribing so no guarantee that we have a builder if an event fires before the ctor is finished.
-            if (this.Builder == null)
-            {
-                return;
-            }
-
-            var xValue = this.XList.ElementAtOrMissing(index);
-            var yValue = this.YList.ElementAtOrMissing(index);
-            this.Builder.UpdateCollectionItemDiff(xValue, yValue, index, this.Settings);
-        }
-
-        private bool TrCreateChild(object xValue, object yValue, out IRefCounted<DirtyTrackerNode> childNode)
-        {
-            if (!IsTrackablePair(xValue, yValue, this.Settings) ||
-                this.Settings.ReferenceHandling != ReferenceHandling.Structural)
-            {
-                childNode = null;
-                return false;
-            }
-
-            childNode = GetOrCreate(xValue, yValue, this.Settings, false);
-            return true;
-        }
-
-        // ReSharper disable once UnusedParameter.Local
-        private void OnChildNodeChanged(object _, TrackerChangedEventArgs<DirtyTrackerNode> e)
-        {
-            if (this.Builder == null)
-            {
-                return;
-            }
-
-            if (e.Previous?.Contains(this) == true)
-            {
-                return;
-            }
-
-            var propertyGraphChangedEventArgs = e as PropertyGraphChangedEventArgs<DirtyTrackerNode>;
-            if (propertyGraphChangedEventArgs != null)
-            {
-                this.OnChildNodeChanged(propertyGraphChangedEventArgs);
-                return;
-            }
-
-            var itemGraphChangedEventArgs = e as ItemGraphChangedEventArgs<DirtyTrackerNode>;
-            if (itemGraphChangedEventArgs != null)
-            {
-                this.OnChildNodeChanged(itemGraphChangedEventArgs);
-                return;
-            }
-
-            throw Throw.ExpectedParameterOfTypes<PropertyGraphChangedEventArgs<DirtyTrackerNode>, ItemGraphChangedEventArgs<DirtyTrackerNode>>(""OnChildNodeChanged failed."");
-        }
-
-        private void OnChildNodeChanged(PropertyGraphChangedEventArgs<DirtyTrackerNode> e)
-        {
-            if (this.Settings.IsIgnoringProperty(e.Property))
-            {
-                return;
-            }
-
-            this.Builder.UpdateMemberDiff(this.X, this.Y, e.Property, this.Settings);
-            this.Builder.Refresh();
-            this.PropertyChanged?.Invoke(this, DiffPropertyChangedEventArgs);
-            this.IsDirty = !this.Builder.IsEmpty;
-            this.Changed?.Invoke(this, e.With(this, e.Property));
-        }
-
-        private void OnChildNodeChanged(ItemGraphChangedEventArgs<DirtyTrackerNode> e)
-        {
-            this.Builder.UpdateCollectionItemDiff(this.XList.ElementAtOrMissing(e.Index), this.YList.ElementAtOrMissing(e.Index), e.Index, this.Settings);
-            this.Builder.Refresh();
-            this.PropertyChanged?.Invoke(this, DiffPropertyChangedEventArgs);
-            this.IsDirty = !this.Builder.IsEmpty;
-            this.Changed?.Invoke(this, e.With(this, e.Index));
-        }
-
-        private void TryRefreshAndNotify<T>(T e)
-            where T : IRootChangeEventArgs
-        {
-            if (this.Builder?.TryRefresh() == true)
-            {
-                this.PropertyChanged?.Invoke(this, DiffPropertyChangedEventArgs);
-                this.IsDirty = !this.Builder.IsEmpty;
-                this.Changed?.Invoke(this, RootChangeEventArgs.Create(this, e));
-            }
+            var i = this.Source.IndexOf(this.Tracker.Current[index]);
+            this.Source.Insert(i, value);
         }
     }
 }";
@@ -552,7 +309,7 @@ namespace Gu.State
             Console.WriteLine(analyzer);
             this.analyzers.Clear();
             this.analyzers.Add(analyzer);
-            Assert.ThrowsAsync<AssertionException>(() => this.VerifyCSharpDiagnosticAsync(new[] { iDirtyTrackerCode, dirtyTrackerCode, dirtyTrackerNodeCode }, EmptyDiagnosticResults)).IgnoreReturnValue();
+            Assert.ThrowsAsync<AssertionException>(() => this.VerifyCSharpDiagnosticAsync(new[] { testCode }, EmptyDiagnosticResults)).IgnoreReturnValue();
         }
 
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
