@@ -129,9 +129,10 @@ public class Foo : IDisposable
 
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
         {
-            return typeof(Gu.Analyzers.KnownSymbol).Assembly.GetTypes()
-                                                   .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                   .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t));
+            return typeof(KnownSymbol).Assembly
+                                      .GetTypes()
+                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t));
         }
     }
 }

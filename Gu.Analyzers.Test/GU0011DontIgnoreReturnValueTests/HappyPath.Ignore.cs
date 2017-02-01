@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
     using System.Threading.Tasks;

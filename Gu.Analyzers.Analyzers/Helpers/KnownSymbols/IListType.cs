@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    // ReSharper disable once InconsistentNaming
     internal class IListType : QualifiedType
     {
         internal readonly QualifiedMethod Add;
