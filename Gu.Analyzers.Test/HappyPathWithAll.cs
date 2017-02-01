@@ -87,6 +87,7 @@ public class Foo
         }
     }
 }";
+
             await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode }, EmptyDiagnosticResults).ConfigureAwait(false);
         }
 

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath : HappyPathVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable>
     {
         private static readonly string DisposableCode = @"
 using System;

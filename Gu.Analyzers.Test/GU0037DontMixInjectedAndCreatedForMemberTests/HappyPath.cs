@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0037DontMixInjectedAndCreatedForMember>
+    internal partial class HappyPath : HappyPathVerifier<GU0037DontMixInjectedAndCreatedForMember>
     {
         [TestCase("this.stream.Dispose();")]
         [TestCase("this.stream?.Dispose();")]

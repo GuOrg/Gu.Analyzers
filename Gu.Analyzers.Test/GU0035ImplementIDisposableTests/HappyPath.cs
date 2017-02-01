@@ -4,15 +4,17 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
 
     using NUnit.Framework;
 
-    internal class HappyPathWhenDisposing : HappyPathVerifier<GU0035ImplementIDisposable>
+    internal partial class HappyPath
     {
-        [TestCase("this.stream.Dispose();")]
-        [TestCase("this.stream?.Dispose();")]
-        [TestCase("stream.Dispose();")]
-        [TestCase("stream?.Dispose();")]
-        public async Task DisposingField(string disposeCall)
+        public class WhenDisposing : NestedHappyPathVerifier<HappyPath>
         {
-            var testCode = @"
+            [TestCase("this.stream.Dispose();")]
+            [TestCase("this.stream?.Dispose();")]
+            [TestCase("stream.Dispose();")]
+            [TestCase("stream?.Dispose();")]
+            public async Task DisposingField(string disposeCall)
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -25,15 +27,15 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
             this.stream.Dispose();
         }
     }";
-            testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldInVirtualDispose()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingFieldInVirtualDispose()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -70,14 +72,14 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
             }
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldInVirtualDispose2()
-        {
-            var disposableCode = @"
+            [Test]
+            public async Task DisposingFieldInVirtualDispose2()
+            {
+                var disposableCode = @"
 using System;
 
 public class Disposable : IDisposable
@@ -86,7 +88,7 @@ public class Disposable : IDisposable
     {
     }
 }";
-            var testCode = @"
+                var testCode = @"
 using System;
 
 public class Foo : IDisposable
@@ -121,34 +123,34 @@ public class Foo : IDisposable
         }
     }
 }";
-            await this.VerifyHappyPathAsync(disposableCode, testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(disposableCode, testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldInExpressionBodyDispose()
-        {
-            var disposableCode = @"
+            [Test]
+            public async Task DisposingFieldInExpressionBodyDispose()
+            {
+                var disposableCode = @"
 using System;
 class Disposable : IDisposable {
     public void Dispose() { }
 }";
 
-            var testCode = @"
+                var testCode = @"
 using System;
 class Goof : IDisposable {
     IDisposable _disposable;
     public void Create()  => _disposable = new Disposable();
     public void Dispose() => _disposable.Dispose();
 }";
-            await this.VerifyHappyPathAsync(disposableCode, testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(disposableCode, testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldAsCast()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingFieldAsCast()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -162,14 +164,14 @@ class Goof : IDisposable {
             disposable?.Dispose();
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldInlineAsCast()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingFieldInlineAsCast()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -182,14 +184,14 @@ class Goof : IDisposable {
             (this.stream as IDisposable)?.Dispose();
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldExplicitCast()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingFieldExplicitCast()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -203,14 +205,14 @@ class Goof : IDisposable {
             disposable.Dispose();
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingFieldInlineExplicitCast()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingFieldInlineExplicitCast()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -223,14 +225,14 @@ class Goof : IDisposable {
             ((IDisposable)this.stream).Dispose();
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingPropertyWhenInitializedInProperty()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingPropertyWhenInitializedInProperty()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -249,14 +251,14 @@ class Goof : IDisposable {
         }
     }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task DisposingPropertyWhenInitializedInline()
-        {
-            var testCode = @"
+            [Test]
+            public async Task DisposingPropertyWhenInitializedInline()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -270,14 +272,14 @@ class Goof : IDisposable {
         }
     }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnorePassedInViaCtor1()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnorePassedInViaCtor1()
+            {
+                var testCode = @"
     using System;
 
     public sealed class Foo
@@ -289,14 +291,14 @@ class Goof : IDisposable {
             this.bar = bar;
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnorePassedInViaCtor2()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnorePassedInViaCtor2()
+            {
+                var testCode = @"
     using System;
 
     public sealed class Foo
@@ -308,14 +310,14 @@ class Goof : IDisposable {
             _bar = bar;
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnorePassedInViaCtor3()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnorePassedInViaCtor3()
+            {
+                var testCode = @"
     using System;
 
     public sealed class Foo : IDisposable
@@ -331,15 +333,15 @@ class Goof : IDisposable {
         {
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [TestCase("disposables.First();")]
-        [TestCase("disposables.Single();")]
-        public async Task IgnoreLinq(string linq)
-        {
-            var testCode = @"
+            [TestCase("disposables.First();")]
+            [TestCase("disposables.Single();")]
+            public async Task IgnoreLinq(string linq)
+            {
+                var testCode = @"
 using System;
 using System.Linq;
 
@@ -352,15 +354,15 @@ public sealed class Foo
         _bar = disposables.First();
     }
 }";
-            testCode = testCode.AssertReplace("disposables.First();", linq);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                testCode = testCode.AssertReplace("disposables.First();", linq);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoredWhenNotAssigned()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoredWhenNotAssigned()
+            {
+                var testCode = @"
     using System;
     using System.IO;
 
@@ -368,14 +370,14 @@ public sealed class Foo
     {
         private readonly IDisposable bar;
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoredWhenBackingField()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoredWhenBackingField()
+            {
+                var testCode = @"
     using System.IO;
 
     public sealed class Foo
@@ -388,106 +390,106 @@ public sealed class Foo
             set { this.stream = value; }
         }
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoreFieldThatIsNotDisposable()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoreFieldThatIsNotDisposable()
+            {
+                var testCode = @"
     public class Foo
     {
         private readonly object bar = new object();
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
+            {
+                var testCode = @"
     public class Foo
     {
         private readonly object bar = Meh();
 
         private static object Meh() => new object();
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
+            {
+                var testCode = @"
     public class Foo
     {
         private readonly object bar = string.Copy(string.Empty);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoredStaticField()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoredStaticField()
+            {
+                var testCode = @"
     using System.IO;
 
     public sealed class Foo
     {
         private static Stream stream = File.OpenRead(string.Empty);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoreTask()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoreTask()
+            {
+                var testCode = @"
     using System.Threading.Tasks;
 
     public sealed class Foo
     {
         private readonly Task stream = Task.Delay(0);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task IgnoreTaskOfInt()
-        {
-            var testCode = @"
+            [Test]
+            public async Task IgnoreTaskOfInt()
+            {
+                var testCode = @"
     using System.Threading.Tasks;
 
     public sealed class Foo
     {
         private readonly Task<int> stream = Task.FromResult(0);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task FieldOfTypeArrayOfInt()
-        {
-            var testCode = @"
+            [Test]
+            public async Task FieldOfTypeArrayOfInt()
+            {
+                var testCode = @"
     public sealed class Foo
     {
         private readonly int[] ints = new[] { 1, 2, 3 };
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task PropertyWithBackingFieldOfTypeArrayOfInt()
-        {
-            var testCode = @"
+            [Test]
+            public async Task PropertyWithBackingFieldOfTypeArrayOfInt()
+            {
+                var testCode = @"
     public sealed class Foo
     {
         private int[] ints;
@@ -507,8 +509,9 @@ public sealed class Foo
 
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
     }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
         }
     }
 }

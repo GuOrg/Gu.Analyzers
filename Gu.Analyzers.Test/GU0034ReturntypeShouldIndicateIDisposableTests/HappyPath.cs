@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0034ReturntypeShouldIndicateIDisposable>
+    internal partial class HappyPath : HappyPathVerifier<GU0034ReturntypeShouldIndicateIDisposable>
     {
         [Test]
         public async Task RealisticExtensionMethodClass()
