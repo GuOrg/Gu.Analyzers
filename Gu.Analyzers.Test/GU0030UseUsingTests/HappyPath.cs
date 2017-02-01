@@ -319,7 +319,6 @@ using System;
 public class Foo
 {
     public IDisposable RecursiveProperty => RecursiveProperty;
-    public IDisposable RecursiveMethod() => RecursiveMethod();
 
     public void Meh()
     {
@@ -346,7 +345,6 @@ using System;
 
 public class Foo
 {
-    public IDisposable RecursiveProperty => RecursiveProperty;
     public IDisposable RecursiveMethod() => RecursiveMethod();
 
     public void Meh()
