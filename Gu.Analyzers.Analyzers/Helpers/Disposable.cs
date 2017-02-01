@@ -1,6 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -196,7 +195,7 @@ namespace Gu.Analyzers
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreatedAndInjected(pooled.Item.AssignedValues, semanticModel, cancellationToken);
+                return IsAssignedWithCreatedAndInjected(pooled.Item, semanticModel, cancellationToken);
             }
         }
 
@@ -204,7 +203,7 @@ namespace Gu.Analyzers
         {
             using (var pooled = MemberAssignmentWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreatedAndInjected(pooled.Item.AssignedValues, semanticModel, cancellationToken);
+                return IsAssignedWithCreatedAndInjected(pooled.Item, semanticModel, cancellationToken);
             }
         }
 
@@ -342,12 +341,11 @@ namespace Gu.Analyzers
             return false;
         }
 
-        [Obsolete("Check if potentially assigned from outside")]
-        private static bool IsAssignedWithCreatedAndInjected(IReadOnlyList<ExpressionSyntax> assignedValues, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedWithCreatedAndInjected(MemberAssignmentWalker assignments, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var anyCreated = false;
-            var anyInjected = false;
-            using (var pooledClassifications = Classification.Create(assignedValues, semanticModel, cancellationToken))
+            bool anyInjected = assignments.IsPotentiallyAssignedFromOutside;
+            using (var pooledClassifications = Classification.Create(assignments.AssignedValues, semanticModel, cancellationToken))
             {
                 foreach (var classification in pooledClassifications.Item)
                 {
