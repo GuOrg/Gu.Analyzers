@@ -83,7 +83,7 @@
 
             if (assignment.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
             {
-                if (!IsMemberInitialized(left, context.CancellationToken) &&
+                if (!IsMemberInitialized(left, context.SemanticModel, context.CancellationToken) &&
                     !IsVariableAssignedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     return;
@@ -201,7 +201,7 @@
             return false;
         }
 
-        private static bool IsMemberInitialized(ISymbol symbol, CancellationToken cancellationToken)
+        private static bool IsMemberInitialized(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var field = symbol as IFieldSymbol;
             if (field != null)
@@ -220,9 +220,38 @@
             {
                 foreach (var declaration in property.Declarations(cancellationToken))
                 {
-                    if ((declaration as VariableDeclaratorSyntax)?.Initializer == null)
+                    var propertyDeclaration = declaration as PropertyDeclarationSyntax;
+                    if (propertyDeclaration == null)
                     {
-                        return false;
+                        continue;
+                    }
+
+                    if (propertyDeclaration.IsAutoProperty())
+                    {
+                        if (propertyDeclaration.Initializer == null)
+                        {
+                            return false;
+                        }
+
+                        continue;
+                    }
+
+                    AccessorDeclarationSyntax setter;
+                    if(propertyDeclaration.TryGetSetAccessorDeclaration(out setter))
+                    {
+                        using (var pooled = AssignmentWalker.Create(setter))
+                        {
+                            foreach (var assignment in pooled.Item.Assignments)
+                            {
+                                var assignedSymbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                                if (IsMemberInitialized(assignedSymbol, semanticModel, cancellationToken))
+                                {
+                                    return true;
+                                }
+                            }
+
+                            return false;
+                        }
                     }
                 }
             }

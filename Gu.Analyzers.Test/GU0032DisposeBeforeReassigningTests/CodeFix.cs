@@ -214,7 +214,7 @@ using System.IO;
 
 public class Foo
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
+    private Stream stream = File.OpenRead(string.Empty);
 
     public Foo()
     {
@@ -238,11 +238,11 @@ using System.IO;
 
 public class Foo
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
+    private Stream stream = File.OpenRead(string.Empty);
 
     public Foo()
     {
-        this.stream?.Dispose();
+        this.Stream?.Dispose();
         this.Stream = File.OpenRead(string.Empty);
     }
 
