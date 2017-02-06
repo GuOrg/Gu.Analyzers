@@ -83,7 +83,7 @@
 
             if (assignment.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
             {
-                if (!IsMemberInitialized(left, assignment, context.SemanticModel, context.CancellationToken) &&
+                if (!IsMemberInitialized(left, context.CancellationToken) &&
                     !IsVariableAssignedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     return;
@@ -201,7 +201,7 @@
             return false;
         }
 
-        private static bool IsMemberInitialized(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsMemberInitialized(ISymbol symbol, CancellationToken cancellationToken)
         {
             var field = symbol as IFieldSymbol;
             if (field != null)
