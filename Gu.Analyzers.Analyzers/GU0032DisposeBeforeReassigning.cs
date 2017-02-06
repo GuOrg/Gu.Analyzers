@@ -54,7 +54,8 @@
             }
 
             var left = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
-            if (left == KnownSymbol.SerialDisposable.Disposable)
+            if (left == KnownSymbol.SerialDisposable.Disposable ||
+                left == KnownSymbol.SingleAssignmentDisposable.Disposable)
             {
                 return;
             }
@@ -237,7 +238,7 @@
                     }
 
                     AccessorDeclarationSyntax setter;
-                    if(propertyDeclaration.TryGetSetAccessorDeclaration(out setter))
+                    if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter))
                     {
                         using (var pooled = AssignmentWalker.Create(setter))
                         {

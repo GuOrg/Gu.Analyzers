@@ -66,6 +66,7 @@
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
     <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
+    <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\VauleWithSource.cs" />
