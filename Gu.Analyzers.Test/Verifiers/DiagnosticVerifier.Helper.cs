@@ -18,20 +18,6 @@ namespace Gu.Analyzers.Test
     /// </summary>
     public abstract partial class DiagnosticVerifier
     {
-        public DiagnosticResult CSharpDiagnostic(string diagnosticId = null)
-        {
-            var analyzers = this.GetCSharpDiagnosticAnalyzers();
-            var supportedDiagnostics = analyzers.SelectMany(analyzer => analyzer.SupportedDiagnostics);
-            if (diagnosticId == null)
-            {
-                return this.CSharpDiagnostic(supportedDiagnostics.Single());
-            }
-            else
-            {
-                return this.CSharpDiagnostic(supportedDiagnostics.Single(i => i.Id == diagnosticId));
-            }
-        }
-
         /// <summary>
         /// Given an analyzer and a collection of documents to apply it to, run the analyzer and gather an array of
         /// diagnostics found. The returned diagnostics are then ordered by location in the source documents.
@@ -82,6 +68,20 @@ namespace Gu.Analyzers.Test
 
             var results = SortDistinctDiagnostics(diagnostics);
             return results.ToImmutableArray();
+        }
+
+        public DiagnosticResult CSharpDiagnostic(string diagnosticId = null)
+        {
+            var analyzers = this.GetCSharpDiagnosticAnalyzers();
+            var supportedDiagnostics = analyzers.SelectMany(analyzer => analyzer.SupportedDiagnostics);
+            if (diagnosticId == null)
+            {
+                return this.CSharpDiagnostic(supportedDiagnostics.Single());
+            }
+            else
+            {
+                return this.CSharpDiagnostic(supportedDiagnostics.Single(i => i.Id == diagnosticId));
+            }
         }
 
         /// <summary>

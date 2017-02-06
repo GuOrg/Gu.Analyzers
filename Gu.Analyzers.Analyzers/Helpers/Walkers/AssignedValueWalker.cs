@@ -261,7 +261,7 @@
                         {
                             foreach (var declaration in assignedSymbol.ContainingSymbol.Declarations(cancellationToken))
                             {
-                                pooledNodes.Item.Add(declaration);
+                                pooledNodes.Item.Add(declaration).IgnoreReturnValue();
                                 pooled.Item.Visit(declaration);
                             }
                         }

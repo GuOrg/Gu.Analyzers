@@ -158,9 +158,9 @@
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             }
 
-            if (IsReadOnly(member) && IsNeverNull(member, semanticModel, cancellationToken))
+            if (IsReadOnly(member) &&
+                IsNeverNull(member, semanticModel, cancellationToken))
             {
-
                 return SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
