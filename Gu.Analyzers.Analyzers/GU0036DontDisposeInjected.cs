@@ -94,19 +94,10 @@
                 return;
             }
 
-            ExpressionSyntax invokee;
-            if (invocation.TryFindInvokee(out invokee))
+            var statement = invocation.FirstAncestor<ExpressionStatementSyntax>();
+            if (Disposable.IsPotentiallyCachedOrInjected(statement, context.SemanticModel, context.CancellationToken))
             {
-                if (invokee is ThisExpressionSyntax ||
-                    invokee is BaseExpressionSyntax)
-                {
-                    return;
-                }
-
-                if (Disposable.IsPotentiallyCachedOrInjected(invokee, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
             }
         }
     }

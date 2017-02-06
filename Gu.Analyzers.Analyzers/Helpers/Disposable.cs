@@ -175,6 +175,23 @@ namespace Gu.Analyzers
             }
         }
 
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        internal static bool IsPotentiallyCachedOrInjected(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (disposeCall == null ||
+                disposeCall.IsMissing)
+            {
+                return false;
+            }
+
+            using (var sources = VauleWithSource.GetRecursiveSources(disposeCall.Expression, semanticModel, cancellationToken))
+            {
+                return IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+            }
+        }
+
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
         {
             if (type == null)

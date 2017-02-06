@@ -374,6 +374,41 @@ public class Foo
         }
 
         [Test]
+        public void AssigningWithFieldElvis()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace Gu.Reactive
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly SingleAssignmentDisposable disposable;
+
+        protected Foo(SingleAssignmentDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            var meh = disposable?.Disposable.Dispose();
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual(@"disposable?.Disposable.Dispose() External, disposable Member, disposable Injected", actual);
+            }
+        }
+
+        [Test]
         public void PropertyGetSet()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
