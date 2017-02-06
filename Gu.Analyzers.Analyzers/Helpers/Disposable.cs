@@ -199,6 +199,20 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignableTo(ITypeSymbol type)
         {
+            var typeParameter = type as ITypeParameterSymbol;
+            if (typeParameter != null)
+            {
+                foreach (var constraintType in typeParameter.ConstraintTypes)
+                {
+                    if (IsAssignableTo(constraintType))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             if (type == null)
             {
                 return false;
