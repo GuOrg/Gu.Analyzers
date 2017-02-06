@@ -24,6 +24,49 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         }
 
         [Test]
+        public async Task FieldSwapCached()
+        {
+            var testCode = @"
+using System.Collections.Generic;
+using System.IO;
+
+public class Foo
+{
+    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+    private Stream current;
+
+    public void SetCurrent(int number)
+    {
+        this.current = this.Cache[number];
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task LocalSwapCached()
+        {
+            var testCode = @"
+using System.Collections.Generic;
+using System.IO;
+
+public class Foo
+{
+    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+    public void SetCurrent(int number)
+    {
+        var current = this.Cache[number];
+        current = this.Cache[number + 1];
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingVariable()
         {
             var testCode = @"

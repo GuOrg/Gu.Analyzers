@@ -58,9 +58,9 @@
                 return;
             }
 
-            if (Disposable.IsAssignableTo(symbol.Type) && declarator.Initializer != null)
+            if (Disposable.IsPotentiallyAssignableTo(symbol.Type) && declarator.Initializer != null)
             {
-                if (Disposable.IsPotentialCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsPotentiallyCreatedAndNotCachedInMember(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
                 {
                     if (variableDeclaration.Parent is UsingStatementSyntax ||
                         variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -162,8 +162,9 @@
             AssignmentExpressionSyntax assignment = null;
             if (block?.TryGetAssignment(symbol, semanticModel, cancellationToken, out assignment) == true)
             {
-                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-                return left is IFieldSymbol || left is IPropertySymbol;
+                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
+                           semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
+                return left is IFieldSymbol || left is IPropertySymbol || left is ILocalSymbol || left is IParameterSymbol;
             }
 
             return false;

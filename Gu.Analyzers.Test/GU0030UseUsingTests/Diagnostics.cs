@@ -6,6 +6,29 @@
     internal class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
     {
         [Test]
+        public async Task PasswordBoxSecurePassword()
+        {
+            var testCode = @"
+    using System.Windows.Controls;
+
+    public class Foo
+    {
+        public PasswordBox PasswordBox { get; }
+
+        public long Bar()
+        {
+            ↓var pwd = PasswordBox.SecurePassword;
+            return pwd.Length;
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task FileOpenRead()
         {
             var testCode = @"

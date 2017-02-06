@@ -230,6 +230,11 @@
                     return false;
                 }
 
+                if (!(declaration is PropertyDeclarationSyntax || declaration is IndexerDeclarationSyntax))
+                {
+                    return false;
+                }
+
                 AccessorDeclarationSyntax _;
                 if (TryGetSetter(declaration, out _))
                 {

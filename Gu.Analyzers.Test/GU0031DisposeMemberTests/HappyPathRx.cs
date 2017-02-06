@@ -6,10 +6,12 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     internal partial class HappyPath
     {
-        [Test]
-        public async Task SerialDisposable()
+        internal class Rx : NestedHappyPathVerifier<HappyPath>
         {
-            var testCode = @"
+            [Test]
+            public async Task SerialDisposable()
+            {
+                var testCode = @"
 using System;
 using System.IO;
 using System.Reactive.Disposables;
@@ -29,7 +31,9 @@ public sealed class Foo : IDisposable
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
         }
     }
 }

@@ -3,6 +3,7 @@
 
 namespace Gu.Analyzers.Test
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
 
@@ -14,12 +15,32 @@ namespace Gu.Analyzers.Test
     /// </summary>
     internal static class MetadataReferences
     {
-        internal static readonly MetadataReference CorlibReference = MetadataReference.CreateFromFile(typeof(object).Assembly.Location).WithAliases(ImmutableArray.Create("global", "corlib"));
-        internal static readonly MetadataReference SystemReference = MetadataReference.CreateFromFile(typeof(System.Diagnostics.Debug).Assembly.Location).WithAliases(ImmutableArray.Create("global", "system"));
-        internal static readonly MetadataReference SystemCoreReference = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
-        internal static readonly MetadataReference SystemReactiveReference = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.SerialDisposable).Assembly.Location);
-        internal static readonly MetadataReference SystemReactiveInterfacesReference = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.ICancelable).Assembly.Location);
-        internal static readonly MetadataReference CSharpSymbolsReference = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
-        internal static readonly MetadataReference CodeAnalysisReference = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+        internal static readonly MetadataReference MsCorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location).WithAliases(ImmutableArray.Create("global", "corlib"));
+        internal static readonly MetadataReference System = MetadataReference.CreateFromFile(typeof(System.Diagnostics.Debug).Assembly.Location).WithAliases(ImmutableArray.Create("global", "system"));
+        internal static readonly MetadataReference SystemCore = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
+        internal static readonly MetadataReference SystemReactive = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.SerialDisposable).Assembly.Location);
+        internal static readonly MetadataReference SystemReactiveInterfaces = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.ICancelable).Assembly.Location);
+        internal static readonly MetadataReference PresentationCore = MetadataReference.CreateFromFile(typeof(System.Windows.Media.Brush).Assembly.Location);
+        internal static readonly MetadataReference PresentationFramework = MetadataReference.CreateFromFile(typeof(System.Windows.Controls.Control).Assembly.Location);
+        internal static readonly MetadataReference WindowsBase = MetadataReference.CreateFromFile(typeof(System.Windows.Media.Matrix).Assembly.Location);
+        internal static readonly MetadataReference SystemXaml = MetadataReference.CreateFromFile(typeof(System.Xaml.XamlLanguage).Assembly.Location);
+        internal static readonly MetadataReference CSharpSymbols = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
+        internal static readonly MetadataReference CodeAnalysis = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+
+        internal static IReadOnlyList<MetadataReference> All =>
+                new[]
+                    {
+                        MsCorlib,
+                        System,
+                        SystemCore,
+                        SystemReactive,
+                        SystemReactiveInterfaces,
+                        PresentationCore,
+                        PresentationFramework,
+                        WindowsBase,
+                        SystemXaml,
+                        CSharpSymbols,
+                        CodeAnalysis
+                    };
     }
 }

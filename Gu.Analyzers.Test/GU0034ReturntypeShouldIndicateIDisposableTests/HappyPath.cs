@@ -326,6 +326,26 @@ public sealed class Foo
         }
 
         [Test]
+        public async Task ReturnDisposableStaticFieldAsObject()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo
+{
+    private readonly static Stream Stream = File.OpenRead(string.Empty);
+
+    public object Meh()
+    {
+        return Stream;
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IfTry()
         {
             var testCode = @"

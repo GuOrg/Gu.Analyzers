@@ -13,10 +13,10 @@ namespace Gu.Analyzers.Test
     {
         // ReSharper disable once UnusedMember.Local
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(Gu.Analyzers.KnownSymbol).Assembly.GetTypes()
-                                            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                            .ToArray();
+            typeof(KnownSymbol).Assembly.GetTypes()
+                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                               .ToArray();
 
         private readonly List<DiagnosticAnalyzer> analyzers = new List<DiagnosticAnalyzer>();
 

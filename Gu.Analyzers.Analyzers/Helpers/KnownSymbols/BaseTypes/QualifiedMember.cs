@@ -30,17 +30,20 @@ namespace Gu.Analyzers
                 return false;
             }
 
+            if (left.MetadataName != right.Name)
+            {
+                return false;
+            }
+
             if (left.Name == right.Name &&
                 left.ContainingType == right.ContainingType)
             {
                 return true;
             }
 
-            var interfaceMember = left.ContainingType.FindImplementationForInterfaceMember(left);
-            if (interfaceMember != null)
+            foreach (var @interface in left.ContainingType.AllInterfaces)
             {
-                if (interfaceMember.Name == right.Name &&
-                    interfaceMember.ContainingType == right.ContainingType)
+                if (@interface == right.ContainingType)
                 {
                     return true;
                 }

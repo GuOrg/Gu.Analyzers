@@ -48,7 +48,7 @@
             }
 
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (!Disposable.IsPotentialCreation(assignment.Right, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyCreated(assignment.Right, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -103,7 +103,7 @@
                     continue;
                 }
 
-                if (!Disposable.IsPotentialCreation(argument.Expression, context.SemanticModel, context.CancellationToken))
+                if (!Disposable.IsPotentiallyCreated(argument.Expression, context.SemanticModel, context.CancellationToken))
                 {
                     return;
                 }
@@ -154,7 +154,7 @@
                     return false;
                 }
 
-                if (Disposable.IsPotentialCreation(declarator.Initializer?.Value, semanticModel, cancellationToken))
+                if (Disposable.IsPotentiallyCreated(declarator.Initializer?.Value, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -166,50 +166,18 @@
                 return false;
             }
 
-            using (var pooled = AssignmentWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            using (var pooled = AssignedValueWalker.AssignedValuesInType(symbol, semanticModel, cancellationToken))
             {
-                foreach (var otherAssignment in pooled.Item.Assignments)
+                foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    if (!IsBefore(otherAssignment, statement))
+                    if (!assignedValue.IsBeforeInScope(statement))
                     {
                         continue;
                     }
 
-                    if (symbol.Equals(semanticModel.GetSymbolSafe(otherAssignment.Left, cancellationToken)))
+                    if (Disposable.IsPotentiallyCreated(assignedValue, semanticModel, cancellationToken))
                     {
-                        if (Disposable.IsPotentialCreation(otherAssignment.Right, semanticModel, cancellationToken))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
-            {
-                foreach (var invocation in pooled.Item.Invocations)
-                {
-                    if (!IsBefore(invocation, statement) ||
-                        invocation.ArgumentList == null ||
-                        invocation.ArgumentList.Arguments.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    foreach (var argument in invocation.ArgumentList.Arguments)
-                    {
-                        if (!argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
-                        {
-                            continue;
-                        }
-
-                        if (symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
-                        {
-                            if (Disposable.IsPotentialCreation(argument.Expression, semanticModel, cancellationToken))
-                            {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
                 }
             }
@@ -223,7 +191,7 @@
             {
                 foreach (var invocation in pooled.Item.Invocations)
                 {
-                    if (!IsBefore(invocation, assignment))
+                    if (!invocation.IsBeforeInScope(assignment))
                     {
                         continue;
                     }
@@ -250,41 +218,6 @@
                         }
                     }
                 }
-            }
-
-            return false;
-        }
-
-        private static bool IsBefore(SyntaxNode node, SyntaxNode other)
-        {
-            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
-            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
-            if (statement == null ||
-                otherStatement == null)
-            {
-                return false;
-            }
-
-            if (statement.SpanStart >= otherStatement.SpanStart)
-            {
-                return false;
-            }
-
-            var block = node.FirstAncestor<BlockSyntax>();
-            var otherblock = other.FirstAncestor<BlockSyntax>();
-            if (block == null || otherblock == null)
-            {
-                return false;
-            }
-
-            while (otherblock != null)
-            {
-                if (ReferenceEquals(block, otherblock))
-                {
-                    return true;
-                }
-
-                otherblock = otherblock.FirstAncestor<BlockSyntax>();
             }
 
             return false;

@@ -51,7 +51,7 @@
             }
 
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (!Disposable.IsPotentialCreation(objectCreation, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyCreated(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -82,7 +82,7 @@
                 return;
             }
 
-            if (!Disposable.IsPotentialCreation(invocation, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyCreated(invocation, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -155,7 +155,7 @@
             var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
             if (initializer != null)
             {
-                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken) as IMethodSymbol;
+                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken);
                 return ctor != null;
             }
 
@@ -223,7 +223,7 @@
                         var argSymbol = semanticModel.GetSymbolSafe(arg.Expression, cancellationToken);
                         if (parameterSymbol.Equals(argSymbol))
                         {
-                            var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken) as IMethodSymbol;
+                            var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
                             return TryGetAssignedFieldOrProperty(arg, chained, semanticModel, cancellationToken, out member);
                         }
                     }

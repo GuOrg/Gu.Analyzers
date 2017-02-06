@@ -7,6 +7,134 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
     internal partial class HappyPath : HappyPathVerifier<GU0036DontDisposeInjected>
     {
         [Test]
+        public async Task DisposingWithBaseClass()
+        {
+            var fooBaseCode = @"
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed = false;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+        }
+    }";
+
+            var fooImplCode = @"
+    using System;
+    using System.IO;
+
+    public class FooImpl : FooBase
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+            await this.VerifyHappyPathAsync(fooBaseCode, fooImplCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingInjectedPropertyInBaseClass()
+        {
+            var fooBaseCode = @"
+    using System;
+
+    public class FooBase : IDisposable
+    {
+        private bool disposed = false;
+
+        public FooBase()
+            : this(null)
+        {
+        }
+
+        public FooBase(object bar)
+        {
+            this.Bar = bar;
+        }
+
+        public object Bar { get; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }";
+
+            var fooImplCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo : FooBase
+    {
+        public Foo(int no)
+            : this(no.ToString())
+        {
+        }
+
+        public Foo(string fileName)
+            : base(File.OpenRead(fileName))
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                (this.Bar as IDisposable)?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+            await this.VerifyHappyPathAsync(fooBaseCode, fooImplCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
@@ -237,6 +365,102 @@ public sealed class Foo : IDisposable
         {
         }
     }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task InjectedInMethod()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool isDirty;
+
+        public Foo()
+        {
+        }
+
+        public void Bar(IDisposable meh)
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreLambdaCreation()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Action<IDisposable> action = x => x.Dispose();
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("action(stream)")]
+        [TestCase("action.Invoke(stream)")]
+        public async Task IgnoreLambdaUsageOnLocal(string invokeCode)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Action<IDisposable> action = x => x.Dispose();
+            var stream = File.OpenRead(string.Empty);
+            action(stream);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("action(stream)", invokeCode);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task IgnoreInLambdaMethod()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Meh(x => x.Dispose());
+        }
+
+        public static void Meh(Action<IDisposable> action)
+        {
+            action(null);
+        }
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }

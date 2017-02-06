@@ -6,7 +6,7 @@
 
     internal partial class HappyPath
     {
-        public class Rx : NestedHappyPathVerifier<GU0036DontDisposeInjectedTests.HappyPath>
+        public class Rx : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
             public async Task SingleAssignmentDisposable()

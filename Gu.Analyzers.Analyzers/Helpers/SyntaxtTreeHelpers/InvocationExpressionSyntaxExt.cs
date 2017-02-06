@@ -6,12 +6,6 @@
 
     internal static class InvocationExpressionSyntaxExt
     {
-        internal static bool TryGetArgumentAtIndex(this InvocationExpressionSyntax invocation, int index, out ArgumentSyntax result)
-        {
-            result = null;
-            return invocation?.ArgumentList?.Arguments.TryGetAtIndex(index, out result) == true;
-        }
-
         internal static bool TryFindInvokee(this InvocationExpressionSyntax invocation, out ExpressionSyntax invokee)
         {
             return TryFindInvokee(invocation.Expression, out invokee);
@@ -63,6 +57,7 @@
                 }
 
                 if (memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                    !(memberAccess.Expression is MemberBindingExpressionSyntax) &&
                     !(memberAccess.Expression is ThisExpressionSyntax))
                 {
                     invokee = memberAccess.Expression;

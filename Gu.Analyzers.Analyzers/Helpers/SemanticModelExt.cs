@@ -7,9 +7,11 @@
 
     internal static class SemanticModelExt
     {
-        internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, MethodDeclarationSyntax node, CancellationToken cancellationToken)
+        internal static SymbolInfo GetSymbolInfoSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
-            return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
+            return semanticModel.SemanticModelFor(node)
+                                ?.GetSymbolInfo(node, cancellationToken) ??
+                                default(SymbolInfo);
         }
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
@@ -17,6 +19,16 @@
             return semanticModel.SemanticModelFor(node)
                                 ?.GetSymbolInfo(node, cancellationToken)
                                  .Symbol;
+        }
+
+        internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, MethodDeclarationSyntax node, CancellationToken cancellationToken)
+        {
+            return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
+        }
+
+        internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, ConstructorInitializerSyntax node, CancellationToken cancellationToken)
+        {
+            return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
         }
 
         internal static IFieldSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, FieldDeclarationSyntax node, CancellationToken cancellationToken)

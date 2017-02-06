@@ -24,7 +24,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType StreamReader = new QualifiedType("System.IO.StreamReader");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IListType IList = new IListType();
-        internal static readonly QualifiedType Enumerable = Create("System.Linq.Enumerable");
+        internal static readonly EnumerableType Enumerable = new EnumerableType();
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();

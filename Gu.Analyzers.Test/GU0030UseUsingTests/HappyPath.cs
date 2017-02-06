@@ -62,86 +62,6 @@ public class Foo
         }
 
         [Test]
-        public async Task DontUseUsingWhenAssigningAField()
-        {
-            var testCode = @"
-    using System.IO;
-
-    public static class Foo
-    {
-        private static readonly Stream Stream = File.OpenRead(string.Empty);
-
-        public static long Bar()
-        {
-            var stream = Stream;
-            return stream.Length;
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task DontUseUsingWhenAssigningAFieldInAMethod()
-        {
-            var testCode = @"
-    using System.IO;
-
-    public class Foo
-    {
-        private Stream stream;
-
-        public void Bar()
-        {
-            this.stream = File.OpenRead(string.Empty);
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
-        {
-            var testCode = @"
-    using System.IO;
-
-    public class Foo
-    {
-        private Stream stream;
-
-        public void Bar()
-        {
-            var newStream = File.OpenRead(string.Empty);
-            this.stream = newStream;
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task DontUseUsingWhenAddingLocalVariableToFieldList()
-        {
-            var testCode = @"
-    using System.Collections.Generic;
-    using System.IO;
-
-    public class Foo
-    {
-        private readonly List<Stream> streams = new List<Stream>();
-
-        public void Bar()
-        {
-            var stream = File.OpenRead(string.Empty);
-            this.streams.Add(stream);
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
         public async Task UsingNewDisposable()
         {
             var disposableCode = @"
@@ -191,23 +111,6 @@ public class Foo
     }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task AssignAssemblyLoadToLocal()
-        {
-            var testCode = @"
-using System.Reflection;
-
-public class Foo
-{
-public void Bar()
-{
-    var assembly = Assembly.Load(string.Empty);
-}
-}";
-            await this.VerifyHappyPathAsync(testCode)
-                        .ConfigureAwait(false);
         }
 
         [Test]
@@ -284,29 +187,25 @@ public class Disposal : IDisposable
                       .ConfigureAwait(false);
         }
 
-        [Test]
-        [Explicit("")]
-        public async Task BuildCollectionThenAssignField()
+        [TestCase("disposables.First();")]
+        [TestCase("disposables.First(x => x != null);")]
+        [TestCase("disposables.Where(x => x != null);")]
+        [TestCase("disposables.Single();")]
+        public async Task IgnoreLinq(string linq)
         {
             var testCode = @"
-public class Foo
+using System;
+using System.Linq;
+
+public sealed class Foo
 {
-    private Disposable[] disposables;
-
-    public Foo()
+    public Foo(IDisposable[] disposables)
     {
-        var items = new Disposable[2];
-        for (var i = 0; i < 2; i++)
-        {
-            var item = new Disposable();
-            items[i] = item;
-        }
-
-        this.disposables = items;
+        var first = disposables.First();
     }
 }";
-
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+            testCode = testCode.AssertReplace("disposables.First();", linq);
+            await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
     }

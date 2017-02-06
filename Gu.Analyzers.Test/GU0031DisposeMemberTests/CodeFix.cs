@@ -242,9 +242,9 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly Stream stream;
 
-    public Foo(Stream stream)
+    public Foo()
     {
-        this.stream = stream ?? File.OpenRead(string.Empty);
+        this.stream = null ?? File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -264,9 +264,9 @@ public sealed class Foo : IDisposable
 {
     private readonly Stream stream;
 
-    public Foo(Stream stream)
+    public Foo()
     {
-        this.stream = stream ?? File.OpenRead(string.Empty);
+        this.stream = null ?? File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -288,9 +288,9 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly Stream stream;
 
-    public Foo(Stream stream)
+    public Foo(bool value)
     {
-        this.stream = stream != null ? stream : File.OpenRead(string.Empty);
+        this.stream = value ? null : File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -310,9 +310,9 @@ public sealed class Foo : IDisposable
 {
     private readonly Stream stream;
 
-    public Foo(Stream stream)
+    public Foo(bool value)
     {
-        this.stream = stream != null ? stream : File.OpenRead(string.Empty);
+        this.stream = value ? null : File.OpenRead(string.Empty);
     }
 
     public void Dispose()
@@ -667,7 +667,7 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task NotDisposingGetSetPropertyWithBackingFieldWhenInitializedInCtor()
+        public async Task NotDisposingGetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
         {
             var testCode = @"
 using System;
@@ -685,7 +685,7 @@ public sealed class Foo : IDisposable
     public Stream Stream
     {
         get { return _stream; }
-        set { _stream = value; }
+        private set { _stream = value; }
     }
 
     public void Dispose()
@@ -714,7 +714,7 @@ public sealed class Foo : IDisposable
     public Stream Stream
     {
         get { return _stream; }
-        set { _stream = value; }
+        private set { _stream = value; }
     }
 
     public void Dispose()

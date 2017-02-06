@@ -3,6 +3,7 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class SyntaxNodeExt
     {
@@ -28,6 +29,41 @@
             return ReferenceEquals(ancestor, node)
                        ? node.Parent?.FirstAncestorOrSelf<T>()
                        : ancestor;
+        }
+
+        internal static bool IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
+        {
+            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
+            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
+            if (statement == null ||
+                otherStatement == null)
+            {
+                return false;
+            }
+
+            if (statement.SpanStart >= otherStatement.SpanStart)
+            {
+                return false;
+            }
+
+            var block = node.FirstAncestor<BlockSyntax>();
+            var otherblock = other.FirstAncestor<BlockSyntax>();
+            if (block == null || otherblock == null)
+            {
+                return false;
+            }
+
+            while (otherblock != null)
+            {
+                if (ReferenceEquals(block, otherblock))
+                {
+                    return true;
+                }
+
+                otherblock = otherblock.FirstAncestor<BlockSyntax>();
+            }
+
+            return false;
         }
     }
 }

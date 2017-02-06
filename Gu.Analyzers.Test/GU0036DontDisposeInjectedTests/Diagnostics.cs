@@ -200,6 +200,37 @@ public sealed class Bar : IDisposable
         }
 
         [Test]
+        public async Task DisposingParameter()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool isDirty;
+
+        public Foo()
+        {
+        }
+
+        public void Bar(IDisposable meh)
+        {
+            ↓meh.Dispose();
+        }
+
+        public void Dispose()
+        {
+        }
+    }";
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task InjectedViaMethod()
         {
             var testCode = @"
@@ -326,8 +357,17 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
-        [Test]
-        public async Task InjectedSingleAssignmentDisposable()
+        [TestCase("this.disposable.Dispose();")]
+        [TestCase("this.disposable?.Dispose();")]
+        [TestCase("disposable.Dispose();")]
+        [TestCase("disposable?.Dispose();")]
+        [TestCase("this.disposable.Disposable.Dispose();")]
+        [TestCase("this.disposable?.Disposable.Dispose();")]
+        [TestCase("this.disposable?.Disposable?.Dispose();")]
+        [TestCase("disposable.Disposable.Dispose();")]
+        [TestCase("disposable?.Disposable.Dispose();")]
+        [TestCase("disposable?.Disposable?.Dispose();")]
+        public async Task InjectedSingleAssignmentDisposable(string dispose)
         {
             var testCode = @"
 namespace Gu.Reactive
@@ -351,6 +391,33 @@ namespace Gu.Reactive
         }
      }
 }";
+            testCode = testCode.AssertReplace("this.disposable.Dispose();", dispose);
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("action(disposable)")]
+        [TestCase("action.Invoke(disposable)")]
+        public async Task IgnoreLambdaUsageOnInjected(string disposeCode)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            Action<IDisposable> action = x => x.Dispose();
+            ↓action(disposable);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("action(disposable)", disposeCode);
             var expected = this.CSharpDiagnostic()
                    .WithLocationIndicated(ref testCode)
                    .WithMessage("Don't dispose injected.");

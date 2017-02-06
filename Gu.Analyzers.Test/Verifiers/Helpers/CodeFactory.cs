@@ -95,13 +95,17 @@
                 .CurrentSolution
                 .AddProject(projectId, TestProjectName, TestProjectName, language)
                 .WithProjectCompilationOptions(projectId, compilationOptions)
-                .AddMetadataReference(projectId, MetadataReferences.CorlibReference)
-                .AddMetadataReference(projectId, MetadataReferences.SystemReference)
-                .AddMetadataReference(projectId, MetadataReferences.SystemCoreReference)
-                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveReference)
-                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfacesReference);
-                ////.AddMetadataReference(projectId, MetadataReferences.CSharpSymbolsReference)
-                ////.AddMetadataReference(projectId, MetadataReferences.CodeAnalysisReference);
+                .AddMetadataReference(projectId, MetadataReferences.MsCorlib)
+                .AddMetadataReference(projectId, MetadataReferences.System)
+                .AddMetadataReference(projectId, MetadataReferences.SystemCore)
+                .AddMetadataReference(projectId, MetadataReferences.PresentationCore)
+                .AddMetadataReference(projectId, MetadataReferences.PresentationFramework)
+                .AddMetadataReference(projectId, MetadataReferences.WindowsBase)
+                .AddMetadataReference(projectId, MetadataReferences.SystemXaml)
+                .AddMetadataReference(projectId, MetadataReferences.SystemReactive)
+                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfaces)
+                .AddMetadataReference(projectId, MetadataReferences.CSharpSymbols)
+                .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis);
 
             solution.Workspace.Options =
                     solution.Workspace.Options

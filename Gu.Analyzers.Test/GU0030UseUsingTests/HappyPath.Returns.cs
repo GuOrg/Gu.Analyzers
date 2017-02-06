@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         public class Returns : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task WhenDisposableIsReturnedMethodSimple()
+            public async Task SimpleStatementBody()
             {
                 var testCode = @"
     using System.IO;
@@ -25,7 +25,21 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedMethodBody()
+            public async Task SimpleExpressionBody()
+            {
+                var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar() => File.OpenRead(string.Empty);
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task Local()
             {
                 var testCode = @"
     using System.IO;
@@ -43,7 +57,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
-            public async Task WhenStreamIsReturnedInStreamReaderMethodBody()
+            public async Task LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
     using System.IO;
@@ -61,7 +75,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
-            public async Task WhenStreamIsReturnedInCompositeDisposableMethodBody()
+            public async Task FileOpenReadIsReturnedInCompositeDisposableMethodBody()
             {
                 var testCode = @"
 using System.IO;
@@ -75,20 +89,6 @@ public static class Foo
         return new CompositeDisposable { stream };
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task WhenDisposableIsReturnedMethodExpressionBody()
-            {
-                var testCode = @"
-    using System.IO;
-
-    public static class Foo
-    {
-        public static Stream Bar() => File.OpenRead(string.Empty);
-    }";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }

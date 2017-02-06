@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
 
     internal partial class HappyPath
     {
-        public class Recursion : NestedHappyPathVerifier<GU0036DontDisposeInjectedTests.HappyPath>
+        public class Recursion : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
             public async Task IgnoresWhenDisposingRecursiveProperty()

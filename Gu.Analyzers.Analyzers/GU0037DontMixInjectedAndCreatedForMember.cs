@@ -53,7 +53,7 @@
 
             if (field.DeclaredAccessibility != Accessibility.Private &&
                 !field.IsReadOnly &&
-                Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken))
+                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 return;
@@ -95,7 +95,7 @@
 
             if (property.SetMethod != null &&
                 property.SetMethod.DeclaredAccessibility != Accessibility.Private &&
-                Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken))
+                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 return;

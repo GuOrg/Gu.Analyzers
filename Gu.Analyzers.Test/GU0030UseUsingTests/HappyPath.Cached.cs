@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
 
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0030UseUsing>
     {
         public class Cached : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task DontUseUsingWhenGettingFromConcurrentDictionaryGetOrAdd()
+            public async Task DontUseUsingWhenGettingFromStaticFieldConcurrentDictionaryGetOrAdd()
             {
                 var testCode = @"
 using System.Collections.Concurrent;
@@ -20,6 +20,27 @@ public static class Foo
     private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
     public static long Bar()
+    {
+        var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+        return stream.Length;
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task DontUseUsingWhenGettingFromFieldConcurrentDictionaryGetOrAdd()
+            {
+                var testCode = @"
+using System.Collections.Concurrent;
+using System.IO;
+
+public class Foo
+{
+    private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+    public long Bar()
     {
         var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
         return stream.Length;
@@ -75,67 +96,6 @@ public static class Foo
         }
 
         return 0;
-    }
-}";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task DontUseUsingWhenAssigningACallThatReturnsAField()
-            {
-                var testCode = @"
-using System.IO;
-
-public static class Foo
-{
-    private static readonly Stream Stream = File.OpenRead(string.Empty);
-
-    public static long Bar()
-    {
-        var stream = GetStream();
-        return stream.Length;
-    }
-
-    public static Stream GetStream()
-    {
-        return Stream;
-    }
-}";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
-            {
-                var testCode = @"
-using System;
-using System.IO;
-
-public static class Foo
-{
-    private static readonly Stream Stream = File.OpenRead(string.Empty);
-
-    public static long Bar()
-    {
-        var stream = GetStream(FileAccess.Read);
-        return stream.Length;
-    }
-
-    public static Stream GetStream(FileAccess fileAccess)
-    {
-        switch (fileAccess)
-        {
-            case FileAccess.Read:
-                return Stream;
-            case FileAccess.Write:
-                return Stream;
-            case FileAccess.ReadWrite:
-                return Stream;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(fileAccess), fileAccess, null);
-        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)

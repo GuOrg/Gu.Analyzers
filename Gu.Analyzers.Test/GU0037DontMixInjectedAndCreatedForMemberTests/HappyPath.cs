@@ -285,27 +285,27 @@ public sealed class Foo : IDisposable
         public async Task PropertyWithBackingFieldInjectedValue(string setter)
         {
             var testCode = @"
-    using System.IO;
+using System.IO;
 
-    public sealed class Foo
+public sealed class Foo
+{
+    private static readonly Stream StaticStream = File.OpenRead(string.Empty);
+    private Stream stream;
+
+    public Foo(Stream stream)
     {
-        private static readonly Stream StaticStream = File.OpenRead(string.Empty);
-        private Stream stream;
+        this.stream = stream;
+        this.stream = StaticStream;
+        this.Stream = stream;
+        this.Stream = StaticStream;
+    }
 
-        public Foo(Stream stream)
-        {
-            this.stream = stream;
-            this.stream = StaticStream;
-            this.Stream = stream;
-            this.Stream = StaticStream;
-        }
-
-        public Stream Stream
-        {
-            get { return this.stream; }
-            private set { this.stream = value; }
-        }
-    }";
+    public Stream Stream
+    {
+        get { return this.stream; }
+        private set { this.stream = value; }
+    }
+}";
             testCode = testCode.AssertReplace("private set", setter);
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }

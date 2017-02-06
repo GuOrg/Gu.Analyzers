@@ -26,6 +26,48 @@ public sealed class Foo
         }
 
         [Test]
+        public async Task ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
+        {
+            var testCode = @"
+using System.Windows.Controls;
+
+public sealed class Foo
+{
+    private static readonly PasswordBox PasswordBox = new PasswordBox();
+
+    public object Meh()
+    {
+        return ↓PasswordBox.SecurePassword;
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturnFieldPasswordBoxSecurePasswordAsObject()
+        {
+            var testCode = @"
+using System.Windows.Controls;
+
+public sealed class Foo
+{
+    private readonly PasswordBox PasswordBox = new PasswordBox();
+
+    public object Meh()
+    {
+        return ↓PasswordBox.SecurePassword;
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IndexerReturningObject()
         {
             var testCode = @"

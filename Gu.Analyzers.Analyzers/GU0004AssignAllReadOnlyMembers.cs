@@ -108,7 +108,7 @@
 
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
+                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
                 ConstructorDeclarationSyntax declaration;
                 if (ctor.TryGetSingleDeclaration(this.cancellationToken, out declaration))
                 {

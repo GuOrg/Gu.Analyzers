@@ -30,15 +30,6 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
             [Test]
             public async Task FactoryMethodCallingPrivateCtorWithCachedDisposable()
             {
-                var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
-}";
                 var testCode = @"
 using System;
 
@@ -54,7 +45,7 @@ public sealed class Foo
 
     public static Foo Create() => new Foo(Cached);
 }";
-                await this.VerifyHappyPathAsync(disposableCode, testCode)
+                await this.VerifyHappyPathAsync(DisposableCode, testCode)
                           .ConfigureAwait(false);
             }
         }

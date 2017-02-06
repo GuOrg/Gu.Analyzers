@@ -65,6 +65,9 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
     <Compile Include="Helpers\Break.cs" />
+    <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
+    <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
+    <Compile Include="Helpers\VauleWithSource.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\IListType.cs" />
@@ -74,8 +77,10 @@
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
     <Compile Include="Helpers\Pooled\ListPool.cs" />
+    <Compile Include="Helpers\ValueSource.cs" />
+    <Compile Include="Helpers\Walkers\CallsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
-    <Compile Include="Helpers\Walkers\MemberAssignmentWalker.cs" />
+    <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\Disposable.cs" />

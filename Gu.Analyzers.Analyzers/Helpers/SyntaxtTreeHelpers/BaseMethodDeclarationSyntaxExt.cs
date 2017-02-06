@@ -16,7 +16,7 @@
             if (argument.NameColon == null)
             {
                 var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
-                                      .Arguments.IndexOf(argument);
+                                    .Arguments.IndexOf(argument);
                 parameter = method.ParameterList.Parameters[index];
                 return true;
             }

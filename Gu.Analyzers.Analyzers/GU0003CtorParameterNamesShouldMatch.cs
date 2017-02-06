@@ -144,7 +144,7 @@
 
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
+                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
                 if (ctor != null)
                 {
                     for (var i = 0; i < node.ArgumentList.Arguments.Count; i++)

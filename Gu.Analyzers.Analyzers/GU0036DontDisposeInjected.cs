@@ -34,48 +34,8 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
             context.RegisterSyntaxNodeAction(HandleUsing, SyntaxKind.UsingStatement);
-        }
-
-        private static void HandleField(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var field = (IFieldSymbol)context.ContainingSymbol;
-            if (field.IsStatic)
-            {
-                return;
-            }
-
-            if (Disposable.IsAssignedWithInjectedOrCached(field, context.SemanticModel, context.CancellationToken))
-            {
-                CheckThatMemberIsNotDisposed(context);
-            }
-        }
-
-        private static void HandleProperty(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var property = (IPropertySymbol)context.ContainingSymbol;
-            if (property.IsStatic ||
-                property.IsIndexer)
-            {
-                return;
-            }
-
-            if (Disposable.IsAssignedWithInjectedOrCached(property, context.SemanticModel, context.CancellationToken))
-            {
-                CheckThatMemberIsNotDisposed(context);
-            }
+            context.RegisterSyntaxNodeAction(HandleInvocation, SyntaxKind.InvocationExpression);
         }
 
         private static void HandleUsing(SyntaxNodeAnalysisContext context)
@@ -115,53 +75,37 @@
             }
         }
 
-        private static void CheckThatMemberIsNotDisposed(SyntaxNodeAnalysisContext context)
+        private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
-            var containingType = context.ContainingSymbol.ContainingType;
-
-            IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, true, out disposeMethod))
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            foreach (var declaration in disposeMethod.Declarations(context.CancellationToken))
+            var invocation = context.Node as InvocationExpressionSyntax;
+            if (invocation == null)
             {
-                using (var pooled = IdentifierNameWalker.Create(declaration))
+                return;
+            }
+
+            var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
+            if (call != KnownSymbol.IDisposable.Dispose)
+            {
+                return;
+            }
+
+            ExpressionSyntax invokee;
+            if (invocation.TryFindInvokee(out invokee))
+            {
+                if (invokee is ThisExpressionSyntax ||
+                    invokee is BaseExpressionSyntax)
                 {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
-                    {
-                        if (identifier.Identifier.ValueText != context.ContainingSymbol.Name)
-                        {
-                            continue;
-                        }
+                    return;
+                }
 
-                        var symbol = context.SemanticModel.GetSymbolSafe(identifier, context.CancellationToken);
-                        if (ReferenceEquals(symbol, context.ContainingSymbol))
-                        {
-                            using (var invocations = InvocationWalker.Create(declaration))
-                            {
-                                foreach (var invocation in invocations.Item.Invocations)
-                                {
-                                    var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-                                    if (method != KnownSymbol.IDisposable.Dispose)
-                                    {
-                                        continue;
-                                    }
-
-                                    ExpressionSyntax invokee;
-                                    if (invocation.TryFindInvokee(out invokee))
-                                    {
-                                        if (ReferenceEquals(invokee, identifier) ||
-                                            ReferenceEquals((invokee as MemberAccessExpressionSyntax)?.Name, identifier))
-                                        {
-                                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, identifier.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? identifier.GetLocation()));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (Disposable.IsPotentiallyCachedOrInjected(invokee, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
             }
         }

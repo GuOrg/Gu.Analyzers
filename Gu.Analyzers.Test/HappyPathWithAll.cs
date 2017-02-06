@@ -2,7 +2,9 @@ namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -130,7 +132,102 @@ public class Foo : IDisposable
     }
 }";
 
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode }, EmptyDiagnosticResults).ConfigureAwait(false);
+            var fooBaseCode = @"
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed = false;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+        }
+    }";
+
+            var fooImplCode = @"
+    using System;
+    using System.IO;
+
+    public class FooImpl : FooBase
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode }, EmptyDiagnosticResults).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WithSyntaxcErrors()
+        {
+            var syntaxErrorCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo : SyntaxError
+    {
+        private readonly Stream stream = File.SyntaxError(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.syntaxError)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+            var analyzers = this.GetCSharpDiagnosticAnalyzers().ToImmutableArray();
+            await GetSortedDiagnosticsFromDocumentsAsync(
+                          analyzers,
+                          CodeFactory.GetDocuments(
+                              new[] { syntaxErrorCode },
+                              analyzers,
+                              Enumerable.Empty<string>()),
+                          CancellationToken.None)
+                      .ConfigureAwait(false);
         }
 
         internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
