@@ -130,7 +130,7 @@ public class Foo
         }
 
         [Test]
-        public async Task NotDisposingFieldInCtor()
+        public async Task NotDisposingInitializedFieldInCtor()
         {
             var testCode = @"
 using System;
@@ -142,13 +142,117 @@ public class Foo
 
     public Foo()
     {
-        ↓stream = File.OpenRead(string.Empty);
+        ↓this.stream = File.OpenRead(string.Empty);
     }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Dispose before re-assigning.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public Foo()
+    {
+        this.stream?.Dispose();
+        this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingInitializedPropertyInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public Foo()
+    {
+        ↓this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream { get; } = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public Foo()
+    {
+        this.Stream?.Dispose();
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream { get; } = File.OpenRead(string.Empty);
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingInitializedBackingFieldInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public Foo()
+    {
+        ↓this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        set { this.stream = value; }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+
+    public Foo()
+    {
+        this.stream?.Dispose();
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        set { this.stream = value; }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]

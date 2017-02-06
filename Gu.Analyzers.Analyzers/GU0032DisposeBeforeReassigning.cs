@@ -80,6 +80,22 @@
 
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
             }
+
+            if (assignment.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
+            {
+                if (!IsMemberInitialized(left, assignment, context.SemanticModel, context.CancellationToken) &&
+                    !IsVariableAssignedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                if (IsDisposedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
+            }
         }
 
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
@@ -183,6 +199,35 @@
             }
 
             return false;
+        }
+
+        private static bool IsMemberInitialized(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var field = symbol as IFieldSymbol;
+            if (field != null)
+            {
+                foreach (var declaration in field.Declarations(cancellationToken))
+                {
+                    if ((declaration as VariableDeclaratorSyntax)?.Initializer == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            var property = symbol as IPropertySymbol;
+            if (property != null)
+            {
+                foreach (var declaration in property.Declarations(cancellationToken))
+                {
+                    if ((declaration as VariableDeclaratorSyntax)?.Initializer == null)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)

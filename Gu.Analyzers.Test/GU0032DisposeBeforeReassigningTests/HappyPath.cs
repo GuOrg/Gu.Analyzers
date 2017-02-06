@@ -24,6 +24,69 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         }
 
         [Test]
+        public async Task AssigningPropertyInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream { get; }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AssigningPropertyWithBackingFieldInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        set { this.stream = value; }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AssigningFieldInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private readonly Stream stream;
+
+    public Foo()
+    {
+        this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task FieldSwapCached()
         {
             var testCode = @"

@@ -17,7 +17,7 @@ public class Disposable : IDisposable
 }";
 
         [Test]
-        public async Task NotDisposingPrivateReadonlyFieldInDisposeMethod()
+        public async Task NotDisposingPrivateReadonlyFieldInitializedWithFileOpenReadInDisposeMethod()
         {
             var testCode = @"
 using System;
@@ -50,6 +50,40 @@ public sealed class Foo : IDisposable
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingPrivateReadonlyFieldInitializedWithNewInDisposeMethod()
+        {
+            var testCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable = new Disposable();
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable = new Disposable();
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
         }
 
         [Test]
@@ -133,7 +167,7 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task NotDisposingFieldAssignedInCtor()
+        public async Task NotDisposingFieldAssignedWIthFileOpenReadInCtor()
         {
             var testCode = @"
 using System;
@@ -176,6 +210,52 @@ public sealed class Foo : IDisposable
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedWithNewDisposableInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly IDisposable disposable;
+
+    public Foo()
+    {
+        this.disposable = new Disposable();
+    }
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly IDisposable disposable;
+
+    public Foo()
+    {
+        this.disposable = new Disposable();
+    }
+
+    public void Dispose()
+    {
+        this.disposable.Dispose();
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
         }
 
         [Test]
