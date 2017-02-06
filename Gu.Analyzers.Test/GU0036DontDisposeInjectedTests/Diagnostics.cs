@@ -399,6 +399,7 @@ namespace Gu.Reactive
                       .ConfigureAwait(false);
         }
 
+        [Explicit("Don't think this is very useful.")]
         [TestCase("action(disposable)")]
         [TestCase("action.Invoke(disposable)")]
         public async Task IgnoreLambdaUsageOnInjected(string disposeCode)
