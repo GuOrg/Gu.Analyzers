@@ -5,6 +5,16 @@
 
     internal class Diagnostics : DiagnosticVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [Test]
         public async Task IgnoringFileOpenRead()
         {
@@ -191,7 +201,6 @@ public sealed class Foo
         }
 
         [Test]
-        [Explicit("Fix later.")]
         public async Task ConstrainedGeneric()
         {
             var factoryCode = @"
@@ -200,16 +209,6 @@ using System;
 public class Factory
 {
     public static T Create<T>() where T : IDisposable, new() => new T();
-}";
-
-            var disposableCode = @"
-using System;
-
-public sealed class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
 }";
 
             var testCode = @"
@@ -223,7 +222,48 @@ public sealed class Disposable : IDisposable
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { factoryCode, disposableCode, testCode }, expected).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { factoryCode, DisposableCode, testCode }, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WithOptionalParameter()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        private IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            ↓Bar(disposable);
+        }
+
+        private static IDisposable Bar(IDisposable disposable, List<IDisposable> list = null)
+        {
+            if (list == null)
+            {
+                list = new List<IDisposable>();
+            }
+
+            if (list.Contains(disposable))
+            {
+                return new Disposable();
+            }
+
+            list.Add(disposable);
+            return Bar(disposable, list);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
         }
     }
 }

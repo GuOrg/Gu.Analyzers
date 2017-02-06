@@ -46,7 +46,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream.Dispose();
+        this.stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -172,14 +172,13 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream.Dispose();
+        this.stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Not fixing this.")]
         public async Task NotDisposingFieldWhenConditionallyAssignedInCtor()
         {
             var testCode = @"
@@ -271,7 +270,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream.Dispose();
+        this.stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -317,7 +316,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream.Dispose();
+        this.stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -392,7 +391,7 @@ public sealed class Foo : IDisposable
     public void Dispose()
     {
         stream1.Dispose();
-        this.stream2.Dispose();
+        this.stream2?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -429,7 +428,7 @@ public sealed class Foo : IDisposable
     public void Dispose()
     {
         this.stream1.Dispose();
-        this.stream2.Dispose();
+        this.stream2?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -539,7 +538,7 @@ public sealed class Foo : IDisposable
         
     public void Dispose()
     {
-        this.Stream.Dispose();
+        this.Stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -766,7 +765,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.Stream.Dispose();
+        this.Stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -840,7 +839,7 @@ public class Foo : IDisposable
         this.disposed = true;
         if (disposing)
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
         }
     }
 
@@ -939,7 +938,7 @@ public class Foo : BaseClass
         this.disposed = true;
         if (disposing)
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
         }
 
         base.Dispose(disposing);
@@ -1111,7 +1110,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.disposable.Dispose();
+        this.disposable?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
@@ -1168,7 +1167,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.disposable.Dispose();
+        this.disposable?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })

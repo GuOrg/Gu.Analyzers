@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -24,13 +26,32 @@ namespace Gu.Analyzers
                 }
             }
 
-            if (arguments.Arguments.Count < parameter.Ordinal)
+            if (arguments.Arguments.Count <= parameter.Ordinal)
             {
                 return false;
             }
 
             argument = arguments.Arguments[parameter.Ordinal];
             return true;
+        }
+
+        internal static bool TryGetMatchingArgumentValue(this ArgumentListSyntax arguments, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
+        {
+            value = null;
+            ArgumentSyntax argument;
+            if (TryGetMatchingArgument(arguments, parameter, out argument))
+            {
+                value = argument.Expression;
+                return value != null;
+            }
+
+            SyntaxNode declaration;
+            if (parameter.HasExplicitDefaultValue && parameter.TryGetSingleDeclaration(cancellationToken, out declaration))
+            {
+                value = (declaration as ParameterSyntax)?.Default.Value;
+            }
+
+            return value != null;
         }
     }
 }

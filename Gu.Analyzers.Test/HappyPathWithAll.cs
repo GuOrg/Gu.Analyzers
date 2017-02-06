@@ -188,7 +188,34 @@ public class Foo : IDisposable
         }
     }";
 
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode }, EmptyDiagnosticResults).ConfigureAwait(false);
+            var withOptionalParameterCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        private IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = Bar(disposable);
+        }
+
+        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        {
+            if (disposables == null)
+            {
+                return Bar(disposable, new[] { disposable });
+            }
+
+            return disposable;
+        }
+    }
+}";
+
+            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode }, EmptyDiagnosticResults).ConfigureAwait(false);
         }
 
         [Test]

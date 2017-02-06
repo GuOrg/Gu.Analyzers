@@ -42,7 +42,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream.Dispose();
+        this.stream?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -88,8 +88,8 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        this.stream1.Dispose();
-        this.stream2.Dispose();
+        this.stream1?.Dispose();
+        this.stream2?.Dispose();
     }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode).ConfigureAwait(false);

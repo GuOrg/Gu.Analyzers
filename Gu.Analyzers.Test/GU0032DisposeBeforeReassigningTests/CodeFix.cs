@@ -130,7 +130,6 @@ public class Foo
         }
 
         [Test]
-        [Explicit("Fix?")]
         public async Task NotDisposingFieldInCtor()
         {
             var testCode = @"

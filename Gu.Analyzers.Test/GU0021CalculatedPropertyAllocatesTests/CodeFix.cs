@@ -462,7 +462,6 @@ namespace Test
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutablePropertyNoFix1()
         {
             var testCode = @"
@@ -492,11 +491,32 @@ public class Foo
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+        this.Bar = new Foo(this.A, this.B, this.C, this.D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; set; }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutablePropertyNoFix2()
         {
             var testCode = @"
@@ -526,11 +546,32 @@ public class Foo
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        A = a;
+        B = b;
+        C = c;
+        D = d;
+        Bar = new Foo(A, B, C, D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; set; }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableFieldNoFix()
         {
             var testCode = @"
@@ -556,11 +597,30 @@ public class Foo
                                .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo
+{
+    public readonly int a;
+    public readonly int b;
+    public readonly int c;
+    public int d;
+
+    public Foo(int a, int b, int c, int d)
+    {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+        this.d = d;
+        this.Bar = new Foo(this.a, this.b, this.c, this.d);
+    }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
         {
             var testCode = @"
@@ -586,11 +646,30 @@ public class Foo
                                .WithMessage("Calculated property allocates reference type.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo
+{
+    public readonly int _a;
+    public readonly int _b;
+    public readonly int _c;
+    public int _d;
+
+    public Foo(int a, int b, int c, int d)
+    {
+        _a = a;
+        _b = b;
+        _c = c;
+        _d = d;
+        Bar = new Foo(_a, _b, _c, _d);
+    }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
         {
             var testCode = @"
@@ -623,11 +702,35 @@ public class Foo
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+        this.Bar = new Foo(this.A, this.B, this.C, 0)
+        {
+            D = this.D
+        };
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; set; }
+
+    public Foo Bar { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromSecondLevelNoFix1()
         {
             var testCode = @"
@@ -660,11 +763,35 @@ public class Foo
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+        this.Bar1 = new Foo(a, b, c, d);
+        this.Bar2 = new Foo(this.A, this.B, this.C, this.Bar1.D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; set; }
+
+    public Foo Bar1 { get; }
+    
+    public Foo Bar2 { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
         [Test]
-        [Explicit("Changing this to allowed with UNSAFE")]
         public async Task AllocatingReferenceTypeFromSecondLevelNoFix2()
         {
             var testCode = @"
@@ -697,7 +824,32 @@ public class Foo
 
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+            var fixedCode = @"
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        this.A = a;
+        this.B = b;
+        this.C = c;
+        this.D = d;
+        this.Bar1 = new Foo(a, b, c, d);
+        this.Bar2 = new Foo(this.A, this.B, this.C, this.Bar1.D);
+    }
+
+    public int A { get; }
+
+    public int B { get; }
+
+    public int C { get; }
+
+    public int D { get; }
+
+    public Foo Bar1 { get; set; }
+    
+    public Foo Bar2 { get; }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
     }
 }

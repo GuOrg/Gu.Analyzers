@@ -75,7 +75,7 @@
                     disposeMethodSymbol.Parameters.Length == 0 &&
                     disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
                 {
-                    var disposeStatement = CreateDisposeStatement(memberSymbol, usesUnderscoreNames);
+                    var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
                     return new Fix(disposeStatement, disposeMethodDeclaration);
                 }
 
@@ -85,7 +85,7 @@
                     var parameterType = semanticModel.GetTypeInfoSafe(disposeMethodDeclaration.ParameterList.Parameters[0]?.Type, cancellationToken).Type;
                     if (parameterType == KnownSymbol.Boolean)
                     {
-                        var disposeStatement = CreateDisposeStatement(memberSymbol, usesUnderscoreNames);
+                        var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
                         return new Fix(disposeStatement, disposeMethodDeclaration);
                     }
                 }
@@ -148,7 +148,7 @@
             return syntaxRoot;
         }
 
-        private static StatementSyntax CreateDisposeStatement(ISymbol member, bool usesUnderScoreNames)
+        private static StatementSyntax CreateDisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken, bool usesUnderScoreNames)
         {
             var prefix = usesUnderScoreNames ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
@@ -158,11 +158,12 @@
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             }
 
-            if (IsReadOnly(member))
+            if (IsReadOnly(member) && IsNeverNull(member, semanticModel, cancellationToken))
             {
+
                 return SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
-                                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             }
 
             return SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
@@ -189,6 +190,33 @@
             }
 
             return isReadOnly.Value;
+        }
+
+        private static bool IsNeverNull(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!(member is IFieldSymbol || member is IPropertySymbol))
+            {
+                return false;
+            }
+
+            var field = member as IFieldSymbol;
+            using (var sources = field != null
+                                     ? VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken)
+                                     : VauleWithSource.GetRecursiveSources((IPropertySymbol)member, semanticModel, cancellationToken))
+            {
+                foreach (var vauleWithSource in sources.Item)
+                {
+                    switch (vauleWithSource.Source)
+                    {
+                        case ValueSource.Created:
+                            continue;
+                        default:
+                            return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;

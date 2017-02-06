@@ -353,28 +353,40 @@ namespace Gu.Analyzers
                     result.Add(new VauleWithSource(value, ValueSource.Injected));
                 }
 
-                ArgumentSyntax argument;
+                ExpressionSyntax argumentValue;
                 foreach (var invocation in calls.Item.Invocations)
                 {
-                    if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out argument))
+                    if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argument.Expression, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                    }
+                    else
+                    {
+                        result.Add(new VauleWithSource(value, ValueSource.Unknown));
                     }
                 }
 
                 foreach (var initializer in calls.Item.Initializers)
                 {
-                    if (initializer.ArgumentList.TryGetMatchingArgument(parameter, out argument))
+                    if (initializer.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argument.Expression, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                    }
+                    else
+                    {
+                        result.Add(new VauleWithSource(value, ValueSource.Unknown));
                     }
                 }
 
                 foreach (var objectCreation in calls.Item.ObjectCreations)
                 {
-                    if (objectCreation.ArgumentList.TryGetMatchingArgument(parameter, out argument))
+                    if (objectCreation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argument.Expression, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                    }
+                    else
+                    {
+                        result.Add(new VauleWithSource(value, ValueSource.Unknown));
                     }
                 }
             }

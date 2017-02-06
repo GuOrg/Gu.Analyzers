@@ -1241,6 +1241,45 @@ internal class Foo
         }
 
         [Test]
+        public void CtorInjectedChainedDefaultValue()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    internal class Foo
+    {
+        public Foo()
+            : this(1)
+        {
+        }
+
+        public Foo(double gg)
+            : this(1, 2)
+        {
+        }
+
+        public Foo(string text)
+            : this(1, text.Length)
+        {
+        }
+
+        public Foo(int _, int meh = 1)
+        {
+            var value = meh;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("meh");
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual("meh Injected, 1 Constant, 2 Constant, text.Length External, text Injected", actual);
+            }
+        }
+
+        [Test]
         public void CtorPrivateInjectedFactoryConstant()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -1338,6 +1377,60 @@ internal class Foo
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                 Assert.AreEqual("meh Injected", actual);
+            }
+        }
+
+        [Test]
+        public void MethodInjectedWithOptional()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal static void Meh()
+    {
+        Bar(1);
+        Bar(2, ""abc"");
+    }
+
+    internal static void Bar(int meh, string text = null)
+    {
+        var value = meh;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual("meh Injected, 1 Constant, 2 Constant", actual);
+            }
+        }
+
+        [Test]
+        public void MethodInjectedWithOptionalAssigningOptional()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal static void Meh()
+    {
+        Bar(1);
+        Bar(2, ""abc"");
+    }
+
+    internal static void Bar(int meh, string text = null)
+    {
+        var value = text;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual(@"text Injected, null Constant, ""abc"" Constant", actual);
             }
         }
 

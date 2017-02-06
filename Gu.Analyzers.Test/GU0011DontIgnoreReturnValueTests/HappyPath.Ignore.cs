@@ -104,31 +104,31 @@ public class Foo
                           .ConfigureAwait(false);
             }
 
-            [Explicit("Don't know if we want this.")]
-            [TestCase("this.ints.Add(1);")]
-            [TestCase("ints.Add(1);")]
-            [TestCase("this.ints.Remove(1);")]
-            public async Task HashSet(string operation)
-            {
-                var testCode = @"
-namespace RoslynSandBox
-{
-    using System.Collections.Generic;
+////            [Explicit("Don't know if we want this.")]
+////            [TestCase("this.ints.Add(1);")]
+////            [TestCase("ints.Add(1);")]
+////            [TestCase("this.ints.Remove(1);")]
+////            public async Task HashSet(string operation)
+////            {
+////                var testCode = @"
+////namespace RoslynSandBox
+////{
+////    using System.Collections.Generic;
 
-    public sealed class Foo
-    {
-        private readonly HashSet<int> ints = new HashSet<int>();
+////    public sealed class Foo
+////    {
+////        private readonly HashSet<int> ints = new HashSet<int>();
 
-        public Foo()
-        {
-            this.ints.Add(1);
-        }
-    }
-}";
-                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
+////        public Foo()
+////        {
+////            this.ints.Add(1);
+////        }
+////    }
+////}";
+////                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
+////                await this.VerifyHappyPathAsync(testCode)
+////                          .ConfigureAwait(false);
+////            }
 
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]
