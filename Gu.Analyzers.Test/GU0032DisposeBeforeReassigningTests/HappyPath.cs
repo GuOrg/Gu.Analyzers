@@ -43,6 +43,31 @@ public class Foo
         }
 
         [Test]
+        public async Task AssigningIndexerInCtor()
+        {
+            var testCode = @"
+using System;
+using System.Collections.Generic;
+
+public class Foo
+{
+    private readonly List<int> ints = new List<int>();
+
+    public Foo()
+    {
+        this[1] = 1;
+    }
+
+    public int this[int index]
+    {
+        get { return this.ints[index]; }
+        set { this.ints[index] = value; }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AssigningPropertyWithBackingFieldInCtor()
         {
             var testCode = @"
