@@ -257,8 +257,11 @@ internal class Foo
                 }
             }
 
-            [Test]
-            public void PrivateStaticMethodWithOptionalParameter()
+            [TestCase("private static")]
+            [TestCase("private")]
+            [TestCase("public")]
+            [TestCase("public static")]
+            public void PrivateStaticMethodWithOptionalParameter(string modifiers)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -284,6 +287,7 @@ namespace RoslynSandBox
         }
     }
 }";
+                testCode = testCode.AssertReplace("private static", modifiers);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -331,6 +335,42 @@ namespace RoslynSandBox
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("Bar(1) Calculated, Baz(value) Calculated, Bar(value) Calculated, Baz(value) Recursion", actual);
+                }
+            }
+
+            [Test]
+            public void Local()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            int meh = 1;
+            meh = meh;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("1 Constant", actual);
+                }
+
+                node = syntaxTree.Descendant<AssignmentExpressionSyntax>().Right;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("1 Constant", actual);
                 }
             }
         }

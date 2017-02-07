@@ -255,7 +255,6 @@
                         }
                     }
 
-                    //// ReSharper disable once PossibleMultipleEnumeration
                     foreach (var node in pooledNodes.Item)
                     {
                         pooled.Item.Visit(node);
