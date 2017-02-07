@@ -60,7 +60,7 @@
 
             if (Disposable.IsPotentiallyAssignableTo(symbol.Type) && declarator.Initializer != null)
             {
-                if (Disposable.IsPotentiallyCreatedAndNotCachedInMember(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
                 {
                     if (variableDeclaration.Parent is UsingStatementSyntax ||
                         variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)

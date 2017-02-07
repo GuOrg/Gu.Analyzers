@@ -94,7 +94,7 @@
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (Disposable.IsPotentiallyCreatedAndNotCachedInMember(returnValue, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(returnValue, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnValue.GetLocation()));
             }

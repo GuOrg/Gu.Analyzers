@@ -344,5 +344,39 @@ public sealed class Foo
     }";
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task LocalSwapCachedDisposableDictionary()
+        {
+            var disposableDictionaryCode = @"
+using System;
+using System.Collections.Generic;
+
+public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+using System.Collections.Generic;
+using System.IO;
+
+public class Foo
+{
+    private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+
+    private Stream current;
+
+    public void SetCurrent(int number)
+    {
+        this.current = this.Cache[number];
+        this.current = this.Cache[number + 1];
+    }
+}";
+
+            await this.VerifyHappyPathAsync(disposableDictionaryCode, testCode).ConfigureAwait(false);
+        }
     }
 }

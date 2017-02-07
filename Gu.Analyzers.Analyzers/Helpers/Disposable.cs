@@ -110,7 +110,7 @@ namespace Gu.Analyzers
             }
         }
 
-        internal static bool IsPotentiallyCreatedAndNotCachedInMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (disposable == null ||
                 disposable.IsMissing ||

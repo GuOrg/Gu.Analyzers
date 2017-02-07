@@ -207,6 +207,38 @@ public class Foo
         }
 
         [Test]
+        public async Task LocalSwapCachedDisposableDictionary()
+        {
+            var disposableDictionaryCode = @"
+using System;
+using System.Collections.Generic;
+
+public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
+            var testCode = @"
+using System.Collections.Generic;
+using System.IO;
+
+public class Foo
+{
+    private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+
+    public void SetCurrent(int number)
+    {
+        var current = this.Cache[number];
+        current = this.Cache[number + 1];
+    }
+}";
+
+            await this.VerifyHappyPathAsync(disposableDictionaryCode, testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task LocalSwapCachedTryGetValue()
         {
             var testCode = @"

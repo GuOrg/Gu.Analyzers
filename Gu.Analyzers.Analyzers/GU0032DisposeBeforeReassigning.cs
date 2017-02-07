@@ -48,7 +48,7 @@
             }
 
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (!Disposable.IsPotentiallyCreated(assignment.Right, context.SemanticModel, context.CancellationToken))
+            if (!Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(assignment.Right, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
