@@ -9,6 +9,64 @@
         public class Rx : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
+            public async Task InjectedSubscribe()
+            {
+                var testCode = @"
+namespace Gu.Reactive
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+
+        protected Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.subscription.Dispose();
+        }
+     }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task InjectedConditionalSubscribe()
+            {
+                var testCode = @"
+namespace Gu.Reactive
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+
+        protected Foo(IObservable<object> observable)
+        {
+            this.subscription = observable?.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.subscription?.Dispose();
+        }
+     }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task SingleAssignmentDisposable()
             {
                 var testCode = @"
