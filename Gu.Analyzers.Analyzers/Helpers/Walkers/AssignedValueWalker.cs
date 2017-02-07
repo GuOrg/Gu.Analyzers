@@ -249,22 +249,21 @@
                 {
                     count = pooled.Item.symbols.Count;
                     pooled.Item.assignedValues.Clear();
-                    //// ReSharper disable once PossibleMultipleEnumeration
-                    foreach (var node in pooledNodes.Item)
-                    {
-                        pooled.Item.Visit(node);
-                    }
-
                     foreach (var assignedSymbol in pooled.Item.symbols)
                     {
-                        if (!IsChecked(assignedSymbol as IParameterSymbol, pooledNodes.Item, cancellationToken))
+                        if (!IsChecked(assignedSymbol as IParameterSymbol, pooledNodes.Item))
                         {
                             foreach (var declaration in assignedSymbol.ContainingSymbol.Declarations(cancellationToken))
                             {
                                 pooledNodes.Item.Add(declaration).IgnoreReturnValue();
-                                pooled.Item.Visit(declaration);
                             }
                         }
+                    }
+
+                    //// ReSharper disable once PossibleMultipleEnumeration
+                    foreach (var node in pooledNodes.Item)
+                    {
+                        pooled.Item.Visit(node);
                     }
                 }
             }
@@ -272,18 +271,18 @@
             return pooled;
         }
 
-        private static bool IsChecked(IParameterSymbol parameter, HashSet<SyntaxNode> nodes, CancellationToken cancellationToken)
+        private static bool IsChecked(IParameterSymbol parameter, HashSet<SyntaxNode> nodes)
         {
             if (parameter == null)
             {
                 return true;
             }
 
-            foreach (var declaration in parameter.ContainingSymbol.Declarations(cancellationToken))
+            foreach (var reference in parameter.ContainingSymbol.DeclaringSyntaxReferences)
             {
                 foreach (var syntaxNode in nodes)
                 {
-                    if (syntaxNode.Span.Contains(declaration.Span))
+                    if (syntaxNode.Span.Contains(reference.Span))
                     {
                         return true;
                     }

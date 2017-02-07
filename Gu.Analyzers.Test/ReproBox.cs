@@ -25,160 +25,264 @@ namespace Gu.Analyzers.Test
         public async Task Repro(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace Gu.Wpf.Reactive
+// ReSharper disable PossibleMultipleEnumeration
+namespace Gu.Localization
 {
+    using System;
     using System.Collections.Generic;
-    using System.Windows;
-    using System.Windows.Controls;
+    using System.Globalization;
+    using System.Resources;
 
-    using Gu.Reactive;
+    using Gu.Localization.Errors;
 
     /// <summary>
-    /// A control for displaying conditions
+    /// This class is meant to be used in unit tests.
+    /// Contains helper methods for asserting properties on localization.
     /// </summary>
-    public partial class ConditionControl : Control
+    public static partial class Validate
     {
-#pragma warning disable SA1202 // Elements must be ordered by access
-#pragma warning disable SA1600 // Elements must be documented
-#pragma warning disable 1591
-        private static readonly IEnumerable<ICondition> Empty = new ICondition[0];
+        private static readonly IReadOnlyList<TranslationError> EmptyErrors = new TranslationError[0];
 
-        public static readonly DependencyProperty ConditionProperty = DependencyProperty.Register(
-            nameof(Condition),
-            typeof(ICondition),
-            typeof(ConditionControl),
-            new PropertyMetadata(default(ICondition), OnConditionChanged));
-
-        private static readonly DependencyPropertyKey RootPropertyKey = DependencyProperty.RegisterReadOnly(
-            nameof(Root),
-            typeof(IEnumerable<ICondition>),
-            typeof(ConditionControl),
-            new PropertyMetadata(Empty));
-
-        public static readonly DependencyProperty RootProperty = RootPropertyKey.DependencyProperty;
-
-        private static readonly DependencyPropertyKey FlattenedPrerequisitesPropertyKey = DependencyProperty.RegisterReadOnly(
-            nameof(FlattenedPrerequisites),
-            typeof(IEnumerable<ICondition>),
-            typeof(ConditionControl),
-            new PropertyMetadata(Empty));
-
-        private static readonly DependencyPropertyKey IsInSyncPropertyKey = DependencyProperty.RegisterReadOnly(
-            nameof(IsInSync),
-            typeof(bool),
-            typeof(ConditionControl),
-            new PropertyMetadata(true));
-
-        public static readonly DependencyProperty IsInSyncProperty = IsInSyncPropertyKey.DependencyProperty;
-
-        public static readonly DependencyProperty FlattenedPrerequisitesProperty = FlattenedPrerequisitesPropertyKey.DependencyProperty;
-
-#pragma warning restore SA1202 // Elements must be ordered by access
-#pragma warning restore 1591
-#pragma warning restore SA1600 // Elements must be documented
-
-        static ConditionControl()
+        /// <summary>
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that:
+        /// 1) All keys in <paramref name=""resourceManager""/> have non null values for all cultures in <see cref=""Translator.Cultures""/>
+        /// 2) If the resource is a format string it checks that
+        ///   - All formats have the same number of parameters.
+        ///   - All formats have numbering 0..1..n for the parameters.
+        /// </summary>
+        /// <param name=""resourceManager"">The resource managerr to check</param>
+        /// <returns>An <see cref=""TranslationErrors""/> with all errors found in <paramref name=""resourceManager""/></returns>
+        public static TranslationErrors Translations(ResourceManager resourceManager)
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ConditionControl), new FrameworkPropertyMetadata(typeof(ConditionControl)));
+            return Translations(resourceManager, Translator.Cultures.Prepend(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref=""ConditionControl""/> class.
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that:
+        /// 1) All keys in <paramref name=""resourceManager""/> have non null values for all cultures in <paramref name=""cultures""/>
+        /// 2) If the resource is a format string it checks that
+        ///   - All formats have the same number of parameters.
+        ///   - All formats have numbering 0..1..n for the parameters.
         /// </summary>
-        public ConditionControl()
+        /// <param name=""resourceManager"">The resource managerr to check</param>
+        /// <param name=""cultures"">The cultures to check resources for</param>
+        /// <returns>An <see cref=""TranslationErrors""/> with all errors found in <paramref name=""resourceManager""/></returns>
+        public static TranslationErrors Translations(ResourceManager resourceManager, IEnumerable<CultureInfo> cultures)
         {
-            this.IsVisibleChanged += (_, __) => this.OnIsVisibleChanged();
-        }
-
-        /// <summary>
-        /// The condition exposed as an enumerable with one element for binding the root of <see cref=""TreeView""/>.
-        /// </summary>
-        public IEnumerable<ICondition> Root
-        {
-            get { return (IEnumerable<ICondition>)this.GetValue(RootProperty); }
-            protected set { this.SetValue(RootPropertyKey, value); }
-        }
-
-        /// <summary>
-        /// A flat list of all conditions
-        /// </summary>
-        public IEnumerable<ICondition> FlattenedPrerequisites
-        {
-            get { return (IEnumerable<ICondition>)this.GetValue(FlattenedPrerequisitesProperty); }
-            protected set { this.SetValue(FlattenedPrerequisitesPropertyKey, value); }
-        }
-
-        /// <summary>
-        /// True if all detected changes of ICondition.IsSatisfied have been notified.
-        /// </summary>
-        public bool IsInSync
-        {
-            get { return (bool)this.GetValue(IsInSyncProperty); }
-            protected set { this.SetValue(IsInSyncPropertyKey, value); }
-        }
-
-        /// <summary>
-        /// The condition.
-        /// </summary>
-        public ICondition Condition
-        {
-            get { return (ICondition)this.GetValue(ConditionProperty); }
-            set { this.SetValue(ConditionProperty, value); }
-        }
-
-        /// <summary>
-        /// Called when the <see cref=""Condition""/> changes.
-        /// </summary>
-        // ReSharper disable once UnusedParameter.Global
-        protected virtual void OnConditionChanged(ICondition oldCondition, ICondition newCondition)
-        {
-            if (newCondition == null)
+            var culturesAndKeys = resourceManager.GetCulturesAndKeys(cultures);
+            Dictionary<string, IReadOnlyList<TranslationError>> errors = null;
+            foreach (var key in culturesAndKeys.AllKeys)
             {
-                this.Root = Empty;
-                this.FlattenedPrerequisites = Empty;
-                return;
+                IReadOnlyList<TranslationError> keyErrors;
+                if (TryGetTranslationErrors(culturesAndKeys, cultures, key, out keyErrors))
+                {
+                    if (errors == null)
+                    {
+                        errors = new Dictionary<string, IReadOnlyList<TranslationError>>();
+                    }
+
+                    errors.Add(key, keyErrors);
+                }
             }
 
-            this.Root = new[] { newCondition };
-            this.FlattenedPrerequisites = FlattenPrerequisites(newCondition);
-            this.IsInSync = this.Condition.IsInSync();
+            resourceManager.ReleaseAllResources();
+            return errors == null
+                       ? TranslationErrors.Empty
+                       : new TranslationErrors(errors);
         }
 
-        private static void OnConditionChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        /// <summary>
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that all members of <typeparamref name=""T""/> have corresponding key in <paramref name=""resourceManager""/>
+        /// and that the key has a non null value for all cultures in <see cref=""Translator.Cultures""/>
+        /// </summary>
+        /// <typeparam name=""T"">An enum type</typeparam>
+        /// <param name=""resourceManager"">The <see cref=""ResourceManager""/> with translations for <typeparamref name=""T""/></param>
+        /// <returns>A list with all members that does not have </returns>
+        public static TranslationErrors EnumTranslations<T>(ResourceManager resourceManager)
+            where T : struct, IComparable, IFormattable, IConvertible
         {
-            var conditionControl = (ConditionControl)o;
-            conditionControl.OnConditionChanged((ICondition)e.OldValue, (ICondition)e.NewValue);
+            return EnumTranslations<T>(resourceManager, Translator.Cultures.Prepend(CultureInfo.InvariantCulture));
         }
 
-        private static IReadOnlyList<ICondition> FlattenPrerequisites(ICondition condition, List<ICondition> list = null)
+        /// <summary>
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that all members of <typeparamref name=""T""/> have corresponding key in <paramref name=""resourceManager""/>
+        /// and that the key has a non null value for all cultures in <see cref=""Translator.Cultures""/>
+        /// </summary>
+        /// <typeparam name=""T"">An enum type</typeparam>
+        /// <param name=""resourceManager"">The <see cref=""ResourceManager""/> with translations for <typeparamref name=""T""/></param>
+        /// <param name=""cultures"">The cultures to check for.</param>
+        /// <returns>A list with all members that does not have </returns>
+        public static TranslationErrors EnumTranslations<T>(ResourceManager resourceManager, IEnumerable<CultureInfo> cultures)
+            where T : struct, IComparable, IFormattable, IConvertible
         {
-            if (list == null)
+            var culturesAndKeys = resourceManager.GetCulturesAndKeys(cultures);
+            Dictionary<string, IReadOnlyList<TranslationError>> errors = null;
+            foreach (var key in Enum.GetNames(typeof(T)))
             {
-                list = new List<ICondition>();
+                IReadOnlyList<TranslationError> keyErrors;
+                if (TryGetTranslationErrors(culturesAndKeys, cultures, key, out keyErrors))
+                {
+                    if (errors == null)
+                    {
+                        errors = new Dictionary<string, IReadOnlyList<TranslationError>>();
+                    }
+
+                    errors.Add(key, keyErrors);
+                }
             }
 
-            if (list.Contains(condition))
-            {
-                return list; // Break recursion
-            }
-
-            list.Add(condition);
-            foreach (var pre in condition.Prerequisites)
-            {
-                FlattenPrerequisites(pre, list);
-            }
-
-            return list;
+            resourceManager.ReleaseAllResources();
+            return errors == null
+                       ? TranslationErrors.Empty
+                       : new TranslationErrors(errors);
         }
 
-        private void OnIsVisibleChanged()
+        /// <summary>
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that:
+        /// 1) <paramref name=""key""/> has non null values for all cultures in <see cref=""Translator.Cultures""/>
+        /// 2) If the resource is a format string it checks that
+        ///   - All formats have the same number of parameters.
+        ///   - All formats have numbering 0..1..n for the parameters.
+        /// </summary>
+        /// <param name=""resourceManager"">The <see cref=""ResourceManager""/> with translations for <paramref name=""key""/></param>
+        /// <param name=""key"">The key</param>
+        /// <returns>A list with all errors for the key or an empty list if no errors.</returns>
+        public static IReadOnlyList<TranslationError> Translations(ResourceManager resourceManager, string key)
         {
-            if (this.Condition != null &&
-                this.Visibility == Visibility.Visible &&
-                this.IsInSync)
+            return Translations(resourceManager, key, Translator.Cultures.Prepend(CultureInfo.InvariantCulture));
+        }
+
+        /// <summary>
+        /// This is meant to be used in unit tests.
+        /// Performance is probably very poor and we load all resources into memory.
+        /// Checks that:
+        /// 1) <paramref name=""key""/> has non null values for all cultures in <see cref=""Translator.Cultures""/>
+        /// 2) If the resource is a format string it checks that
+        ///   - All formats have the same number of parameters.
+        ///   - All formats have numbering 0..1..n for the parameters.
+        /// </summary>
+        /// <param name=""resourceManager"">The <see cref=""ResourceManager""/> with translations for <paramref name=""key""/></param>
+        /// <param name=""key"">The key</param>
+        /// <param name=""cultures"">The cultures to check</param>
+        /// <returns>A list with all errors for the key or an empty list if no errors.</returns>
+        public static IReadOnlyList<TranslationError> Translations(ResourceManager resourceManager, string key, IEnumerable<CultureInfo> cultures)
+        {
+            IReadOnlyList<TranslationError> errors;
+            if (TryGetTranslationErrors(resourceManager, key, cultures, out errors))
             {
-                this.IsInSync = this.Condition.IsInSync();
+                return errors;
             }
+
+            return EmptyErrors;
+        }
+
+        public static bool TryGetTranslationErrors(ResourceManager resourceManager, string key, IEnumerable<CultureInfo> cultures, out IReadOnlyList<TranslationError> errors)
+        {
+            var culturesAndKeys = resourceManager.GetCulturesAndKeys(cultures);
+            var result = TryGetTranslationErrors(culturesAndKeys, cultures, key, out errors);
+            resourceManager.ReleaseAllResources();
+            return result;
+        }
+
+        private static bool TryGetTranslationErrors(ResourceManagerExt.CulturesAndKeys culturesAndKeys, IEnumerable<CultureInfo> cultures, string key, out IReadOnlyList<TranslationError> errors)
+        {
+            List<TranslationError> foundErrors = null;
+            FormatError formatErrors;
+            if (TryGetFormatErrors(key, culturesAndKeys, cultures, out formatErrors))
+            {
+                foundErrors = new List<TranslationError>(1) { formatErrors };
+            }
+
+            MissingTranslation missingTranslation;
+            if (TryGetMissingTranslations(key, culturesAndKeys, cultures, out missingTranslation))
+            {
+                if (foundErrors == null)
+                {
+                    foundErrors = new List<TranslationError>(1) { missingTranslation };
+                }
+                else
+                {
+                    foundErrors.Add(missingTranslation);
+                }
+            }
+
+            errors = foundErrors;
+            return errors != null;
+        }
+
+        private static bool TryGetFormatErrors(
+            string key,
+            ResourceManagerExt.CulturesAndKeys culturesAndKeys,
+            IEnumerable<CultureInfo> cultures,
+            out FormatError formatErrors)
+        {
+            int? count = null;
+            var translations = culturesAndKeys.GetTranslationsFor(key, cultures);
+            foreach (var translation in translations)
+            {
+                int indexCount;
+                bool? anyItemHasFormat;
+                if (!FormatString.IsValidFormat(translation.Value, out indexCount, out anyItemHasFormat))
+                {
+                    formatErrors = new FormatError(key, translations);
+                    return true;
+                }
+
+                if (count == null)
+                {
+                    count = indexCount;
+                    continue;
+                }
+
+                if (count != indexCount)
+                {
+                    formatErrors = new FormatError(key, translations);
+                    return true;
+                }
+            }
+
+            formatErrors = null;
+            return false;
+        }
+
+        private static bool TryGetMissingTranslations(
+            string key,
+            ResourceManagerExt.CulturesAndKeys culturesAndKeys,
+            IEnumerable<CultureInfo> cultures,
+            out MissingTranslation missingTranslations)
+        {
+            List<CultureInfo> missing = null;
+            foreach (var culture in cultures)
+            {
+                if (!culturesAndKeys.HasKey(culture, key))
+                {
+                    if (missing == null)
+                    {
+                        missing = new List<CultureInfo>();
+                    }
+
+                    missing.Add(culture);
+                }
+            }
+
+            if (missing == null)
+            {
+                missingTranslations = null;
+                return false;
+            }
+
+            missingTranslations = new MissingTranslation(key, missing);
+            return true;
         }
     }
 }";

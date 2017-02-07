@@ -43,6 +43,29 @@ public class Foo
         }
 
         [Test]
+        public async Task AssigningPropertyInCtorInDisposableType()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream { get; }
+
+    public void Dispose()
+    {
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AssigningIndexerInCtor()
         {
             var testCode = @"
@@ -62,6 +85,35 @@ public class Foo
     {
         get { return this.ints[index]; }
         set { this.ints[index] = value; }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AssigningIndexerInCtorInDisposableType()
+        {
+            var testCode = @"
+using System;
+using System.Collections.Generic;
+
+public class Foo : IDisposable
+{
+    private readonly List<int> ints = new List<int>();
+
+    public Foo()
+    {
+        this[1] = 1;
+    }
+
+    public int this[int index]
+    {
+        get { return this.ints[index]; }
+        set { this.ints[index] = value; }
+    }
+
+    public void Dispose()
+    {
     }
 }";
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
@@ -442,6 +494,89 @@ namespace RoslynSandBox
     }
 }";
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ChainedCalls()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        private IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = Bar(disposable);
+        }
+
+        private static IDisposable Bar(IDisposable disposable)
+        {
+            if (disposable == null)
+            {
+                return Bar(disposable, new[] { disposable });
+            }
+
+            return disposable;
+        }
+
+        private static IDisposable Bar(IDisposable disposable, IDisposable[] list)
+        {
+            return disposable;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ChainedCallsWithHelper()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        private IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = Helper.Bar(disposable);
+        }
+    }
+}";
+
+            var helperCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public static class Helper
+    {
+        public static IDisposable Bar(IDisposable disposable)
+        {
+            if (disposable == null)
+            {
+                return Bar(disposable, new[] { disposable });
+            }
+
+            return disposable;
+        }
+
+        public static IDisposable Bar(IDisposable disposable, IDisposable[] list)
+        {
+            return disposable;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(helperCode, testCode).ConfigureAwait(false);
         }
 
         [Test]
