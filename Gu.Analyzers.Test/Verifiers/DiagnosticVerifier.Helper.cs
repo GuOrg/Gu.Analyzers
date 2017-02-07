@@ -70,6 +70,21 @@ namespace Gu.Analyzers.Test
             return results.ToImmutableArray();
         }
 
+        /// <summary>
+        /// Given classes in the form of strings, their language, and an <see cref="DiagnosticAnalyzer"/> to apply to
+        /// it, return the <see cref="Diagnostic"/>s found in the string after converting it to a
+        /// <see cref="Document"/>.
+        /// </summary>
+        /// <param name="sources">Classes in the form of strings.</param>
+        /// <param name="analyzers">The analyzers to be run on the sources.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
+        /// <returns>A collection of <see cref="Diagnostic"/>s that surfaced in the source code, sorted by
+        /// <see cref="Diagnostic.Location"/>.</returns>
+        public static Task<ImmutableArray<Diagnostic>> GetSortedDiagnosticsAsync(string[] sources, ImmutableArray<DiagnosticAnalyzer> analyzers, CancellationToken cancellationToken)
+        {
+            return GetSortedDiagnosticsFromDocumentsAsync(analyzers, CodeFactory.GetDocuments(sources, analyzers, Enumerable.Empty<string>()), cancellationToken);
+        }
+
         public DiagnosticResult CSharpDiagnostic(string diagnosticId = null)
         {
             var analyzers = this.GetCSharpDiagnosticAnalyzers();
@@ -116,21 +131,6 @@ namespace Gu.Analyzers.Test
         private static Diagnostic[] SortDistinctDiagnostics(IEnumerable<Diagnostic> diagnostics)
         {
             return diagnostics.OrderBy(d => d.Location.SourceSpan.Start).ThenBy(d => d.Id).ToArray();
-        }
-
-        /// <summary>
-        /// Given classes in the form of strings, their language, and an <see cref="DiagnosticAnalyzer"/> to apply to
-        /// it, return the <see cref="Diagnostic"/>s found in the string after converting it to a
-        /// <see cref="Document"/>.
-        /// </summary>
-        /// <param name="sources">Classes in the form of strings.</param>
-        /// <param name="analyzers">The analyzers to be run on the sources.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/> that the task will observe.</param>
-        /// <returns>A collection of <see cref="Diagnostic"/>s that surfaced in the source code, sorted by
-        /// <see cref="Diagnostic.Location"/>.</returns>
-        private Task<ImmutableArray<Diagnostic>> GetSortedDiagnosticsAsync(string[] sources, ImmutableArray<DiagnosticAnalyzer> analyzers, CancellationToken cancellationToken)
-        {
-            return GetSortedDiagnosticsFromDocumentsAsync(analyzers, CodeFactory.GetDocuments(sources, analyzers, Enumerable.Empty<string>()), cancellationToken);
         }
     }
 }

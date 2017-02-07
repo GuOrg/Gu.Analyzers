@@ -11,19 +11,12 @@ namespace Gu.Analyzers.Test
 
     using NUnit.Framework;
 
-    public class HappyPathWithAll : DiagnosticVerifier
+    public class HappyPathWithAll
     {
-        [Test]
-        public void NotEmpty()
-        {
-            CollectionAssert.IsNotEmpty(this.GetCSharpDiagnosticAnalyzers());
-            Assert.Pass($"Count: {this.GetCSharpDiagnosticAnalyzers().Count()}");
-        }
-
-        public override void IdMatches()
-        {
-            Assert.Pass();
-        }
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly.GetTypes()
+                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                               .ToImmutableArray();
 
         ////[Explicit("Temporarily ignore")]
         [Test]
@@ -215,7 +208,7 @@ namespace RoslynSandBox
     }
 }";
 
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode }, EmptyDiagnosticResults).ConfigureAwait(false);
+            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode }, AllAnalyzers).ConfigureAwait(false);
         }
 
         [Test]
@@ -247,7 +240,7 @@ namespace RoslynSandBox
         }
     }";
             var analyzers = this.GetCSharpDiagnosticAnalyzers().ToImmutableArray();
-            await GetSortedDiagnosticsFromDocumentsAsync(
+            await DiagnosticVerifier.GetSortedDiagnosticsFromDocumentsAsync(
                           analyzers,
                           CodeFactory.GetDocuments(
                               new[] { syntaxErrorCode },
@@ -257,12 +250,14 @@ namespace RoslynSandBox
                       .ConfigureAwait(false);
         }
 
-        internal override IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
+        public async Task VerifyHappyPathAsync(params string[] testCode)
         {
-            return typeof(KnownSymbol).Assembly
-                                      .GetTypes()
-                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t));
+            await DiagnosticVerifier.VerifyHappyPathAsync(testCode, AllAnalyzers).ConfigureAwait(false);
+        }
+
+        internal IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
+        {
+            return AllAnalyzers;
         }
     }
 }
