@@ -29,7 +29,6 @@ public class Foo
         return true;
     }
 }";
-
                 await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
 

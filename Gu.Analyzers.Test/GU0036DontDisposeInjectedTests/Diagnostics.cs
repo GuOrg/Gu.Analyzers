@@ -38,6 +38,85 @@
                       .ConfigureAwait(false);
         }
 
+        [TestCase("this.disposable.Dispose();")]
+        [TestCase("this.disposable?.Dispose();")]
+        [TestCase("disposable.Dispose();")]
+        [TestCase("disposable?.Dispose();")]
+        public async Task DisposingPublicField(string disposeCall)
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        public IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            ↓this.disposable.Dispose();
+        }
+    }";
+            testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingPublicFieldOutsideOfLock()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo : IDisposable
+    {
+        private readonly object gate;
+
+        public IDisposable disposable;
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            var toDispose = (IDisposable)null;
+            lock (this.gate)
+            {
+                if (this.disposed)
+                {
+                    return;
+                }
+
+                this.disposed = true;
+                toDispose = this.disposable;
+                this.disposable = null;
+            }
+
+            ↓toDispose?.Dispose();
+        }
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
         [TestCase("this.Disposable.Dispose();")]
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]

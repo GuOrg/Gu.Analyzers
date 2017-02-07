@@ -22,7 +22,7 @@ namespace Gu.Reactive
     {
         private readonly IDisposable subscription;
 
-        protected Foo(IObservable<object> observable)
+        public Foo(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ => { });
         }
@@ -30,6 +30,46 @@ namespace Gu.Reactive
         public void Dispose()
         {
             this.subscription.Dispose();
+        }
+     }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task ChainedCtorInjectedSubscribe()
+            {
+                var testCode = @"
+namespace Gu.Reactive
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+
+        public Foo(int no)
+            : this(Create(no))
+        {
+        }
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.subscription.Dispose();
+        }
+
+        private static IObservable<object> Create(int i)
+        {
+            return Observable.Empty<object>();
         }
      }
 }";
@@ -51,7 +91,7 @@ namespace Gu.Reactive
     {
         private readonly IDisposable subscription;
 
-        protected Foo(IObservable<object> observable)
+        public Foo(IObservable<object> observable)
         {
             this.subscription = observable?.Subscribe(_ => { });
         }

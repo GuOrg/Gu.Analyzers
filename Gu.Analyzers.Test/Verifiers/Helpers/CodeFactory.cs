@@ -104,6 +104,7 @@
                 .AddMetadataReference(projectId, MetadataReferences.SystemXaml)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactive)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfaces)
+                .AddMetadataReference(projectId, MetadataReferences.SystemReactiveLinq)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbols)
                 .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis);
 

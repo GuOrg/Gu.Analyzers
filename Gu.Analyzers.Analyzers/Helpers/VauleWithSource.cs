@@ -23,53 +23,43 @@ namespace Gu.Analyzers
 
         internal static Pool<List<VauleWithSource>>.Pooled GetRecursiveSources(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledSet = SetPool<ExpressionSyntax>.Create())
-            {
-                var pooledList = ListPool<VauleWithSource>.Create();
-                AddRecursively(value, semanticModel, cancellationToken, pooledSet.Item, pooledList.Item);
-                return pooledList;
-            }
+            var pooledList = ListPool<VauleWithSource>.Create();
+            AddRecursively(value, semanticModel, cancellationToken, pooledList.Item);
+            return pooledList;
         }
 
         internal static Pool<List<VauleWithSource>>.Pooled GetRecursiveSources(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledSet = SetPool<ExpressionSyntax>.Create())
+            var pooledList = ListPool<VauleWithSource>.Create();
+            using (var pooled = AssignedValueWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
             {
-                var pooledList = ListPool<VauleWithSource>.Create();
-                using (var pooled = AssignedValueWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
+                foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    foreach (var assignedValue in pooled.Item.AssignedValues)
-                    {
-                        AddRecursively(assignedValue, semanticModel, cancellationToken, pooledSet.Item, pooledList.Item);
-                    }
+                    AddRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
-
-                return pooledList;
             }
+
+            return pooledList;
         }
 
         internal static Pool<List<VauleWithSource>>.Pooled GetRecursiveSources(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledSet = SetPool<ExpressionSyntax>.Create())
+            var pooledList = ListPool<VauleWithSource>.Create();
+            using (var pooled = AssignedValueWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
             {
-                var pooledList = ListPool<VauleWithSource>.Create();
-                using (var pooled = AssignedValueWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+                foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    foreach (var assignedValue in pooled.Item.AssignedValues)
-                    {
-                        AddRecursively(assignedValue, semanticModel, cancellationToken, pooledSet.Item, pooledList.Item);
-                    }
+                    AddRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
-
-                return pooledList;
             }
+
+            return pooledList;
         }
 
         private static void AddRecursively(
             ExpressionSyntax value,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             if (value == null ||
@@ -79,7 +69,7 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (!@checked.Add(value))
+            if (IsAlreadyChecked(value, result))
             {
                 result.Add(new VauleWithSource(value, ValueSource.Recursion));
                 return;
@@ -103,33 +93,23 @@ namespace Gu.Analyzers
             if (value.IsKind(SyntaxKind.CoalesceExpression))
             {
                 var binaryExpression = (BinaryExpressionSyntax)value;
-                AddRecursively(binaryExpression.Left, semanticModel, cancellationToken, @checked, result);
-                AddRecursively(binaryExpression.Right, semanticModel, cancellationToken, @checked, result);
+                AddRecursively(binaryExpression.Left, semanticModel, cancellationToken, result);
+                AddRecursively(binaryExpression.Right, semanticModel, cancellationToken, result);
                 return;
             }
 
             var conditional = value as ConditionalExpressionSyntax;
             if (conditional != null)
             {
-                AddRecursively(conditional.WhenTrue, semanticModel, cancellationToken, @checked, result);
-                AddRecursively(conditional.WhenFalse, semanticModel, cancellationToken, @checked, result);
+                AddRecursively(conditional.WhenTrue, semanticModel, cancellationToken, result);
+                AddRecursively(conditional.WhenFalse, semanticModel, cancellationToken, result);
                 return;
             }
 
             var awaitExpression = value as AwaitExpressionSyntax;
             if (awaitExpression != null)
             {
-                if (semanticModel.GetSymbolSafe(awaitExpression.Expression, cancellationToken) != null)
-                {
-                    result.Add(new VauleWithSource(value, ValueSource.Calculated));
-                }
-                else
-                {
-                    result.Add(new VauleWithSource(value, ValueSource.Unknown));
-                    return;
-                }
-
-                AddRecursively(awaitExpression, semanticModel, cancellationToken, @checked, result);
+                AddRecursively(awaitExpression, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -139,7 +119,7 @@ namespace Gu.Analyzers
             {
                 var whenNotNull = (value as ConditionalAccessExpressionSyntax)?.WhenNotNull;
                 while (whenNotNull is ConditionalAccessExpressionSyntax &&
-                       @checked.Add(whenNotNull))
+                       !IsAlreadyChecked(whenNotNull, result))
                 {
                     whenNotNull = ((ConditionalAccessExpressionSyntax)whenNotNull).WhenNotNull;
                 }
@@ -152,21 +132,33 @@ namespace Gu.Analyzers
                 }
             }
 
-            AddRecursively(value, symbol, semanticModel, cancellationToken, @checked, result);
-            AddPathRecursively(value, semanticModel, cancellationToken, @checked, result);
+            AddRecursively(value, symbol, semanticModel, cancellationToken, result);
+            AddPathRecursively(value, semanticModel, cancellationToken, result);
+        }
+
+        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result)
+        {
+            foreach (var vauleWithSource in result)
+            {
+                if (ReferenceEquals(vauleWithSource.Value, value))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void AddPathRecursively(
             ExpressionSyntax value,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             var invocation = value as InvocationExpressionSyntax;
             if (invocation != null)
             {
-                AddPathRecursively(invocation.Expression, semanticModel, cancellationToken, @checked, result);
+                AddPathRecursively(invocation.Expression, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -175,7 +167,7 @@ namespace Gu.Analyzers
             if (expression == null ||
                 expression is ThisExpressionSyntax ||
                 expression is BaseExpressionSyntax ||
-                @checked.Contains(expression))
+                IsAlreadyChecked(expression, result))
             {
                 return;
             }
@@ -193,14 +185,13 @@ namespace Gu.Analyzers
                 return;
             }
 
-            AddRecursively(expression, semanticModel, cancellationToken, @checked, result);
+            AddRecursively(expression, semanticModel, cancellationToken, result);
         }
 
         private static void AddRecursively(
             AwaitExpressionSyntax awaitExpression,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             var awaitedValue = awaitExpression.Expression;
@@ -216,16 +207,35 @@ namespace Gu.Analyzers
                     {
                         awaitedValue = memberAccess.Expression;
                     }
+
+                    awaitedSymbol = semanticModel.GetSymbolSafe(awaitedValue, cancellationToken);
+                }
+
+                if (awaitedSymbol != null)
+                {
+                    var source = awaitedSymbol.DeclaringSyntaxReferences.Length == 0
+                                     ? ValueSource.External
+                                     : ValueSource.Calculated;
+                    result.Add(new VauleWithSource(awaitExpression, source));
+                }
+                else
+                {
+                    result.Add(new VauleWithSource(awaitExpression, ValueSource.Unknown));
+                    return;
                 }
             }
 
             using (var tempResults = ListPool<VauleWithSource>.Create())
             {
-                AddRecursively(awaitedValue, semanticModel, cancellationToken, @checked, tempResults.Item);
-                foreach (var temp in tempResults.Item)
+                tempResults.Item.AddRange(result);
+                AddRecursively(awaitedValue, semanticModel, cancellationToken, tempResults.Item);
+                for (var i = result.Count; i < tempResults.Item.Count; i++)
                 {
+                    var temp = tempResults.Item[i];
                     var symbol = semanticModel.GetSymbolSafe(temp.Value, cancellationToken) ??
-                                 semanticModel.GetSymbolSafe((temp.Value as AwaitExpressionSyntax)?.Expression, cancellationToken);
+                                 semanticModel.GetSymbolSafe(
+                                     (temp.Value as AwaitExpressionSyntax)?.Expression,
+                                     cancellationToken);
                     if (symbol == null)
                     {
                         result.Add(new VauleWithSource(temp.Value, ValueSource.Unknown));
@@ -234,7 +244,11 @@ namespace Gu.Analyzers
 
                     if (symbol == KnownSymbol.Task.FromResult)
                     {
-                        AddRecursively(((InvocationExpressionSyntax)temp.Value).ArgumentList.Arguments[0].Expression, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(
+                            ((InvocationExpressionSyntax)temp.Value).ArgumentList.Arguments[0].Expression,
+                            semanticModel,
+                            cancellationToken,
+                            result);
                     }
                     else if (symbol == KnownSymbol.Task.Run)
                     {
@@ -242,7 +256,7 @@ namespace Gu.Analyzers
                         var lambda = expression as ParenthesizedLambdaExpressionSyntax;
                         if (lambda != null)
                         {
-                            AddRecursively(lambda.Body as ExpressionSyntax, semanticModel, cancellationToken, @checked, result);
+                            AddRecursively(lambda.Body as ExpressionSyntax, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -262,20 +276,19 @@ namespace Gu.Analyzers
             ISymbol symbol,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             var method = symbol as IMethodSymbol;
             if (method != null)
             {
-                AddReturnValuesRecursively(value, method, semanticModel, cancellationToken, @checked, result);
+                AddReturnValuesRecursively(value, method, semanticModel, cancellationToken, result);
                 return;
             }
 
             var property = symbol as IPropertySymbol;
             if (property != null)
             {
-                AddReturnValuesRecursively(value, property, semanticModel, cancellationToken, @checked, result);
+                AddReturnValuesRecursively(value, property, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -300,21 +313,21 @@ namespace Gu.Analyzers
                     result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
                 }
 
-                AddAssignedValuesRecursively(field, semanticModel, cancellationToken, @checked, result);
+                AddAssignedValuesRecursively(field, semanticModel, cancellationToken, result);
                 return;
             }
 
             var parameter = symbol as IParameterSymbol;
             if (parameter != null)
             {
-                AddRecursively(parameter, value, semanticModel, cancellationToken, @checked, result);
+                AddRecursively(parameter, value, semanticModel, cancellationToken, result);
                 return;
             }
 
             var variable = symbol as ILocalSymbol;
             if (variable != null)
             {
-                AddAssignedValuesRecursively(variable, semanticModel, cancellationToken, @checked, result);
+                AddAssignedValuesRecursively(variable, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -326,7 +339,6 @@ namespace Gu.Analyzers
             ExpressionSyntax value,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             var method = parameter.ContainingSymbol as IMethodSymbol;
@@ -358,7 +370,7 @@ namespace Gu.Analyzers
                 {
                     if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -370,7 +382,7 @@ namespace Gu.Analyzers
                 {
                     if (initializer.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -382,7 +394,7 @@ namespace Gu.Analyzers
                 {
                     if (objectCreation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        AddRecursively(argumentValue, semanticModel, cancellationToken, @checked, result);
+                        AddRecursively(argumentValue, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -391,14 +403,13 @@ namespace Gu.Analyzers
                 }
             }
 
-            AddAssignedValuesRecursively(parameter, semanticModel, cancellationToken, @checked, result);
+            AddAssignedValuesRecursively(parameter, semanticModel, cancellationToken, result);
         }
 
         private static void AddAssignedValuesRecursively(
             ISymbol symbol,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             using (var assignments = AssignedValueWalker.AssignedValuesInType(symbol, semanticModel, cancellationToken))
@@ -424,11 +435,11 @@ namespace Gu.Analyzers
                             result.Add(new VauleWithSource(invocation, ValueSource.Out));
                         }
 
-                        AddPathRecursively(invocation, semanticModel, cancellationToken, @checked, result);
+                        AddPathRecursively(invocation, semanticModel, cancellationToken, result);
                         continue;
                     }
 
-                    AddRecursively(assignedValue, semanticModel, cancellationToken, @checked, result);
+                    AddRecursively(assignedValue, semanticModel, cancellationToken, result);
                 }
             }
         }
@@ -438,11 +449,15 @@ namespace Gu.Analyzers
             IMethodSymbol method,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             if (method.DeclaringSyntaxReferences.Length > 0)
             {
+                if (value.FirstAncestor<AwaitExpressionSyntax>() == null)
+                {
+                    result.Add(new VauleWithSource(value, ValueSource.Calculated));
+                }
+
                 foreach (var reference in method.DeclaringSyntaxReferences)
                 {
                     var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
@@ -454,12 +469,7 @@ namespace Gu.Analyzers
 
                     if (methodDeclaration.ExpressionBody != null)
                     {
-                        AddRecursively(
-                            methodDeclaration.ExpressionBody.Expression,
-                            semanticModel,
-                            cancellationToken,
-                            @checked,
-                            result);
+                        AddRecursively(methodDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -467,7 +477,7 @@ namespace Gu.Analyzers
                         {
                             foreach (var returnValue in pooledReturns.Item.ReturnValues)
                             {
-                                AddRecursively(returnValue, semanticModel, cancellationToken, @checked, result);
+                                AddRecursively(returnValue, semanticModel, cancellationToken, result);
                             }
                         }
                     }
@@ -484,7 +494,6 @@ namespace Gu.Analyzers
             IPropertySymbol property,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
-            HashSet<ExpressionSyntax> @checked,
             List<VauleWithSource> result)
         {
             if (property.DeclaringSyntaxReferences.Length > 0)
@@ -504,12 +513,7 @@ namespace Gu.Analyzers
                         if (propertyDeclaration.ExpressionBody != null)
                         {
                             result.Add(new VauleWithSource(value, ValueSource.Calculated));
-                            AddRecursively(
-                                propertyDeclaration.ExpressionBody.Expression,
-                                semanticModel,
-                                cancellationToken,
-                                @checked,
-                                result);
+                            AddRecursively(propertyDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -529,7 +533,7 @@ namespace Gu.Analyzers
                                         }
                                     }
 
-                                    AddAssignedValuesRecursively(property, semanticModel, cancellationToken, @checked, result);
+                                    AddAssignedValuesRecursively(property, semanticModel, cancellationToken, result);
                                 }
                                 else
                                 {
@@ -538,7 +542,7 @@ namespace Gu.Analyzers
                                     {
                                         foreach (var returnValue in pooledReturns.Item.ReturnValues)
                                         {
-                                            AddRecursively(returnValue, semanticModel, cancellationToken, @checked, result);
+                                            AddRecursively(returnValue, semanticModel, cancellationToken, result);
                                         }
                                     }
                                 }
