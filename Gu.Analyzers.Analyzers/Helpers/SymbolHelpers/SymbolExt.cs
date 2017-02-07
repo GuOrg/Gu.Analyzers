@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
 
@@ -23,14 +22,6 @@
             }
 
             return false;
-        }
-
-        internal static IEnumerable<SyntaxNode> Declarations(this ISymbol symbol, CancellationToken cancellationToken)
-        {
-            foreach (var syntaxReference in symbol.DeclaringSyntaxReferences)
-            {
-                yield return syntaxReference.GetSyntax(cancellationToken);
-            }
         }
     }
 }

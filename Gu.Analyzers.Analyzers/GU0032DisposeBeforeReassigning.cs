@@ -207,9 +207,9 @@
             var field = symbol as IFieldSymbol;
             if (field != null)
             {
-                foreach (var declaration in field.Declarations(cancellationToken))
+                foreach (var reference in field.DeclaringSyntaxReferences)
                 {
-                    if ((declaration as VariableDeclaratorSyntax)?.Initializer == null)
+                    if ((reference.GetSyntax(cancellationToken) as VariableDeclaratorSyntax)?.Initializer == null)
                     {
                         return false;
                     }
@@ -219,9 +219,9 @@
             var property = symbol as IPropertySymbol;
             if (property != null)
             {
-                foreach (var declaration in property.Declarations(cancellationToken))
+                foreach (var reference in property.DeclaringSyntaxReferences)
                 {
-                    var propertyDeclaration = declaration as PropertyDeclarationSyntax;
+                    var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
                     if (propertyDeclaration == null)
                     {
                         continue;

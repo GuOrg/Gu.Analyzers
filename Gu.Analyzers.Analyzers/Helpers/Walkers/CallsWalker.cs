@@ -46,9 +46,9 @@
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
 
-            foreach (var declaration in method.ContainingType.Declarations(cancellationToken))
+            foreach (var declaration in method.ContainingType.DeclaringSyntaxReferences)
             {
-                pooled.Item.Visit(declaration);
+                pooled.Item.Visit(declaration.GetSyntax(cancellationToken));
             }
 
             return pooled;

@@ -26,9 +26,9 @@ namespace Gu.Analyzers
 
         internal static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            foreach (var declaration in disposeMethod.Declarations(cancellationToken))
+            foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
             {
-                using (var pooled = IdentifierNameWalker.Create(declaration))
+                using (var pooled = IdentifierNameWalker.Create(reference.GetSyntax(cancellationToken)))
                 {
                     foreach (var identifier in pooled.Item.IdentifierNames)
                     {

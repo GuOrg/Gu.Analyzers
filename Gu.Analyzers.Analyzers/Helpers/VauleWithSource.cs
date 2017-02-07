@@ -443,9 +443,9 @@ namespace Gu.Analyzers
         {
             if (method.DeclaringSyntaxReferences.Length > 0)
             {
-                foreach (var declaration in method.Declarations(cancellationToken))
+                foreach (var reference in method.DeclaringSyntaxReferences)
                 {
-                    var methodDeclaration = declaration as MethodDeclarationSyntax;
+                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
                     if (methodDeclaration == null)
                     {
                         result.Add(new VauleWithSource(value, ValueSource.Unknown));
@@ -489,16 +489,16 @@ namespace Gu.Analyzers
         {
             if (property.DeclaringSyntaxReferences.Length > 0)
             {
-                foreach (var declaration in property.Declarations(cancellationToken))
+                foreach (var reference in property.DeclaringSyntaxReferences)
                 {
-                    var basePropertyDeclaration = declaration as BasePropertyDeclarationSyntax;
+                    var basePropertyDeclaration = reference.GetSyntax(cancellationToken) as BasePropertyDeclarationSyntax;
                     if (basePropertyDeclaration == null)
                     {
                         result.Add(new VauleWithSource(value, ValueSource.Unknown));
                         continue;
                     }
 
-                    var propertyDeclaration = declaration as PropertyDeclarationSyntax;
+                    var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
                     if (propertyDeclaration != null)
                     {
                         if (propertyDeclaration.ExpressionBody != null)

@@ -36,36 +36,32 @@
 
         public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(property, property.ContainingType.Declarations(cancellationToken), semanticModel, cancellationToken);
+            return CreateCore(property, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(field, field.ContainingType.Declarations(cancellationToken), semanticModel, cancellationToken);
+            return CreateCore(field, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(local, local.ContainingSymbol.Declarations(cancellationToken), semanticModel, cancellationToken);
+            return CreateCore(local, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IParameterSymbol parameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(parameter, parameter.ContainingSymbol.Declarations(cancellationToken), semanticModel, cancellationToken);
+            return CreateCore(parameter, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
-                symbol is IPropertySymbol)
-            {
-                return CreateCore(symbol, symbol.ContainingType.Declarations(cancellationToken), semanticModel, cancellationToken);
-            }
-
-            if (symbol is ILocalSymbol ||
+                symbol is IPropertySymbol ||
+                symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return CreateCore(symbol, symbol.ContainingSymbol.Declarations(cancellationToken), semanticModel, cancellationToken);
+                return CreateCore(symbol,  semanticModel, cancellationToken);
             }
 
             return Pool.GetOrCreate();
@@ -233,7 +229,7 @@
             base.VisitPropertyDeclaration(node);
         }
 
-        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, IEnumerable<SyntaxNode> nodes, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             pooled.Item.symbol = symbol;
@@ -243,7 +239,6 @@
 
             using (var pooledNodes = SetPool<SyntaxNode>.Create())
             {
-                pooledNodes.Item.UnionWith(nodes);
                 var count = 0;
                 while (count != pooled.Item.symbols.Count)
                 {
@@ -251,11 +246,11 @@
                     pooled.Item.assignedValues.Clear();
                     foreach (var assignedSymbol in pooled.Item.symbols)
                     {
-                        if (!IsChecked(assignedSymbol as IParameterSymbol, pooledNodes.Item))
+                        if (!IsChecked(assignedSymbol, pooledNodes.Item))
                         {
-                            foreach (var declaration in assignedSymbol.ContainingSymbol.Declarations(cancellationToken))
+                            foreach (var reference in assignedSymbol.ContainingSymbol.DeclaringSyntaxReferences)
                             {
-                                pooledNodes.Item.Add(declaration).IgnoreReturnValue();
+                                pooledNodes.Item.Add(reference.GetSyntax(cancellationToken)).IgnoreReturnValue();
                             }
                         }
                     }
@@ -271,14 +266,14 @@
             return pooled;
         }
 
-        private static bool IsChecked(IParameterSymbol parameter, HashSet<SyntaxNode> nodes)
+        private static bool IsChecked(ISymbol symbol, HashSet<SyntaxNode> nodes)
         {
-            if (parameter == null)
+            if (symbol == null)
             {
                 return true;
             }
 
-            foreach (var reference in parameter.ContainingSymbol.DeclaringSyntaxReferences)
+            foreach (var reference in symbol.ContainingSymbol.DeclaringSyntaxReferences)
             {
                 foreach (var syntaxNode in nodes)
                 {

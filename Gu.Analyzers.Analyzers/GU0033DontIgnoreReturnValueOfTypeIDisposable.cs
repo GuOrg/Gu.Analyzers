@@ -189,9 +189,9 @@
                 return true;
             }
 
-            foreach (var declaration in method.Declarations(cancellationToken))
+            foreach (var reference in method.DeclaringSyntaxReferences)
             {
-                var methodDeclaration = declaration as BaseMethodDeclarationSyntax;
+                var methodDeclaration = reference.GetSyntax(cancellationToken) as BaseMethodDeclarationSyntax;
                 if (methodDeclaration == null)
                 {
                     continue;
@@ -215,7 +215,7 @@
                     }
                 }
 
-                var ctor = declaration as ConstructorDeclarationSyntax;
+                var ctor = reference.GetSyntax(cancellationToken) as ConstructorDeclarationSyntax;
                 if (ctor?.Initializer != null)
                 {
                     foreach (var arg in ctor.Initializer.ArgumentList.Arguments)

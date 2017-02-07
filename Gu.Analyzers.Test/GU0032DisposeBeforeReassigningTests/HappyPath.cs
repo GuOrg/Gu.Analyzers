@@ -207,6 +207,31 @@ public class Foo
         }
 
         [Test]
+        public async Task LocalSwapCachedTryGetValue()
+        {
+            var testCode = @"
+using System.Collections.Generic;
+using System.IO;
+
+public class Foo
+{
+    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+    public void SetCurrent(int number)
+    {
+        Stream current = this.Cache[number];
+        this.Cache.TryGetValue(1, out current);
+        Stream temp;
+        this.Cache.TryGetValue(2, out temp);
+        current = temp;
+        current = this.Cache[number + 1];
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingVariable()
         {
             var testCode = @"
