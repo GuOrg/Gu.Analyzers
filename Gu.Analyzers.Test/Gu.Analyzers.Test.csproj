@@ -82,8 +82,11 @@
     <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
     <Compile Include="ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
     <Compile Include="ValueWithSourceTests\ValueWithSourceTests.cs" />
+    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
+    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
     <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Recursive.cs" />
     <Compile Include="ReproBox.cs" />
+    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.SyntaxError.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />
     <Compile Include="Verifiers\NestedCodeFixVerifier.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />

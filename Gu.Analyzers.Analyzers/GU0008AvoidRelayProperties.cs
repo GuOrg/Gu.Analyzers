@@ -120,7 +120,7 @@
             var field = member as IFieldSymbol;
             if (field != null)
             {
-                using (var walker = AssignedValueWalker.AssignedValuesInType(field, semanticModel, cancellationToken))
+                using (var walker = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
                 {
                     foreach (var assignedValue in walker.Item.AssignedValues)
                     {
@@ -140,7 +140,7 @@
             var property = member as IPropertySymbol;
             if (property != null)
             {
-                using (var walker = AssignedValueWalker.AssignedValuesInType(property, semanticModel, cancellationToken))
+                using (var walker = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
                 {
                     foreach (var assignedValue in walker.Item.AssignedValues)
                     {

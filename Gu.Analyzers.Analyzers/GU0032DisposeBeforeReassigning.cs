@@ -183,7 +183,7 @@
                 return false;
             }
 
-            using (var pooled = AssignedValueWalker.AssignedValuesInType(symbol, semanticModel, cancellationToken))
+            using (var pooled = AssignedValueWalker.Create(symbol, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {

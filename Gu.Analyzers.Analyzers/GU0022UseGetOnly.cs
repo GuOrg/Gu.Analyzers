@@ -58,7 +58,7 @@
                 return;
             }
 
-            using (var pooled = AssignedValueWalker.AssignedValuesInType(propertySymbol, context.SemanticModel, context.CancellationToken))
+            using (var pooled = AssignedValueWalker.Create(propertySymbol, context.SemanticModel, context.CancellationToken))
             {
                 foreach (var value in pooled.Item.AssignedValues)
                 {

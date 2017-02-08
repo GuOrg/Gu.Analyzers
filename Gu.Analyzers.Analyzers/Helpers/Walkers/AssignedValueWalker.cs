@@ -34,27 +34,27 @@
 
         public IReadOnlyList<ExpressionSyntax> AssignedValues => this.assignedValues;
 
-        public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(property, semanticModel, cancellationToken);
         }
 
-        public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(field, semanticModel, cancellationToken);
         }
 
-        public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(local, semanticModel, cancellationToken);
         }
 
-        public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(IParameterSymbol parameter, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(IParameterSymbol parameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(parameter, semanticModel, cancellationToken);
         }
 
-        public static Pool<AssignedValueWalker>.Pooled AssignedValuesInType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
                 symbol is IPropertySymbol ||

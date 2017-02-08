@@ -8,6 +8,7 @@ namespace Gu.Analyzers
         Constant,
         Created,
         PotentiallyCreated,
+        Argument,
         Injected,
         PotentiallyInjected,
         Member,

@@ -249,6 +249,122 @@ namespace RoslynSandBox
         }
 
         [Test]
+        public async Task ReactiveSample()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    public abstract class RxFoo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
+
+        public RxFoo(int no)
+            : this(Create(no))
+        {
+        }
+
+        public RxFoo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ => { });
+            this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.subscription.Dispose();
+            this.singleAssignmentDisposable.Dispose();
+        }
+
+        private static IObservable<object> Create(int i)
+        {
+            return Observable.Empty<object>();
+        }
+     }
+}";
+
+            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { testCode }, AllAnalyzers).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task RecursiveSample()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.Collections.Generic;
+
+    public abstract class Foo
+    {
+        public Foo()
+        {
+            var value = this.RecursiveExpressionBodyProperty;
+            value = this.RecursiveStatementBodyProperty;
+            value = this.RecursiveExpressionBodyMethod();
+            value = this.RecursiveExpressionBodyMethod(1);
+            value = this.RecursiveStatementBodyMethod();
+            value = this.RecursiveStatementBodyMethod(1);
+            value = RecursiveStatementBodyMethodWithOptionalParameter(1);
+            value = value;
+        }
+
+        public int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
+
+        public int RecursiveStatementBodyProperty
+        {
+            get
+            {
+                return this.RecursiveStatementBodyProperty;
+            }
+        }
+
+        public int RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
+
+        public int RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
+
+        public int RecursiveStatementBodyMethod()
+        {
+            return this.RecursiveStatementBodyMethod();
+        }
+
+        public int RecursiveStatementBodyMethod(int value)
+        {
+            return this.RecursiveStatementBodyMethod(value);
+        }
+
+        public void Meh()
+        {
+            var value = this.RecursiveExpressionBodyProperty;
+            value = this.RecursiveStatementBodyProperty;
+            value = this.RecursiveExpressionBodyMethod();
+            value = this.RecursiveExpressionBodyMethod(1);
+            value = this.RecursiveStatementBodyMethod();
+            value = this.RecursiveStatementBodyMethod(1);
+            value = RecursiveStatementBodyMethodWithOptionalParameter(1);
+            value = value;
+        }
+
+        private static int RecursiveStatementBodyMethodWithOptionalParameter(int value, IEnumerable<int> values = null)
+        {
+            if (values == null)
+            {
+                return RecursiveStatementBodyMethodWithOptionalParameter(value, new[] { value });
+            }
+
+            return value;
+        }
+     }
+}";
+
+            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { testCode }, AllAnalyzers).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WithSyntaxcErrors()
         {
             var syntaxErrorCode = @"
