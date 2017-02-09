@@ -4,7 +4,6 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -25,8 +24,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -41,7 +39,6 @@ internal class Foo
 namespace RoslynSandBox
 {
     using System;
-    using System.Collections.Generic;
 
     public class Foo
     {
@@ -67,16 +64,14 @@ namespace RoslynSandBox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<AssignmentExpressionSyntax>().Right;
-                Assert.AreEqual("this.disposable = Id(disposable);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.AssignmentExpression("this.disposable = Id(disposable);").Right;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("Id(disposable) Calculated, arg Argument, disposable Injected", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(0).Value;
-                Assert.AreEqual("var temp = this.disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -121,20 +116,18 @@ namespace RoslynSandBox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<AssignmentExpressionSyntax>().Right;
-                Assert.AreEqual("this.disposable = Bar(arg);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.AssignmentExpression("this.disposable = Bar(arg);").Right;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, disposable Argument, arg Injected, disposable Recursion, disposable Recursion", actual);
+                    Assert.AreEqual("Bar(arg) Calculated, arg Injected, Bar(disposable, new[] { disposable }) Recursion, disposable Argument", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
-                Assert.AreEqual("var temp = this.disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.disposable Member, Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, disposable Argument, arg Injected, disposable Recursion, disposable Recursion", actual);
+                    Assert.AreEqual("this.disposable Member, Bar(arg) Calculated, arg Injected, Bar(disposable, new[] { disposable }) Recursion, disposable Argument", actual);
                 }
             }
 
@@ -155,8 +148,7 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = disposable.Disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = disposable.Disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -181,8 +173,7 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = disposable?.Disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = disposable?.Disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -215,16 +206,14 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = this.meh?.Disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("this.meh?.Disposable External, this.meh Member, meh Injected", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
-                Assert.AreEqual("var temp = this.meh?.Disposable;", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -249,8 +238,7 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = meh?.Disposable?.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh?.Disposable?.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -283,16 +271,14 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = this.meh?.Disposable?.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable?.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
-                Assert.AreEqual("var temp = this.meh?.Disposable?.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable?.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -317,8 +303,7 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = meh?.Disposable.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh?.Disposable.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -351,16 +336,14 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = this.meh?.Disposable.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("this.meh?.Disposable.GetHashCode() External, this.meh Member, meh Injected", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
-                Assert.AreEqual("var temp = this.meh?.Disposable.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -393,16 +376,14 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = this.meh?.Disposable?.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable?.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
                 }
 
-                node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
-                Assert.AreEqual("var temp = this.meh?.Disposable?.GetHashCode();", node.FirstAncestor<StatementSyntax>().ToString());
+                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable?.GetHashCode();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -424,8 +405,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("temp");
-                Assert.AreEqual("var value = temp;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = temp;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -446,8 +426,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("meh");
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -475,8 +454,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("meh");
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -502,8 +480,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("meh");
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -529,8 +506,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = arg;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = arg;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -556,8 +532,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -596,8 +571,7 @@ namespace RoslynSandBox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("meh");
-                Assert.AreEqual("var value = meh;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -623,8 +597,7 @@ public sealed class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("value");
-                Assert.AreEqual("var temp = value;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -651,8 +624,7 @@ public sealed class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("value");
-                Assert.AreEqual("var temp = value;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -679,8 +651,7 @@ public sealed class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.FirstDescendant<IdentifierNameSyntax>("value");
-                Assert.AreEqual("var temp = value;", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));

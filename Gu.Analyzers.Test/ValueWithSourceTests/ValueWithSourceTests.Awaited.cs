@@ -4,7 +4,6 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -33,8 +32,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -63,8 +61,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync().ConfigureAwait(false);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync().ConfigureAwait(false);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -93,8 +90,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync().ConfigureAwait(false);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync().ConfigureAwait(false);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -117,8 +113,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await Task.FromResult(new string(' ', 1));", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await Task.FromResult(new string(' ', 1));").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -141,8 +136,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await Task.Run(() => new string(' ', 1));", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await Task.Run(() => new string(' ', 1));").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -167,7 +161,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
+                var node = syntaxTree.EqualsValueClause("var text = condition").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -195,8 +189,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -224,8 +217,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync();", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync();").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -258,8 +250,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync(true);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync(true);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -292,8 +283,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync(true);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync(true);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -326,8 +316,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync(true).ConfigureAwait(false);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync(true).ConfigureAwait(false);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -360,8 +349,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>().Value;
-                Assert.AreEqual("var text = await CreateAsync(true);", node.FirstAncestor<StatementSyntax>().ToString());
+                var node = syntaxTree.EqualsValueClause("var text = await CreateAsync(true);").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));

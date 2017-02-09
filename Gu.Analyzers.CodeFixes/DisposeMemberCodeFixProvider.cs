@@ -209,6 +209,7 @@
                     switch (vauleWithSource.Source)
                     {
                         case ValueSource.Created:
+                        case ValueSource.Argument:
                             continue;
                         default:
                             return false;

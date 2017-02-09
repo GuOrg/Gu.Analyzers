@@ -236,8 +236,6 @@ namespace RoslynSandBox
 
     public class Foo
     {
-        private IDisposable disposable;
-
         public Foo(IDisposable disposable)
         {
             ↓Bar(disposable);

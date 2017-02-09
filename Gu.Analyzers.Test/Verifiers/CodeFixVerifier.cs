@@ -400,7 +400,7 @@ namespace Gu.Analyzers.Test
                 var actual = await GetStringFromDocumentAsync(updatedDocuments[i], cancellationToken).ConfigureAwait(false);
                 var expectedCode = new CodeReader(newSources[i]);
                 var actualCode = new CodeReader(actual);
-                if (actualCode != expectedCode)
+                if (expectedCode != actualCode)
                 {
                     Console.WriteLine("Expected:");
                     Console.Write(expectedCode);

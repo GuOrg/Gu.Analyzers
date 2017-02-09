@@ -4,7 +4,6 @@ namespace Gu.Analyzers.Test
     using System.Threading;
 
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -32,7 +31,7 @@ public class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.Descendant<EqualsValueClauseSyntax>(1).Value;
+                var node = syntaxTree.EqualsValueClause("var temp = stream;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));

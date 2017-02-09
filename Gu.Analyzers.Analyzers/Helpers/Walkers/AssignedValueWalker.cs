@@ -16,6 +16,7 @@
                 x.symbols.Clear();
                 x.assignedValues.Clear();
                 x.symbol = null;
+                x.statement = null;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
             });
@@ -24,6 +25,7 @@
         private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>();
 
         private ISymbol symbol;
+        private StatementSyntax statement;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
         private bool isSamplingRetunValues;
@@ -36,22 +38,36 @@
 
         public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(property, semanticModel, cancellationToken);
+            return CreateCore(property, null, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(field, semanticModel, cancellationToken);
+            return CreateCore(field, null, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled Create(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(local, semanticModel, cancellationToken);
+            return CreateCore(local, null, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled Create(IParameterSymbol parameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(parameter, semanticModel, cancellationToken);
+            return CreateCore(parameter, null, semanticModel, cancellationToken);
+        }
+
+        public static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+            if (symbol is IFieldSymbol ||
+                symbol is IPropertySymbol ||
+                symbol is ILocalSymbol ||
+                symbol is IParameterSymbol)
+            {
+                return CreateCore(symbol, value.FirstAncestor<StatementSyntax>(), semanticModel, cancellationToken);
+            }
+
+            return Pool.GetOrCreate();
         }
 
         public static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -61,7 +77,7 @@
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return CreateCore(symbol,  semanticModel, cancellationToken);
+                return CreateCore(symbol, null, semanticModel, cancellationToken);
             }
 
             return Pool.GetOrCreate();
@@ -70,7 +86,8 @@
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
-            if (this.symbols.Contains(left))
+            if (this.symbols.Contains(left) &&
+                this.IsBeforeInScope(node))
             {
                 this.AddPropertyIfInSetter(node);
                 this.assignedValues.Add(node.Right);
@@ -82,7 +99,8 @@
         public override void VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (this.symbols.Contains(operand))
+            if (this.symbols.Contains(operand) &&
+                this.IsBeforeInScope(node))
             {
                 this.AddPropertyIfInSetter(node);
                 this.assignedValues.Add(node.Operand);
@@ -94,7 +112,8 @@
         public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (this.symbols.Contains(operand))
+            if (this.symbols.Contains(operand) &&
+                this.IsBeforeInScope(node))
             {
                 this.AddPropertyIfInSetter(node);
                 this.assignedValues.Add(node.Operand);
@@ -110,7 +129,8 @@
             {
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
                 if (invocation != null &&
-                    this.symbols.Contains(this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
+                    this.symbols.Contains(this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)) &&
+                     this.IsBeforeInScope(node))
                 {
                     this.assignedValues.Add(node.Expression);
                     var method = (IMethodSymbol)this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
@@ -229,10 +249,11 @@
             base.VisitPropertyDeclaration(node);
         }
 
-        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, StatementSyntax statement, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             pooled.Item.symbol = symbol;
+            pooled.Item.statement = statement;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.symbols.Add(symbol).IgnoreReturnValue();
@@ -297,6 +318,34 @@
                     this.symbols.Add(property).IgnoreReturnValue();
                 }
             }
+        }
+
+        private bool IsBeforeInScope(SyntaxNode node)
+        {
+            if (this.statement == null)
+            {
+                return true;
+            }
+
+            var ctor = this.statement.FirstAncestor<ConstructorDeclarationSyntax>();
+            if (ctor != null)
+            {
+                var otherCtor = node.FirstAncestor<ConstructorDeclarationSyntax>();
+                if (otherCtor == null)
+                {
+                    return false;
+                }
+
+                if (otherCtor.IsBeforeInScope(ctor, this.semanticModel, this.cancellationToken))
+                {
+                    return true;
+                }
+
+                return node.IsBeforeInScope(this.statement);
+            }
+
+            return this.statement.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
+                   node.IsBeforeInScope(this.statement);
         }
     }
 }

@@ -1137,7 +1137,7 @@ public sealed class Foo : IDisposable
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
-          .ConfigureAwait(false);
+                      .ConfigureAwait(false);
         }
 
         [Test]

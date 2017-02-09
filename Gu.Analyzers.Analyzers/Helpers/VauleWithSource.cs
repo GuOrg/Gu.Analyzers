@@ -77,9 +77,10 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (IsAlreadyChecked(value, result))
+            int index;
+            if (IsAlreadyChecked(value, result, out index))
             {
-                result.Add(new VauleWithSource(value, ValueSource.Recursion));
+                result[index] = result[index].WithSource(ValueSource.Recursion);
                 return;
             }
 
@@ -128,7 +129,7 @@ namespace Gu.Analyzers
             if (symbol == null)
             {
                 var whenNotNull = (value as ConditionalAccessExpressionSyntax)?.WhenNotNull;
-                while (whenNotNull is ConditionalAccessExpressionSyntax && !IsAlreadyChecked(whenNotNull, result))
+                while (whenNotNull is ConditionalAccessExpressionSyntax && !IsAlreadyChecked(whenNotNull, result, out index))
                 {
                     whenNotNull = ((ConditionalAccessExpressionSyntax)whenNotNull).WhenNotNull;
                 }
@@ -145,12 +146,15 @@ namespace Gu.Analyzers
             AddPathRecursively(value, semanticModel, cancellationToken, result);
         }
 
-        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result)
+        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result, out int index)
         {
-            foreach (var vauleWithSource in result)
+            index = -1;
+            for (var i = 0; i < result.Count; i++)
             {
+                var vauleWithSource = result[i];
                 if (ReferenceEquals(vauleWithSource.Value, value))
                 {
+                    index = i;
                     return true;
                 }
             }
@@ -173,17 +177,17 @@ namespace Gu.Analyzers
 
             var expression = (value as MemberAccessExpressionSyntax)?.Expression ??
                              (value as ConditionalAccessExpressionSyntax)?.Expression;
+            int index;
             if (expression == null ||
                 expression is ThisExpressionSyntax ||
                 expression is BaseExpressionSyntax ||
-                IsAlreadyChecked(expression, result))
+                IsAlreadyChecked(expression, result, out index))
             {
                 return;
             }
 
             var symbol = semanticModel.GetSymbolSafe(expression, cancellationToken);
-            if (symbol == null ||
-                !(symbol is IFieldSymbol || symbol is IPropertySymbol || symbol is IParameterSymbol))
+            if (symbol == null)
             {
                 return;
             }
@@ -238,6 +242,14 @@ namespace Gu.Analyzers
             {
                 tempResults.Item.AddRange(result);
                 AddRecursively(awaitedValue, semanticModel, cancellationToken, tempResults.Item);
+                for (var i = 0; i < result.Count; i++)
+                {
+                    if (tempResults.Item[i].Source == ValueSource.Recursion)
+                    {
+                        result[i] = tempResults.Item[i];
+                    }
+                }
+
                 for (var i = result.Count; i < tempResults.Item.Count; i++)
                 {
                     var temp = tempResults.Item[i];
@@ -318,7 +330,7 @@ namespace Gu.Analyzers
             var variable = symbol as ILocalSymbol;
             if (variable != null)
             {
-                AddAssignedValuesRecursively(variable, semanticModel, cancellationToken, result);
+                AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -385,8 +397,7 @@ namespace Gu.Analyzers
             {
                 foreach (var reference in property.DeclaringSyntaxReferences)
                 {
-                    var basePropertyDeclaration =
-                        reference.GetSyntax(cancellationToken) as BasePropertyDeclarationSyntax;
+                    var basePropertyDeclaration = reference.GetSyntax(cancellationToken) as BasePropertyDeclarationSyntax;
                     if (basePropertyDeclaration == null)
                     {
                         result.Add(new VauleWithSource(value, ValueSource.Unknown));
@@ -417,13 +428,16 @@ namespace Gu.Analyzers
                                     if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter) &&
                                         setter.Body == null)
                                     {
-                                        if (property.SetMethod.DeclaredAccessibility != Accessibility.Private)
+                                        VauleWithSource first;
+                                        if (property.SetMethod.DeclaredAccessibility != Accessibility.Private &&
+                                            result.TryGetFirst(out first) &&
+                                            first.Value.FirstAncestor<ConstructorDeclarationSyntax>() == null)
                                         {
                                             result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
                                         }
                                     }
 
-                                    AddAssignedValuesRecursively(property, semanticModel, cancellationToken, result);
+                                    AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
                                 }
                                 else
                                 {
@@ -467,13 +481,16 @@ namespace Gu.Analyzers
             }
 
             result.Add(new VauleWithSource(value, ValueSource.Member));
+            VauleWithSource first;
             if (!field.IsReadOnly &&
-                field.DeclaredAccessibility != Accessibility.Private)
+                field.DeclaredAccessibility != Accessibility.Private &&
+                result.TryGetFirst(out first) &&
+                first.Value.FirstAncestor<ConstructorDeclarationSyntax>() == null)
             {
                 result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
             }
 
-            AddAssignedValuesRecursively(field, semanticModel, cancellationToken, result);
+            AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
         }
 
         private static void AddRecursively(
@@ -568,21 +585,21 @@ namespace Gu.Analyzers
                 }
             }
 
-            AddAssignedValuesRecursively(parameter, semanticModel, cancellationToken, result);
+            AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
         }
 
         private static void AddAssignedValuesRecursively(
-            ISymbol symbol,
+            ExpressionSyntax value,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
             List<VauleWithSource> result)
         {
-            using (var assignments = AssignedValueWalker.Create(symbol, semanticModel, cancellationToken))
+            using (var assignments = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in assignments.Item.AssignedValues)
                 {
-                    if ((symbol is ILocalSymbol || symbol is IParameterSymbol) &&
-                        symbol.Equals(semanticModel.GetSymbolSafe(assignedValue, cancellationToken)))
+                    int index;
+                    if (IsAlreadyChecked(assignedValue, result, out index))
                     {
                         continue;
                     }
@@ -613,6 +630,11 @@ namespace Gu.Analyzers
                     AddRecursively(assignedValue, semanticModel, cancellationToken, result);
                 }
             }
+        }
+
+        private VauleWithSource WithSource(ValueSource source)
+        {
+            return new VauleWithSource(this.Value, source);
         }
     }
 }

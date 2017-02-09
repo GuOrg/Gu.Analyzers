@@ -279,26 +279,37 @@ public sealed class Bar : IDisposable
         }
 
         [Test]
+        public async Task DisposingCtorParameter()
+        {
+            var testCode = @"
+using System;
+
+public class Foo
+{
+    public Foo(IDisposable meh)
+    {
+        ↓meh.Dispose();
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingParameter()
         {
             var testCode = @"
     using System;
 
-    public sealed class Foo : IDisposable
+    public class Foo
     {
-        private bool isDirty;
-
-        public Foo()
-        {
-        }
-
         public void Bar(IDisposable meh)
         {
             ↓meh.Dispose();
-        }
-
-        public void Dispose()
-        {
         }
     }";
 
