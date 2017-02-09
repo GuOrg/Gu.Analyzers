@@ -171,6 +171,13 @@ namespace Gu.Analyzers
             var invocation = value as InvocationExpressionSyntax;
             if (invocation != null)
             {
+                var method = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                if (method == null ||
+                    method.IsStatic)
+                {
+                    return;
+                }
+
                 AddPathRecursively(invocation.Expression, semanticModel, cancellationToken, result);
                 return;
             }

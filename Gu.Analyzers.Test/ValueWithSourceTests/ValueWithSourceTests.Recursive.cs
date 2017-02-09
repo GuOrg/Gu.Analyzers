@@ -379,7 +379,7 @@ internal class Foo
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.Value(out temp) Out, this.Value(out value) Out, this.Value(out value) Recursion", actual);
+                    Assert.AreEqual($"this.Value(out temp) Out, this.Value(out value) Recursion", actual);
                 }
             }
 

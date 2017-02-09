@@ -289,14 +289,14 @@ internal class Foo
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.field.Value Member, this.field Created", actual);
+                    Assert.AreEqual($"this.field.Value Member, this.field Member, new Nested() Created", actual);
                 }
 
                 node = syntaxTree.EqualsValueClause("var temp2 = this.field.Value;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.field.Value Member, this.field Member, new Nested() Created, this.field.Value PotentiallyInjected", actual);
+                    Assert.AreEqual($"this.field.Value Member, this.field.Value PotentiallyInjected, this.field Member, new Nested() Created", actual);
                 }
             }
 

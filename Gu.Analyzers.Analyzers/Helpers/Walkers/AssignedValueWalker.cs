@@ -130,7 +130,7 @@
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
                 if (invocation != null &&
                     this.symbols.Contains(this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)) &&
-                     this.IsBeforeInScope(node))
+                    this.IsBeforeInScope(node))
                 {
                     this.assignedValues.Add(node.Expression);
                     var method = (IMethodSymbol)this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
@@ -334,6 +334,11 @@
                 if (otherCtor == null)
                 {
                     return false;
+                }
+
+                if (ctor == otherCtor)
+                {
+                    return node.IsBeforeInScope(this.statement);
                 }
 
                 if (otherCtor.IsBeforeInScope(ctor, this.semanticModel, this.cancellationToken))
