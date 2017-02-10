@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;
@@ -76,6 +76,54 @@ namespace RoslynSandBox
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected", actual);
+                }
+            }
+
+            [Test]
+            public void SimpleValuePassedToMethodAssigningParameter()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            Id(null);
+            this.disposable = Bar(disposable);
+        }
+
+        public IDisposable Bar(IDisposable arg)
+        {
+            arg = new Disposable();
+            return arg;
+        }
+
+        public void Bar()
+        {
+            var temp = this.disposable;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.AssignmentExpression("this.disposable = Bar(disposable);").Right;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected", actual);
+                }
+
+                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected", actual);
                 }
             }
 

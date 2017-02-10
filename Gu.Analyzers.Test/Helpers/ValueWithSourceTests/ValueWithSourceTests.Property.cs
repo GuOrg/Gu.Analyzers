@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;
@@ -367,14 +367,14 @@ internal class Foo
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Value Member, 1 Constant", actual);
+                    Assert.AreEqual("Value Member, value Argument, 1 Constant", actual);
                 }
 
                 node = syntaxTree.EqualsValueClause("var temp2 = Value;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Value Member, 1 Constant, Value PotentiallyInjected", actual);
+                    Assert.AreEqual("Value Member, value Argument, 1 Constant, Value PotentiallyInjected", actual);
                 }
             }
 
@@ -902,7 +902,6 @@ internal class Foo
                     Assert.AreEqual("this.Value Calculated, this.value Member, 1 Constant", actual);
                 }
             }
-
 
             [TestCase("{ 1, 2, 3 }")]
             [TestCase("new [] { 1, 2, 3 }")]

@@ -78,6 +78,7 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />

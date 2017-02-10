@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;

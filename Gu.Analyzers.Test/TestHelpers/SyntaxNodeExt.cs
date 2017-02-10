@@ -35,9 +35,35 @@
                 {
                     return node;
                 }
+
+                var member = node.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (member?.ToFullString().Contains(statement) == true)
+                {
+                    return node;
+                }
             }
 
             throw new InvalidOperationException($"The tree does not contain an {typeof(EqualsValueClauseSyntax).Name} in a statement: {statement}");
+        }
+
+        internal static AssignmentExpressionSyntax AssignmentExpression(this SyntaxTree tree, string statement)
+        {
+            foreach (var node in tree.GetRoot().DescendantNodes().OfType<AssignmentExpressionSyntax>())
+            {
+                var statementSyntax = node.FirstAncestor<StatementSyntax>();
+                if (statementSyntax?.ToFullString()?.Contains(statement) == true)
+                {
+                    return node;
+                }
+
+                var member = node.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (member?.ToFullString().Contains(statement) == true)
+                {
+                    return node;
+                }
+            }
+
+            throw new InvalidOperationException($"The tree does not contain an {typeof(AssignmentExpressionSyntax).Name} in a statement: {statement}");
         }
 
         internal static ConstructorDeclarationSyntax ConstructorDeclarationSyntax(this SyntaxTree tree, string signature)
@@ -51,20 +77,6 @@
             }
 
             throw new InvalidOperationException($"The tree does not contain an {typeof(ConstructorDeclarationSyntax).Name} matching {signature}");
-        }
-
-        internal static AssignmentExpressionSyntax AssignmentExpression(this SyntaxTree tree, string statement)
-        {
-            foreach (var node in tree.GetRoot().DescendantNodes().OfType<AssignmentExpressionSyntax>())
-            {
-                var statementSyntax = node.FirstAncestor<StatementSyntax>();
-                if (statementSyntax?.ToFullString()?.Contains(statement) == true)
-                {
-                    return node;
-                }
-            }
-
-            throw new InvalidOperationException($"The tree does not contain an {typeof(AssignmentExpressionSyntax).Name} in a statement: {statement}");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;
@@ -589,7 +589,41 @@ internal class Foo
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("this.Assign(out value) Out, 1 Constant", actual);
+                Assert.AreEqual("this.Assign(out value) Out, value Argument, 1 Constant", actual);
+            }
+        }
+
+        [Test]
+        public void VariableAssignedWithChainedOutParameter()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal void Bar()
+    {
+        int value;
+        this.Assign1(out value);
+        var temp = value;
+        var meh = temp;
+    }
+
+    private void Assign1(out int value1)
+    {
+        this.Assign2(out value1);
+    }
+
+    private void Assign2(out int value2)
+    {
+        value2 = 1;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.EqualsValueClause("var meh = temp;").Value;
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual("this.Assign1(out value) Out, this.Assign2(out value1) Out, value1 Argument, 1 Constant", actual);
             }
         }
 

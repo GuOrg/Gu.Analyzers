@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -16,7 +17,7 @@
                 x.symbols.Clear();
                 x.assignedValues.Clear();
                 x.symbol = null;
-                x.statement = null;
+                x.context = null;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
             });
@@ -25,7 +26,7 @@
         private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>();
 
         private ISymbol symbol;
-        private StatementSyntax statement;
+        private SyntaxNode context;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
         private bool isSamplingRetunValues;
@@ -36,24 +37,16 @@
 
         public IReadOnlyList<ExpressionSyntax> AssignedValues => this.assignedValues;
 
-        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
+        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(property, null, semanticModel, cancellationToken);
+            return CreateCore(property, context, semanticModel, cancellationToken);
         }
 
+        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(field, null, semanticModel, cancellationToken);
-        }
-
-        public static Pool<AssignedValueWalker>.Pooled Create(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return CreateCore(local, null, semanticModel, cancellationToken);
-        }
-
-        public static Pool<AssignedValueWalker>.Pooled Create(IParameterSymbol parameter, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return CreateCore(parameter, null, semanticModel, cancellationToken);
         }
 
         public static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -64,12 +57,13 @@
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return CreateCore(symbol, value.FirstAncestor<StatementSyntax>(), semanticModel, cancellationToken);
+                return CreateCore(symbol, value, semanticModel, cancellationToken);
             }
 
             return Pool.GetOrCreate();
         }
 
+        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
@@ -249,11 +243,11 @@
             base.VisitPropertyDeclaration(node);
         }
 
-        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, StatementSyntax statement, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             pooled.Item.symbol = symbol;
-            pooled.Item.statement = statement;
+            pooled.Item.context = context;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.symbols.Add(symbol).IgnoreReturnValue();
@@ -322,20 +316,43 @@
 
         private bool IsBeforeInScope(SyntaxNode node)
         {
-            if (this.statement == null)
+            if (this.context == null)
             {
                 return true;
             }
 
-            var ctor = this.statement.FirstAncestor<ConstructorDeclarationSyntax>();
-            var otherCtor = node.FirstAncestor<ConstructorDeclarationSyntax>();
-            if (ctor != null && otherCtor != null && ctor != otherCtor)
+            var ctor = node.FirstAncestor<ConstructorDeclarationSyntax>();
+            var contextCtor = this.context.FirstAncestor<ConstructorDeclarationSyntax>();
+            if (ctor != null && ctor != contextCtor)
             {
-                return otherCtor.IsRunBefore(ctor, this.semanticModel, this.cancellationToken);
+                if (contextCtor != null)
+                {
+                    return ctor.IsRunBefore(contextCtor, this.semanticModel, this.cancellationToken);
+                }
+
+                var contextType = this.semanticModel.GetDeclaredSymbolSafe(this.context.FirstAncestor<TypeDeclarationSyntax>(), this.cancellationToken);
+                foreach (var reference in contextType.DeclaringSyntaxReferences)
+                {
+                    var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                    if (ctor.FirstAncestor<TypeDeclarationSyntax>() == typeDeclaration)
+                    {
+                        return true;
+                    }
+
+                    foreach (var member in typeDeclaration.Members)
+                    {
+                        if (ctor.IsRunBefore(member as ConstructorDeclarationSyntax, this.semanticModel, this.cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
             }
 
-            return this.statement.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
-                   node.IsBeforeInScope(this.statement);
+            return this.context.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
+                   node.IsBeforeInScope(this.context);
         }
     }
 }

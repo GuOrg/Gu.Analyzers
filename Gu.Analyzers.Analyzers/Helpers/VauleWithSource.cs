@@ -122,6 +122,25 @@ namespace Gu.Analyzers
                 return;
             }
 
+            var argument = value.FirstAncestor<ArgumentSyntax>();
+            var invocation = argument?.FirstAncestor<InvocationExpressionSyntax>();
+            if (invocation != null)
+            {
+                if (semanticModel.GetSymbolSafe(invocation, cancellationToken) == null)
+                {
+                    result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
+                }
+
+                if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
+                {
+                    result.Add(new VauleWithSource(invocation, ValueSource.Ref));
+                }
+                else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
+                {
+                    result.Add(new VauleWithSource(invocation, ValueSource.Out));
+                }
+            }
+
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken) ??
                          semanticModel.GetSymbolSafe(
                              (value as ElementAccessExpressionSyntax)?.Expression,
@@ -142,8 +161,51 @@ namespace Gu.Analyzers
                 }
             }
 
-            AddRecursively(value, symbol, semanticModel, cancellationToken, result);
-            AddPathRecursively(value, semanticModel, cancellationToken, result);
+            var method = symbol as IMethodSymbol;
+            if (method != null)
+            {
+                AddReturnValuesRecursively(value, method, semanticModel, cancellationToken, result);
+                AddPathRecursively(value, semanticModel, cancellationToken, result);
+                return;
+            }
+
+            var property = symbol as IPropertySymbol;
+            if (property != null)
+            {
+                AddReturnValuesRecursively(value, property, semanticModel, cancellationToken, result);
+                AddPathRecursively(value, semanticModel, cancellationToken, result);
+                return;
+            }
+
+            var field = symbol as IFieldSymbol;
+            if (field != null)
+            {
+                AddReturnValuesRecursively(value, field, semanticModel, cancellationToken, result);
+                AddPathRecursively(value, semanticModel, cancellationToken, result);
+                return;
+            }
+
+            var parameter = symbol as IParameterSymbol;
+            if (parameter != null)
+            {
+                AddRecursively(value, parameter, semanticModel, cancellationToken, result);
+                return;
+            }
+
+            var variable = symbol as ILocalSymbol;
+            if (variable != null)
+            {
+                AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
+                return;
+            }
+
+            result.Add(new VauleWithSource(value, ValueSource.Unknown));
+        }
+
+        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result)
+        {
+            int index;
+            return IsAlreadyChecked(value, result, out index);
         }
 
         private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result, out int index)
@@ -297,51 +359,6 @@ namespace Gu.Analyzers
                     }
                 }
             }
-        }
-
-        private static void AddRecursively(
-            ExpressionSyntax value,
-            ISymbol symbol,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken,
-            List<VauleWithSource> result)
-        {
-            var method = symbol as IMethodSymbol;
-            if (method != null)
-            {
-                AddReturnValuesRecursively(value, method, semanticModel, cancellationToken, result);
-                return;
-            }
-
-            var property = symbol as IPropertySymbol;
-            if (property != null)
-            {
-                AddReturnValuesRecursively(value, property, semanticModel, cancellationToken, result);
-                return;
-            }
-
-            var field = symbol as IFieldSymbol;
-            if (field != null)
-            {
-                AddReturnValuesRecursively(value, field, semanticModel, cancellationToken, result);
-                return;
-            }
-
-            var parameter = symbol as IParameterSymbol;
-            if (parameter != null)
-            {
-                AddRecursively(value, parameter, semanticModel, cancellationToken, result);
-                return;
-            }
-
-            var variable = symbol as ILocalSymbol;
-            if (variable != null)
-            {
-                AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
-                return;
-            }
-
-            result.Add(new VauleWithSource(value, ValueSource.Unknown));
         }
 
         private static void AddReturnValuesRecursively(
@@ -514,22 +531,33 @@ namespace Gu.Analyzers
                 return;
             }
 
-            VauleWithSource match;
-            if (result.TryGetLast(x => x.Value is InvocationExpressionSyntax && ReferenceEquals(semanticModel.GetSymbolSafe(x.Value, cancellationToken), method), out match))
+            bool wasCalled = false;
+            for (var i = result.Count - 1; i >= 0; i--)
             {
-                var invocation = (InvocationExpressionSyntax)match.Value;
-                result.Add(new VauleWithSource(value, ValueSource.Argument));
-                ExpressionSyntax argumentValue;
-                if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                var vauleWithSource = result[i];
+                var invocation = vauleWithSource.Value as InvocationExpressionSyntax;
+                if (invocation != null &&
+                    ReferenceEquals(semanticModel.GetSymbolSafe(invocation, cancellationToken), method))
                 {
-                    AddRecursively(argumentValue, semanticModel, cancellationToken, result);
-                }
-                else
-                {
-                    result.Add(new VauleWithSource(value, ValueSource.Unknown));
+                    wasCalled = true;
+                    ExpressionSyntax argumentValue;
+                    if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                    {
+                        if (!IsAlreadyChecked(value, result))
+                        {
+                            result.Add(new VauleWithSource(value, ValueSource.Argument));
+                            AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
+                            AddRecursively(argumentValue, semanticModel, cancellationToken, result);
+                        }
+                    }
+                    else
+                    {
+                        result.Add(new VauleWithSource(value, ValueSource.Unknown));
+                    }
                 }
             }
-            else
+
+            if (!wasCalled)
             {
                 using (var calls = CallsWalker.GetCallsInType(method, semanticModel, cancellationToken))
                 {
@@ -590,8 +618,6 @@ namespace Gu.Analyzers
                     }
                 }
             }
-
-            AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
         }
 
         private static void AddAssignedValuesRecursively(
@@ -604,35 +630,6 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in assignments.Item.AssignedValues)
                 {
-                    int index;
-                    if (IsAlreadyChecked(assignedValue, result, out index))
-                    {
-                        continue;
-                    }
-
-                    var argument = assignedValue.FirstAncestor<ArgumentSyntax>();
-                    var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
-                    if (invocation != null)
-                    {
-                        if (semanticModel.GetSymbolSafe(invocation, cancellationToken) == null)
-                        {
-                            result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
-                            continue;
-                        }
-
-                        if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) == true)
-                        {
-                            result.Add(new VauleWithSource(invocation, ValueSource.Ref));
-                        }
-                        else if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) == true)
-                        {
-                            result.Add(new VauleWithSource(invocation, ValueSource.Out));
-                        }
-
-                        AddPathRecursively(invocation, semanticModel, cancellationToken, result);
-                        continue;
-                    }
-
                     AddRecursively(assignedValue, semanticModel, cancellationToken, result);
                 }
             }
