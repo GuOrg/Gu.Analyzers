@@ -197,6 +197,103 @@ internal class Foo : FooBase
             }
 
             [Test]
+            public void AutoPublicGetSetInitializedInBaseCtorWhenBaseHasManyCtors()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase
+{
+    internal FooBase()
+    {
+        this.Value = 1;
+    }
+
+    internal FooBase(int value)
+    {
+        this.Value = value;
+    }
+
+    public int Value { get; set; }
+}
+
+internal class Foo : FooBase
+{
+    internal Foo()
+    {
+        var temp1 = Value;
+    }
+
+    internal void Bar()
+    {
+        var temp2 = Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var temp1 = Value;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Value Member, 1 Constant", actual);
+                }
+
+                node = syntaxTree.EqualsValueClause("var temp2 = Value;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Value Member, Value PotentiallyInjected, 1 Constant", actual);
+                }
+            }
+
+            [Test]
+            public void AutoPublicGetSetInjectedInBaseCtorWhenBaseHasManyCtors()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase
+{
+    internal FooBase()
+    {
+        this.Value = 1;
+    }
+
+    internal FooBase(int value)
+    {
+        this.Value = value;
+    }
+
+    public int Value { get; set; }
+}
+
+internal class Foo : FooBase
+{
+    internal Foo(int arg)
+        : base(arg)
+    {
+        var temp1 = Value;
+    }
+
+    internal void Bar()
+    {
+        var temp2 = Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var temp1 = Value;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Value Member, value Argument, arg Injected", actual);
+                }
+
+                node = syntaxTree.EqualsValueClause("var temp2 = Value;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Value Member, Value PotentiallyInjected, value Argument, arg Injected", actual);
+                }
+            }
+
+            [Test]
             public void AutoPublicGetSetInitializedInBaseCtorExplicitBaseCall()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"

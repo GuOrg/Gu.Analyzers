@@ -328,25 +328,10 @@
             }
 
             var ctor = this.statement.FirstAncestor<ConstructorDeclarationSyntax>();
-            if (ctor != null)
+            var otherCtor = node.FirstAncestor<ConstructorDeclarationSyntax>();
+            if (ctor != null && otherCtor != null && ctor != otherCtor)
             {
-                var otherCtor = node.FirstAncestor<ConstructorDeclarationSyntax>();
-                if (otherCtor == null)
-                {
-                    return false;
-                }
-
-                if (ctor == otherCtor)
-                {
-                    return node.IsBeforeInScope(this.statement);
-                }
-
-                if (otherCtor.IsBeforeInScope(ctor, this.semanticModel, this.cancellationToken))
-                {
-                    return true;
-                }
-
-                return node.IsBeforeInScope(this.statement);
+                return otherCtor.IsRunBefore(ctor, this.semanticModel, this.cancellationToken);
             }
 
             return this.statement.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||

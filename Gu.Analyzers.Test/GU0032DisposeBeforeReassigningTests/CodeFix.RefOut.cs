@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFix : CodeFixVerifier<GU0032DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>
     {
         internal class RefAndOut : NestedCodeFixVerifier<CodeFix>
         {

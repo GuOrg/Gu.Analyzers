@@ -514,11 +514,10 @@ namespace Gu.Analyzers
                 return;
             }
 
-            VauleWithSource last;
-            if (result.TryGetLast(out last) &&
-                last.Value is InvocationExpressionSyntax)
+            VauleWithSource match;
+            if (result.TryGetLast(x => x.Value is InvocationExpressionSyntax && ReferenceEquals(semanticModel.GetSymbolSafe(x.Value, cancellationToken), method), out match))
             {
-                var invocation = (InvocationExpressionSyntax)last.Value;
+                var invocation = (InvocationExpressionSyntax)match.Value;
                 result.Add(new VauleWithSource(value, ValueSource.Argument));
                 ExpressionSyntax argumentValue;
                 if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))

@@ -7,7 +7,7 @@
 
     internal static class ConstructorDeclarationSyntaxExt
     {
-        internal static bool IsBeforeInScope(this ConstructorDeclarationSyntax first, ConstructorDeclarationSyntax other, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsRunBefore(this ConstructorDeclarationSyntax first, ConstructorDeclarationSyntax other, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (first == null ||
                 other == null)
@@ -17,26 +17,31 @@
 
             var firstSymbol = semanticModel.GetDeclaredSymbolSafe(first, cancellationToken);
             var otherSymbol = semanticModel.GetDeclaredSymbolSafe(other, cancellationToken);
-
-            if (first.Initializer == null)
+            if (ReferenceEquals(firstSymbol, otherSymbol))
             {
-                if (otherSymbol.Parameters.Length != 0)
+                return false;
+            }
+
+            if (other.Initializer == null)
+            {
+                if (firstSymbol.Parameters.Length != 0 ||
+                    firstSymbol.ContainingType == otherSymbol.ContainingType)
                 {
                     return false;
                 }
 
-                return firstSymbol.ContainingType.Is(otherSymbol.ContainingType);
+                return otherSymbol.ContainingType.Is(firstSymbol.ContainingType);
             }
 
-            var initializerSymbol = semanticModel.GetSymbolSafe(first.Initializer, cancellationToken);
-            if (ReferenceEquals(initializerSymbol, otherSymbol))
+            var initializerSymbol = semanticModel.GetSymbolSafe(other.Initializer, cancellationToken);
+            if (ReferenceEquals(initializerSymbol, firstSymbol))
             {
                 return true;
             }
 
             foreach (var reference in initializerSymbol.DeclaringSyntaxReferences)
             {
-                if (IsBeforeInScope((ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken), other, semanticModel, cancellationToken))
+                if (IsRunBefore(first, (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken), semanticModel, cancellationToken))
                 {
                     return true;
                 }

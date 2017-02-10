@@ -120,14 +120,14 @@ namespace RoslynSandBox
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Bar(arg) Calculated, arg Injected, Bar(disposable, new[] { disposable }) Recursion, disposable Argument", actual);
+                    Assert.AreEqual("Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected", actual);
                 }
 
                 node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.disposable Member, Bar(arg) Calculated, arg Injected, Bar(disposable, new[] { disposable }) Recursion, disposable Argument", actual);
+                    Assert.AreEqual("this.disposable Member, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected", actual);
                 }
             }
 

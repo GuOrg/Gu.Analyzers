@@ -174,7 +174,7 @@ internal class Foo
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("Create1(1) Calculated, value1 Argument, 1 Constant, Create2(value1) Calculated, value2 Argument", actual);
+                Assert.AreEqual("Create1(1) Calculated, Create2(value1) Calculated, value2 Argument, value1 Argument, 1 Constant", actual);
             }
         }
 

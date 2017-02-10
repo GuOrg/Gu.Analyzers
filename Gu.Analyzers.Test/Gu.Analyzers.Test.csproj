@@ -78,15 +78,16 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
-    <Compile Include="Helpers\SyntaxNodeExt.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.Recursive.cs" />
+    <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
+    <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Recursive.cs" />
     <Compile Include="ReproBox.cs" />
-    <Compile Include="ValueWithSourceTests\ValueWithSourceTests.SyntaxError.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.SyntaxError.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />
     <Compile Include="Verifiers\NestedCodeFixVerifier.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
@@ -131,7 +132,7 @@
     <Compile Include="Documentation\Tests.cs" />
     <Compile Include="Verifiers\Helpers\CodeFactory.cs" />
     <Compile Include="Verifiers\Helpers\CodeReader.cs" />
-    <Compile Include="Helpers\StringHelpers.cs" />
+    <Compile Include="TestHelpers\StringHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

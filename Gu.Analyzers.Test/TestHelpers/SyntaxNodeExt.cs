@@ -40,6 +40,19 @@
             throw new InvalidOperationException($"The tree does not contain an {typeof(EqualsValueClauseSyntax).Name} in a statement: {statement}");
         }
 
+        internal static ConstructorDeclarationSyntax ConstructorDeclarationSyntax(this SyntaxTree tree, string signature)
+        {
+            foreach (var ctor in tree.GetRoot().DescendantNodes().OfType<ConstructorDeclarationSyntax>())
+            {
+                if (ctor.ToFullString().Contains(signature))
+                {
+                    return ctor;
+                }
+            }
+
+            throw new InvalidOperationException($"The tree does not contain an {typeof(ConstructorDeclarationSyntax).Name} matching {signature}");
+        }
+
         internal static AssignmentExpressionSyntax AssignmentExpression(this SyntaxTree tree, string statement)
         {
             foreach (var node in tree.GetRoot().DescendantNodes().OfType<AssignmentExpressionSyntax>())
