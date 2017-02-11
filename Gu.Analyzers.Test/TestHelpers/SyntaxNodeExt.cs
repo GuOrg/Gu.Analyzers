@@ -36,6 +36,11 @@
                     return node;
                 }
 
+                if (statementSyntax != null)
+                {
+                    continue;
+                }
+
                 var member = node.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                 if (member?.ToFullString().Contains(statement) == true)
                 {
@@ -54,6 +59,11 @@
                 if (statementSyntax?.ToFullString()?.Contains(statement) == true)
                 {
                     return node;
+                }
+
+                if (statementSyntax != null)
+                {
+                    continue;
                 }
 
                 var member = node.FirstAncestorOrSelf<MemberDeclarationSyntax>();

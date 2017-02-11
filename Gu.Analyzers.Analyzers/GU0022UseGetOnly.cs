@@ -34,7 +34,7 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.SetAccessorDeclaration);
         }
 
         private static void HandleProperty(SyntaxNodeAnalysisContext context)
@@ -44,21 +44,20 @@
                 return;
             }
 
-            var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
-            AccessorDeclarationSyntax setter;
-            if (!propertyDeclaration.TryGetSetAccessorDeclaration(out setter) ||
-                setter.Body != null)
+            AccessorDeclarationSyntax setter = (AccessorDeclarationSyntax) context.Node;
+            if (setter.Body != null)
             {
                 return;
             }
 
-            var propertySymbol = (IPropertySymbol)context.ContainingSymbol;
-            if (propertySymbol.SetMethod?.DeclaredAccessibility != Accessibility.Private)
+            var propertySymbol = context.ContainingProperty();
+            if (propertySymbol.SetMethod?.DeclaredAccessibility != Accessibility.Private ||
+                propertySymbol.IsIndexer)
             {
                 return;
             }
 
-            using (var pooled = AssignedValueWalker.Create(propertySymbol, context.Node, context.SemanticModel, context.CancellationToken))
+            using (var pooled = AssignedValueWalker.Create(propertySymbol, context.SemanticModel, context.CancellationToken))
             {
                 foreach (var value in pooled.Item.AssignedValues)
                 {

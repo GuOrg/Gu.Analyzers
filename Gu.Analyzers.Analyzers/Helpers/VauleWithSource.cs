@@ -129,6 +129,8 @@ namespace Gu.Analyzers
                 if (semanticModel.GetSymbolSafe(invocation, cancellationToken) == null)
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
+                    AddPathRecursively(invocation, semanticModel, cancellationToken, result);
+                    return;
                 }
 
                 if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))

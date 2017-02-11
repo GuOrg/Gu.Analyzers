@@ -38,9 +38,9 @@
         public IReadOnlyList<ExpressionSyntax> AssignedValues => this.assignedValues;
 
         [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
-        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return CreateCore(property, context, semanticModel, cancellationToken);
+            return CreateCore(property, null, semanticModel, cancellationToken);
         }
 
         [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
