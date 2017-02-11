@@ -39,8 +39,9 @@ internal class Foo
             }
         }
 
-        [Test]
-        public void IdentityMethod()
+        [TestCase("var temp1 = this.Id(1);", "this.Id(1) Calculated, arg Argument, 1 Constant")]
+        [TestCase("var temp2 = this.Id(1);", "this.Id(1) Calculated, arg Argument, 1 Constant")]
+        public void IdentityMethod(string code, string expected)
         {
             var testCode = @"
 namespace RoslynSandBox
@@ -68,18 +69,11 @@ namespace RoslynSandBox
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var node = syntaxTree.EqualsValueClause("var temp1 = this.Id(1);").Value;
+            var node = syntaxTree.EqualsValueClause(code).Value;
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("this.Id(1) Calculated, arg Argument, 1 Constant", actual);
-            }
-
-            node = syntaxTree.EqualsValueClause("var temp2 = this.Id(1);").Value;
-            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("this.Id(1) Calculated, arg Argument, 1 Constant", actual);
+                Assert.AreEqual(expected, actual);
             }
         }
 
@@ -575,7 +569,6 @@ internal class Foo
         int value;
         this.Assign(out value);
         var temp = value;
-        var meh = temp;
     }
 
     private void Assign(out int value)
@@ -585,11 +578,40 @@ internal class Foo
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var node = syntaxTree.EqualsValueClause("var meh = temp;").Value;
+            var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("this.Assign(out value) Out, value Argument, 1 Constant", actual);
+                Assert.AreEqual("this.Assign(out value) Out, 1 Constant", actual);
+            }
+        }
+
+        [Test]
+        public void VariableAssignedWithOutParameterAssignedTwice()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal void Bar()
+    {
+        int value;
+        this.Assign(out value);
+        var temp = value;
+    }
+
+    private void Assign(out int value)
+    {
+        value = 1;
+        value = 2;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
+            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                Assert.AreEqual("this.Assign(out value) Out, 1 Constant, 2 Constant", actual);
             }
         }
 
@@ -623,7 +645,7 @@ internal class Foo
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("this.Assign1(out value) Out, this.Assign2(out value1) Out, value1 Argument, 1 Constant", actual);
+                Assert.AreEqual("this.Assign1(out value) Out, this.Assign2(out value1) Out, 1 Constant", actual);
             }
         }
 

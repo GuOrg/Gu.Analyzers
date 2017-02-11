@@ -56,10 +56,13 @@ internal class Foo
                 }
             }
 
-            [TestCase("private void Assign")]
-            [TestCase("public void Assign")]
-            [TestCase("public static void Assign")]
-            public void PrivateAssignedWithOutParameterAfterInCtor(string code)
+            [TestCase("var temp1 = this.field;", "this.field Member", "private void Assign")]
+            [TestCase("var temp1 = this.field;", "this.field Member", "public void Assign")]
+            [TestCase("var temp1 = this.field;", "this.field Member", "public static void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "private void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "public void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "public static void Assign")]
+            public void PrivateAssignedWithOutParameterAfterInCtor(string code, string expected, string modifiers)
             {
                 var testCode = @"
 internal class Foo
@@ -82,22 +85,15 @@ internal class Foo
         value = 1;
     }
 }";
-                testCode = testCode.AssertReplace("private void Assign", code);
+                testCode = testCode.AssertReplace("private void Assign", modifiers);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var temp1 = this.field;").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.field Member", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp2 = this.field;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.field Member, this.Assign(out this.field) Out, 1 Constant", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -146,8 +142,9 @@ internal class Foo
                 }
             }
 
-            [Test]
-            public void PublicInitialized()
+            [TestCase("var temp1 = this.field;", "this.field Member, 1 Constant")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.field PotentiallyInjected, 1 Constant")]
+            public void PublicInitialized(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -166,18 +163,11 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var temp1 = this.field;").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.field Member, 1 Constant", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp2 = this.field;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.field Member, this.field PotentiallyInjected, 1 Constant", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -259,8 +249,9 @@ internal class Foo
                 }
             }
 
-            [Test]
-            public void PublicReadonlyThenAccessedMutableNested()
+            [TestCase("var temp1 = this.field.Value;", "this.field.Value Member, this.field Member, new Nested() Created")]
+            [TestCase("var temp2 = this.field.Value;", "this.field.Value Member, this.field.Value PotentiallyInjected, this.field Member, new Nested() Created")]
+            public void PublicReadonlyThenAccessedMutableNested(string code, string expected)
             {
                 var testCode = @"
 internal class Nested
@@ -285,18 +276,11 @@ internal class Foo
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var temp1 = this.field.Value;").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.field.Value Member, this.field Member, new Nested() Created", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp2 = this.field.Value;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.field.Value Member, this.field.Value PotentiallyInjected, this.field Member, new Nested() Created", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 

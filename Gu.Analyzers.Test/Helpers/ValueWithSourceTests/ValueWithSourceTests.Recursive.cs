@@ -367,7 +367,7 @@ internal class Foo
     {
         int temp;
         this.Value(out temp);
-        var meh = temp;
+        var temp1 = temp;
     }
 
     public void Value(out int value) => this.Value(out value);
@@ -375,7 +375,7 @@ internal class Foo
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var meh = temp;").Value;
+                var node = syntaxTree.EqualsValueClause("var temp1 = temp;").Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
@@ -536,8 +536,9 @@ namespace RoslynSandBox
                 }
             }
 
-            [Test]
-            public void AssigningFieldWithSelf()
+            [TestCase("this.value = this.value; // first", "this.value Recursion, this.value Recursion")]
+            [TestCase("this.value = this.value; // second", "this.value Recursion, this.value Recursion")]
+            public void AssigningFieldWithSelf(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -563,23 +564,17 @@ namespace RoslynSandBox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression("this.value = this.value; // first").Right;
+                var node = syntaxTree.AssignmentExpression(code).Right;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.value Recursion, this.value Recursion", actual);
-                }
-
-                node = syntaxTree.AssignmentExpression("this.value = this.value; // second").Right;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.value Recursion, this.value Recursion", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void AssigningPropertyPrivateSetWithSelf()
+            [TestCase("this.Value = this.Value; // first", "this.Value Recursion, this.Value Recursion")]
+            [TestCase("this.Value = this.Value; // second", "this.Value Recursion, this.Value Recursion")]
+            public void AssigningPropertyPrivateSetWithSelf(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -606,18 +601,11 @@ namespace RoslynSandBox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression("this.Value = this.Value; // first").Right;
+                var node = syntaxTree.AssignmentExpression(code).Right;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.Value Recursion, this.Value Recursion", actual);
-                }
-
-                node = syntaxTree.AssignmentExpression("this.Value = this.Value; // second").Right;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.Value Recursion, this.Value Recursion", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 

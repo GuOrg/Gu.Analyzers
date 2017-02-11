@@ -32,8 +32,9 @@ internal class Foo
                 }
             }
 
-            [Test]
-            public void SimpleValuePassedToIdentityMethod()
+            [TestCase("var temp1 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
+            public void SimpleValuePassedToIdentityMethod(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -48,6 +49,7 @@ namespace RoslynSandBox
         {
             Id(null);
             this.disposable = Id(disposable);
+            var temp1 = this.disposable;
         }
 
         public IDisposable Id(IDisposable arg)
@@ -57,30 +59,24 @@ namespace RoslynSandBox
 
         public void Bar()
         {
-            var temp = this.disposable;
+            var temp2 = this.disposable;
         }
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression("this.disposable = Id(disposable);").Right;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Id(disposable) Calculated, arg Argument, disposable Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void SimpleValuePassedToMethodAssigningParameter()
+            [TestCase("var temp1 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
+            public void SimpleValuePassedToMethodAssigningParameter(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -95,6 +91,7 @@ namespace RoslynSandBox
         {
             Id(null);
             this.disposable = Bar(disposable);
+            var temp1 = this.disposable;
         }
 
         public IDisposable Bar(IDisposable arg)
@@ -105,30 +102,24 @@ namespace RoslynSandBox
 
         public void Bar()
         {
-            var temp = this.disposable;
+            var temp2 = this.disposable;
         }
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression("this.disposable = Bar(disposable);").Right;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void SimpleValuePassedToStaticMethodWithOptionalParameter()
+            [TestCase("this.disposable = Bar(arg);", "Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected")]
+            [TestCase("var temp = this.disposable;", "this.disposable Member, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected")]
+            public void SimpleValuePassedToStaticMethodWithOptionalParameter(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -164,18 +155,11 @@ namespace RoslynSandBox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression("this.disposable = Bar(arg);").Right;
+                var node = syntaxTree.AssignmentExpression(code).Right;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.disposable;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.disposable Member, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -229,8 +213,9 @@ internal abstract class Foo
                 }
             }
 
-            [Test]
-            public void MemberNestedElvisValue()
+            [TestCase("var temp1 = this.meh?.Disposable;", "this.meh?.Disposable External, this.meh Member, meh Injected")]
+            [TestCase("var temp2 = this.meh?.Disposable;", "this.meh?.Disposable External, this.meh Member, meh Injected")]
+            public void MemberNestedElvisValue(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 using System;
@@ -244,28 +229,21 @@ internal abstract class Foo
     protected Foo(SingleAssignmentDisposable meh)
     {
         this.meh = meh;
-        var value = this.meh?.Disposable;
+        var temp1 = this.meh?.Disposable;
     }
 
     protected void Bar()
     {
-        var temp = this.meh?.Disposable;
+        var temp2 = this.meh?.Disposable;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable;").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable External, this.meh Member, meh Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable;").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable External, this.meh Member, meh Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -294,8 +272,9 @@ internal abstract class Foo
                 }
             }
 
-            [Test]
-            public void MemberNestedElvisValues()
+            [TestCase("var temp1 = this.meh?.Disposable?.GetHashCode();", "this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected")]
+            [TestCase("var temp2 = this.meh?.Disposable?.GetHashCode();", "this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected")]
+            public void MemberNestedElvisValues(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 using System;
@@ -309,28 +288,21 @@ internal abstract class Foo
     protected Foo(SingleAssignmentDisposable meh)
     {
         this.meh = meh;
-        var value = this.meh?.Disposable?.GetHashCode();
+        var temp1 = this.meh?.Disposable?.GetHashCode();
     }
 
     protected void Bar()
     {
-        var temp = this.meh?.Disposable?.GetHashCode();
+        var temp2 = this.meh?.Disposable?.GetHashCode();
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable?.GetHashCode();").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable?.GetHashCode();").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -359,8 +331,9 @@ internal abstract class Foo
                 }
             }
 
-            [Test]
-            public void MemberNestedElvisValues2()
+            [TestCase("var value = this.meh?.Disposable.GetHashCode();", "this.meh?.Disposable.GetHashCode() External, this.meh Member, meh Injected")]
+            [TestCase("var temp = this.meh?.Disposable.GetHashCode();", "this.meh?.Disposable.GetHashCode() External, this.meh Member, meh Injected")]
+            public void MemberNestedElvisValues2(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 using System;
@@ -384,23 +357,17 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable.GetHashCode();").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable.GetHashCode() External, this.meh Member, meh Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable.GetHashCode();").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable.GetHashCode() External, this.meh Member, meh Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void MemberNestedElvisValues3()
+            [TestCase("var value = this.meh?.Disposable?.GetHashCode();", "this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected")]
+            [TestCase("var temp = this.meh?.Disposable?.GetHashCode();", "this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected")]
+            public void MemberNestedElvisValues3(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 using System;
@@ -424,18 +391,11 @@ internal abstract class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var value = this.meh?.Disposable?.GetHashCode();").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp = this.meh?.Disposable?.GetHashCode();").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("this.meh?.Disposable?.GetHashCode() External, this.meh Member, meh Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 

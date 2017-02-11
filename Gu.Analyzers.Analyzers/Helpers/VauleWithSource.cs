@@ -141,6 +141,9 @@ namespace Gu.Analyzers
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Out));
                 }
+
+                AddPathRecursively(invocation, semanticModel, cancellationToken, result);
+                return;
             }
 
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken) ??
