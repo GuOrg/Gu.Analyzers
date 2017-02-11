@@ -456,8 +456,8 @@ public sealed class Foo
                 }
             }
 
-            [TestCase("var temp1 = this.stream;", @"stream Member, File.OpenRead(""A"") External, File.OpenRead(""B"") External")]
-            [TestCase("var temp2 = this.stream;", @"this.stream Member, File.OpenRead(""A"") External, File.OpenRead(""B"") External")]
+            [TestCase("var temp1 = this.Stream;", @"this.Stream Calculated, this.stream Member, File.OpenRead(""A"") External, File.OpenRead(""B"") External")]
+            [TestCase("var temp2 = this.Stream;", @"this.Stream PotentiallyInjected, this.stream Member, File.OpenRead(""A"") External, File.OpenRead(""B"") External")]
             public void GetPublicSetWithBackingFieldAssignedInCtorAndInializer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -481,7 +481,7 @@ public sealed class Foo
 
     public void Bar()
     {
-        var temp2 = this.stream;
+        var temp2 = this.Stream;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -770,47 +770,8 @@ internal class Foo
                 }
             }
 
-            [TestCase("{ 1, 2, 3 }")]
-            [TestCase("new [] { 1, 2, 3 }")]
-            [TestCase("new int[] { 1, 2, 3 }")]
-            public void PublicReadonlyArrayInitializedArrayThenAccessedWithIndexer(string collection)
-            {
-                var testCode = @"
-internal class Foo
-{
-    internal Foo()
-    {
-        var temp1 = this.Array[1];
-    }
-
-    public int[] Array { get; } = { 1, 2, 3 };
-
-    internal void Bar()
-    {
-        var temp2 = this.Array[1];
-    }
-}";
-                testCode = testCode.AssertReplace("{ 1, 2, 3 }", collection);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var temp1 = this.Array[1];").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.Array[1] Member, {collection} Created", actual);
-                }
-
-                node = syntaxTree.EqualsValueClause("var temp2 = this.Array[1];").Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual($"this.Array[1] Member, this.Array[1] PotentiallyInjected, {collection} Created", actual);
-                }
-            }
-
-            [TestCase("var temp1 = this.Nested.Value;", "this.Nested.Value Member, this.Nested Created")]
-            [TestCase("var temp2 = this.Nested.Value;", "this.Nested.Value Member, this.Nested Member, new Nested() Created, this.Nested.Value PotentiallyInjected")]
+            [TestCase("var temp1 = this.Nested.Value;", "this.Nested.Value Member, this.Nested Member, new Nested() Created")]
+            [TestCase("var temp2 = this.Nested.Value;", "this.Nested.Value Member, this.Nested.Value PotentiallyInjected, this.Nested Member, new Nested() Created")]
             public void PublicReadonlyThenAccessedMutableNested(string code, string expected)
             {
                 var testCode = @"
