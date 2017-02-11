@@ -59,9 +59,9 @@ internal class Foo
             [TestCase("var temp1 = this.field;", "this.field Member", "private void Assign")]
             [TestCase("var temp1 = this.field;", "this.field Member", "public void Assign")]
             [TestCase("var temp1 = this.field;", "this.field Member", "public static void Assign")]
-            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "private void Assign")]
-            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "public void Assign")]
-            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, out int value Argument, 1 Constant", "public static void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant", "private void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant", "public void Assign")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant", "public static void Assign")]
             public void PrivateAssignedWithOutParameterAfterInCtor(string code, string expected, string modifiers)
             {
                 var testCode = @"

@@ -34,7 +34,7 @@ internal class Foo
 
             [TestCase("var temp1 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
             [TestCase("var temp2 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
-            public void SimpleValuePassedToIdentityMethod(string code, string expected)
+            public void InjectedValuePassedToIdentityMethod(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -76,7 +76,7 @@ namespace RoslynSandBox
 
             [TestCase("var temp1 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
             [TestCase("var temp2 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
-            public void SimpleValuePassedToMethodAssigningParameter(string code, string expected)
+            public void InjectedValuePassedToMethodAssigningParameter(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
