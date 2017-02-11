@@ -16,6 +16,7 @@
             {
                 x.symbols.Clear();
                 x.assignedValues.Clear();
+                x.ctorsRunBefore.Clear();
                 x.symbol = null;
                 x.context = null;
                 x.semanticModel = null;
@@ -24,6 +25,7 @@
 
         private readonly List<ExpressionSyntax> assignedValues = new List<ExpressionSyntax>();
         private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>();
+        private readonly HashSet<ConstructorDeclarationSyntax> ctorsRunBefore = new HashSet<ConstructorDeclarationSyntax>();
 
         private ISymbol symbol;
         private SyntaxNode context;
@@ -251,7 +253,7 @@
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.symbols.Add(symbol).IgnoreReturnValue();
-
+            pooled.Item.AddCtorsRunBefore();
             using (var pooledNodes = SetPool<SyntaxNode>.Create())
             {
                 var count = 0;
@@ -325,34 +327,97 @@
             var contextCtor = this.context.FirstAncestor<ConstructorDeclarationSyntax>();
             if (ctor != null && ctor != contextCtor)
             {
-                if (contextCtor != null)
-                {
-                    return ctor.IsRunBefore(contextCtor, this.semanticModel, this.cancellationToken);
-                }
-
-                var contextType = this.semanticModel.GetDeclaredSymbolSafe(this.context.FirstAncestor<TypeDeclarationSyntax>(), this.cancellationToken);
-                foreach (var reference in contextType.DeclaringSyntaxReferences)
-                {
-                    var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    if (ctor.FirstAncestor<TypeDeclarationSyntax>() == typeDeclaration)
-                    {
-                        return true;
-                    }
-
-                    foreach (var member in typeDeclaration.Members)
-                    {
-                        if (ctor.IsRunBefore(member as ConstructorDeclarationSyntax, this.semanticModel, this.cancellationToken))
-                        {
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
+                return this.ctorsRunBefore.Contains(ctor);
             }
 
             return this.context.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
                    node.IsBeforeInScope(this.context);
+        }
+
+        private void AddCtorsRunBefore()
+        {
+            var contextCtor = this.context?.FirstAncestor<ConstructorDeclarationSyntax>();
+            if (contextCtor == null)
+            {
+                var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken) ??
+                                             this.symbol.ContainingType;
+                if (type.Constructors.Length != 0)
+                {
+                    foreach (var ctor in type.Constructors)
+                    {
+                        foreach (var reference in ctor.DeclaringSyntaxReferences)
+                        {
+                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                            this.ctorsRunBefore.Add(ctorDeclaration).IgnoreReturnValue();
+                            this.AddCtorsRecursively(ctorDeclaration);
+                        }
+                    }
+                }
+                else
+                {
+                    var ctor = GetDefaultCtor(type);
+                    if (ctor != null)
+                    {
+                        foreach (var reference in ctor.DeclaringSyntaxReferences)
+                        {
+                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                            this.ctorsRunBefore.Add(ctorDeclaration).IgnoreReturnValue();
+                            this.AddCtorsRecursively(ctorDeclaration);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                this.AddCtorsRecursively(contextCtor);
+            }
+        }
+
+        private void AddCtorsRecursively(ConstructorDeclarationSyntax ctor)
+        {
+            if (ctor.Initializer != null)
+            {
+                var nestedCtor = this.semanticModel.GetSymbolSafe(ctor.Initializer, this.cancellationToken);
+                foreach (var reference in nestedCtor.DeclaringSyntaxReferences)
+                {
+                    var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                    this.ctorsRunBefore.Add(runBefore).IgnoreReturnValue();
+                    this.AddCtorsRecursively(runBefore);
+                }
+            }
+            else
+            {
+                var baseType = this.semanticModel.GetDeclaredSymbolSafe(ctor, this.cancellationToken)
+                                                 .ContainingType.BaseType;
+                var defaultCtor = GetDefaultCtor(baseType);
+                if (defaultCtor != null)
+                {
+                    foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
+                    {
+                        var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                        this.ctorsRunBefore.Add(runBefore).IgnoreReturnValue();
+                        this.AddCtorsRecursively(runBefore);
+                    }
+                }
+            }
+        }
+
+        private static IMethodSymbol GetDefaultCtor(INamedTypeSymbol type)
+        {
+            while (type != null && type != KnownSymbol.Object)
+            {
+                foreach (var ctorSymbol in type.Constructors)
+                {
+                    if (ctorSymbol.Parameters.Length == 0)
+                    {
+                        return ctorSymbol;
+                    }
+                }
+
+                type = type.BaseType;
+            }
+
+            return null;
         }
     }
 }
