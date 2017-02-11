@@ -228,7 +228,8 @@ namespace Gu.Analyzers
             }
 
             var expression = (value as MemberAccessExpressionSyntax)?.Expression ??
-                             (value as ConditionalAccessExpressionSyntax)?.Expression;
+                             (value as ConditionalAccessExpressionSyntax)?.Expression ??
+                             (value as ElementAccessExpressionSyntax)?.Expression;
             int index;
             if (expression == null ||
                 expression is ThisExpressionSyntax ||

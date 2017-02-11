@@ -310,7 +310,7 @@ namespace RoslynSandBox
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
-            value = value;
+            // value = value;
         }
 
         public int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
@@ -346,7 +346,7 @@ namespace RoslynSandBox
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
-            value = value;
+            // value = value;
         }
 
         private static int RecursiveStatementBodyMethodWithOptionalParameter(int value, IEnumerable<int> values = null)

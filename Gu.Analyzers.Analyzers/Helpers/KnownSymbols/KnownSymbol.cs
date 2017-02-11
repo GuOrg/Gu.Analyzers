@@ -7,6 +7,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Object = Create("System.Object");
         internal static readonly QualifiedType Boolean = Create("System.Boolean");
         internal static readonly StringType String = new StringType();
+        internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly QualifiedType Func = Create("System.Func");
         internal static readonly QualifiedType SerializableAttribute = Create("System.SerializableAttribute");

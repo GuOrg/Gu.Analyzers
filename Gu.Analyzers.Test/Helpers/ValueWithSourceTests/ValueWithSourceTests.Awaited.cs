@@ -7,7 +7,7 @@
 
     using NUnit.Framework;
 
-    public partial class ValueWithSourceTests
+    internal partial class ValueWithSourceTests
     {
         public class Awaited
         {

@@ -7,7 +7,7 @@
 
     using NUnit.Framework;
 
-    public partial class ValueWithSourceTests
+    internal partial class ValueWithSourceTests
     {
         public class Property
         {
@@ -130,7 +130,7 @@ internal class Foo
             }
 
             [TestCase("var temp1 = Value;", "Value Member, 1 Constant")]
-            [TestCase("var temp1 = Value;", "Value Member, Value PotentiallyInjected, 1 Constant")]
+            [TestCase("var temp2 = Value;", "Value Member, Value PotentiallyInjected, 1 Constant")]
             public void AutoPublicGetSetInitializedInBaseCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -290,15 +290,15 @@ internal class Foo : FooBase
             }
 
             [TestCase("var temp1 = Value;", "Value Member, value Argument, 1 Constant")]
-            [TestCase("var temp2 = Value;", "Value Member, value Argument, 1 Constant, Value PotentiallyInjected")]
+            [TestCase("var temp2 = Value;", "Value Member, Value PotentiallyInjected, ctorArg PotentiallyInjected, 1 Constant")]
             public void AutoPublicGetSetInitializedInPreviousCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
 {
-    internal Foo(int value)
+    internal Foo(int ctorArg)
     {
-        this.Value = value;
+        this.Value = ctorArg;
     }
 
     internal Foo(string text)

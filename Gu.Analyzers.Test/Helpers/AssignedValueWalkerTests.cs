@@ -304,5 +304,28 @@ internal class Foo : FooBase
                 Assert.AreEqual(expected, actual);
             }
         }
+
+        [Test]
+        public void ArrayIndexer()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo()
+    {
+        var ints = new int[2];
+        ints[0] = 1;
+        var temp = ints[0];
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause("var temp = ints[0];").Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual("1", actual);
+            }
+        }
     }
 }
