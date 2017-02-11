@@ -32,9 +32,10 @@ internal class Foo
                 }
             }
 
-            [TestCase("var temp1 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
-            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Id(disposable) Calculated, arg Argument, disposable Injected")]
-            public void InjectedValuePassedToIdentityMethod(string code, string expected)
+            [TestCase("var temp1 = Id(ctorArg);", "Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            [TestCase("var temp3 = this.disposable;", "this.disposable Member, Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            public void InjectedValuePassedToIdentityMethodStatementBody(string code, string expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -45,11 +46,12 @@ namespace RoslynSandBox
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable ctorArg)
         {
+            var temp1 = Id(ctorArg);
             Id(null);
-            this.disposable = Id(disposable);
-            var temp1 = this.disposable;
+            this.disposable = Id(ctorArg);
+            var temp2 = this.disposable;
         }
 
         public IDisposable Id(IDisposable arg)
@@ -59,7 +61,7 @@ namespace RoslynSandBox
 
         public void Bar()
         {
-            var temp2 = this.disposable;
+            var temp3 = this.disposable;
         }
     }
 }";
@@ -74,8 +76,50 @@ namespace RoslynSandBox
                 }
             }
 
-            [TestCase("var temp1 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
-            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Bar(disposable) Calculated, arg Argument, new Disposable() Created, disposable Injected")]
+            [TestCase("var temp1 = Id(ctorArg);", "Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            [TestCase("var temp3 = this.disposable;", "this.disposable Member, Id(ctorArg) Calculated, arg Argument, ctorArg Injected")]
+            public void InjectedValuePassedToIdentityMethodExpressionBody(string code, string expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IDisposable ctorArg)
+        {
+            var temp1 = Id(ctorArg);
+            Id(null);
+            this.disposable = Id(ctorArg);
+            var temp2 = this.disposable;
+        }
+
+        public IDisposable Id(IDisposable arg) => arg;
+
+        public void Bar()
+        {
+            var temp3 = this.disposable;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = Bar(ctorArg);", "Bar(ctorArg) Calculated, arg Argument, new Disposable() Created, ctorArg Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Bar(ctorArg) Calculated, arg Argument, new Disposable() Created, ctorArg Injected")]
+            [TestCase("var temp3 = this.disposable;", "this.disposable Member, Bar(ctorArg) Calculated, arg Argument, new Disposable() Created, ctorArg Injected")]
             public void InjectedValuePassedToMethodAssigningParameter(string code, string expected)
             {
                 var testCode = @"
@@ -87,11 +131,12 @@ namespace RoslynSandBox
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable ctorArg)
         {
+            var temp1 = Bar(ctorArg);
             Id(null);
-            this.disposable = Bar(disposable);
-            var temp1 = this.disposable;
+            this.disposable = Bar(ctorArg);
+            var temp2 = this.disposable;
         }
 
         public IDisposable Bar(IDisposable arg)
@@ -102,7 +147,7 @@ namespace RoslynSandBox
 
         public void Bar()
         {
-            var temp2 = this.disposable;
+            var temp3 = this.disposable;
         }
     }
 }";
@@ -117,8 +162,9 @@ namespace RoslynSandBox
                 }
             }
 
-            [TestCase("this.disposable = Bar(arg);", "Bar(arg) Calculated, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected")]
-            [TestCase("var temp = this.disposable;", "this.disposable Member, Bar(disposable, new[] { disposable }) Recursion, disposable Argument, arg Injected")]
+            [TestCase("var temp1 = Bar(ctorArg);", "Bar(ctorArg) Calculated, Bar(arg, new[] { arg }) Recursion, arg Recursion, ctorArg Injected")]
+            [TestCase("var temp2 = this.disposable;", "this.disposable Member, Bar(ctorArg) Calculated, Bar(arg, new[] { arg }) Recursion, arg Recursion, ctorArg Injected")]
+            [TestCase("var temp3 = this.disposable;", "this.disposable Member, Bar(ctorArg) Calculated, Bar(arg, new[] { arg }) Recursion, arg Recursion, ctorArg Injected")]
             public void SimpleValuePassedToStaticMethodWithOptionalParameter(string code, string expected)
             {
                 var testCode = @"
@@ -131,31 +177,33 @@ namespace RoslynSandBox
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable arg)
+        public Foo(IDisposable ctorArg)
         {
-            this.disposable = Bar(arg);
+            var temp1 = Bar(ctorArg);
+            this.disposable = Bar(ctorArg);
+            var temp2 = this.disposable;
         }
 
-        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        private static IDisposable Bar(IDisposable arg, IEnumerable<IDisposable> args = null)
         {
-            if (disposables == null)
+            if (arg == null)
             {
-                return Bar(disposable, new[] { disposable });
+                return Bar(arg, new[] { arg });
             }
 
-            return disposable;
+            return arg;
         }
 
         public void Bar()
         {
-            var temp = this.disposable;
+            var temp3 = this.disposable;
         }
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.AssignmentExpression(code).Right;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));

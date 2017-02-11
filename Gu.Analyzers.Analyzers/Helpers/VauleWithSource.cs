@@ -26,7 +26,7 @@ namespace Gu.Analyzers
             CancellationToken cancellationToken)
         {
             var pooledList = ListPool<VauleWithSource>.Create();
-            AddRecursively(value, semanticModel, cancellationToken, pooledList.Item);
+            AddSourcesRecursively(value, semanticModel, cancellationToken, pooledList.Item);
             return pooledList;
         }
 
@@ -40,7 +40,7 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    AddRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
@@ -57,14 +57,14 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    AddRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
             return pooledList;
         }
 
-        private static void AddRecursively(
+        private static void AddSourcesRecursively(
             ExpressionSyntax value,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
@@ -102,30 +102,30 @@ namespace Gu.Analyzers
             if (value.IsKind(SyntaxKind.CoalesceExpression))
             {
                 var binaryExpression = (BinaryExpressionSyntax)value;
-                AddRecursively(binaryExpression.Left, semanticModel, cancellationToken, result);
-                AddRecursively(binaryExpression.Right, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(binaryExpression.Left, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(binaryExpression.Right, semanticModel, cancellationToken, result);
                 return;
             }
 
             var conditional = value as ConditionalExpressionSyntax;
             if (conditional != null)
             {
-                AddRecursively(conditional.WhenTrue, semanticModel, cancellationToken, result);
-                AddRecursively(conditional.WhenFalse, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(conditional.WhenTrue, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(conditional.WhenFalse, semanticModel, cancellationToken, result);
                 return;
             }
 
             var awaitExpression = value as AwaitExpressionSyntax;
             if (awaitExpression != null)
             {
-                AddRecursively(awaitExpression, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(awaitExpression, semanticModel, cancellationToken, result);
                 return;
             }
 
             var argument = value.FirstAncestor<ArgumentSyntax>();
-            var invocation = argument?.FirstAncestor<InvocationExpressionSyntax>();
-            if (invocation != null)
+            if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.None) == false)
             {
+                var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
                 if (semanticModel.GetSymbolSafe(invocation, cancellationToken) == null)
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
@@ -185,7 +185,7 @@ namespace Gu.Analyzers
             var field = symbol as IFieldSymbol;
             if (field != null)
             {
-                AddReturnValuesRecursively(value, field, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(value, field, semanticModel, cancellationToken, result);
                 AddPathRecursively(value, semanticModel, cancellationToken, result);
                 return;
             }
@@ -193,7 +193,7 @@ namespace Gu.Analyzers
             var parameter = symbol as IParameterSymbol;
             if (parameter != null)
             {
-                AddRecursively(value, parameter, semanticModel, cancellationToken, result);
+                AddSourcesRecursively(value, parameter, semanticModel, cancellationToken, result);
                 return;
             }
 
@@ -205,28 +205,6 @@ namespace Gu.Analyzers
             }
 
             result.Add(new VauleWithSource(value, ValueSource.Unknown));
-        }
-
-        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result)
-        {
-            int index;
-            return IsAlreadyChecked(value, result, out index);
-        }
-
-        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result, out int index)
-        {
-            index = -1;
-            for (var i = 0; i < result.Count; i++)
-            {
-                var vauleWithSource = result[i];
-                if (ReferenceEquals(vauleWithSource.Value, value))
-                {
-                    index = i;
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static void AddPathRecursively(
@@ -272,10 +250,10 @@ namespace Gu.Analyzers
                 return;
             }
 
-            AddRecursively(expression, semanticModel, cancellationToken, result);
+            AddSourcesRecursively(expression, semanticModel, cancellationToken, result);
         }
 
-        private static void AddRecursively(
+        private static void AddSourcesRecursively(
             AwaitExpressionSyntax awaitExpression,
             SemanticModel semanticModel,
             CancellationToken cancellationToken,
@@ -315,7 +293,7 @@ namespace Gu.Analyzers
             using (var tempResults = ListPool<VauleWithSource>.Create())
             {
                 tempResults.Item.AddRange(result);
-                AddRecursively(awaitedValue, semanticModel, cancellationToken, tempResults.Item);
+                AddSourcesRecursively(awaitedValue, semanticModel, cancellationToken, tempResults.Item);
                 for (var i = 0; i < result.Count; i++)
                 {
                     if (tempResults.Item[i].Source == ValueSource.Recursion)
@@ -339,7 +317,7 @@ namespace Gu.Analyzers
 
                     if (symbol == KnownSymbol.Task.FromResult)
                     {
-                        AddRecursively(
+                        AddSourcesRecursively(
                             ((InvocationExpressionSyntax)temp.Value).ArgumentList.Arguments[0].Expression,
                             semanticModel,
                             cancellationToken,
@@ -351,7 +329,7 @@ namespace Gu.Analyzers
                         var lambda = expression as ParenthesizedLambdaExpressionSyntax;
                         if (lambda != null)
                         {
-                            AddRecursively(lambda.Body as ExpressionSyntax, semanticModel, cancellationToken, result);
+                            AddSourcesRecursively(lambda.Body as ExpressionSyntax, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -391,11 +369,7 @@ namespace Gu.Analyzers
 
                     if (methodDeclaration.ExpressionBody != null)
                     {
-                        AddRecursively(
-                            methodDeclaration.ExpressionBody.Expression,
-                            semanticModel,
-                            cancellationToken,
-                            result);
+                        AddSourcesRecursively(methodDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -403,7 +377,7 @@ namespace Gu.Analyzers
                         {
                             foreach (var returnValue in pooledReturns.Item.ReturnValues)
                             {
-                                AddRecursively(returnValue, semanticModel, cancellationToken, result);
+                                AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                             }
                         }
                     }
@@ -439,7 +413,7 @@ namespace Gu.Analyzers
                         if (propertyDeclaration.ExpressionBody != null)
                         {
                             result.Add(new VauleWithSource(value, ValueSource.Calculated));
-                            AddRecursively(
+                            AddSourcesRecursively(
                                 propertyDeclaration.ExpressionBody.Expression,
                                 semanticModel,
                                 cancellationToken,
@@ -475,7 +449,7 @@ namespace Gu.Analyzers
                                     {
                                         foreach (var returnValue in pooledReturns.Item.ReturnValues)
                                         {
-                                            AddRecursively(returnValue, semanticModel, cancellationToken, result);
+                                            AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                                         }
                                     }
                                 }
@@ -490,7 +464,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static void AddReturnValuesRecursively(
+        private static void AddSourcesRecursively(
             ExpressionSyntax value,
             IFieldSymbol field,
             SemanticModel semanticModel,
@@ -522,7 +496,7 @@ namespace Gu.Analyzers
             AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
         }
 
-        private static void AddRecursively(
+        private static void AddSourcesRecursively(
             ExpressionSyntax value,
             IParameterSymbol parameter,
             SemanticModel semanticModel,
@@ -536,7 +510,7 @@ namespace Gu.Analyzers
                 return;
             }
 
-            bool wasCalled = false;
+            var wasCalled = false;
             for (var i = result.Count - 1; i >= 0; i--)
             {
                 var vauleWithSource = result[i];
@@ -548,12 +522,15 @@ namespace Gu.Analyzers
                     ExpressionSyntax argumentValue;
                     if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
-                        if (!IsAlreadyChecked(value, result))
+                        var argValueSymbol = semanticModel.GetSymbolSafe(argumentValue, cancellationToken);
+                        if (ReferenceEquals(parameter, argValueSymbol))
                         {
-                            result.Add(new VauleWithSource(value, ValueSource.Argument));
-                            AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
-                            AddRecursively(argumentValue, semanticModel, cancellationToken, result);
+                            continue;
                         }
+
+                        result.Add(new VauleWithSource(value, ValueSource.Argument));
+                        AddAssignedValuesRecursively(value, semanticModel, cancellationToken, result);
+                        AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                     }
                     else
                     {
@@ -590,7 +567,7 @@ namespace Gu.Analyzers
                     {
                         if (call.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
-                            AddRecursively(argumentValue, semanticModel, cancellationToken, result);
+                            AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -602,7 +579,7 @@ namespace Gu.Analyzers
                     {
                         if (initializer.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
-                            AddRecursively(argumentValue, semanticModel, cancellationToken, result);
+                            AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -614,7 +591,7 @@ namespace Gu.Analyzers
                     {
                         if (objectCreation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
-                            AddRecursively(argumentValue, semanticModel, cancellationToken, result);
+                            AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }
                         else
                         {
@@ -635,9 +612,25 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in assignments.Item.AssignedValues)
                 {
-                    AddRecursively(assignedValue, semanticModel, cancellationToken, result);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
                 }
             }
+        }
+
+        private static bool IsAlreadyChecked(ExpressionSyntax value, List<VauleWithSource> result, out int index)
+        {
+            index = -1;
+            for (var i = 0; i < result.Count; i++)
+            {
+                var vauleWithSource = result[i];
+                if (ReferenceEquals(vauleWithSource.Value, value))
+                {
+                    index = i;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private VauleWithSource WithSource(ValueSource source)

@@ -80,6 +80,7 @@
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
