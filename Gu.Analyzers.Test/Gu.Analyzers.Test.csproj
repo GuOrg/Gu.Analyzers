@@ -82,6 +82,7 @@
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Nested.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />

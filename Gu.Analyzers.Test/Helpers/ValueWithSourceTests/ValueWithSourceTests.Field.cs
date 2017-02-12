@@ -171,41 +171,6 @@ internal class Foo
                 }
             }
 
-            [TestCase("var temp1 = this.field.Value;", "this.field.Value Member, this.field Member, new Nested() Created")]
-            [TestCase("var temp2 = this.field.Value;", "this.field.Value Member, this.field.Value PotentiallyInjected, this.field Member, new Nested() Created")]
-            public void PublicReadonlyThenAccessedMutableNested(string code, string expected)
-            {
-                var testCode = @"
-internal class Nested
-{
-    public int Value;
-}
-
-internal class Foo
-{
-    public readonly Nested field = new Nested();
-
-    internal Foo()
-    {
-        var temp1 = this.field.Value;
-    }
-
-    internal void Bar()
-    {
-        var temp2 = this.field.Value;
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause(code).Value;
-                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual(expected, actual);
-                }
-            }
-
             [TestCase("public readonly")]
             [TestCase("private readonly")]
             [TestCase("private")]
