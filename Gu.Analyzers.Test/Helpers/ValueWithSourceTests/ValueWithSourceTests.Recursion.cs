@@ -9,7 +9,7 @@
 
     internal partial class ValueWithSourceTests
     {
-        public class Recursive
+        internal class Recursion
         {
             [TestCase("Value")]
             [TestCase("this.Value")]
@@ -458,7 +458,7 @@ namespace RoslynSandBox
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("Bar(1) Calculated, Bar(value, new[] { value }) Recursion, value Argument, 1 Constant", actual);
+                    Assert.AreEqual("Bar(1) Calculated, Bar(value, new[] { value }) Recursion, value Recursion, 1 Constant", actual);
                 }
             }
 

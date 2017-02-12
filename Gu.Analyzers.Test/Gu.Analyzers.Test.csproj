@@ -89,7 +89,7 @@
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Recursive.cs" />
+    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Recursion.cs" />
     <Compile Include="ReproBox.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.SyntaxError.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />

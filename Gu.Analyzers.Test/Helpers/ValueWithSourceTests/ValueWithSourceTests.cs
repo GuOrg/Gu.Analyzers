@@ -80,7 +80,7 @@ internal class Foo
             using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("Cache[1] Cached", actual);
+                Assert.AreEqual("Cache[1] Cached, Cache Cached", actual);
             }
         }
 
