@@ -5,6 +5,7 @@ namespace Gu.Analyzers.Test
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Data.Common;
     using System.Linq;
 
     using Microsoft.CodeAnalysis;
@@ -18,6 +19,7 @@ namespace Gu.Analyzers.Test
         internal static readonly MetadataReference MsCorlib = MetadataReference.CreateFromFile(typeof(object).Assembly.Location).WithAliases(ImmutableArray.Create("global", "corlib"));
         internal static readonly MetadataReference System = MetadataReference.CreateFromFile(typeof(System.Diagnostics.Debug).Assembly.Location).WithAliases(ImmutableArray.Create("global", "system"));
         internal static readonly MetadataReference SystemCore = MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location);
+        internal static readonly MetadataReference SystemData = MetadataReference.CreateFromFile(typeof(DbConnection).Assembly.Location);
         internal static readonly MetadataReference SystemReactive = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.SerialDisposable).Assembly.Location);
         internal static readonly MetadataReference SystemReactiveInterfaces = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.ICancelable).Assembly.Location);
         internal static readonly MetadataReference SystemReactiveLinq = MetadataReference.CreateFromFile(typeof(System.Reactive.Linq.Observable).Assembly.Location);
@@ -34,6 +36,7 @@ namespace Gu.Analyzers.Test
                         MsCorlib,
                         System,
                         SystemCore,
+                        SystemData,
                         SystemReactive,
                         SystemReactiveInterfaces,
                         SystemReactiveLinq,

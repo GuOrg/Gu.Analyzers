@@ -208,5 +208,25 @@ public sealed class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task InjectedDbConnectionCreateCommand()
+        {
+            var testCode = @"
+using System.Data.Common;
+
+public class C
+{
+	public static void F(DbConnection conn)
+	{
+		using(var command = conn.CreateCommand())
+		{
+				
+		}
+	}
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
