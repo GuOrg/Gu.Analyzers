@@ -39,16 +39,21 @@
 
         public IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
 
-        public static Pool<CallsWalker>.Pooled GetCallsInType(IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static Pool<CallsWalker>.Pooled GetCallsInContext(IMethodSymbol method, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             pooled.Item.method = method;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
-
-            foreach (var declaration in method.ContainingType.DeclaringSyntaxReferences)
+            var type = semanticModel.GetDeclaredSymbolSafe(context.FirstAncestor<TypeDeclarationSyntax>(), cancellationToken);
+            while (type != null && type != KnownSymbol.Object)
             {
-                pooled.Item.Visit(declaration.GetSyntax(cancellationToken));
+                foreach (var reference in type.DeclaringSyntaxReferences)
+                {
+                    pooled.Item.Visit(reference.GetSyntax(cancellationToken));
+                }
+
+                type = type.BaseType;
             }
 
             return pooled;
@@ -62,17 +67,20 @@
                 this.invocations.Add(node);
             }
 
-            ////if (this.method.MethodKind == MethodKind.AnonymousFunction &&
-            ////    invokedMethod?.MethodKind == MethodKind.DelegateInvoke)
-            ////{
-            ////}
-
             base.VisitInvocationExpression(node);
         }
 
         public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
         {
-            if (this.method.Equals(this.semanticModel.GetSymbolSafe(node, this.cancellationToken)))
+            if (this.method.MethodKind == MethodKind.Constructor)
+            {
+                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (this.method.Equals(ctor))
+                {
+                    this.initializers.Add(node);
+                }
+            }
+            else
             {
                 this.initializers.Add(node);
             }
@@ -82,7 +90,15 @@
 
         public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
         {
-            if (this.method.Equals(this.semanticModel.GetSymbolSafe(node, this.cancellationToken)))
+            if (this.method.MethodKind == MethodKind.Constructor)
+            {
+                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (this.method.Equals(ctor))
+                {
+                    this.objectCreations.Add(node);
+                }
+            }
+            else
             {
                 this.objectCreations.Add(node);
             }

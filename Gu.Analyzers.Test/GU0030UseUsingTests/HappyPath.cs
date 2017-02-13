@@ -215,13 +215,38 @@ public sealed class Foo
             var testCode = @"
 using System.Data.Common;
 
-public class C
+public class Foo
 {
-	public static void F(DbConnection conn)
+	public static void Bar(DbConnection conn)
 	{
 		using(var command = conn.CreateCommand())
 		{
-				
+		}
+	}
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task InjectedMemberDbConnectionCreateCommand()
+        {
+            var testCode = @"
+using System.Data.Common;
+
+public class Foo
+{
+    private readonly DbConnection connection;
+
+	public Foo(DbConnection connection)
+	{
+		this.connection = connection;
+	}
+
+	public void Bar()
+	{
+		using(var command = this.connection.CreateCommand())
+		{
 		}
 	}
 }";

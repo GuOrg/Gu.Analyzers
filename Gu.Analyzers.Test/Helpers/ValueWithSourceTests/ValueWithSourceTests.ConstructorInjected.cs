@@ -470,6 +470,28 @@ internal class Foo
             }
 
             [Test]
+            public void AssignedToVariableGeneric()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo<T>
+{
+    internal Foo(T meh)
+    {
+        var temp = meh;
+        var value = temp;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var value = temp;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("meh Injected", actual);
+                }
+            }
+
+            [Test]
             public void PrivateNoChained()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -519,7 +541,7 @@ internal class Foo
             }
 
             [Test]
-            public void ChainedPrivatePropertyOnInjected()
+            public void ChainedPrivateInjected()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -592,12 +614,38 @@ internal class Foo
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("meh PotentiallyInjected, gg Injected", actual);
+                    Assert.AreEqual("meh PotentiallyInjected, meh Argument, gg Injected", actual);
                 }
             }
 
             [Test]
-            public void ChainedDefaultValue()
+            public void Chained4Generic()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo<T>
+{
+    public Foo(T gg, string foo)
+        : this(gg)
+    {
+    }
+
+    public Foo(T meh)
+    {
+        var value = meh;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("meh PotentiallyInjected, meh Argument, gg Injected", actual);
+                }
+            }
+
+            [TestCase("var temp = meh;", "meh PotentiallyInjected, meh Argument, 1 Constant, 2 Constant, text.Length External, text Injected")]
+            public void ChainedDefaultValue(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandBox
@@ -621,17 +669,17 @@ namespace RoslynSandBox
 
         public Foo(int _, int meh = 1)
         {
-            var value = meh;
+            var temp = meh;
         }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var node = syntaxTree.EqualsValueClause("var value = meh;").Value;
+                var node = syntaxTree.EqualsValueClause(code).Value;
                 using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                    Assert.AreEqual("meh PotentiallyInjected, 1 Constant, 2 Constant, text.Length External, text Injected", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -658,6 +706,32 @@ public sealed class Foo
                 {
                     var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
                     Assert.AreEqual("value Argument, 1 Constant", actual);
+                }
+            }
+
+            [Test]
+            public void PrivateInjectedFactoryConstantGeneric()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+public sealed class Foo<T>
+{
+    private Foo(T value)
+    {
+        var temp = value;
+    }
+
+    public static Foo Create()
+    {
+        return new Foo(default(T));
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("value Argument, default(T) Constant", actual);
                 }
             }
 
@@ -715,10 +789,14 @@ public sealed class Foo
                 }
             }
 
-            [TestCase("var temp1 = this.value;", "this.value Member, ctorArg Argument, 1 Constant")]
-            [TestCase("var temp2 = this.Value;", "this.Value Member, ctorArg Argument, 1 Constant")]
-            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, ctorArg PotentiallyInjected, 1 Constant")]
-            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, ctorArg PotentiallyInjected, 1 Constant")]
+            [TestCase("var temp1 = this.value;", "this.value Member")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member")]
+            [TestCase("var temp3 = this.value;", "this.value Member, ctorArg PotentiallyInjected, ctorArg Argument, 1 Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, ctorArg PotentiallyInjected, ctorArg Argument, 1 Constant")]
+            [TestCase("var temp5 = this.value;", "this.value Member, ctorArg Argument, 1 Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, ctorArg Argument, 1 Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, ctorArg PotentiallyInjected, ctorArg Argument, 1 Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, ctorArg PotentiallyInjected, ctorArg Argument, 1 Constant")]
             public void MutableInitializedInPreviousCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -728,23 +806,27 @@ internal class Foo
 
     internal Foo(int ctorArg)
     {
+        var temp1 = this.value;
+        var temp2 = this.Value;
         this.value = ctorArg;
         this.Value = ctorArg;
+        var temp3 = this.value;
+        var temp4 = this.Value;
     }
 
     internal Foo(string text)
         : this(1)
     {
-        var temp1 = this.value;
-        var temp2 = this.Value;
+        var temp5 = this.value;
+        var temp6 = this.Value;
     }
 
     public int Value { get; set; }
 
     internal void Bar()
     {
-        var temp3 = this.value;
-        var temp4 = this.Value;
+        var temp7 = this.value;
+        var temp8 = this.Value;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -757,10 +839,64 @@ internal class Foo
                 }
             }
 
-            [TestCase("var temp1 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
-            [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
-            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected")]
-            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected")]
+            [TestCase("var temp1 = this.value;", "this.value Member")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member")]
+            [TestCase("var temp3 = this.value;", "this.value Member, ctorArg PotentiallyInjected, ctorArg Argument, default(T) Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, ctorArg PotentiallyInjected, ctorArg Argument, default(T) Constant")]
+            [TestCase("var temp5 = this.value;", "this.value Member, ctorArg Argument, default(T) Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, ctorArg Argument, default(T) Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, ctorArg PotentiallyInjected, ctorArg Argument, default(T) Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, ctorArg PotentiallyInjected, ctorArg Argument, default(T) Constant")]
+            public void MutableInitializedInPreviousCtorGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo<T>
+{
+    public int value;
+
+    internal Foo(T ctorArg)
+    {
+        var temp1 = this.value;
+        var temp2 = this.Value;
+        this.value = ctorArg;
+        this.Value = ctorArg;
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+
+    internal Foo(string text)
+        : this(default(T))
+    {
+        var temp5 = this.value;
+        var temp6 = this.Value;
+    }
+
+    public T Value { get; set; }
+
+    internal void Bar()
+    {
+        var temp7 = this.value;
+        var temp8 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, baseArg Injected")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Injected")]
+            [TestCase("var temp3 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
             public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtors(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -778,6 +914,8 @@ internal class FooBase
     {
         this.value = baseArg;
         this.Value = baseArg;
+        var temp1 = this.value;
+        var temp2 = this.Value;
     }
 
     public int Value { get; set; }
@@ -788,14 +926,85 @@ internal class Foo : FooBase
     internal Foo(int arg)
         : base(arg)
     {
-        var temp1 = this.value;
-        var temp2 = this.Value;
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+
+    internal Foo()
+        : base(2)
+    {
+        var temp5 = this.value;
+        var temp6 = this.Value;
     }
 
     internal void Bar()
     {
+        var temp7 = this.value;
+        var temp8 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, baseArg Injected")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Injected")]
+            [TestCase("var temp3 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtorsGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = 1;
+        this.Value = 1;
+    }
+
+    internal FooBase(T baseArg)
+    {
+        this.value = baseArg;
+        this.Value = baseArg;
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo : FooBase<int>
+{
+    internal Foo(int arg)
+        : base(arg)
+    {
         var temp3 = this.value;
         var temp4 = this.Value;
+    }
+
+    internal Foo()
+        : base(2)
+    {
+        var temp5 = this.value;
+        var temp6 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp7 = this.value;
+        var temp8 = this.Value;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);

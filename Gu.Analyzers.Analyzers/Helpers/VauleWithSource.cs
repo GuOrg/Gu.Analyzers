@@ -84,7 +84,8 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (value is LiteralExpressionSyntax)
+            if (value is LiteralExpressionSyntax ||
+                value is DefaultExpressionSyntax)
             {
                 result.Add(new VauleWithSource(value, ValueSource.Constant));
                 return;
@@ -542,15 +543,43 @@ namespace Gu.Analyzers
 
             if (!wasCalled)
             {
-                using (var calls = CallsWalker.GetCallsInType(method, semanticModel, cancellationToken))
+                var contextType = semanticModel.GetDeclaredSymbolSafe(result.Count == 0 ? value.FirstAncestor<TypeDeclarationSyntax>() : result[0].Value.FirstAncestor<TypeDeclarationSyntax>(), cancellationToken);
+                using (var calls = result.Count == 0 ? CallsWalker.GetCallsInContext(method, value, semanticModel, cancellationToken)
+                                                     : CallsWalker.GetCallsInContext(method, result[0].Value, semanticModel, cancellationToken))
                 {
-                    if (method.AssociatedSymbol == null &&
-                        method.MethodKind != MethodKind.LambdaMethod &&
-                        calls.Item.Invocations.Count == 0 &&
-                        calls.Item.ObjectCreations.Count == 0 &&
-                        calls.Item.Initializers.Count == 0)
+                    if (method.MethodKind == MethodKind.Constructor)
                     {
-                        result.Add(new VauleWithSource(value, ValueSource.Injected));
+                        if (ReferenceEquals(contextType, method.ContainingType))
+                        {
+                            var firstCtor = result.Count == 0
+                                                ? value.FirstAncestor<ConstructorDeclarationSyntax>()
+                                                : result[0].Value.FirstAncestor<ConstructorDeclarationSyntax>();
+                            if (calls.Item.Initializers.Count > 0 || calls.Item.ObjectCreations.Count > 0)
+                            {
+                                var firstCtorSymbol = semanticModel.GetDeclaredSymbolSafe(firstCtor, cancellationToken);
+                                if (firstCtorSymbol == null &&
+                                    method.DeclaredAccessibility != Accessibility.Private)
+                                {
+                                    result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
+                                }
+                                else if (firstCtorSymbol != null &&
+                                         ReferenceEquals(method, firstCtorSymbol) &&
+                                         firstCtorSymbol.DeclaredAccessibility != Accessibility.Private)
+                                {
+                                    result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
+                                }
+
+                                result.Add(new VauleWithSource(value, ValueSource.Argument));
+                            }
+                            else
+                            {
+                                result.Add(new VauleWithSource(value, ValueSource.Injected));
+                            }
+                        }
+                        else
+                        {
+                            result.Add(new VauleWithSource(value, ValueSource.Argument));
+                        }
                     }
                     else if (method.AssociatedSymbol == null &&
                              method.MethodKind != MethodKind.LambdaMethod &&

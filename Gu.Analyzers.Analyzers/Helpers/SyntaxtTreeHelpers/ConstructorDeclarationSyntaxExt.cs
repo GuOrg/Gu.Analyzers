@@ -7,7 +7,11 @@
 
     internal static class ConstructorDeclarationSyntaxExt
     {
-        internal static bool IsRunBefore(this ConstructorDeclarationSyntax first, ConstructorDeclarationSyntax other, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsRunBefore(
+            this ConstructorDeclarationSyntax first,
+            ConstructorDeclarationSyntax other,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken)
         {
             if (first == null ||
                 other == null)
@@ -41,7 +45,11 @@
 
             foreach (var reference in initializerSymbol.DeclaringSyntaxReferences)
             {
-                if (IsRunBefore(first, (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken), semanticModel, cancellationToken))
+                if (IsRunBefore(
+                    first,
+                    (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken),
+                    semanticModel,
+                    cancellationToken))
                 {
                     return true;
                 }
