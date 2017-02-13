@@ -30,7 +30,12 @@
 
         internal static void AddRunBefore(SyntaxNode context, HashSet<IMethodSymbol> ctorsRunBefore, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var contextCtor = context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            if (context == null)
+            {
+                return;
+            }
+
+            var contextCtor = context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
             if (contextCtor == null)
             {
                 var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);

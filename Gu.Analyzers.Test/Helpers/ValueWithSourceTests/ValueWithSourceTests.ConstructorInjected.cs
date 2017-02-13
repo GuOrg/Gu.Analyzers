@@ -1067,6 +1067,106 @@ internal class Foo : FooBase
                 }
             }
 
+            [TestCase("var temp1 = this.value;", "this.value Member, default(T) Constant")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, default(T) Constant")]
+            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, default(T) Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, default(T) Constant")]
+            public void MutableInBaseInitializedInBaseCtorWhenBaseHasManyCtorsImplicitBaseCallGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = default(T);
+        this.Value = default(T);
+    }
+
+    internal FooBase(T value)
+    {
+        this.value = value;
+        this.Value = value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo : FooBase<int>
+{
+    internal Foo()
+    {
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, default(T) Constant")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, default(T) Constant")]
+            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, default(T) Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, default(T) Constant")]
+            public void MutableInBaseInitializedInBaseCtorWhenBaseHasManyCtorsImplicitBaseCallGenericGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = default(T);
+        this.Value = default(T);
+    }
+
+    internal FooBase(T value)
+    {
+        this.value = value;
+        this.Value = value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo<T> : FooBase<T>
+{
+    internal Foo()
+    {
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
             [TestCase("var temp1 = this.value;", "this.value Member, 1 Constant")]
             [TestCase("var temp2 = this.Value;", "this.Value Member, 1 Constant")]
             [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, 1 Constant")]
@@ -1094,6 +1194,108 @@ internal class FooBase
 }
 
 internal class Foo : FooBase
+{
+    internal Foo()
+        : base()
+    {
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, default(T) Constant")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, default(T) Constant")]
+            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, default(T) Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, default(T) Constant")]
+            public void MutableInBaseInitializedInBaseCtorWhenBaseHasManyCtorsExplicitBaseCallGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = default(T);
+        this.Value = default(T);
+    }
+
+    internal FooBase(T value)
+    {
+        this.value = value;
+        this.Value = value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo : FooBase<int>
+{
+    internal Foo()
+        : base()
+    {
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp3 = this.value;
+        var temp4 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, default(T) Constant")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, default(T) Constant")]
+            [TestCase("var temp3 = this.value;", "this.value Member, this.value PotentiallyInjected, default(T) Constant")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, default(T) Constant")]
+            public void MutableInBaseInitializedInBaseCtorWhenBaseHasManyCtorsExplicitBaseCallGenericGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = default(T);
+        this.Value = default(T);
+    }
+
+    internal FooBase(int value)
+    {
+        this.value = value;
+        this.Value = value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo<T> : FooBase<T>
 {
     internal Foo()
         : base()
