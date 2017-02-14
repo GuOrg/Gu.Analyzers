@@ -18,6 +18,7 @@
                     x.objectCreations.Clear();
                     x.ctors.Clear();
                     x.method = null;
+                    x.contextType = null;
                     x.semanticModel = null;
                     x.cancellationToken = CancellationToken.None;
                 });
@@ -28,6 +29,7 @@
         private readonly HashSet<IMethodSymbol> ctors = new HashSet<IMethodSymbol>(SymbolComparer.Default);
 
         private IMethodSymbol method;
+        private ITypeSymbol contextType;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -56,7 +58,8 @@
                 pooled.Item.ctors.Add(contextCtor).IgnoreReturnValue();
             }
 
-            var type = semanticModel.GetDeclaredSymbolSafe(context.FirstAncestor<TypeDeclarationSyntax>(), cancellationToken);
+            pooled.Item.contextType = semanticModel.GetDeclaredSymbolSafe(context.FirstAncestor<TypeDeclarationSyntax>(), cancellationToken);
+            var type = pooled.Item.contextType;
             while (type != null && type != KnownSymbol.Object)
             {
                 foreach (var reference in type.DeclaringSyntaxReferences)
@@ -86,11 +89,17 @@
             if (this.method.MethodKind == MethodKind.Constructor)
             {
                 var calledCtor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                var callingCtor = this.semanticModel.GetDeclaredSymbolSafe(node.Parent, this.cancellationToken) as IMethodSymbol;
-                if (SymbolComparer.Equals(this.method, calledCtor) &&
-                    this.ctors.Contains(callingCtor))
+                if (this.IsValidCtor(calledCtor))
                 {
-                    this.initializers.Add(node);
+                    var callingCtor = this.semanticModel.GetDeclaredSymbolSafe(node.Parent, this.cancellationToken) as IMethodSymbol;
+                    if (SymbolComparer.Equals(calledCtor.ContainingType, callingCtor?.ContainingType))
+                    {
+                        this.initializers.Add(node);
+                    }
+                    else if (this.ctors.Contains(callingCtor))
+                    {
+                        this.initializers.Add(node);
+                    }
                 }
             }
             else
@@ -106,8 +115,7 @@
             if (this.method.MethodKind == MethodKind.Constructor)
             {
                 var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
-                if (SymbolComparer.Equals(this.method, ctor) &&
-                    this.ctors.Contains(ctor))
+                if (this.IsValidCtor(ctor))
                 {
                     this.objectCreations.Add(node);
                 }
@@ -118,6 +126,21 @@
             }
 
             base.VisitObjectCreationExpression(node);
+        }
+
+        private bool IsValidCtor(IMethodSymbol ctor)
+        {
+            if (!SymbolComparer.Equals(this.method, ctor))
+            {
+                return false;
+            }
+
+            if (SymbolComparer.Equals(this.contextType, ctor?.ContainingType))
+            {
+                return true;
+            }
+
+            return this.ctors.Contains(ctor);
         }
     }
 }
