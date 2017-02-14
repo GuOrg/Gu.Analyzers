@@ -44,7 +44,7 @@
                 return;
             }
 
-            AccessorDeclarationSyntax setter = (AccessorDeclarationSyntax) context.Node;
+            AccessorDeclarationSyntax setter = (AccessorDeclarationSyntax)context.Node;
             if (setter.Body != null)
             {
                 return;

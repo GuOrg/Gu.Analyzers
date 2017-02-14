@@ -222,6 +222,44 @@ internal class Foo
             }
         }
 
+        [TestCase("var temp1 = this.value;", "this.value, 1")]
+        [TestCase("var temp2 = this.value;", "this.value, 1")]
+        public void FieldInitializedlWithOutParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    internal class Foo
+    {
+        private int value;
+
+        public Foo()
+        {
+            this.Assign(out this.value);
+            var temp1 = this.value;
+        }
+
+        internal void Bar()
+        {
+            var temp2 = this.value;
+        }
+
+        private void Assign(out int outValue)
+        {
+            outValue = 1;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
         [TestCase("var temp1 = this.value;", "1, 2")]
         [TestCase("var temp2 = this.value;", "1, 2")]
         public void FieldInitializedInCtorWithLiteral(string code, string expected)
@@ -468,6 +506,126 @@ internal class Foo<T> : FooBase<T>
     internal void Bar()
     {
         var temp2 = this.value;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("var temp1 = this.bar;", "1, 2")]
+        [TestCase("var temp2 = this.Bar;", "1, 2")]
+        [TestCase("var temp3 = this.bar;", "1, 2, value")]
+        [TestCase("var temp4 = this.Bar;", "1, 2, value")]
+        public void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+public sealed class Foo
+{
+    private int bar = 1;
+
+    public Foo()
+    {
+        this.bar = 2;
+        var temp1 = this.bar;
+        var temp2 = this.Bar;
+    }
+
+    public int Bar
+    {
+        get { return this.bar; }
+        private set { this.bar = value; }
+    }
+
+    public void Meh()
+    {
+        var temp3 = this.bar;
+        var temp4 = this.Bar;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("var temp1 = this.bar;", "1, 2")]
+        [TestCase("var temp2 = this.Bar;", "1, 2")]
+        [TestCase("var temp3 = this.bar;", "1, 2, value")]
+        [TestCase("var temp4 = this.Bar;", "1, 2, value")]
+        public void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+public sealed class Foo
+{
+    private int bar = 1;
+
+    public Foo()
+    {
+        this.bar = 2;
+        var temp1 = this.bar;
+        var temp2 = this.Bar;
+    }
+
+    public int Bar
+    {
+        get { return this.bar; }
+        private set { this.bar = value; }
+    }
+
+    public void Meh()
+    {
+        var temp3 = this.bar;
+        var temp4 = this.Bar;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("var temp1 = this.bar;", "1, 2")]
+        [TestCase("var temp2 = this.Bar;", "1, 2")]
+        [TestCase("var temp3 = this.bar;", "1, 2, value")]
+        [TestCase("var temp4 = this.Bar;", "1, 2, value")]
+        public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+public sealed class Foo
+{
+    private int bar = 1;
+
+    public Foo()
+    {
+        this.Bar = 2;
+        var temp1 = this.bar;
+        var temp2 = this.Bar;
+    }
+
+    public int Bar
+    {
+        get { return this.bar; }
+        private set { this.bar = value; }
+    }
+
+    public void Meh()
+    {
+        var temp3 = this.bar;
+        var temp4 = this.Bar;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);

@@ -11,10 +11,50 @@
     {
         public class Field
         {
+            [TestCase("var temp1 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant")]
+            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant")]
+            public void PrivateAssignedWithOutParameterBeforeInCtor(string code, string expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    internal class Foo
+    {
+        private int field;
+
+        public Foo()
+        {
+            this.Assign(out this.field);
+            var temp1 = this.field;
+        }
+
+        internal void Bar()
+        {
+            var temp2 = this.field;
+        }
+
+        private void Assign(out int value)
+        {
+            value = 1;
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("private void Assign", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
             [TestCase("private void Assign")]
             [TestCase("public void Assign")]
             [TestCase("public static void Assign")]
-            public void PrivateAssignedWithOutParameterBeforeInCtor(string code)
+            public void PrivateAssignedWithOutParameterBeforeInCtorWithModifiers(string code)
             {
                 var testCode = @"
 internal class Foo

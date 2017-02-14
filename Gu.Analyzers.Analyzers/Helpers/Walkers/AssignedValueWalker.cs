@@ -81,12 +81,15 @@
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
-            var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
-            if (this.symbols.Contains(left) &&
-                this.IsBeforeInScope(node))
+            if (this.IsBeforeInScope(node))
             {
-                this.AddPropertyIfInSetter(node);
-                this.assignedValues.Add(node.Right);
+                var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
+                this.HandleBackingField(left as IPropertySymbol);
+                if (this.symbols.Contains(left))
+                {
+                    this.AddPropertyIfInSetter(node);
+                    this.assignedValues.Add(node.Right);
+                }
             }
 
             base.VisitAssignmentExpression(node);
@@ -94,12 +97,15 @@
 
         public override void VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
-            var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (this.symbols.Contains(operand) &&
-                this.IsBeforeInScope(node))
+            if (this.IsBeforeInScope(node))
             {
-                this.AddPropertyIfInSetter(node);
-                this.assignedValues.Add(node.Operand);
+                var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
+                this.HandleBackingField(operand as IPropertySymbol);
+                if (this.symbols.Contains(operand))
+                {
+                    this.AddPropertyIfInSetter(node);
+                    this.assignedValues.Add(node.Operand);
+                }
             }
 
             base.VisitPrefixUnaryExpression(node);
@@ -107,12 +113,15 @@
 
         public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
-            var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (this.symbols.Contains(operand) &&
-                this.IsBeforeInScope(node))
+            if (this.IsBeforeInScope(node))
             {
-                this.AddPropertyIfInSetter(node);
-                this.assignedValues.Add(node.Operand);
+                var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
+                this.HandleBackingField(operand as IPropertySymbol);
+                if (this.symbols.Contains(operand))
+                {
+                    this.AddPropertyIfInSetter(node);
+                    this.assignedValues.Add(node.Operand);
+                }
             }
 
             base.VisitPostfixUnaryExpression(node);
@@ -316,6 +325,44 @@
             }
         }
 
+        private void HandleBackingField(IPropertySymbol property)
+        {
+            if (property == null ||
+                property.DeclaringSyntaxReferences.Length == 0)
+            {
+                return;
+            }
+
+            foreach (var reference in property.DeclaringSyntaxReferences)
+            {
+                var declaration = reference.GetSyntax(this.cancellationToken) as PropertyDeclarationSyntax;
+                AccessorDeclarationSyntax setter;
+                if (declaration.TryGetSetAccessorDeclaration(out setter))
+                {
+                    using (var pooled = IdentifierNameWalker.Create(setter))
+                    {
+                        foreach (var name in pooled.Item.IdentifierNames)
+                        {
+                            var assignment = name.FirstAncestor<AssignmentExpressionSyntax>();
+                            if (assignment != null &&
+                                assignment.Left.Span.Contains(name.Span))
+                            {
+                                var assignedSymbol = this.semanticModel.GetSymbolSafe(assignment.Left, this.cancellationToken);
+                                if (this.symbols.Contains(assignedSymbol))
+                                {
+                                    this.symbols.Add(property).IgnoreReturnValue();
+                                }
+                                else if (this.symbols.Contains(property))
+                                {
+                                    this.symbols.Add(assignedSymbol).IgnoreReturnValue();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private bool IsBeforeInScope(SyntaxNode node)
         {
             if (this.context == null)
@@ -325,9 +372,14 @@
 
             var ctor = node.FirstAncestor<ConstructorDeclarationSyntax>();
             var contextCtor = this.context.FirstAncestor<ConstructorDeclarationSyntax>();
-            if (ctor != null && ctor != contextCtor)
+            if (ctor != null)
             {
-                return this.ctorsRunBefore.Contains(this.semanticModel.GetDeclaredSymbolSafe(ctor, this.cancellationToken));
+                if (ctor != contextCtor)
+                {
+                    return this.ctorsRunBefore.Contains(this.semanticModel.GetDeclaredSymbolSafe(ctor, this.cancellationToken));
+                }
+
+                return node.IsBeforeInScope(this.context);
             }
 
             return this.context.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
