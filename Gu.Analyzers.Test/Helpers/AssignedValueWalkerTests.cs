@@ -8,10 +8,14 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal class AssignedValueWalkerTests
     {
-        [Test]
-        public void LocalInitializedWithLiteral()
+        [TestCase("1")]
+        [TestCase("abc")]
+        [TestCase("default(int)")]
+        [TestCase("typeof(int)")]
+        [TestCase("nameof(int)")]
+        public void LocalInitializedWithConstant(string code)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            var testCode = @"
 internal class Foo
 {
     internal Foo()
@@ -19,14 +23,16 @@ internal class Foo
         var value = 1;
         var temp = value;
     }
-}");
+}";
+            testCode = testCode.AssertReplace("1", code);
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("1", actual);
+                Assert.AreEqual(code, actual);
             }
         }
 

@@ -24,8 +24,8 @@
             });
 
         private readonly List<ExpressionSyntax> assignedValues = new List<ExpressionSyntax>();
-        private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>();
-        private readonly HashSet<IMethodSymbol> ctorsRunBefore = new HashSet<IMethodSymbol>();
+        private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>(SymbolComparer.Default);
+        private readonly HashSet<IMethodSymbol> ctorsRunBefore = new HashSet<IMethodSymbol>(SymbolComparer.Default);
 
         private ISymbol symbol;
         private SyntaxNode context;

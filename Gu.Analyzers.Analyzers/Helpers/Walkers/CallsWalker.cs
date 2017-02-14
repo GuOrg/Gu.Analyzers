@@ -16,6 +16,7 @@
                     x.invocations.Clear();
                     x.initializers.Clear();
                     x.objectCreations.Clear();
+                    x.ctors.Clear();
                     x.method = null;
                     x.semanticModel = null;
                     x.cancellationToken = CancellationToken.None;
@@ -24,6 +25,7 @@
         private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
         private readonly List<ConstructorInitializerSyntax> initializers = new List<ConstructorInitializerSyntax>();
         private readonly List<ObjectCreationExpressionSyntax> objectCreations = new List<ObjectCreationExpressionSyntax>();
+        private readonly HashSet<IMethodSymbol> ctors = new HashSet<IMethodSymbol>(SymbolComparer.Default);
 
         private IMethodSymbol method;
         private SemanticModel semanticModel;
@@ -45,6 +47,15 @@
             pooled.Item.method = method;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
+            Constructor.AddRunBefore(context, pooled.Item.ctors, semanticModel, cancellationToken);
+            var contextCtor = semanticModel.GetDeclaredSymbolSafe(
+                context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>(),
+                cancellationToken);
+            if (contextCtor != null)
+            {
+                pooled.Item.ctors.Add(contextCtor).IgnoreReturnValue();
+            }
+
             var type = semanticModel.GetDeclaredSymbolSafe(context.FirstAncestor<TypeDeclarationSyntax>(), cancellationToken);
             while (type != null && type != KnownSymbol.Object)
             {
@@ -62,7 +73,7 @@
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             var invokedMethod = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
-            if (this.method.Equals(invokedMethod))
+            if (SymbolComparer.Equals(this.method, invokedMethod))
             {
                 this.invocations.Add(node);
             }
@@ -74,8 +85,10 @@
         {
             if (this.method.MethodKind == MethodKind.Constructor)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (this.method.Equals(ctor))
+                var calledCtor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                var callingCtor = this.semanticModel.GetDeclaredSymbolSafe(node.Parent, this.cancellationToken) as IMethodSymbol;
+                if (SymbolComparer.Equals(this.method, calledCtor) &&
+                    this.ctors.Contains(callingCtor))
                 {
                     this.initializers.Add(node);
                 }
@@ -92,8 +105,9 @@
         {
             if (this.method.MethodKind == MethodKind.Constructor)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (this.method.Equals(ctor))
+                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
+                if (SymbolComparer.Equals(this.method, ctor) &&
+                    this.ctors.Contains(ctor))
                 {
                     this.objectCreations.Add(node);
                 }

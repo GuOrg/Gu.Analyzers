@@ -153,7 +153,7 @@ namespace RoslynSandBox
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public async Task DisposingCaclulatedPropertyStatementBody(string disposeCall)
+        public async Task DisposingCaclulatedPropertyNestedStatementBody(string disposeCall)
         {
             var fooCode = @"
 using System;
@@ -207,7 +207,7 @@ public sealed class Bar : IDisposable
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public async Task DisposingCaclulatedPropertyExpressionBody(string disposeCall)
+        public async Task DisposingCaclulatedPropertyNestedExpressionBody(string disposeCall)
         {
             var fooCode = @"
 using System;

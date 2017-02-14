@@ -39,6 +39,11 @@
             if (contextCtor == null)
             {
                 var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);
+                if (type == null)
+                {
+                    return;
+                }
+
                 if (type.Constructors.Length != 0)
                 {
                     foreach (var ctor in type.Constructors)
@@ -76,6 +81,11 @@
             if (ctor.Initializer != null)
             {
                 var nestedCtor = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
+                if (nestedCtor == null)
+                {
+                    return;
+                }
+
                 foreach (var reference in nestedCtor.DeclaringSyntaxReferences)
                 {
                     var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
@@ -92,8 +102,8 @@
                 {
                     foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
                     {
-                        var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
                         ctorsRunBefore.Add(defaultCtor).IgnoreReturnValue();
+                        var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
                         AddCtorsRecursively(runBefore, ctorsRunBefore, semanticModel, cancellationToken);
                     }
                 }

@@ -889,14 +889,16 @@ internal class Foo<T>
                 }
             }
 
-            [TestCase("var temp1 = this.value;", "this.value Member, baseArg Injected")]
-            [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Injected")]
-            [TestCase("var temp3 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
-            [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
-            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
-            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
-            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
-            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            [TestCase("var temp1 = this.value;", "this.value Member")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member")]
+            [TestCase("var temp3 = this.value;", "this.value Member, baseArg Injected")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Injected")]
+            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp7 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp9 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            [TestCase("var temp10 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
             public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtors(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -912,16 +914,82 @@ internal class FooBase
 
     internal FooBase(int baseArg)
     {
-        this.value = baseArg;
-        this.Value = baseArg;
         var temp1 = this.value;
         var temp2 = this.Value;
+        this.value = baseArg;
+        this.Value = baseArg;
+        var temp3 = this.value;
+        var temp4 = this.Value;
     }
 
     public int Value { get; set; }
 }
 
 internal class Foo : FooBase
+{
+    internal Foo(int arg)
+        : base(arg)
+    {
+        var temp5 = this.value;
+        var temp6 = this.Value;
+    }
+
+    internal Foo()
+        : base(2)
+    {
+        var temp7 = this.value;
+        var temp8 = this.Value;
+    }
+
+    internal void Bar()
+    {
+        var temp9 = this.value;
+        var temp10 = this.Value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause(code).Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "this.value Member, baseArg Injected")]
+            [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Injected")]
+            [TestCase("var temp3 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
+            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
+            public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtorsGeneric(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBase<T>
+{
+    public T value;
+
+    internal FooBase()
+    {
+        this.value = default(T);
+        this.Value = default(T);
+    }
+
+    internal FooBase(T baseArg)
+    {
+        this.value = baseArg;
+        this.Value = baseArg;
+        var temp1 = this.value;
+        var temp2 = this.Value;
+    }
+
+    public T Value { get; set; }
+}
+
+internal class Foo : FooBase<int>
 {
     internal Foo(int arg)
         : base(arg)
@@ -957,11 +1025,11 @@ internal class Foo : FooBase
             [TestCase("var temp2 = this.Value;", "this.Value Member, baseArg Injected")]
             [TestCase("var temp3 = this.value;", "this.value Member, baseArg Argument, arg Injected")]
             [TestCase("var temp4 = this.Value;", "this.Value Member, baseArg Argument, arg Injected")]
-            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, 2 Constant")]
-            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, 2 Constant")]
-            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
-            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, 2 Constant")]
-            public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtorsGeneric(string code, string expected)
+            [TestCase("var temp5 = this.value;", "this.value Member, baseArg Argument, default(T) Constant")]
+            [TestCase("var temp6 = this.Value;", "this.Value Member, baseArg Argument, default(T) Constant")]
+            [TestCase("var temp7 = this.value;", "this.value Member, this.value PotentiallyInjected, baseArg Argument, arg Injected, default(T) Constant")]
+            [TestCase("var temp8 = this.Value;", "this.Value Member, this.Value PotentiallyInjected, baseArg Argument, arg Injected, default(T) Constant")]
+            public void MutableInBaseInjectedInBaseCtorWhenBaseHasManyCtorsGenericGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class FooBase<T>
@@ -970,8 +1038,8 @@ internal class FooBase<T>
 
     internal FooBase()
     {
-        this.value = 1;
-        this.Value = 1;
+        this.value = default(T);
+        this.Value = default(T);
     }
 
     internal FooBase(T baseArg)
@@ -985,9 +1053,9 @@ internal class FooBase<T>
     public T Value { get; set; }
 }
 
-internal class Foo : FooBase<int>
+internal class Foo<T> : FooBase<T>
 {
-    internal Foo(int arg)
+    internal Foo(T arg)
         : base(arg)
     {
         var temp3 = this.value;
@@ -995,7 +1063,7 @@ internal class Foo : FooBase<int>
     }
 
     internal Foo()
-        : base(2)
+        : base(default(T))
     {
         var temp5 = this.value;
         var temp6 = this.Value;
