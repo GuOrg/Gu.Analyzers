@@ -11,8 +11,8 @@
     {
         public class Field
         {
-            [TestCase("var temp1 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant")]
-            [TestCase("var temp2 = this.field;", "this.field Member, this.Assign(out this.field) Out, 1 Constant")]
+            [TestCase("var temp1 = this.value;", "this.value Member, Assign(out this.value) Out, 1 Constant")]
+            [TestCase("var temp2 = this.value;", "this.value Member, Assign(out this.value) Out, 1 Constant")]
             public void PrivateAssignedWithOutParameterBeforeInCtor(string code, string expected)
             {
                 var testCode = @"
@@ -20,26 +20,25 @@ namespace RoslynSandBox
 {
     internal class Foo
     {
-        private int field;
+        private int value;
 
         public Foo()
         {
-            this.Assign(out this.field);
-            var temp1 = this.field;
+            Assign(out this.value);
+            var temp1 = this.value;
         }
 
         internal void Bar()
         {
-            var temp2 = this.field;
+            var temp2 = this.value;
         }
 
-        private void Assign(out int value)
+        private static void Assign(out int outValue)
         {
-            value = 1;
+            outValue = 1;
         }
     }
 }";
-                testCode = testCode.AssertReplace("private void Assign", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
