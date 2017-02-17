@@ -18,6 +18,11 @@
             return this.parent.VerifyCSharpDiagnosticAsync(testCode, expected);
         }
 
+        public Task VerifyCSharpDiagnosticAsync(string[] testCode, DiagnosticResult expected)
+        {
+            return this.parent.VerifyCSharpDiagnosticAsync(testCode, expected);
+        }
+
         /// <summary>
         /// Called to test a C# code fix when applied on the input source as a string.
         /// </summary>
@@ -47,6 +52,27 @@
                 oldSource: oldSource,
                 newSource: newSource,
                 batchNewSource: batchNewSource,
+                codeFixIndex: codeFixIndex,
+                allowNewCompilerDiagnostics: allowNewCompilerDiagnostics,
+                numberOfIncrementalIterations: numberOfIncrementalIterations,
+                numberOfFixAllIterations: numberOfFixAllIterations,
+                cancellationToken: cancellationToken);
+        }
+
+        public Task VerifyCSharpFixAsync(
+            string[] oldSource,
+            string[] newSource,
+            string[] batchNewSource = null,
+            int? codeFixIndex = null,
+            bool allowNewCompilerDiagnostics = false,
+            int numberOfIncrementalIterations = -1000,
+            int numberOfFixAllIterations = 1,
+            CancellationToken cancellationToken = default(CancellationToken))
+        {
+            return this.parent.VerifyCSharpFixAsync(
+                oldSources: oldSource,
+                newSources: newSource,
+                batchNewSources: batchNewSource,
                 codeFixIndex: codeFixIndex,
                 allowNewCompilerDiagnostics: allowNewCompilerDiagnostics,
                 numberOfIncrementalIterations: numberOfIncrementalIterations,

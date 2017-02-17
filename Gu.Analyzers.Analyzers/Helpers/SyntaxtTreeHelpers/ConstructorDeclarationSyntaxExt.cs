@@ -45,11 +45,7 @@
 
             foreach (var reference in initializerSymbol.DeclaringSyntaxReferences)
             {
-                if (IsRunBefore(
-                    first,
-                    (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken),
-                    semanticModel,
-                    cancellationToken))
+                if (IsRunBefore(first, (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken), semanticModel, cancellationToken))
                 {
                     return true;
                 }

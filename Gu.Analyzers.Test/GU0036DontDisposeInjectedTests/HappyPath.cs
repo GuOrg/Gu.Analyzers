@@ -6,6 +6,16 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0036DontDisposeInjected>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [Test]
         public async Task DisposingWithBaseClass()
         {

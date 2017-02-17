@@ -46,24 +46,46 @@
                 return false;
             }
 
-            var block = node.FirstAncestor<BlockSyntax>();
-            var otherblock = other.FirstAncestor<BlockSyntax>();
+            var block = statement.Parent as BlockSyntax;
+            var otherblock = otherStatement.Parent as BlockSyntax;
+            if (block == null || otherblock == null)
+            {
+                if (SharesAncestor<IfStatementSyntax>(statement, otherStatement) ||
+                    SharesAncestor<SwitchStatementSyntax>(statement, otherStatement))
+                {
+                    return false;
+                }
+            }
+
+            block = statement.FirstAncestor<BlockSyntax>();
+            otherblock = otherStatement.FirstAncestor<BlockSyntax>();
             if (block == null || otherblock == null)
             {
                 return false;
             }
 
-            while (otherblock != null)
+            if (ReferenceEquals(block, otherblock) ||
+                otherblock.Span.Contains(block.Span) ||
+                block.Span.Contains(otherblock.Span))
             {
-                if (ReferenceEquals(block, otherblock))
-                {
-                    return true;
-                }
-
-                otherblock = otherblock.FirstAncestor<BlockSyntax>();
+                return true;
             }
 
             return false;
+        }
+
+        private static bool SharesAncestor<T>(StatementSyntax first, StatementSyntax other) 
+            where T : SyntaxNode
+        {
+            var firstAncestor = first.FirstAncestor<T>();
+            var otherAncestor = other.FirstAncestor<T>();
+            if (firstAncestor == null ||
+                otherAncestor == null)
+            {
+                return false;
+            }
+
+            return firstAncestor == otherAncestor;
         }
     }
 }

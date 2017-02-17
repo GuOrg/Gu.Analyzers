@@ -198,6 +198,55 @@ internal class Foo
             }
         }
 
+        [Test]
+        public void LocalAssignedInLock()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo : IDisposable
+    {
+        private readonly object gate;
+
+        public IDisposable disposable;
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            var toDispose = (IDisposable)null;
+            lock (this.gate)
+            {
+                if (this.disposed)
+                {
+                    return;
+                }
+
+                this.disposed = true;
+                toDispose = this.disposable;
+                this.disposable = null;
+            }
+
+            var temp = toDispose;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause("var temp = toDispose;").Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual("(IDisposable)null, this.disposable", actual);
+            }
+        }
+
         [TestCase("var temp2 = this.value;", "1")]
         public void FieldInitializedlWithLiteral(string code, string expected)
         {
@@ -685,7 +734,7 @@ namespace RoslynSandBox
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("1", actual);
+                Assert.AreEqual("3", actual);
             }
         }
     }

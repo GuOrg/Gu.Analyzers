@@ -360,67 +360,6 @@ class Goof : IDisposable {
                       .ConfigureAwait(false);
         }
 
-        [Test]
-        public async Task IgnorePassedInViaCtor1()
-        {
-            var testCode = @"
-    using System;
-
-    public sealed class Foo
-    {
-        private readonly IDisposable bar;
-        
-        public Foo(IDisposable bar)
-        {
-            this.bar = bar;
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task IgnorePassedInViaCtor2()
-        {
-            var testCode = @"
-    using System;
-
-    public sealed class Foo
-    {
-        private readonly IDisposable _bar;
-        
-        public Foo(IDisposable bar)
-        {
-            _bar = bar;
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task IgnorePassedInViaCtor3()
-        {
-            var testCode = @"
-    using System;
-
-    public sealed class Foo : IDisposable
-    {
-        private readonly IDisposable _bar;
-        
-        public Foo(IDisposable bar)
-        {
-            _bar = bar;
-        }
-
-        public void Dispose()
-        {
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
         [TestCase("disposables.First();")]
         [TestCase("disposables.Single();")]
         public async Task IgnoreLinq(string linq)

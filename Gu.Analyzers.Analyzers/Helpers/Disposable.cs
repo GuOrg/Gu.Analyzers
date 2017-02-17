@@ -73,7 +73,7 @@ namespace Gu.Analyzers
             using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
             {
                 return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                       !IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -88,7 +88,7 @@ namespace Gu.Analyzers
             using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
             {
                 return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                       !IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -122,7 +122,7 @@ namespace Gu.Analyzers
             using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
             {
                 return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken) &&
+                       !IsPotentiallyCachedOrInjected(sources) &&
                        !IsCachedInMember(sources, semanticModel, cancellationToken);
             }
         }
@@ -138,7 +138,7 @@ namespace Gu.Analyzers
             using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
             {
                 return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                       IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -153,7 +153,7 @@ namespace Gu.Analyzers
             using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
             {
                 return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                       IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -171,7 +171,8 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                return !IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                       IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -188,7 +189,8 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(disposeCall.Expression, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken);
+                return !IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                       IsPotentiallyCachedOrInjected(sources);
             }
         }
 
@@ -326,50 +328,61 @@ namespace Gu.Analyzers
         {
             foreach (var vauleWithSource in sources.Item)
             {
-                switch (vauleWithSource.Source)
+                if (IsPotentiallyCreated(vauleWithSource, semanticModel, cancellationToken))
                 {
-                    case ValueSource.Created:
-                    case ValueSource.PotentiallyCreated:
-                        if (IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
-                        {
-                            return true;
-                        }
-
-                        break;
-                    case ValueSource.External:
-                        var type = semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type;
-                        if (IsAssignableTo(type))
-                        {
-                            var symbol = semanticModel.GetSymbolSafe(vauleWithSource.Value, cancellationToken);
-                            var property = symbol as IPropertySymbol;
-                            if (property != null &&
-                                property == KnownSymbol.PasswordBox.SecurePassword)
-                            {
-                                return true;
-                            }
-
-                            var method = symbol as IMethodSymbol;
-                            if (method != null)
-                            {
-                                if (method.ContainingType == KnownSymbol.Enumerable ||
-                                    method.ContainingType.Is(KnownSymbol.IDictionary) ||
-                                    method == KnownSymbol.IEnumerable.GetEnumerator)
-                                {
-                                    continue;
-                                }
-
-                                return true;
-                            }
-                        }
-
-                        break;
+                    return true;
                 }
             }
 
             return false;
         }
 
-        private static bool IsPotentiallyCachedOrInjected(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsPotentiallyCreated(VauleWithSource vauleWithSource, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
+            {
+                return false;
+            }
+
+            switch (vauleWithSource.Source)
+            {
+                case ValueSource.Created:
+                case ValueSource.PotentiallyCreated:
+                    return true;
+                case ValueSource.External:
+                    {
+                        var symbol = semanticModel.GetSymbolSafe(vauleWithSource.Value, cancellationToken);
+                        var property = symbol as IPropertySymbol;
+                        if (property != null)
+                        {
+                            return property == KnownSymbol.PasswordBox.SecurePassword;
+                        }
+
+                        var method = symbol as IMethodSymbol;
+                        if (method != null)
+                        {
+                            return !method.ContainingType.Is(KnownSymbol.IDictionary);
+                        }
+
+                        return true;
+                    }
+
+                case ValueSource.Calculated:
+                    {
+                        var symbol = semanticModel.GetSymbolSafe(vauleWithSource.Value, cancellationToken);
+                        if (symbol == null)
+                        {
+                            return true;
+                        }
+
+                        return symbol.IsAbstract || symbol.IsVirtual;
+                    }
+            }
+
+            return false;
+        }
+
+        private static bool IsPotentiallyCachedOrInjected(Pool<List<VauleWithSource>>.Pooled sources)
         {
             foreach (var vauleWithSource in sources.Item)
             {
@@ -378,12 +391,7 @@ namespace Gu.Analyzers
                     case ValueSource.Injected:
                     case ValueSource.PotentiallyInjected:
                     case ValueSource.Cached:
-                        if (IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
-                        {
-                            return true;
-                        }
-
-                        break;
+                        return true;
                 }
             }
 

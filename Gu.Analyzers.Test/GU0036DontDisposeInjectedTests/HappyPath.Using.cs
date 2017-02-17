@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0036DontDisposeInjectedTests
 
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0036DontDisposeInjected>
     {
         public class Using : NestedHappyPathVerifier<HappyPath>
         {
@@ -114,21 +114,27 @@ public static class Foo
             }
 
             [Test]
-            public async Task Enumerator()
+            public async Task InjectedIEnumerableOfTGetEnumerator()
             {
                 var testCode = @"
+namespace RoslynSandBox
+{
     using System.Collections.Generic;
 
-    public static class Ext
+    public static class Foo
     {
-        public static TSource Foo<TSource>(this IEnumerable<TSource> source)
+        public static IEnumerable<T> Bar<T>(this IEnumerable<T> source)
         {
             using (var e = source.GetEnumerator())
             {
-                return default(TSource);
+                while (e.MoveNext())
+                {
+                    yield return default(T);
+                }
             }
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -167,6 +173,31 @@ public class Foo
     }
 }";
                 await this.VerifyHappyPathAsync(factoryCode, disposableCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task InjectedPasswordBoxSecurePassword()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System.Windows.Controls;
+
+    internal class Foo
+    {
+        private readonly PasswordBox passwordBox;
+
+        internal Foo(PasswordBox passwordBox)
+        {
+            this.passwordBox = passwordBox;
+            using (this.passwordBox.SecurePassword)
+            {
+            }
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
 
@@ -259,7 +290,7 @@ public class Foo
             }
 
             [Test]
-            public async Task CreatedUsingInjectedGenericAbstractFactoryWIthImplementation()
+            public async Task CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
             {
                 var abstractFactoryCode = @"
 using System;
@@ -278,15 +309,6 @@ public class Factory : FactoryBase<int>
         return new Disposable();
     }
 }";
-                var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
-}";
 
                 var testCode = @"
 public class Foo
@@ -298,7 +320,7 @@ public class Foo
         }
     }
 }";
-                await this.VerifyHappyPathAsync(abstractFactoryCode, factoryCode, disposableCode, testCode)
+                await this.VerifyHappyPathAsync(abstractFactoryCode, factoryCode, DisposableCode, testCode)
                           .ConfigureAwait(false);
             }
 

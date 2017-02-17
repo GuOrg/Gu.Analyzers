@@ -61,7 +61,10 @@
     <Compile Include="GU0030UseUsingTests\HappyPath.Cached.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Returns.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFix.InjectedCreated.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFix.Rx.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFixAll.cs" />
+    <Compile Include="GU0031DisposeMemberTests\HappyPath.Injected.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPathRx.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFix.RefOut.cs" />
@@ -81,6 +84,7 @@
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
+    <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Nested.cs" />

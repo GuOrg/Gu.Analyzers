@@ -16,9 +16,20 @@
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
+            var awaitExpression = node as AwaitExpressionSyntax;
+            if (awaitExpression != null)
+            {
+                return GetSymbolSafe(semanticModel, awaitExpression, cancellationToken);
+            }
+
             return semanticModel.SemanticModelFor(node)
                                 ?.GetSymbolInfo(node, cancellationToken)
                                  .Symbol;
+        }
+
+        internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
+        {
+            return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
         }
 
         internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, MethodDeclarationSyntax node, CancellationToken cancellationToken)

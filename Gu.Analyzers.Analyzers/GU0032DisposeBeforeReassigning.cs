@@ -143,7 +143,7 @@
                     return;
                 }
 
-                if (invocation.FirstAncestorOrSelf<MethodDeclarationSyntax>() != null)
+                if (invocation.FirstAncestorOrSelf<MemberDeclarationSyntax>() != null)
                 {
                     if (IsDisposedBefore(argSymbol, invocation, context.SemanticModel, context.CancellationToken))
                     {

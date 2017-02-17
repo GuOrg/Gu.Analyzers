@@ -51,7 +51,7 @@
                 return;
             }
 
-            if (IsDisposableReturnType(ReturnType(context)))
+            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
             {
                 return;
             }
@@ -78,7 +78,7 @@
                 return;
             }
 
-            if (IsDisposableReturnType(ReturnType(context)))
+            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
             {
                 return;
             }
@@ -100,7 +100,7 @@
             }
         }
 
-        private static bool IsDisposableReturnType(ITypeSymbol type)
+        private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type)
         {
             if (type == null)
             {
@@ -108,6 +108,11 @@
             }
 
             if (Disposable.IsAssignableTo(type))
+            {
+                return true;
+            }
+
+            if (type == KnownSymbol.IEnumerator)
             {
                 return true;
             }

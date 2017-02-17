@@ -33,6 +33,30 @@ public class Foo
             }
 
             [Test]
+            public async Task AssigningFieldViaCachedOutParameter()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System.Collections.Concurrent;
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+        private Stream current;
+
+        public bool Update(int number)
+        {
+            return this.Cache.TryGetValue(number, out this.current);
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task AssigningFieldWithCahcedViaOutParameter()
             {
                 var testCode = @"

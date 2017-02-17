@@ -420,6 +420,50 @@ namespace RoslynSandBox
                 }
             }
 
+            [Test]
+            public void PrivateStaticMethodWithOptionalParameter2()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var temp = Bar(disposable);
+        }
+
+        private static IDisposable Bar(IDisposable disposable, List<IDisposable> list = null)
+        {
+            if (list == null)
+            {
+                list = new List<IDisposable>();
+            }
+
+            if (list.Contains(disposable))
+            {
+                return new Disposable();
+            }
+
+            list.Add(disposable);
+            return Bar(disposable, list);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var node = syntaxTree.EqualsValueClause("var temp = Bar(disposable);").Value;
+                using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
+                    Assert.AreEqual("Bar(disposable) Calculated, new Disposable() Created, Bar(disposable, list) Recursion", actual);
+                }
+            }
+
             [TestCase("private static")]
             [TestCase("private")]
             [TestCase("public")]

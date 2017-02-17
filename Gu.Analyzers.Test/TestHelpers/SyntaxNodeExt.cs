@@ -36,6 +36,11 @@
             return tree.BestMatch<AssignmentExpressionSyntax>(code);
         }
 
+        internal static StatementSyntax Statement(this SyntaxTree tree, string code)
+        {
+            return tree.BestMatch<StatementSyntax>(code);
+        }
+
         internal static ConstructorDeclarationSyntax ConstructorDeclarationSyntax(this SyntaxTree tree, string signature)
         {
             foreach (var ctor in tree.GetRoot().DescendantNodes().OfType<ConstructorDeclarationSyntax>())
@@ -58,7 +63,7 @@
                        .DescendantNodes()
                        .OfType<T>())
             {
-                var statementSyntax = node.FirstAncestor<StatementSyntax>();
+                var statementSyntax = node.FirstAncestorOrSelf<StatementSyntax>();
                 if (statementSyntax?.ToFullString().Contains(code) == true)
                 {
                     if (parent == null || statementSyntax.Span.Length < parent.Span.Length)

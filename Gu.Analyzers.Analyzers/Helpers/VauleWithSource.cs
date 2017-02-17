@@ -127,17 +127,35 @@ namespace Gu.Analyzers
             if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.None) == false)
             {
                 var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
-                if (semanticModel.GetSymbolSafe(invocation, cancellationToken) == null)
-                {
-                    result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
-                }
-                else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
+                if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Ref));
                 }
                 else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Out));
+                }
+
+                var invokedMethod = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                if (invokedMethod == null)
+                {
+                    result.Add(new VauleWithSource(invocation, ValueSource.Unknown));
+                }
+                else
+                {
+                    foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
+                    {
+                        var methodDeclaraion = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+                        if (methodDeclaraion != null)
+                        {
+                            ParameterSyntax assignedParameterSyntax;
+                            if (methodDeclaraion.TryGetMatchingParameter(argument, out assignedParameterSyntax))
+                            {
+                                var assignedParameter = semanticModel.GetDeclaredSymbolSafe(assignedParameterSyntax, cancellationToken) as IParameterSymbol;
+                                AddSourcesRecursively(argument.Expression, assignedParameter, semanticModel, cancellationToken, result);
+                            }
+                        }
+                    }
                 }
 
                 AddPathRecursively(invocation, semanticModel, cancellationToken, result);
@@ -502,7 +520,7 @@ namespace Gu.Analyzers
             CancellationToken cancellationToken,
             List<VauleWithSource> result)
         {
-            var method = parameter.ContainingSymbol as IMethodSymbol;
+            var method = parameter?.ContainingSymbol as IMethodSymbol;
             if (method == null)
             {
                 result.Add(new VauleWithSource(value, ValueSource.Unknown));
@@ -582,7 +600,10 @@ namespace Gu.Analyzers
                              method.MethodKind != MethodKind.LambdaMethod &&
                              method.DeclaredAccessibility != Accessibility.Private)
                     {
-                        result.Add(new VauleWithSource(value, ValueSource.PotentiallyInjected));
+                        var source = calls.Item.Invocations.Count == 0
+                            ? ValueSource.Injected
+                            : ValueSource.PotentiallyInjected;
+                        result.Add(new VauleWithSource(value, source));
                     }
                     else
                     {

@@ -24,9 +24,9 @@ public class Foo
         TryGetStream(↓out stream);
     }
 
-    public bool TryGetStream(out Stream stream)
+    public bool TryGetStream(out Stream outValue)
     {
-        stream = File.OpenRead(string.Empty);
+        outValue = File.OpenRead(string.Empty);
         return true;
     }
 }";
