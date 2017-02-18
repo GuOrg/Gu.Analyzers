@@ -74,7 +74,7 @@
             return false;
         }
 
-        private static bool SharesAncestor<T>(StatementSyntax first, StatementSyntax other) 
+        private static bool SharesAncestor<T>(StatementSyntax first, StatementSyntax other)
             where T : SyntaxNode
         {
             var firstAncestor = first.FirstAncestor<T>();

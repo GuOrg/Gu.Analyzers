@@ -127,6 +127,12 @@ namespace Gu.Analyzers
             if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.None) == false)
             {
                 var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
+                if (IsAlreadyChecked(invocation,result, out index))
+                {
+                    result[index] = result[index].WithSource(ValueSource.Recursion);
+                    return;
+                }
+
                 if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
                 {
                     result.Add(new VauleWithSource(invocation, ValueSource.Ref));
@@ -151,8 +157,15 @@ namespace Gu.Analyzers
                             ParameterSyntax assignedParameterSyntax;
                             if (methodDeclaraion.TryGetMatchingParameter(argument, out assignedParameterSyntax))
                             {
-                                var assignedParameter = semanticModel.GetDeclaredSymbolSafe(assignedParameterSyntax, cancellationToken) as IParameterSymbol;
-                                AddSourcesRecursively(argument.Expression, assignedParameter, semanticModel, cancellationToken, result);
+                                result.Add(new VauleWithSource(assignedParameterSyntax, ValueSource.Argument));
+                                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(assignedParameterSyntax, cancellationToken);
+                                using (var assignments = AssignedValueWalker.Create(parameterSymbol, semanticModel, cancellationToken))
+                                {
+                                    foreach (var assignedValue in assignments.Item.AssignedValues)
+                                    {
+                                        AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
+                                    }
+                                }
                             }
                         }
                     }
