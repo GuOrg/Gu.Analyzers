@@ -127,7 +127,7 @@ namespace Gu.Analyzers
             if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.None) == false)
             {
                 var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
-                if (IsAlreadyChecked(invocation,result, out index))
+                if (IsAlreadyChecked(invocation, result, out index))
                 {
                     result[index] = result[index].WithSource(ValueSource.Recursion);
                     return;

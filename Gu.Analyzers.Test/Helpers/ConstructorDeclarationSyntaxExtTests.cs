@@ -123,6 +123,60 @@ internal class Foo : FooBase
             Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
         }
 
+        [TestCase("Foo()", "FooBaseBase()", false)]
+        [TestCase("FooBaseBase()", "Foo()", true)]
+        [TestCase("FooBaseBase()", "Foo(int value)", true)]
+        [TestCase("FooBaseBase()", "Foo(string text)", true)]
+        [TestCase("FooBaseBase(int value)", "Foo()", false)]
+        [TestCase("FooBaseBase(int value)", "Foo(int value)", false)]
+        [TestCase("FooBaseBase(int value)", "Foo(string text)", false)]
+        public void TwoLevelBaseImplicit(string firstSignature, string otherSignature, bool expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class FooBaseBase
+{
+    internal FooBaseBase()
+    {
+    }
+
+    internal FooBaseBase(int value)
+        : this()
+    {
+    }
+
+    internal FooBaseBase(string text)
+        : this(1)
+    {
+    }
+}
+
+internal class FooBase : FooBaseBase
+{
+}
+
+internal class Foo : FooBase
+{
+    internal Foo()
+    {
+    }
+
+    internal Foo(int value)
+        : this()
+    {
+    }
+
+    internal Foo(string text)
+        : this(1)
+    {
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
+            var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+            Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
+        }
+
         [TestCase("Foo()", "FooBase()", false)]
         [TestCase("FooBase()", "Foo()", true)]
         [TestCase("FooBase(int value)", "Foo()", true)]

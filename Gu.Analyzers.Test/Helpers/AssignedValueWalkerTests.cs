@@ -6,247 +6,8 @@ namespace Gu.Analyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    internal class AssignedValueWalkerTests
+    internal partial class AssignedValueWalkerTests
     {
-        [TestCase("1")]
-        [TestCase("abc")]
-        [TestCase("default(int)")]
-        [TestCase("typeof(int)")]
-        [TestCase("nameof(int)")]
-        public void LocalInitializedWithConstant(string code)
-        {
-            var testCode = @"
-internal class Foo
-{
-    internal Foo()
-    {
-        var value = 1;
-        var temp = value;
-    }
-}";
-            testCode = testCode.AssertReplace("1", code);
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual(code, actual);
-            }
-        }
-
-        [Test]
-        public void LocalInitializedWithDefaultGeneric()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo<T>
-{
-    internal Foo()
-    {
-        var value = default(T);
-        var temp = value;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("default(T)", actual);
-            }
-        }
-
-        [Test]
-        public void LocalOutParameter()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
-{
-    internal Foo()
-    {
-        int value;
-        Assign(out value);
-        var temp = value;
-    }
-
-    internal void Assign(out int value)
-    {
-        value = 1;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("value, 1", actual);
-            }
-        }
-
-        [Test]
-        public void LocalOutParameterGeneric()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo<T>
-{
-    internal Foo()
-    {
-        T value;
-        Assign(out value);
-        var temp = value;
-    }
-
-    internal void Assign(out T value)
-    {
-        value = default(T);
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("value, default(T)", actual);
-            }
-        }
-
-        [Test]
-        public void LocalChainedOutParameter()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
-{
-    internal Foo()
-    {
-        int value;
-        Assign1(out value);
-        var temp = value;
-    }
-
-    internal void Assign1(out int value1)
-    {
-         Assign2(out value1);
-    }
-
-    internal void Assign2(out int value2)
-    {
-        value2 = 1;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("value, value1, 1", actual);
-            }
-        }
-
-        [Test]
-        public void LocalRefParameter()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
-{
-    internal Foo()
-    {
-        int value;
-        Assign(ref value);
-        var temp = value;
-    }
-
-    internal void Assign(ref int value)
-    {
-        value = 1;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("value, 1", actual);
-            }
-        }
-
-        [Test]
-        public void LocalNotInitialized()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
-{
-    internal Foo()
-    {
-        int value;
-        var temp = value;
-        value = 1;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual(string.Empty, actual);
-            }
-        }
-
-        [Test]
-        public void LocalAssignedInLock()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
-{
-    using System;
-
-    public class Foo : IDisposable
-    {
-        private readonly object gate;
-
-        public IDisposable disposable;
-        private bool disposed;
-
-        public void Dispose()
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            var toDispose = (IDisposable)null;
-            lock (this.gate)
-            {
-                if (this.disposed)
-                {
-                    return;
-                }
-
-                this.disposed = true;
-                toDispose = this.disposable;
-                this.disposable = null;
-            }
-
-            var temp = toDispose;
-        }
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = toDispose;").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("(IDisposable)null, this.disposable", actual);
-            }
-        }
-
         [TestCase("var temp2 = this.value;", "1")]
         public void FieldInitializedlWithLiteral(string code, string expected)
         {
@@ -339,8 +100,8 @@ internal class Foo
             }
         }
 
-        [TestCase("var temp1 = this.Value;", "1")]
-        [TestCase("var temp2 = this.Value;", "1")]
+        [TestCase("var temp1 = this.Value;", "1, 2, 3")]
+        [TestCase("var temp2 = this.Value;", "1, 2, 3")]
         public void FieldInitializedInChainedWithLiteral(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -348,11 +109,47 @@ internal class Foo
 {
     internal Foo()
     {
-        this.Value = 1;
+        this.Value = 2;
     }
 
     internal Foo(string text)
         : this()
+    {
+        this.Value = 3;
+        var temp1 = this.Value;
+    }
+
+    public int Value { get; set; } = 1;
+
+    internal void Bar()
+    {
+        var temp2 = this.Value;
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.AssignedValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("var temp1 = this.Value;", "value")]
+        [TestCase("var temp2 = this.Value;", "value")]
+        public void FieldInitializedInChainedWithPassed(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo(int value)
+    {
+        this.Value = value;
+    }
+
+    internal Foo()
+        : this(1)
     {
         var temp1 = this.Value;
     }
@@ -569,8 +366,8 @@ internal class Foo<T> : FooBase<T>
 
         [TestCase("var temp1 = this.bar;", "1, 2")]
         [TestCase("var temp2 = this.Bar;", "1, 2")]
-        [TestCase("var temp3 = this.bar;", "1, 2, value")]
-        [TestCase("var temp4 = this.Bar;", "1, 2, value")]
+        [TestCase("var temp3 = this.bar;", "1, 2")]
+        [TestCase("var temp4 = this.Bar;", "1, 2")]
         public void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -628,7 +425,7 @@ public sealed class Foo
     public int Bar
     {
         get { return this.bar; }
-        private set { this.bar = value; }
+        set { this.bar = value; }
     }
 
     public void Meh()
@@ -647,10 +444,10 @@ public sealed class Foo
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1, 2")]
-        [TestCase("var temp2 = this.Bar;", "1, 2")]
-        [TestCase("var temp3 = this.bar;", "1, 2, value")]
-        [TestCase("var temp4 = this.Bar;", "1, 2, value")]
+        [TestCase("var temp1 = this.bar;", "1, value, 2")]
+        [TestCase("var temp2 = this.Bar;", "1, value, 2")]
+        [TestCase("var temp3 = this.bar;", "1, value, 2")]
+        [TestCase("var temp4 = this.Bar;", "1, value, 2")]
         public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
