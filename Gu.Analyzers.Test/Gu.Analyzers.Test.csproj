@@ -83,6 +83,7 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.Field.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Local.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />

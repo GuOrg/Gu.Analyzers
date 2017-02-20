@@ -14,9 +14,7 @@
             () => new AssignedValueWalker(),
             x =>
             {
-                x.symbols.Clear();
                 x.assignedValues.Clear();
-                x.ctorsRunBefore.Clear();
                 x.symbol = null;
                 x.context = null;
                 x.semanticModel = null;
@@ -24,8 +22,6 @@
             });
 
         private readonly List<ExpressionSyntax> assignedValues = new List<ExpressionSyntax>();
-        private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>(SymbolComparer.Default);
-        private readonly HashSet<IMethodSymbol> ctorsRunBefore = new HashSet<IMethodSymbol>(SymbolComparer.Default);
 
         private ISymbol symbol;
         private SyntaxNode context;
@@ -79,49 +75,93 @@
             return Pool.GetOrCreate();
         }
 
-        public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+        public override void Visit(SyntaxNode node)
         {
-            if (this.IsBeforeInScope(node))
+            if (!this.IsBeforeInScope(node))
             {
-                var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
-                this.HandleBackingField(left as IPropertySymbol);
-                if (this.symbols.Contains(left))
+                return;
+            }
+
+            base.Visit(node);
+        }
+
+        public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
+        {
+            if (node.Initializer != null &&
+                SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
+            {
+                this.assignedValues.Add(node.Initializer.Value);
+            }
+
+            base.VisitVariableDeclarator(node);
+        }
+
+        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
+        {
+            if (node.Initializer != null &&
+                SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
+            {
+                this.assignedValues.Add(node.Initializer.Value);
+            }
+
+            base.VisitPropertyDeclaration(node);
+        }
+
+        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+        {
+            if (node.Initializer != null)
+            {
+                var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
+                if (ctor != null)
                 {
-                    this.AddPropertyIfInSetter(node);
-                    this.assignedValues.Add(node.Right);
+                    foreach (var reference in ctor.DeclaringSyntaxReferences)
+                    {
+                        this.Visit(reference.GetSyntax(this.cancellationToken));
+                    }
+                }
+            }
+            else
+            {
+                var ctor = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
+                IMethodSymbol baseCtor;
+                if (Constructor.TryGetDefault(ctor?.ContainingType.BaseType, out baseCtor))
+                {
+                    foreach (var reference in baseCtor.DeclaringSyntaxReferences)
+                    {
+                        this.Visit(reference.GetSyntax(this.cancellationToken));
+                    }
                 }
             }
 
-            base.VisitAssignmentExpression(node);
+            base.VisitConstructorDeclaration(node);
+        }
+
+        public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+        {
+            var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
+            if (SymbolComparer.Equals(this.symbol, left))
+            {
+                this.assignedValues.Add(node.Right);
+                base.VisitAssignmentExpression(node);
+            }
         }
 
         public override void VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
-            if (this.IsBeforeInScope(node))
+            var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
+            if (SymbolComparer.Equals(this.symbol, operand))
             {
-                var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-                this.HandleBackingField(operand as IPropertySymbol);
-                if (this.symbols.Contains(operand))
-                {
-                    this.AddPropertyIfInSetter(node);
-                    this.assignedValues.Add(node.Operand);
-                }
+                this.assignedValues.Add(node.Operand);
+                base.VisitPrefixUnaryExpression(node);
             }
-
-            base.VisitPrefixUnaryExpression(node);
         }
 
         public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
-            if (this.IsBeforeInScope(node))
+            var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
+            if (SymbolComparer.Equals(this.symbol, operand))
             {
-                var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-                this.HandleBackingField(operand as IPropertySymbol);
-                if (this.symbols.Contains(operand))
-                {
-                    this.AddPropertyIfInSetter(node);
-                    this.assignedValues.Add(node.Operand);
-                }
+                this.assignedValues.Add(node.Operand);
             }
 
             base.VisitPostfixUnaryExpression(node);
@@ -134,229 +174,78 @@
             {
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
                 if (invocation != null &&
-                    this.symbols.Contains(this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)) &&
-                    this.IsBeforeInScope(node))
+                    SymbolComparer.Equals(this.symbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
                 {
                     this.assignedValues.Add(node.Expression);
-                    var method = (IMethodSymbol)this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                    if (method == null)
-                    {
-                        return;
-                    }
-
-                    if (node.NameColon?.Name != null)
-                    {
-                        foreach (var parameter in method.Parameters)
-                        {
-                            if (parameter.Name == node.NameColon.Name.Identifier.ValueText)
-                            {
-                                if (this.symbols.Add(parameter))
-                                {
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var argumentList = node.FirstAncestorOrSelf<ArgumentListSyntax>();
-                        var parameter = method.Parameters[argumentList.Arguments.IndexOf(node)];
-                        if (this.symbols.Add(parameter))
-                        {
-                            return;
-                        }
-                    }
                 }
             }
 
             base.VisitArgument(node);
         }
 
-        public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
-        {
-            if (node.Initializer != null &&
-                this.symbols.Contains(this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
-            {
-                this.assignedValues.Add(node.Initializer.Value);
-            }
-
-            base.VisitVariableDeclarator(node);
-        }
-
-        public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
-        {
-            var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-            if (propertyDeclaration != null)
-            {
-                var property = this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken);
-                if (this.symbols.Contains(property))
-                {
-                    var returnedSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
-                    if (returnedSymbol != null)
-                    {
-                        if (this.symbols.Add(returnedSymbol))
-                        {
-                            return;
-                        }
-                    }
-                }
-            }
-
-            base.VisitArrowExpressionClause(node);
-        }
-
-        public override void VisitAccessorDeclaration(AccessorDeclarationSyntax node)
-        {
-            if (node.IsKind(SyntaxKind.GetAccessorDeclaration))
-            {
-                var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                if (propertyDeclaration != null)
-                {
-                    var property = this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken);
-                    if (this.symbols.Contains(property))
-                    {
-                        this.isSamplingRetunValues = true;
-                        base.VisitAccessorDeclaration(node);
-                        this.isSamplingRetunValues = false;
-                        return;
-                    }
-                }
-            }
-
-            base.VisitAccessorDeclaration(node);
-        }
-
-        public override void VisitReturnStatement(ReturnStatementSyntax node)
-        {
-            if (this.isSamplingRetunValues)
-            {
-                var returnedSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
-                if (returnedSymbol != null)
-                {
-                    if (this.symbols.Add(returnedSymbol))
-                    {
-                        return;
-                    }
-                }
-            }
-
-            base.VisitReturnStatement(node);
-        }
-
-        public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-        {
-            if (node.Initializer != null &&
-                ReferenceEquals(this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken), this.symbol))
-            {
-                this.assignedValues.Add(node.Initializer.Value);
-            }
-
-            base.VisitPropertyDeclaration(node);
-        }
-
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
-            pooled.Item.symbol = symbol;
-            pooled.Item.context = context;
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.symbols.Add(symbol).IgnoreReturnValue();
-            Constructor.AddRunBefore(context, pooled.Item.ctorsRunBefore, semanticModel, cancellationToken);
-            using (var pooledNodes = SetPool<SyntaxNode>.Create())
-            {
-                var count = 0;
-                while (count != pooled.Item.symbols.Count)
-                {
-                    count = pooled.Item.symbols.Count;
-                    pooled.Item.assignedValues.Clear();
-                    foreach (var assignedSymbol in pooled.Item.symbols)
-                    {
-                        if (!IsChecked(assignedSymbol, pooledNodes.Item))
-                        {
-                            foreach (var reference in assignedSymbol.ContainingSymbol.DeclaringSyntaxReferences)
-                            {
-                                pooledNodes.Item.Add(reference.GetSyntax(cancellationToken)).IgnoreReturnValue();
-                            }
-                        }
-                    }
-
-                    foreach (var node in pooledNodes.Item)
-                    {
-                        pooled.Item.Visit(node);
-                    }
-                }
-            }
-
+            pooled.Item.Run(symbol, context, semanticModel, cancellationToken);
             return pooled;
         }
 
-        private static bool IsChecked(ISymbol symbol, HashSet<SyntaxNode> nodes)
+        private void Run(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel,
+                         CancellationToken cancellationToken)
         {
-            if (symbol == null)
+            this.context = context;
+            this.semanticModel = semanticModel;
+            this.cancellationToken = cancellationToken;
+            this.symbol = symbol;
+
+            foreach (var reference in this.symbol.DeclaringSyntaxReferences)
             {
-                return true;
+                var declaration = reference.GetSyntax(cancellationToken);
+                this.Visit(declaration);
             }
 
-            foreach (var reference in symbol.ContainingSymbol.DeclaringSyntaxReferences)
+            var ctor = context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            if (ctor != null)
             {
-                foreach (var syntaxNode in nodes)
+                this.Visit(ctor);
+            }
+            else
+            {
+                var typeDeclaration = context?.FirstAncestorOrSelf<TypeDeclarationSyntax>();
+                if (typeDeclaration != null)
                 {
-                    if (syntaxNode.Span.Contains(reference.Span))
+                    var type = (INamedTypeSymbol) semanticModel.GetDeclaredSymbolSafe(typeDeclaration, cancellationToken);
+                    if (type.Constructors.Length > 0)
                     {
-                        return true;
+                        foreach (var typeCtor in type.Constructors)
+                        {
+                            foreach (var reference in typeCtor.DeclaringSyntaxReferences)
+                            {
+                                throw new NotImplementedException("Check that chained is only checked once");
+                                this.Visit(reference.GetSyntax(cancellationToken));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        IMethodSymbol defaultCtor;
+                        if (Constructor.TryGetDefault(type.BaseType, out defaultCtor))
+                        {
+                            foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
+                            {
+                                this.Visit(reference.GetSyntax(cancellationToken));
+                            }
+                        }
                     }
                 }
-            }
-
-            return false;
-        }
-
-        private void AddPropertyIfInSetter(SyntaxNode assignment)
-        {
-            var setter = assignment.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
-            if (setter?.IsKind(SyntaxKind.SetAccessorDeclaration) == true)
-            {
-                var property = this.semanticModel.GetDeclaredSymbolSafe(setter.FirstAncestorOrSelf<BasePropertyDeclarationSyntax>(), this.cancellationToken) as IPropertySymbol;
-                if (property?.SetMethod != null)
+                else
                 {
-                    this.symbols.Add(property).IgnoreReturnValue();
-                }
-            }
-        }
-
-        private void HandleBackingField(IPropertySymbol property)
-        {
-            if (property == null ||
-                property.DeclaringSyntaxReferences.Length == 0)
-            {
-                return;
-            }
-
-            foreach (var reference in property.DeclaringSyntaxReferences)
-            {
-                var declaration = reference.GetSyntax(this.cancellationToken) as PropertyDeclarationSyntax;
-                AccessorDeclarationSyntax setter;
-                if (declaration.TryGetSetAccessorDeclaration(out setter))
-                {
-                    using (var pooled = IdentifierNameWalker.Create(setter))
+                    pooled.Item.Visit(typeDeclaration);
+                    foreach (var assignedSymbol in pooled.Item.symbol)
                     {
-                        foreach (var name in pooled.Item.IdentifierNames)
+                        foreach (var reference in assignedSymbol.ContainingSymbol.DeclaringSyntaxReferences)
                         {
-                            var assignment = name.FirstAncestor<AssignmentExpressionSyntax>();
-                            if (assignment != null &&
-                                assignment.Left.Span.Contains(name.Span))
-                            {
-                                var assignedSymbol = this.semanticModel.GetSymbolSafe(assignment.Left, this.cancellationToken);
-                                if (this.symbols.Contains(assignedSymbol))
-                                {
-                                    this.symbols.Add(property).IgnoreReturnValue();
-                                }
-                                else if (this.symbols.Contains(property))
-                                {
-                                    this.symbols.Add(assignedSymbol).IgnoreReturnValue();
-                                }
-                            }
+                            pooled.Item.Visit(reference.GetSyntax(cancellationToken));
                         }
                     }
                 }
@@ -365,25 +254,15 @@
 
         private bool IsBeforeInScope(SyntaxNode node)
         {
-            if (this.context == null)
+            if (this.context == null ||
+                node is BlockSyntax ||
+                node.FirstAncestorOrSelf<StatementSyntax>() == null ||
+                !this.context.SharesAncestor<MemberDeclarationSyntax>(node))
             {
                 return true;
             }
 
-            var ctor = node.FirstAncestor<ConstructorDeclarationSyntax>();
-            var contextCtor = this.context.FirstAncestor<ConstructorDeclarationSyntax>();
-            if (ctor != null)
-            {
-                if (ctor != contextCtor)
-                {
-                    return this.ctorsRunBefore.Contains(this.semanticModel.GetDeclaredSymbolSafe(ctor, this.cancellationToken));
-                }
-
-                return node.IsBeforeInScope(this.context);
-            }
-
-            return this.context.FirstAncestor<MemberDeclarationSyntax>() != node.FirstAncestor<MemberDeclarationSyntax>() ||
-                   node.IsBeforeInScope(this.context);
+            return node.IsBeforeInScope(this.context);
         }
     }
 }

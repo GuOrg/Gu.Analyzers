@@ -83,6 +83,7 @@
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
     <Compile Include="Helpers\Pooled\ListPool.cs" />
     <Compile Include="Helpers\ValueSource.cs" />
+    <Compile Include="Helpers\Walkers\AssignedValueWalker_.cs" />
     <Compile Include="Helpers\Walkers\CallsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
