@@ -104,10 +104,72 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
+            using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken);
+                return IsPotentiallyCreated(pooled, semanticModel, cancellationToken);
             }
+        }
+
+        private static bool IsPotentiallyCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            foreach (var assignment in pooled.Item.AssignedValues)
+            {
+                var value = assignment.Value;
+                if (!IsAssignableTo(semanticModel.GetTypeInfoSafe(value, cancellationToken).Type))
+                {
+                    continue;
+                }
+
+                if (value is ObjectCreationExpressionSyntax)
+                {
+                    return true;
+                }
+
+                var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                if (symbol == KnownSymbol.PasswordBox.SecurePassword)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+
+            //switch (value.Source)
+            //{
+            //    case ValueSource.Created:
+            //    case ValueSource.PotentiallyCreated:
+            //        return true;
+            //    case ValueSource.External:
+            //        {
+            //            var symbol = semanticModel.GetSymbolSafe(value.Value, cancellationToken);
+            //            var property = symbol as IPropertySymbol;
+            //            if (property != null)
+            //            {
+            //                return property == KnownSymbol.PasswordBox.SecurePassword;
+            //            }
+
+            //            var method = symbol as IMethodSymbol;
+            //            if (method != null)
+            //            {
+            //                return !method.ContainingType.Is(KnownSymbol.IDictionary);
+            //            }
+
+            //            return true;
+            //        }
+
+            //    case ValueSource.Calculated:
+            //        {
+            //            var symbol = semanticModel.GetSymbolSafe(value.Value, cancellationToken);
+            //            if (symbol == null)
+            //            {
+            //                return true;
+            //            }
+
+            //            return symbol.IsAbstract || symbol.IsVirtual;
+            //        }
+            //}
+
+            //return false;
         }
 
         internal static bool IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
