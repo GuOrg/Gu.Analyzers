@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.Helpers
 {
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis.CSharp;
@@ -8,10 +9,12 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal partial class AssignedValueWalkerTests
     {
-        [Test]
-        public void ArrayIndexer()
+        internal class Indexer
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            [Test]
+            public void ArrayIndexer()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
 {
     internal Foo()
@@ -21,20 +24,22 @@ internal class Foo
         var temp = ints[0];
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = ints[0];").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("1", actual);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause("var temp = ints[0];")
+                                      .Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                    Assert.AreEqual("1", actual);
+                }
             }
-        }
 
-        [Test]
-        public void ListOfIntIndexer()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            [TestCase("var temp1 = ints[0];", "")]
+            [TestCase("var temp2 = ints[0];", "3")]
+            public void ListOfIntIndexer(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandBox
 {
     using System.Collections.Generic;
@@ -44,18 +49,21 @@ namespace RoslynSandBox
         internal Foo()
         {
             var ints = new List<int> { 1, 2 };
+            var temp1 = ints[0];
             ints[0] = 3;
-            var temp = ints[0];
+            var temp2 = ints[0];
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.EqualsValueClause("var temp = ints[0];").Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled.Item.AssignedValues);
-                Assert.AreEqual("3", actual);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code)
+                                      .Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                    Assert.AreEqual(expected, actual);
+                }
             }
         }
     }

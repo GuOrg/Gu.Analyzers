@@ -15,6 +15,7 @@
             x =>
             {
                 x.assignedValues.Clear();
+                x.checkedSymbols.Clear();
                 x.visitedMembers.Clear();
                 x.symbol = null;
                 x.context = null;
@@ -22,7 +23,8 @@
                 x.cancellationToken = CancellationToken.None;
             });
 
-        private readonly List<ExpressionSyntax> assignedValues = new List<ExpressionSyntax>();
+        private readonly List<Assignment> assignedValues = new List<Assignment>();
+        private readonly HashSet<ISymbol> checkedSymbols = new HashSet<ISymbol>();
         private readonly HashSet<SyntaxNode> visitedMembers = new HashSet<SyntaxNode>();
 
         private ISymbol symbol;
@@ -35,7 +37,7 @@
         {
         }
 
-        public IReadOnlyList<ExpressionSyntax> AssignedValues => this.assignedValues;
+        public IReadOnlyList<Assignment> AssignedValues => this.assignedValues;
 
         [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -79,17 +81,9 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (!this.IsBeforeInScope(node))
-            {
-                return;
-            }
-
-            if (this.visitedMembers.AddIfNotNull(node as MemberDeclarationSyntax) == false)
-            {
-                return;
-            }
-
-            if (this.visitedMembers.AddIfNotNull(node as AccessorDeclarationSyntax) == false)
+            if (this.visitedMembers.AddIfNotNull(node as MemberDeclarationSyntax) == false ||
+                this.visitedMembers.AddIfNotNull(node as AccessorDeclarationSyntax) == false ||
+                !this.IsBeforeInScope(node))
             {
                 return;
             }
@@ -102,7 +96,7 @@
             if (node.Initializer != null &&
                 SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(node.Initializer.Value);
+                this.assignedValues.Add(new Assignment(this.symbol, node.Initializer.Value));
             }
 
             base.VisitVariableDeclarator(node);
@@ -113,7 +107,7 @@
             if (node.Initializer != null &&
                 SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(node.Initializer.Value);
+                this.assignedValues.Add(new Assignment(this.symbol, node.Initializer.Value));
             }
 
             base.VisitPropertyDeclaration(node);
@@ -153,7 +147,7 @@
             var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
             if (SymbolComparer.Equals(this.symbol, left))
             {
-                this.assignedValues.Add(node.Right);
+                this.assignedValues.Add(new Assignment(this.symbol, node.Right));
             }
             else if (left is IPropertySymbol)
             {
@@ -168,7 +162,7 @@
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
             if (SymbolComparer.Equals(this.symbol, operand))
             {
-                this.assignedValues.Add(node);
+                this.assignedValues.Add(new Assignment(this.symbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -183,7 +177,7 @@
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
             if (SymbolComparer.Equals(this.symbol, operand))
             {
-                this.assignedValues.Add(node);
+                this.assignedValues.Add(new Assignment(this.symbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -224,7 +218,7 @@
                 if (invocation != null &&
                     SymbolComparer.Equals(this.symbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
                 {
-                    this.assignedValues.Add(invocation);
+                    this.assignedValues.Add(new Assignment(this.symbol, invocation));
                 }
             }
 
@@ -235,7 +229,7 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(node.Expression);
+                this.assignedValues.Add(new Assignment(this.symbol, node.Expression));
             }
 
             base.VisitArrowExpressionClause(node);
@@ -245,7 +239,7 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(node.Expression);
+                this.assignedValues.Add(new Assignment(this.symbol, node.Expression));
             }
 
             base.VisitReturnStatement(node);
@@ -262,8 +256,27 @@
             return pooled;
         }
 
+        internal void AppendAssignmentsFor(ExpressionSyntax assignedValue)
+        {
+            this.symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
+            this.Run();
+            var parameter = this.symbol as IParameterSymbol;
+            if (parameter?.Name == "value")
+            {
+                this.symbol = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
+                this.Run();
+            }
+        }
+
         private void Run()
         {
+            if (this.symbol == null ||
+                !this.checkedSymbols.Add(this.symbol))
+            {
+                return;
+            }
+
+            this.visitedMembers.Clear();
             if (this.symbol is IFieldSymbol ||
                 this.symbol is IPropertySymbol)
             {

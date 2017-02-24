@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.Helpers
 {
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis.CSharp;
@@ -33,7 +34,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(code, actual);
                 }
             }
@@ -55,7 +56,7 @@ internal class Foo<T>
                 var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual("default(T)", actual);
                 }
             }
@@ -95,7 +96,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -123,7 +124,7 @@ internal class Foo<T>
                 var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual("Assign(out value)", actual);
                 }
             }
@@ -158,7 +159,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -193,7 +194,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -223,7 +224,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -248,7 +249,7 @@ internal class Foo
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual(expected, actual);
                 }
             }
@@ -297,7 +298,7 @@ namespace RoslynSandBox
                 var value = syntaxTree.EqualsValueClause("var temp = toDispose;").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
                     Assert.AreEqual("(IDisposable)null, this.disposable", actual);
                 }
             }
