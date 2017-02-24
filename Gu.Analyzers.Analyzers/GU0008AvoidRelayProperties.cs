@@ -120,16 +120,16 @@
             var field = member as IFieldSymbol;
             if (field != null)
             {
-                using (var walker = AssignedValueWalker_.Create(field, semanticModel, cancellationToken))
+                using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in walker.Item.AssignedValues)
+                    foreach (var assignedValue in pooled.Item.AssignedValues)
                     {
-                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
                             continue;
                         }
 
-                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
+                        if (semanticModel.GetSymbolSafe(assignedValue.Value, cancellationToken) is IParameterSymbol)
                         {
                             return true;
                         }
@@ -140,16 +140,16 @@
             var property = member as IPropertySymbol;
             if (property != null)
             {
-                using (var walker = AssignedValueWalker_.Create(property, semanticModel, cancellationToken))
+                using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in walker.Item.AssignedValues)
+                    foreach (var assignedValue in pooled.Item.AssignedValues)
                     {
-                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
                             continue;
                         }
 
-                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
+                        if (semanticModel.GetSymbolSafe(assignedValue.Value, cancellationToken) is IParameterSymbol)
                         {
                             return true;
                         }

@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -39,13 +38,11 @@
 
         public IReadOnlyList<Assignment> AssignedValues => this.assignedValues;
 
-        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(property, null, semanticModel, cancellationToken);
         }
 
-        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(field, null, semanticModel, cancellationToken);
@@ -65,7 +62,6 @@
             return Pool.GetOrCreate();
         }
 
-        [Obsolete("Remove this, use the overload with expression to capture context for figuring out what ctors to run.")]
         public static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
@@ -247,12 +243,33 @@
 
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (symbol == null)
+            {
+                return Pool.GetOrCreate();
+            }
+
             var pooled = Pool.GetOrCreate();
             pooled.Item.symbol = symbol;
             pooled.Item.context = context;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.Run();
+            if (context != null)
+            {
+                pooled.Item.Run();
+            }
+            else
+            {
+                foreach (var reference in symbol.DeclaringSyntaxReferences)
+                {
+                    pooled.Item.context = symbol is IFieldSymbol || symbol is IPropertySymbol
+                                              ? reference.GetSyntax(cancellationToken)
+                                                         .FirstAncestor<TypeDeclarationSyntax>()
+                                              : reference.GetSyntax(cancellationToken)
+                                                         .FirstAncestor<MemberDeclarationSyntax>();
+                    pooled.Item.Run();
+                }
+            }
+
             return pooled;
         }
 
