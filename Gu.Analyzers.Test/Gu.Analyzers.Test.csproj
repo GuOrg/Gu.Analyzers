@@ -83,8 +83,10 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
-    <Compile Include="Helpers\AssignedValueWalkerTests.Field.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.Constructors.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.Indexer.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Local.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.Property.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />

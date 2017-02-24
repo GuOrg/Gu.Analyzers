@@ -60,8 +60,11 @@ internal class Foo<T>
                 }
             }
 
-            [Test]
-            public void OutParameter()
+            [TestCase("var temp1 = value;", "")]
+            [TestCase("var temp2 = value;", "Assign(out value)")]
+            [TestCase("var temp3 = value;", "")]
+            [TestCase("var temp4 = value;", "Assign(out value)")]
+            public void OutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -69,22 +72,31 @@ internal class Foo
     internal Foo()
     {
         int value;
+        var temp1 = value;
         Assign(out value);
-        var temp = value;
+        var temp2 = value;
     }
 
-    internal void Assign(out int value)
+    internal void Bar()
     {
-        value = 1;
+        int value;
+        var temp3 = value;
+        Assign(out value);
+        var temp4 = value;
+    }
+
+    internal void Assign(out int outValue)
+    {
+        outValue = 1;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item.AssignedValues);
-                    Assert.AreEqual("value, 1", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
@@ -101,9 +113,9 @@ internal class Foo<T>
         var temp = value;
     }
 
-    internal void Assign(out T value)
+    internal void Assign(out T outValue)
     {
-        value = default(T);
+        outValue = default(T);
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -112,12 +124,13 @@ internal class Foo<T>
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item.AssignedValues);
-                    Assert.AreEqual("value, default(T)", actual);
+                    Assert.AreEqual("Assign(out value)", actual);
                 }
             }
 
-            [Test]
-            public void ChainedOutParameter()
+            [TestCase("var temp1 = value;", "")]
+            [TestCase("var temp2 = value;", "Assign1(out value)")]
+            public void ChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -125,8 +138,9 @@ internal class Foo
     internal Foo()
     {
         int value;
+        var temp1 = value;
         Assign1(out value);
-        var temp = value;
+        var temp2 = value;
     }
 
     internal void Assign1(out int value1)
@@ -141,16 +155,17 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item.AssignedValues);
-                    Assert.AreEqual("value, value1, 1", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void RefParameter()
+            [TestCase("var temp1 = value;", "")]
+            [TestCase("var temp2 = value;", "Assign1(ref value)")]
+            public void ChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -158,8 +173,44 @@ internal class Foo
     internal Foo()
     {
         int value;
+        var temp1 = value;
+        Assign1(ref value);
+        var temp2 = value;
+    }
+
+    internal void Assign1(ref int value1)
+    {
+         Assign2(ref value1);
+    }
+
+    internal void Assign2(ref int value2)
+    {
+        value2 = 1;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item.AssignedValues);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = value", "")]
+            [TestCase("var temp2 = value", "Assign(ref value)")]
+            public void RefParameter(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo()
+    {
+        int value;
+        var temp1 = value;
         Assign(ref value);
-        var temp = value;
+        var temp2 = value;
     }
 
     internal void Assign(ref int value)
@@ -169,16 +220,17 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item.AssignedValues);
-                    Assert.AreEqual("value, 1", actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 
-            [Test]
-            public void NotInitialized()
+            [TestCase("var temp1 = value;", "")]
+            [TestCase("var temp2 = value;", "1")]
+            public void NotInitialized(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -186,17 +238,18 @@ internal class Foo
     internal Foo()
     {
         int value;
-        var temp = value;
+        var temp1 = value;
         value = 1;
+        var temp2 = value;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item.AssignedValues);
-                    Assert.AreEqual(string.Empty, actual);
+                    Assert.AreEqual(expected, actual);
                 }
             }
 

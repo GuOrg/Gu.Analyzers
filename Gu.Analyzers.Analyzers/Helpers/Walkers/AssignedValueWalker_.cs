@@ -183,6 +183,27 @@ namespace Gu.Analyzers
             base.VisitVariableDeclarator(node);
         }
 
+        public override void VisitAccessorDeclaration(AccessorDeclarationSyntax node)
+        {
+            if (node.IsKind(SyntaxKind.GetAccessorDeclaration))
+            {
+                var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
+                if (propertyDeclaration != null)
+                {
+                    var property = this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken);
+                    if (this.symbols.Contains(property))
+                    {
+                        this.isSamplingRetunValues = true;
+                        base.VisitAccessorDeclaration(node);
+                        this.isSamplingRetunValues = false;
+                        return;
+                    }
+                }
+            }
+
+            base.VisitAccessorDeclaration(node);
+        }
+
         public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
         {
             var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
@@ -203,27 +224,6 @@ namespace Gu.Analyzers
             }
 
             base.VisitArrowExpressionClause(node);
-        }
-
-        public override void VisitAccessorDeclaration(AccessorDeclarationSyntax node)
-        {
-            if (node.IsKind(SyntaxKind.GetAccessorDeclaration))
-            {
-                var propertyDeclaration = node.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                if (propertyDeclaration != null)
-                {
-                    var property = this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken);
-                    if (this.symbols.Contains(property))
-                    {
-                        this.isSamplingRetunValues = true;
-                        base.VisitAccessorDeclaration(node);
-                        this.isSamplingRetunValues = false;
-                        return;
-                    }
-                }
-            }
-
-            base.VisitAccessorDeclaration(node);
         }
 
         public override void VisitReturnStatement(ReturnStatementSyntax node)

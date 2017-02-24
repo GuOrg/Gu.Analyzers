@@ -4,6 +4,7 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class Constructor
@@ -108,6 +109,38 @@
                     }
                 }
             }
+        }
+
+        public static bool IsCalledByOther(IMethodSymbol ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (ctor == null)
+            {
+                return false;
+            }
+
+            foreach (var other in ctor.ContainingType.Constructors)
+            {
+                if (ReferenceEquals(ctor, other))
+                {
+                    continue;
+                }
+
+                foreach (var reference in other.DeclaringSyntaxReferences)
+                {
+                    var otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                    if (otherDeclaration.Initializer?.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword) == true)
+                    {
+                        var chained = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
+                        if (ctor.Equals(chained))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+
+            return false;
         }
     }
 }
