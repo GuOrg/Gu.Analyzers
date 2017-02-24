@@ -7,6 +7,7 @@
 
     using NUnit.Framework;
 
+    [Explicit]
     internal partial class ValueWithSourceTests
     {
         [TestCase("1", "1 Constant")]

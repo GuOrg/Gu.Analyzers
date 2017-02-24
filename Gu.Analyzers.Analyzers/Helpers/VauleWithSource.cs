@@ -36,11 +36,11 @@ namespace Gu.Analyzers
             CancellationToken cancellationToken)
         {
             var pooledList = ListPool<VauleWithSource>.Create();
-            using (var pooled = AssignedValueWalker_.Create(field, semanticModel, cancellationToken))
+            using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
@@ -53,11 +53,11 @@ namespace Gu.Analyzers
             CancellationToken cancellationToken)
         {
             var pooledList = ListPool<VauleWithSource>.Create();
-            using (var pooled = AssignedValueWalker_.Create(property, semanticModel, cancellationToken))
+            using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
@@ -159,11 +159,11 @@ namespace Gu.Analyzers
                             {
                                 result.Add(new VauleWithSource(assignedParameterSyntax, ValueSource.Argument));
                                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(assignedParameterSyntax, cancellationToken);
-                                using (var assignments = AssignedValueWalker_.Create(parameterSymbol, semanticModel, cancellationToken))
+                                using (var assignments = AssignedValueWalker.Create(parameterSymbol, semanticModel, cancellationToken))
                                 {
                                     foreach (var assignedValue in assignments.Item.AssignedValues)
                                     {
-                                        AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
+                                        AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
                                     }
                                 }
                             }
@@ -669,11 +669,11 @@ namespace Gu.Analyzers
             CancellationToken cancellationToken,
             List<VauleWithSource> result)
         {
-            using (var assignments = AssignedValueWalker_.Create(value, semanticModel, cancellationToken))
+            using (var assignments = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in assignments.Item.AssignedValues)
                 {
-                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
+                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
                 }
             }
         }

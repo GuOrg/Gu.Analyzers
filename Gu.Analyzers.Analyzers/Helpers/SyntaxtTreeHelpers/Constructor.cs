@@ -39,7 +39,7 @@
             var contextCtor = context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
             if (contextCtor == null)
             {
-                var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);
+                var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);
                 if (type == null)
                 {
                     return;

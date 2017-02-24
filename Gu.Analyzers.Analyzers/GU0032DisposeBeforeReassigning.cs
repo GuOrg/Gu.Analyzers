@@ -183,16 +183,16 @@
                 return false;
             }
 
-            using (var pooled = AssignedValueWalker_.Create(symbol, semanticModel, cancellationToken))
+            using (var pooled = AssignedValueWalker.Create(symbol, semanticModel, cancellationToken))
             {
                 foreach (var assignedValue in pooled.Item.AssignedValues)
                 {
-                    if (!assignedValue.IsBeforeInScope(statement))
+                    if (!assignedValue.Value.IsBeforeInScope(statement))
                     {
                         continue;
                     }
 
-                    if (Disposable.IsPotentiallyCreated(assignedValue, semanticModel, cancellationToken))
+                    if (Disposable.IsPotentiallyCreated(assignedValue.Value, semanticModel, cancellationToken))
                     {
                         return true;
                     }
