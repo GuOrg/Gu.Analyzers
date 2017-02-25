@@ -36,6 +36,8 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleReturnValue, SyntaxKind.ReturnStatement);
             context.RegisterSyntaxNodeAction(HandleArrow, SyntaxKind.ArrowExpressionClause);
+            context.RegisterSyntaxNodeAction(HandleLamdba, SyntaxKind.ParenthesizedLambdaExpression);
+            context.RegisterSyntaxNodeAction(HandleLamdba, SyntaxKind.SimpleLambdaExpression);
         }
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context)
@@ -92,9 +94,39 @@
             HandleReturnValue(context, arrowClause.Expression);
         }
 
+        private static void HandleLamdba(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            var symbol = context.ContainingSymbol;
+            if (IsIgnored(symbol))
+            {
+                return;
+            }
+
+            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            {
+                return;
+            }
+
+            var lambda = context.Node as LambdaExpressionSyntax;
+            var returnValue = lambda?.Body as ExpressionSyntax;
+            if (returnValue == null)
+            {
+                return;
+            }
+
+            HandleReturnValue(context, returnValue);
+        }
+
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(returnValue, context.SemanticModel, context.CancellationToken))
+            var isCreation = Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken);
+            if (isCreation == Result.Yes ||
+                isCreation == Result.Maybe)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnValue.GetLocation()));
             }

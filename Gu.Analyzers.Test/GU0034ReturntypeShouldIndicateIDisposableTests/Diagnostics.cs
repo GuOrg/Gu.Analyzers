@@ -1,6 +1,9 @@
 ﻿namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
 {
     using System.Threading.Tasks;
+
+    using Microsoft.CodeAnalysis.CSharp;
+
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<GU0034ReturntypeShouldIndicateIDisposable>
@@ -129,21 +132,68 @@ public sealed class Foo
         }
 
         [Test]
-        public async Task Lambda()
+        public async Task StatementLambda()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-internal static class Foo
+namespace RoslynSandBox
 {
-    internal static void Bar()
+    using System;
+
+    internal static class Foo
     {
-        Func<object> f = () =>
+        internal static void Bar()
         {
-	        var file = System.IO.File.OpenRead(null);
-	        return ↓file;
-        };
+            Func<object> f = () =>
+                {
+                    return ↓System.IO.File.OpenRead(null);
+                };
+        }
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ParenthesizedLambdaExpression()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    internal static class Foo
+    {
+        internal static void Bar()
+        {
+            Func<object> f = () => ↓System.IO.File.OpenRead(null);
+        }
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task SimpleLambdaExpression()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+
+    internal static class Foo
+    {
+        internal static void Bar()
+        {
+            Func<int,object> f = x => ↓System.IO.File.OpenRead(null);
+        }
     }
 }";
 

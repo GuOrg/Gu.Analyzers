@@ -124,13 +124,13 @@ namespace Gu.Analyzers
                 {
                     using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
                     {
-                        return pooled.Item.AddReturnValues(property)
+                        return pooled.Item.AddReturnValues(property, candidate)
                                    ? IsReturnValueCreation(candidate, property.GetMethod, pooled, semanticModel, cancellationToken)
                                    : Result.No;
                     }
                 }
 
-                return pooled.Item.AddReturnValues(property)
+                return pooled.Item.AddReturnValues(property, candidate)
                            ? IsReturnValueCreation(candidate, property.GetMethod, pooled, semanticModel, cancellationToken)
                            : Result.No;
             }
@@ -155,13 +155,13 @@ namespace Gu.Analyzers
                 {
                     using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
                     {
-                        return pooled.Item.AddReturnValues(method)
+                        return pooled.Item.AddReturnValues(method, candidate)
                                    ? IsReturnValueCreation(candidate, method, pooled, semanticModel, cancellationToken)
                                    : Result.No;
                     }
                 }
 
-                return pooled.Item.AddReturnValues(method)
+                return pooled.Item.AddReturnValues(method, candidate)
                            ? IsReturnValueCreation(candidate, method, pooled, semanticModel, cancellationToken)
                            : Result.No;
             }

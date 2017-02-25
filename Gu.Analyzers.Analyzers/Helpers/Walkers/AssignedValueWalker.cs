@@ -16,6 +16,7 @@
                 x.values.Clear();
                 x.checkedSymbols.Clear();
                 x.visitedMembers.Clear();
+                x.visitedCalls.Clear();
                 x.currentSymbol = null;
                 x.context = null;
                 x.semanticModel = null;
@@ -25,6 +26,7 @@
         private readonly List<Assignment> values = new List<Assignment>();
         private readonly HashSet<ISymbol> checkedSymbols = new HashSet<ISymbol>();
         private readonly HashSet<SyntaxNode> visitedMembers = new HashSet<SyntaxNode>();
+        private readonly HashSet<SyntaxNode> visitedCalls = new HashSet<SyntaxNode>();
 
         private ISymbol currentSymbol;
         private SyntaxNode context;
@@ -264,11 +266,12 @@
             }
         }
 
-        internal bool AddReturnValues(IPropertySymbol property)
+        internal bool AddReturnValues(IPropertySymbol property, SyntaxNode call)
         {
             if (property == null ||
                 property.DeclaringSyntaxReferences.Length == 0 ||
-                property.GetMethod == null)
+                property.GetMethod == null ||
+                !this.visitedCalls.Add(call))
             {
                 return false;
             }
@@ -303,10 +306,11 @@
             return before != this.values.Count;
         }
 
-        internal bool AddReturnValues(IMethodSymbol method)
+        internal bool AddReturnValues(IMethodSymbol method, SyntaxNode call)
         {
             if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0)
+                method.DeclaringSyntaxReferences.Length == 0 ||
+                !this.visitedCalls.Add(call))
             {
                 return false;
             }
@@ -387,7 +391,7 @@
                     if (memberDeclaration != null)
                     {
                         var oldSymbol = this.currentSymbol;
-                        this.AddReturnValues(this.currentSymbol as IPropertySymbol);
+                        this.AddReturnValues(this.currentSymbol as IPropertySymbol, memberDeclaration).IgnoreReturnValue();
                         this.currentSymbol = oldSymbol;
                         this.Visit(memberDeclaration);
                     }

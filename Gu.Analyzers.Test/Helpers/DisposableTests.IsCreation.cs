@@ -81,7 +81,7 @@ namespace RoslynSandBox
     {
         internal Foo()
         {
-            StaticCreateIntStatementBody();
+            // Meh();
         }
 
         internal static int StaticCreateIntStatementBody()
@@ -113,7 +113,7 @@ namespace RoslynSandBox
         internal T Id<T>(T arg) => arg;
     }
 }";
-                testCode = testCode.AssertReplace("StaticCreateIntStatementBody()", code);
+                testCode = testCode.AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -153,7 +153,7 @@ namespace RoslynSandBox
 
         internal Foo()
         {
-            this.Id<IDisposable>(null);
+            // Meh();
         }
 
         internal T Id<T>(T arg) => arg;
@@ -200,7 +200,7 @@ namespace RoslynSandBox
         }
     }
 }";
-                testCode = testCode.AssertReplace("this.Id<IDisposable>(null)", code);
+                testCode = testCode.AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -211,7 +211,7 @@ namespace RoslynSandBox
             [TestCase("StaticRecursiveStatementBody()", Result.No)]
             [TestCase("StaticRecursiveExpressionBody()", Result.No)]
             [TestCase("CallingRecursive()", Result.No)]
-            [TestCase("RecursiveTernary(bool flag)", Result.Maybe)]
+            [TestCase("RecursiveTernary(true)", Result.Yes)]
             [TestCase("this.RecursiveExpressionBody()", Result.No)]
             [TestCase("this.RecursiveStatementBody()", Result.No)]
             public void CallRecursiveMethod(string code, Result expected)
@@ -233,7 +233,7 @@ namespace RoslynSandBox
     {
         internal Foo()
         {
-            StaticRecursiveStatementBody();
+            // Meh();
         }
 
         private static IDisposable StaticRecursiveStatementBody()
@@ -255,7 +255,7 @@ namespace RoslynSandBox
         private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
     }
 }";
-                testCode = testCode.AssertReplace("RecursiveStatementBody()", code);
+                testCode = testCode.AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -272,7 +272,7 @@ namespace RoslynSandBox
             [TestCase("await Task.Run(() => new Disposable())", Result.Yes)]
             [TestCase("await Task.FromResult(new Disposable())", Result.Yes)]
             [TestCase("await CreateDisposableAsync()", Result.Yes)]
-            public void AwaitAsync(string code, Result expected)
+            public void AwaitAsyncStuff(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -292,7 +292,7 @@ namespace RoslynSandBox
     {
         internal async Task Bar()
         {
-            var value = await CreateStringAsync();
+            var value = // Meh();
         }
 
         internal static async Task<string> CreateStringAsync()
@@ -308,7 +308,7 @@ namespace RoslynSandBox
         }
     }
 }";
-                testCode = testCode.AssertReplace("await CreateStringAsync()", code);
+                testCode = testCode.AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -355,11 +355,11 @@ namespace RoslynSandBox
 
         internal Foo()
         {
-            var value = File.OpenRead(string.Empty);
+            var value = // Meh();
         }
     }
 }";
-                testCode = testCode.AssertReplace("File.OpenRead(string.Empty)", code);
+                testCode = testCode.AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
