@@ -13,7 +13,7 @@
             () => new AssignedValueWalker(),
             x =>
             {
-                x.assignedValues.Clear();
+                x.values.Clear();
                 x.checkedSymbols.Clear();
                 x.visitedMembers.Clear();
                 x.currentSymbol = null;
@@ -22,7 +22,7 @@
                 x.cancellationToken = CancellationToken.None;
             });
 
-        private readonly List<Assignment> assignedValues = new List<Assignment>();
+        private readonly List<Assignment> values = new List<Assignment>();
         private readonly HashSet<ISymbol> checkedSymbols = new HashSet<ISymbol>();
         private readonly HashSet<SyntaxNode> visitedMembers = new HashSet<SyntaxNode>();
 
@@ -36,7 +36,7 @@
         {
         }
 
-        public IReadOnlyList<Assignment> AssignedValues => this.assignedValues;
+        public IReadOnlyList<Assignment> Values => this.values;
 
         public override void Visit(SyntaxNode node)
         {
@@ -55,7 +55,7 @@
             if (node.Initializer != null &&
                 SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
+                this.values.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
             }
 
             base.VisitVariableDeclarator(node);
@@ -66,7 +66,7 @@
             if (node.Initializer != null &&
                 SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
+                this.values.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
             }
 
             base.VisitPropertyDeclaration(node);
@@ -106,7 +106,7 @@
             var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
             if (SymbolComparer.Equals(this.currentSymbol, left))
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Right));
+                this.values.Add(new Assignment(this.currentSymbol, node.Right));
             }
             else if (left is IPropertySymbol)
             {
@@ -121,7 +121,7 @@
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
             if (SymbolComparer.Equals(this.currentSymbol, operand))
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node));
+                this.values.Add(new Assignment(this.currentSymbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -136,7 +136,7 @@
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
             if (SymbolComparer.Equals(this.currentSymbol, operand))
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node));
+                this.values.Add(new Assignment(this.currentSymbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -177,7 +177,7 @@
                 if (invocation != null &&
                     SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
                 {
-                    this.assignedValues.Add(new Assignment(this.currentSymbol, invocation));
+                    this.values.Add(new Assignment(this.currentSymbol, invocation));
                 }
             }
 
@@ -188,7 +188,7 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Expression));
+                this.values.Add(new Assignment(this.currentSymbol, node.Expression));
             }
 
             base.VisitArrowExpressionClause(node);
@@ -198,7 +198,7 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Expression));
+                this.values.Add(new Assignment(this.currentSymbol, node.Expression));
             }
 
             base.VisitReturnStatement(node);
@@ -241,6 +241,15 @@
             return Pool.GetOrCreate();
         }
 
+        internal static Pool<AssignedValueWalker>.Pooled CreateEmpty(SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var pooled = Pool.GetOrCreate();
+            pooled.Item.context = semanticModel.SyntaxTree.GetRoot(cancellationToken);
+            pooled.Item.semanticModel = semanticModel;
+            pooled.Item.cancellationToken = cancellationToken;
+            return pooled;
+        }
+
         internal bool HasChecked(ISymbol symbol) => this.checkedSymbols.Contains(symbol);
 
         internal void AppendAssignmentsFor(ExpressionSyntax assignedValue)
@@ -253,6 +262,53 @@
                 this.currentSymbol = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
                 this.Run();
             }
+        }
+
+        internal bool AddReturnValues(IPropertySymbol property)
+        {
+            if (property == null ||
+                property.DeclaringSyntaxReferences.Length == 0 ||
+                property.GetMethod == null ||
+                !this.checkedSymbols.Add(property.GetMethod))
+            {
+                return false;
+            }
+
+            this.currentSymbol = property.GetMethod;
+            foreach (var reference in property.DeclaringSyntaxReferences)
+            {
+                var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                AccessorDeclarationSyntax getter;
+                if (declaration.TryGetGetAccessorDeclaration(out getter))
+                {
+                    this.isSamplingRetunValues = true;
+                    this.Visit(getter);
+                    this.isSamplingRetunValues = false;
+                }
+            }
+
+            return true;
+        }
+
+        internal bool AddReturnValues(IMethodSymbol method)
+        {
+            if (method == null ||
+                method.DeclaringSyntaxReferences.Length == 0 ||
+                !this.checkedSymbols.Add(method))
+            {
+                return false;
+            }
+
+            this.currentSymbol = method;
+            foreach (var reference in method.DeclaringSyntaxReferences)
+            {
+                var declaration = (MethodDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                this.isSamplingRetunValues = true;
+                this.Visit(declaration);
+                this.isSamplingRetunValues = false;
+            }
+
+            return true;
         }
 
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -302,17 +358,11 @@
                 foreach (var reference in this.currentSymbol.DeclaringSyntaxReferences)
                 {
                     var memberDeclaration = reference.GetSyntax(this.cancellationToken)?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                    AccessorDeclarationSyntax getter;
-                    if ((memberDeclaration as PropertyDeclarationSyntax).TryGetGetAccessorDeclaration(out getter))
-                    {
-                        this.isSamplingRetunValues = true;
-                        this.Visit(getter);
-                        this.isSamplingRetunValues = false;
-                        this.visitedMembers.Remove(memberDeclaration).IgnoreReturnValue();
-                    }
-
                     if (memberDeclaration != null)
                     {
+                        var oldSymbol = this.currentSymbol;
+                        this.AddReturnValues(this.currentSymbol as IPropertySymbol);
+                        this.currentSymbol = oldSymbol;
                         this.Visit(memberDeclaration);
                     }
                 }

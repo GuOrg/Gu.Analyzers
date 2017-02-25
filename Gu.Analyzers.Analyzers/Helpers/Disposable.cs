@@ -6,7 +6,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class Disposable
+    internal static partial class Disposable
     {
         internal static bool IsMemberDisposed(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -91,126 +91,6 @@ namespace Gu.Analyzers
                 return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        !IsPotentiallyCachedOrInjected(sources);
             }
-        }
-
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
-        internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
-            {
-                return Result.No;
-            }
-
-            using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
-            }
-        }
-
-        internal static Result IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
-            {
-                return Result.No;
-            }
-
-            using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
-            }
-        }
-
-        private static Result IsAssignedWithCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var result = Analyzers.Result.No;
-            foreach (var assignment in pooled.Item.AssignedValues)
-            {
-                switch (IsCreation(assignment.Value, semanticModel, cancellationToken))
-                {
-                    case Analyzers.Result.Unknown:
-                        result = Analyzers.Result.Unknown;
-                        break;
-                    case Analyzers.Result.Yes:
-                        return Result.Yes;
-                    case Analyzers.Result.No:
-                        break;
-                    case Analyzers.Result.Maybe:
-                        result = Analyzers.Result.Maybe;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
-        internal static Result IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
-            {
-                return Result.No;
-            }
-
-            if (disposable is ObjectCreationExpressionSyntax)
-            {
-                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
-                {
-                    return Result.Yes;
-                }
-
-                return Result.No;
-            }
-
-            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
-            var property = symbol as IPropertySymbol;
-            if (property != null)
-            {
-                if (property.DeclaringSyntaxReferences.Length == 0)
-                {
-                    return property == KnownSymbol.PasswordBox.SecurePassword 
-                        ? Result.Yes
-                        : Result.No;
-                }
-
-                foreach (var reference in property.DeclaringSyntaxReferences)
-                {
-                    var syntax = reference.GetSyntax(cancellationToken);
-                }
-            }
-
-            var method = symbol as IMethodSymbol;
-            if (method != null)
-            {
-                if (method.DeclaringSyntaxReferences.Length == 0)
-                {
-                    if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
-                        method.ContainingType == KnownSymbol.Enumerable ||
-                        method.ContainingType.Name.StartsWith("ConditionalWeakTable"))
-                    {
-                        return Result.No;
-                    }
-
-                    return IsAssignableTo(method.ReturnType) ? Result.Maybe : Result.No;
-                }
-
-                foreach (var reference in method.DeclaringSyntaxReferences)
-                {
-                    var syntax = reference.GetSyntax(cancellationToken);
-                }
-            }
-
-            return Result.No;
         }
 
         internal static bool IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -427,6 +307,7 @@ namespace Gu.Analyzers
             return false;
         }
 
+        [Obsolete]
         private static bool IsAssignedWithCreated(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             foreach (var vauleWithSource in sources.Item)

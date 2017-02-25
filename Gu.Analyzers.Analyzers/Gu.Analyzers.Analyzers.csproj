@@ -65,6 +65,7 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
     <Compile Include="Helpers\Break.cs" />
+    <Compile Include="Helpers\Disposable.Creation.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />

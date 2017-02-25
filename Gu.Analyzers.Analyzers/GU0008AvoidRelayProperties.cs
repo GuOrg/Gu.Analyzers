@@ -122,7 +122,7 @@
             {
                 using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in pooled.Item.AssignedValues)
+                    foreach (var assignedValue in pooled.Item.Values)
                     {
                         if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
@@ -142,7 +142,7 @@
             {
                 using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in pooled.Item.AssignedValues)
+                    foreach (var assignedValue in pooled.Item.Values)
                     {
                         if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {

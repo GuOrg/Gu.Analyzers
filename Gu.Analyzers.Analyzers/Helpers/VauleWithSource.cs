@@ -38,7 +38,7 @@ namespace Gu.Analyzers
             var pooledList = ListPool<VauleWithSource>.Create();
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                foreach (var assignedValue in pooled.Item.AssignedValues)
+                foreach (var assignedValue in pooled.Item.Values)
                 {
                     AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
                 }
@@ -55,7 +55,7 @@ namespace Gu.Analyzers
             var pooledList = ListPool<VauleWithSource>.Create();
             using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
-                foreach (var assignedValue in pooled.Item.AssignedValues)
+                foreach (var assignedValue in pooled.Item.Values)
                 {
                     AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
                 }
@@ -161,7 +161,7 @@ namespace Gu.Analyzers
                                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(assignedParameterSyntax, cancellationToken);
                                 using (var assignments = AssignedValueWalker.Create(parameterSymbol, semanticModel, cancellationToken))
                                 {
-                                    foreach (var assignedValue in assignments.Item.AssignedValues)
+                                    foreach (var assignedValue in assignments.Item.Values)
                                     {
                                         AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
                                     }
@@ -671,7 +671,7 @@ namespace Gu.Analyzers
         {
             using (var assignments = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
             {
-                foreach (var assignedValue in assignments.Item.AssignedValues)
+                foreach (var assignedValue in assignments.Item.Values)
                 {
                     AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
                 }

@@ -1,0 +1,371 @@
+﻿namespace Gu.Analyzers.Test.Helpers
+{
+    using System.Threading;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using NUnit.Framework;
+
+    internal class DisposableTests
+    {
+        internal class IsCreation
+        {
+            [TestCase("1", Result.No)]
+            [TestCase("new string(' ', 1)", Result.No)]
+            [TestCase("new Disposable()", Result.Yes)]
+            [TestCase("new Disposable() as object", Result.Yes)]
+            [TestCase("(object) new Disposable()", Result.Yes)]
+            [TestCase("typeof(IDisposable)", Result.No)]
+            [TestCase("(IDisposable)null", Result.No)]
+            [TestCase("File.OpenRead(string.Empty) ?? null", Result.Maybe)]
+            [TestCase("null ?? File.OpenRead(string.Empty)", Result.Maybe)]
+            [TestCase("true ? null : File.OpenRead(string.Empty)", Result.Maybe)]
+            [TestCase("true ? File.OpenRead(string.Empty) : null", Result.Maybe)]
+            public void LanguageConstructs(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            var value = new Disposable();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("new Disposable()", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("StaticCreateIntStatementBody()", Result.No)]
+            [TestCase("StaticCreateIntExpressionBody()", Result.No)]
+            [TestCase("StaticCreateIntWithArg()", Result.No)]
+            [TestCase("StaticCreateIntId()", Result.No)]
+            [TestCase("StaticCreateIntSquare()", Result.No)]
+            [TestCase("this.CreateIntStatementBody()", Result.No)]
+            [TestCase("CreateIntExpressionBody()", Result.No)]
+            [TestCase("CreateIntWithArg()", Result.No)]
+            [TestCase("CreateIntId()", Result.No)]
+            [TestCase("CreateIntSquare()", Result.No)]
+            [TestCase("Id<int>()", Result.No)]
+            public void CallMethodInSyntaxTreeReturningNotDisposable(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            StaticCreateIntStatementBody();
+        }
+
+        internal static int StaticCreateIntStatementBody()
+        {
+            return 1;
+        }
+
+        internal static int StaticCreateIntExpressionBody() => 2;
+
+        internal static int StaticCreateIntWithArg(int arg) => 3;
+
+        internal static int StaticCreateIntId(int arg) => arg;
+
+        internal static int StaticCreateIntSquare(int arg) => arg * arg;
+
+        internal int CreateIntStatementBody()
+        {
+            return 1;
+        }
+
+        internal int CreateIntExpressionBody() => 2;
+
+        internal int CreateIntWithArg(int arg) => 3;
+   
+        internal int CreateIntId(int arg) => arg;
+   
+        internal int CreateIntSquare(int arg) => arg * arg;
+
+        internal T Id<T>(T arg) => arg;
+    }
+}";
+                testCode = testCode.AssertReplace("StaticCreateIntStatementBody()", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("Id<IDisposable>(null)", Result.No)]
+            [TestCase("this.Id<IDisposable>(null)", Result.No)]
+            [TestCase("this.Id<IDisposable>(this.disposable)", Result.No)]
+            [TestCase("this.Id<IDisposable>(new Disposable())", Result.Yes)]
+            [TestCase("this.Id<object>(new Disposable())", Result.Yes)]
+            [TestCase("CreateDisposableStatementBody()", Result.Yes)]
+            [TestCase("this.CreateDisposableStatementBody()", Result.Yes)]
+            [TestCase("CreateDisposableExpressionBody()", Result.Yes)]
+            [TestCase("CreateDisposableExpressionBodyReturnTypeObject()", Result.Yes)]
+            [TestCase("CreateDisposableInIf(true)", Result.Yes)]
+            [TestCase("CreateDisposableInElse(true)", Result.Yes)]
+            public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        private readonly IDisposable disposable = new Disposable();
+
+        internal Foo()
+        {
+            this.Id<IDisposable>(null);
+        }
+
+        internal T Id<T>(T arg) => arg;
+
+        internal T ConstrainedFactory<T>(T arg) where T : IDisposable, new() => new T();
+
+        internal T ConstrainedStructFactory<T>(T arg) where T : struct, new() => new T();
+
+        internal IDisposable CreateDisposableStatementBody()
+        {
+            return new Disposable();
+        }
+
+        internal IDisposable CreateDisposableExpressionBody() => new Disposable();
+       
+        internal object CreateDisposableExpressionBodyReturnTypeObject() => new Disposable();
+
+        internal IDisposable CreateDisposableInIf(bool flag)
+        {
+            if (flag)
+            {
+                return new Disposable();
+            }
+            else
+            {
+                return null;
+            }
+
+            return null;
+        }
+
+        internal IDisposable CreateDisposableInElse(bool flag)
+        {
+            if (flag)
+            {
+                return null;
+            }
+            else
+            {
+                return new Disposable();
+            }
+
+            return null;
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("this.Id<IDisposable>(null)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("StaticRecursiveStatementBody()", Result.No)]
+            [TestCase("StaticRecursiveExpressionBody()", Result.No)]
+            [TestCase("CallingRecursive()", Result.No)]
+            [TestCase("RecursiveTernary(bool flag)", Result.Maybe)]
+            [TestCase("this.RecursiveExpressionBody()", Result.No)]
+            [TestCase("this.RecursiveStatementBody()", Result.No)]
+            public void CallRecursiveMethod(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            StaticRecursiveStatementBody();
+        }
+
+        private static IDisposable StaticRecursiveStatementBody()
+        {
+            return StaticRecursiveStatementBody();
+        }
+
+        private static IDisposable StaticRecursiveExpressionBody() => StaticRecursiveExpressionBody();
+
+        private static IDisposable CallingRecursive() => StaticRecursiveStatementBody();
+
+        private static IDisposable RecursiveTernary(bool flag) => flag ? new Disposable() : RecursiveTernary(bool flag);
+
+        private IDisposable RecursiveStatementBody()
+        {
+            return this.RecursiveStatementBody();
+        }
+
+        private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
+    }
+}";
+                testCode = testCode.AssertReplace("RecursiveStatementBody()", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("Task.Run(() => 1)", Result.No)]
+            [TestCase("Task.Run(() => new Disposable())", Result.No)]
+            [TestCase("CreateStringAsync()", Result.No)]
+            [TestCase("await CreateStringAsync()", Result.No)]
+            [TestCase("await Task.Run(() => new string(' ', 1))", Result.No)]
+            [TestCase("await Task.FromResult(new string(' ', 1))", Result.No)]
+            [TestCase("await Task.Run(() => new Disposable())", Result.Yes)]
+            [TestCase("await Task.FromResult(new Disposable())", Result.Yes)]
+            [TestCase("await CreateDisposableAsync()", Result.Yes)]
+            public void AwaitAsync(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal async Task Bar()
+        {
+            var value = await CreateStringAsync();
+        }
+
+        internal static async Task<string> CreateStringAsync()
+        {
+            await Task.Delay(0);
+            return new string(' ', 1);
+        }
+
+        internal static async Task<IDisposable> CreateDisposableAsync()
+        {
+            await Task.Delay(0);
+            return new Disposable();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("await CreateStringAsync()", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("File.OpenRead(string.Empty)", Result.Maybe)]
+            [TestCase("this.ints.GetEnumerator()", Result.No)]
+            [TestCase("((IList)this.ints).GetEnumerator()", Result.No)]
+            [TestCase("this.disposables.First()", Result.No)]
+            [TestCase("this.disposableMap[1]", Result.No)]
+            [TestCase("this.readonlyDisposableMap[1]", Result.No)]
+            [TestCase("this.conditionalWeakTable.GetOrCreateValue(this.disposable)", Result.No)]
+            [TestCase("new PasswordBox().SecurePassword", Result.Yes)]
+            [TestCase("passwordBox.SecurePassword", Result.Yes)]
+            [TestCase("PasswordBox.SecurePassword", Result.Yes)]
+            public void CallExternal(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Windows.Controls;
+
+    internal class Foo
+    {
+        private static readonly PasswordBox PasswordBox = new PasswordBox();
+
+        private readonly IDisposable disposable = new Disposable();
+        private readonly List<int> ints = new List<int>();
+        private readonly List<IDisposable> disposables = new List<IDisposable>();
+      
+        private readonly IReadOnlyDictionary<int, IDisposable> readonlyDisposableMap = new Dictionary<int, IDisposable>();
+        private readonly Dictionary<int, IDisposable> disposableMap = new Dictionary<int, IDisposable>();
+        private readonly ConditionalWeakTable<IDisposable, IDisposable> conditionalWeakTable = new ConditionalWeakTable<IDisposable, IDisposable>();
+
+        private readonly PasswordBox passwordBox = new PasswordBox();
+
+        internal Foo()
+        {
+            var value = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("File.OpenRead(string.Empty)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+        }
+    }
+}

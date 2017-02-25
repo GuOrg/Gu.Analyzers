@@ -48,14 +48,14 @@ public sealed class Foo
             var value = syntaxTree.EqualsValueClause(code1).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                var actual = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                 Assert.AreEqual(expected, actual);
 
                 if (assigned != null)
                 {
-                    var assignedValue = pooled.Item.AssignedValues.Single(x => x.Value.ToFullString().Contains(assigned));
+                    var assignedValue = pooled.Item.Values.Single(x => x.Value.ToFullString().Contains(assigned));
                     pooled.Item.AppendAssignmentsFor(assignedValue.Value);
-                    var actual2 = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                    var actual2 = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                     Assert.AreEqual(expected2, actual2);
                 }
             }
@@ -100,7 +100,7 @@ public sealed class Foo
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                var actual = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -144,14 +144,14 @@ public sealed class Foo
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                var actual = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                 Assert.AreEqual(expected, actual);
 
                 if (assigned != null)
                 {
-                    var assignedValue = pooled.Item.AssignedValues.Single(x => x.Value.ToFullString().Contains(assigned));
+                    var assignedValue = pooled.Item.Values.Single(x => x.Value.ToFullString().Contains(assigned));
                     pooled.Item.AppendAssignmentsFor(assignedValue.Value);
-                    var actual2 = string.Join(", ", pooled.Item.AssignedValues.Select(x => x.Value));
+                    var actual2 = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                     Assert.AreEqual(expected2, actual2);
                 }
             }

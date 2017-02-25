@@ -88,7 +88,7 @@
     <Compile Include="Helpers\AssignedValueWalkerTests.Local.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Property.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
-    <Compile Include="Helpers\DisposableTests.cs" />
+    <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
