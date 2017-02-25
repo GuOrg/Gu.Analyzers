@@ -268,13 +268,26 @@
         {
             if (property == null ||
                 property.DeclaringSyntaxReferences.Length == 0 ||
-                property.GetMethod == null ||
-                !this.checkedSymbols.Add(property.GetMethod))
+                property.GetMethod == null)
             {
                 return false;
             }
 
+            if (!this.checkedSymbols.Add(property.GetMethod))
+            {
+                foreach (var assignment in this.values)
+                {
+                    if (Equals(assignment.Symbol, property))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             this.currentSymbol = property.GetMethod;
+            var before = this.values.Count;
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
                 var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
@@ -287,19 +300,32 @@
                 }
             }
 
-            return true;
+            return before != this.values.Count;
         }
 
         internal bool AddReturnValues(IMethodSymbol method)
         {
             if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0 ||
-                !this.checkedSymbols.Add(method))
+                method.DeclaringSyntaxReferences.Length == 0)
             {
                 return false;
             }
 
+            if (!this.checkedSymbols.Add(method))
+            {
+                foreach (var assignment in this.values)
+                {
+                    if (Equals(assignment.Symbol, method))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             this.currentSymbol = method;
+            var before = this.values.Count;
             foreach (var reference in method.DeclaringSyntaxReferences)
             {
                 var declaration = (MethodDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
@@ -308,7 +334,7 @@
                 this.isSamplingRetunValues = false;
             }
 
-            return true;
+            return before != this.values.Count;
         }
 
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)

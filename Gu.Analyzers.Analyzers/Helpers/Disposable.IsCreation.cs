@@ -125,13 +125,13 @@ namespace Gu.Analyzers
                     using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
                     {
                         return pooled.Item.AddReturnValues(property)
-                                   ? IsReturnValueCreation(property.GetMethod, pooled, semanticModel, cancellationToken)
+                                   ? IsReturnValueCreation(candidate, property.GetMethod, pooled, semanticModel, cancellationToken)
                                    : Result.No;
                     }
                 }
 
                 return pooled.Item.AddReturnValues(property)
-                           ? IsReturnValueCreation(property.GetMethod, pooled, semanticModel, cancellationToken)
+                           ? IsReturnValueCreation(candidate, property.GetMethod, pooled, semanticModel, cancellationToken)
                            : Result.No;
             }
 
@@ -156,20 +156,20 @@ namespace Gu.Analyzers
                     using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
                     {
                         return pooled.Item.AddReturnValues(method)
-                                   ? IsReturnValueCreation(method, pooled, semanticModel, cancellationToken)
+                                   ? IsReturnValueCreation(candidate, method, pooled, semanticModel, cancellationToken)
                                    : Result.No;
                     }
                 }
 
                 return pooled.Item.AddReturnValues(method)
-                           ? IsReturnValueCreation(method, pooled, semanticModel, cancellationToken)
+                           ? IsReturnValueCreation(candidate, method, pooled, semanticModel, cancellationToken)
                            : Result.No;
             }
 
             return Result.Unknown;
         }
 
-        private static Result IsReturnValueCreation(ISymbol symbol, Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsReturnValueCreation(ExpressionSyntax invocation, ISymbol symbol, Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
             {
@@ -185,7 +185,18 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                switch (IsCreation(assignment.Value, semanticModel, cancellationToken, pooled))
+                var value = assignment.Value;
+                var parameter = semanticModel.GetSymbolSafe(assignment.Value, cancellationToken) as IParameterSymbol;
+                if (parameter != null)
+                {
+                    if ((invocation as InvocationExpressionSyntax)?.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value) != true)
+                    {
+                        result = Result.Unknown;
+                        continue;
+                    }
+                }
+
+                switch (IsCreation(value, semanticModel, cancellationToken, pooled))
                 {
                     case Analyzers.Result.Unknown:
                         result = Analyzers.Result.Unknown;
