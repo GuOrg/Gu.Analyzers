@@ -35,10 +35,10 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.VariableDeclaration);
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext context)
+        private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -47,7 +47,8 @@
 
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
             VariableDeclaratorSyntax declarator;
-            if (!variableDeclaration.Variables.TryGetSingle(out declarator))
+            if (!variableDeclaration.Variables.TryGetSingle(out declarator) ||
+                declarator.Initializer == null)
             {
                 return;
             }
@@ -58,38 +59,36 @@
                 return;
             }
 
-            if (Disposable.IsPotentiallyAssignableTo(symbol.Type) && declarator.Initializer != null)
+            var isCreation = Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken);
+            if (isCreation == Result.Yes || isCreation == Result.Maybe)
             {
-                if (Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                if (variableDeclaration.Parent is UsingStatementSyntax ||
+                    variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
                 {
-                    if (variableDeclaration.Parent is UsingStatementSyntax ||
-                        variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
-                    {
-                        return;
-                    }
-
-                    if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    if (IsDisposedAfter(symbol, declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                    return;
                 }
+
+                if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                if (IsDisposedAfter(symbol, declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
+
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
             }
         }
 

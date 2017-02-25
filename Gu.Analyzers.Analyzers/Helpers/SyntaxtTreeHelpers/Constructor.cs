@@ -9,6 +9,37 @@
 
     internal static class Constructor
     {
+        internal static bool IsCalledByOther(IMethodSymbol ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (ctor == null)
+            {
+                return false;
+            }
+
+            foreach (var other in ctor.ContainingType.Constructors)
+            {
+                if (ReferenceEquals(ctor, other))
+                {
+                    continue;
+                }
+
+                foreach (var reference in other.DeclaringSyntaxReferences)
+                {
+                    var otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                    if (otherDeclaration.Initializer?.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword) == true)
+                    {
+                        var chained = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
+                        if (ctor.Equals(chained))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         internal static bool TryGetDefault(INamedTypeSymbol type, out IMethodSymbol result)
         {
             while (type != null && type != KnownSymbol.Object)
@@ -109,38 +140,6 @@
                     }
                 }
             }
-        }
-
-        public static bool IsCalledByOther(IMethodSymbol ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (ctor == null)
-            {
-                return false;
-            }
-
-            foreach (var other in ctor.ContainingType.Constructors)
-            {
-                if (ReferenceEquals(ctor, other))
-                {
-                    continue;
-                }
-
-                foreach (var reference in other.DeclaringSyntaxReferences)
-                {
-                    var otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                    if (otherDeclaration.Initializer?.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword) == true)
-                    {
-                        var chained = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
-                        if (ctor.Equals(chained))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-
-            return false;
         }
     }
 }

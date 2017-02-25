@@ -11,6 +11,7 @@ namespace Gu.Analyzers.Test.Helpers
     {
         internal class Indexer
         {
+            [Explicit("Saving this for later")]
             [Test]
             public void ArrayIndexer()
             {

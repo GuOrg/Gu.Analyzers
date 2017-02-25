@@ -51,7 +51,9 @@
             }
 
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (!Disposable.IsPotentiallyCreated(objectCreation, context.SemanticModel, context.CancellationToken))
+            var isCreation = Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken);
+            if (isCreation == Result.No ||
+                isCreation == Result.Unknown)
             {
                 return;
             }
@@ -70,19 +72,17 @@
             }
 
             var invocation = (InvocationExpressionSyntax)context.Node;
-            if (invocation == null)
+            var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
+            if (method == null ||
+                method.ReturnsVoid ||
+                !Disposable.IsPotentiallyAssignableTo(method.ReturnType))
             {
                 return;
             }
 
-            var symbol = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
-            if (symbol == null ||
-                symbol.ReturnsVoid)
-            {
-                return;
-            }
-
-            if (!Disposable.IsPotentiallyCreated(invocation, context.SemanticModel, context.CancellationToken))
+            var isCreation = Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken);
+            if (isCreation == Result.No ||
+                isCreation == Result.Unknown)
             {
                 return;
             }

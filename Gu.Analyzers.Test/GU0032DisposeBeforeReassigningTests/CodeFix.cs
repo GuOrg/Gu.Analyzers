@@ -224,7 +224,7 @@ public class Foo
     public Stream Stream
     {
         get { return this.stream; }
-        set { this.stream = value; }
+        private set { this.stream = value; }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -242,14 +242,14 @@ public class Foo
 
     public Foo()
     {
-        this.Stream?.Dispose();
+        this.stream?.Dispose();
         this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream
     {
         get { return this.stream; }
-        set { this.stream = value; }
+        private set { this.stream = value; }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);

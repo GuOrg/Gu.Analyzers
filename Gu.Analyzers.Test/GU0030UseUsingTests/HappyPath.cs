@@ -191,6 +191,7 @@ public class Disposal : IDisposable
         [TestCase("disposables.First(x => x != null);")]
         [TestCase("disposables.Where(x => x != null);")]
         [TestCase("disposables.Single();")]
+        [TestCase("Enumerable.Empty<IDisposable>();")]
         public async Task IgnoreLinq(string linq)
         {
             var testCode = @"

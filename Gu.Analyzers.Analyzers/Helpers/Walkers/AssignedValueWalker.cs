@@ -16,7 +16,7 @@
                 x.assignedValues.Clear();
                 x.checkedSymbols.Clear();
                 x.visitedMembers.Clear();
-                x.symbol = null;
+                x.currentSymbol = null;
                 x.context = null;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
@@ -26,7 +26,7 @@
         private readonly HashSet<ISymbol> checkedSymbols = new HashSet<ISymbol>();
         private readonly HashSet<SyntaxNode> visitedMembers = new HashSet<SyntaxNode>();
 
-        private ISymbol symbol;
+        private ISymbol currentSymbol;
         private SyntaxNode context;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -37,43 +37,6 @@
         }
 
         public IReadOnlyList<Assignment> AssignedValues => this.assignedValues;
-
-        public static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return CreateCore(property, null, semanticModel, cancellationToken);
-        }
-
-        public static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return CreateCore(field, null, semanticModel, cancellationToken);
-        }
-
-        public static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-            if (symbol is IFieldSymbol ||
-                symbol is IPropertySymbol ||
-                symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
-            {
-                return CreateCore(symbol, value, semanticModel, cancellationToken);
-            }
-
-            return Pool.GetOrCreate();
-        }
-
-        public static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (symbol is IFieldSymbol ||
-                symbol is IPropertySymbol ||
-                symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
-            {
-                return CreateCore(symbol, null, semanticModel, cancellationToken);
-            }
-
-            return Pool.GetOrCreate();
-        }
 
         public override void Visit(SyntaxNode node)
         {
@@ -90,9 +53,9 @@
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
             if (node.Initializer != null &&
-                SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
+                SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node.Initializer.Value));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
             }
 
             base.VisitVariableDeclarator(node);
@@ -101,9 +64,9 @@
         public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
         {
             if (node.Initializer != null &&
-                SymbolComparer.Equals(this.symbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
+                SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node.Initializer.Value));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
             }
 
             base.VisitPropertyDeclaration(node);
@@ -141,9 +104,9 @@
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             var left = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
-            if (SymbolComparer.Equals(this.symbol, left))
+            if (SymbolComparer.Equals(this.currentSymbol, left))
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node.Right));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Right));
             }
             else if (left is IPropertySymbol)
             {
@@ -156,9 +119,9 @@
         public override void VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (SymbolComparer.Equals(this.symbol, operand))
+            if (SymbolComparer.Equals(this.currentSymbol, operand))
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -171,9 +134,9 @@
         public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
             var operand = this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken);
-            if (SymbolComparer.Equals(this.symbol, operand))
+            if (SymbolComparer.Equals(this.currentSymbol, operand))
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node));
             }
             else if (operand is IPropertySymbol)
             {
@@ -185,14 +148,14 @@
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (this.symbol is IFieldSymbol ||
-                this.symbol is IPropertySymbol)
+            if (this.currentSymbol is IFieldSymbol ||
+                this.currentSymbol is IPropertySymbol)
             {
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
                 if (method != null)
                 {
-                    if (method.ContainingType.Is(this.symbol.ContainingType) ||
-                        this.symbol.ContainingType.Is(method.ContainingType))
+                    if (method.ContainingType.Is(this.currentSymbol.ContainingType) ||
+                        this.currentSymbol.ContainingType.Is(method.ContainingType))
                     {
                         foreach (var reference in method.DeclaringSyntaxReferences)
                         {
@@ -212,9 +175,9 @@
             {
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
                 if (invocation != null &&
-                    SymbolComparer.Equals(this.symbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
+                    SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
                 {
-                    this.assignedValues.Add(new Assignment(this.symbol, invocation));
+                    this.assignedValues.Add(new Assignment(this.currentSymbol, invocation));
                 }
             }
 
@@ -225,7 +188,7 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node.Expression));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Expression));
             }
 
             base.VisitArrowExpressionClause(node);
@@ -235,10 +198,61 @@
         {
             if (this.isSamplingRetunValues)
             {
-                this.assignedValues.Add(new Assignment(this.symbol, node.Expression));
+                this.assignedValues.Add(new Assignment(this.currentSymbol, node.Expression));
             }
 
             base.VisitReturnStatement(node);
+        }
+
+        internal static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return CreateCore(property, null, semanticModel, cancellationToken);
+        }
+
+        internal static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return CreateCore(field, null, semanticModel, cancellationToken);
+        }
+
+        internal static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+            if (symbol is IFieldSymbol ||
+                symbol is IPropertySymbol ||
+                symbol is ILocalSymbol ||
+                symbol is IParameterSymbol)
+            {
+                return CreateCore(symbol, value, semanticModel, cancellationToken);
+            }
+
+            return Pool.GetOrCreate();
+        }
+
+        internal static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (symbol is IFieldSymbol ||
+                symbol is IPropertySymbol ||
+                symbol is ILocalSymbol ||
+                symbol is IParameterSymbol)
+            {
+                return CreateCore(symbol, null, semanticModel, cancellationToken);
+            }
+
+            return Pool.GetOrCreate();
+        }
+
+        internal bool HasChecked(ISymbol symbol) => this.checkedSymbols.Contains(symbol);
+
+        internal void AppendAssignmentsFor(ExpressionSyntax assignedValue)
+        {
+            this.currentSymbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
+            this.Run();
+            var parameter = this.currentSymbol as IParameterSymbol;
+            if (parameter?.Name == "value")
+            {
+                this.currentSymbol = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
+                this.Run();
+            }
         }
 
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -249,7 +263,7 @@
             }
 
             var pooled = Pool.GetOrCreate();
-            pooled.Item.symbol = symbol;
+            pooled.Item.currentSymbol = symbol;
             pooled.Item.context = context;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
@@ -273,31 +287,19 @@
             return pooled;
         }
 
-        internal void AppendAssignmentsFor(ExpressionSyntax assignedValue)
-        {
-            this.symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
-            this.Run();
-            var parameter = this.symbol as IParameterSymbol;
-            if (parameter?.Name == "value")
-            {
-                this.symbol = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
-                this.Run();
-            }
-        }
-
         private void Run()
         {
-            if (this.symbol == null ||
-                !this.checkedSymbols.Add(this.symbol))
+            if (this.currentSymbol == null ||
+                !this.checkedSymbols.Add(this.currentSymbol))
             {
                 return;
             }
 
             this.visitedMembers.Clear();
-            if (this.symbol is IFieldSymbol ||
-                this.symbol is IPropertySymbol)
+            if (this.currentSymbol is IFieldSymbol ||
+                this.currentSymbol is IPropertySymbol)
             {
-                foreach (var reference in this.symbol.DeclaringSyntaxReferences)
+                foreach (var reference in this.currentSymbol.DeclaringSyntaxReferences)
                 {
                     var memberDeclaration = reference.GetSyntax(this.cancellationToken)?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                     AccessorDeclarationSyntax getter;
@@ -329,8 +331,8 @@
                     return;
                 }
 
-                if (this.symbol is IFieldSymbol ||
-                    this.symbol is IPropertySymbol)
+                if (this.currentSymbol is IFieldSymbol ||
+                    this.currentSymbol is IPropertySymbol)
                 {
                     var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(typeDeclaration, this.cancellationToken);
                     foreach (var typeCtor in type.Constructors)
@@ -393,8 +395,8 @@
                 return true;
             }
 
-            if (this.symbol is IParameterSymbol ||
-                this.symbol is ILocalSymbol)
+            if (this.currentSymbol is IParameterSymbol ||
+                this.currentSymbol is ILocalSymbol)
             {
                 return node.IsBeforeInScope(this.context);
             }

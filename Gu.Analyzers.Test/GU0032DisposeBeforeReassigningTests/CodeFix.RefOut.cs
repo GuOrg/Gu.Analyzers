@@ -9,7 +9,7 @@
         internal class RefAndOut : NestedCodeFixVerifier<CodeFix>
         {
             [Test]
-            public async Task AssigningFieldViaOutParameter()
+            public async Task AssigningFieldViaOutParameterInPublicMethod()
             {
                 var testCode = @"
 using System;

@@ -51,7 +51,9 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
+            var isAssignedWithCreated = Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken);
+            if (isAssignedWithCreated == Result.Yes ||
+                isAssignedWithCreated == Result.Maybe)
             {
                 if (!Disposable.IsMemberDisposed(field, context.SemanticModel, context.CancellationToken))
                 {

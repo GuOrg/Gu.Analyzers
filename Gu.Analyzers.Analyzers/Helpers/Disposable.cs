@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
@@ -72,7 +73,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        !IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -87,7 +88,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        !IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -95,81 +96,121 @@ namespace Gu.Analyzers
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        internal static bool IsPotentiallyCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (disposable == null ||
                 disposable.IsMissing ||
                 !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
             {
-                return false;
+                return Result.No;
             }
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(pooled, semanticModel, cancellationToken);
+                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
             }
         }
 
-        private static bool IsPotentiallyCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (field == null ||
+                !IsPotentiallyAssignableTo(field.Type))
+            {
+                return Result.No;
+            }
+
+            using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+            {
+                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
+            }
+        }
+
+        private static Result IsAssignedWithCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var result = Analyzers.Result.No;
             foreach (var assignment in pooled.Item.AssignedValues)
             {
-                var value = assignment.Value;
-                if (!IsAssignableTo(semanticModel.GetTypeInfoSafe(value, cancellationToken).Type))
+                switch (IsCreation(assignment.Value, semanticModel, cancellationToken))
                 {
-                    continue;
-                }
-
-                if (value is ObjectCreationExpressionSyntax)
-                {
-                    return true;
-                }
-
-                var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                if (symbol == KnownSymbol.PasswordBox.SecurePassword)
-                {
-                    return true;
+                    case Analyzers.Result.Unknown:
+                        result = Analyzers.Result.Unknown;
+                        break;
+                    case Analyzers.Result.Yes:
+                        return Result.Yes;
+                    case Analyzers.Result.No:
+                        break;
+                    case Analyzers.Result.Maybe:
+                        result = Analyzers.Result.Maybe;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
-            return false;
+            return result;
+        }
 
-            //switch (value.Source)
-            //{
-            //    case ValueSource.Created:
-            //    case ValueSource.PotentiallyCreated:
-            //        return true;
-            //    case ValueSource.External:
-            //        {
-            //            var symbol = semanticModel.GetSymbolSafe(value.Value, cancellationToken);
-            //            var property = symbol as IPropertySymbol;
-            //            if (property != null)
-            //            {
-            //                return property == KnownSymbol.PasswordBox.SecurePassword;
-            //            }
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        internal static Result IsCreation(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (disposable == null ||
+                disposable.IsMissing ||
+                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
+            {
+                return Result.No;
+            }
 
-            //            var method = symbol as IMethodSymbol;
-            //            if (method != null)
-            //            {
-            //                return !method.ContainingType.Is(KnownSymbol.IDictionary);
-            //            }
+            if (disposable is ObjectCreationExpressionSyntax)
+            {
+                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
+                {
+                    return Result.Yes;
+                }
 
-            //            return true;
-            //        }
+                return Result.No;
+            }
 
-            //    case ValueSource.Calculated:
-            //        {
-            //            var symbol = semanticModel.GetSymbolSafe(value.Value, cancellationToken);
-            //            if (symbol == null)
-            //            {
-            //                return true;
-            //            }
+            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
+            var property = symbol as IPropertySymbol;
+            if (property != null)
+            {
+                if (property.DeclaringSyntaxReferences.Length == 0)
+                {
+                    return property == KnownSymbol.PasswordBox.SecurePassword 
+                        ? Result.Yes
+                        : Result.No;
+                }
 
-            //            return symbol.IsAbstract || symbol.IsVirtual;
-            //        }
-            //}
+                foreach (var reference in property.DeclaringSyntaxReferences)
+                {
+                    var syntax = reference.GetSyntax(cancellationToken);
+                }
+            }
 
-            //return false;
+            var method = symbol as IMethodSymbol;
+            if (method != null)
+            {
+                if (method.DeclaringSyntaxReferences.Length == 0)
+                {
+                    if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
+                        method.ContainingType == KnownSymbol.Enumerable ||
+                        method.ContainingType.Name.StartsWith("ConditionalWeakTable"))
+                    {
+                        return Result.No;
+                    }
+
+                    return IsAssignableTo(method.ReturnType) ? Result.Maybe : Result.No;
+                }
+
+                foreach (var reference in method.DeclaringSyntaxReferences)
+                {
+                    var syntax = reference.GetSyntax(cancellationToken);
+                }
+            }
+
+            return Result.No;
         }
 
         internal static bool IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -183,7 +224,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        !IsPotentiallyCachedOrInjected(sources) &&
                        !IsCachedInMember(sources, semanticModel, cancellationToken);
             }
@@ -199,7 +240,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -214,7 +255,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -233,7 +274,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
             {
-                return !IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return !IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -251,7 +292,7 @@ namespace Gu.Analyzers
 
             using (var sources = VauleWithSource.GetRecursiveSources(disposeCall.Expression, semanticModel, cancellationToken))
             {
-                return !IsPotentiallyCreated(sources, semanticModel, cancellationToken) &&
+                return !IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
                        IsPotentiallyCachedOrInjected(sources);
             }
         }
@@ -386,11 +427,11 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsPotentiallyCreated(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedWithCreated(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             foreach (var vauleWithSource in sources.Item)
             {
-                if (IsPotentiallyCreated(vauleWithSource, semanticModel, cancellationToken))
+                if (IsAssignedWithCreated(vauleWithSource, semanticModel, cancellationToken))
                 {
                     return true;
                 }
@@ -399,7 +440,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsPotentiallyCreated(VauleWithSource vauleWithSource, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedWithCreated(VauleWithSource vauleWithSource, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (!IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
             {
