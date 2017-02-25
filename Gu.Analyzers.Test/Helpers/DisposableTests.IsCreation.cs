@@ -132,6 +132,7 @@ namespace RoslynSandBox
             [TestCase("CreateDisposableExpressionBodyReturnTypeObject()", Result.Yes)]
             [TestCase("CreateDisposableInIf(true)", Result.Yes)]
             [TestCase("CreateDisposableInElse(true)", Result.Yes)]
+            [TestCase("ReturningLocal()", Result.Yes)]
             public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
             {
                 var testCode = @"
@@ -197,6 +198,12 @@ namespace RoslynSandBox
             }
 
             return null;
+        }
+
+        public static Stream ReturningLocal()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return stream;
         }
     }
 }";

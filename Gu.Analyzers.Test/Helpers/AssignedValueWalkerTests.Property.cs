@@ -54,7 +54,7 @@ public sealed class Foo
                 if (assigned != null)
                 {
                     var assignedValue = pooled.Item.Values.Single(x => x.Value.ToFullString().Contains(assigned));
-                    pooled.Item.AppendAssignmentsFor(assignedValue.Value);
+                    pooled.Item.AppendAssignedValuesFor(assignedValue.Value);
                     var actual2 = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                     Assert.AreEqual(expected2, actual2);
                 }
@@ -150,7 +150,7 @@ public sealed class Foo
                 if (assigned != null)
                 {
                     var assignedValue = pooled.Item.Values.Single(x => x.Value.ToFullString().Contains(assigned));
-                    pooled.Item.AppendAssignmentsFor(assignedValue.Value);
+                    pooled.Item.AppendAssignedValuesFor(assignedValue.Value);
                     var actual2 = string.Join(", ", pooled.Item.Values.Select(x => x.Value));
                     Assert.AreEqual(expected2, actual2);
                 }

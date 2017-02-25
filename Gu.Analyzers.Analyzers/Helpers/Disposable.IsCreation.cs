@@ -186,7 +186,8 @@ namespace Gu.Analyzers
                 }
 
                 var value = assignment.Value;
-                var parameter = semanticModel.GetSymbolSafe(assignment.Value, cancellationToken) as IParameterSymbol;
+                var returnedSymbol = semanticModel.GetSymbolSafe(assignment.Value, cancellationToken);
+                var parameter = returnedSymbol as IParameterSymbol;
                 if (parameter != null)
                 {
                     if ((invocation as InvocationExpressionSyntax)?.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value) != true)
@@ -194,6 +195,29 @@ namespace Gu.Analyzers
                         result = Result.Unknown;
                         continue;
                     }
+                }
+
+                var local = returnedSymbol as ILocalSymbol;
+                if (local != null)
+                {
+                    pooled.Item.AppendAssignedValuesFor(value);
+                    switch (IsReturnValueCreation(invocation, local, pooled, semanticModel, cancellationToken))
+                    {
+                        case Analyzers.Result.Unknown:
+                            result = Analyzers.Result.Unknown;
+                            break;
+                        case Analyzers.Result.Yes:
+                            return Result.Yes;
+                        case Analyzers.Result.No:
+                            break;
+                        case Analyzers.Result.Maybe:
+                            result = Analyzers.Result.Maybe;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    continue;
                 }
 
                 switch (IsCreation(value, semanticModel, cancellationToken, pooled))

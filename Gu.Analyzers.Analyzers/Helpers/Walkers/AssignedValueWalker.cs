@@ -254,7 +254,7 @@
 
         internal bool HasChecked(ISymbol symbol) => this.checkedSymbols.Contains(symbol);
 
-        internal void AppendAssignmentsFor(ExpressionSyntax assignedValue)
+        internal void AppendAssignedValuesFor(ExpressionSyntax assignedValue)
         {
             this.currentSymbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
             this.Run();
