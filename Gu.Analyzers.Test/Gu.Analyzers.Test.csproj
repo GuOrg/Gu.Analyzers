@@ -82,6 +82,7 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.AddReturnValues.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Constructors.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Indexer.cs" />

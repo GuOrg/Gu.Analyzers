@@ -122,7 +122,7 @@ namespace Gu.Analyzers
 
                 if (pooled == null)
                 {
-                    using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
+                    using (pooled = AssignedValueWalker.CreateEmpty(candidate, semanticModel, cancellationToken))
                     {
                         return pooled.Item.AddReturnValues(property, candidate)
                                    ? IsReturnValueCreation(candidate, property.GetMethod, pooled, semanticModel, cancellationToken)
@@ -153,7 +153,7 @@ namespace Gu.Analyzers
 
                 if (pooled == null)
                 {
-                    using (pooled = AssignedValueWalker.CreateEmpty(semanticModel, cancellationToken))
+                    using (pooled = AssignedValueWalker.CreateEmpty(candidate, semanticModel, cancellationToken))
                     {
                         return pooled.Item.AddReturnValues(method, candidate)
                                    ? IsReturnValueCreation(candidate, method, pooled, semanticModel, cancellationToken)
@@ -171,73 +171,90 @@ namespace Gu.Analyzers
 
         private static Result IsReturnValueCreation(ExpressionSyntax invocation, ISymbol symbol, Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (symbol == null)
-            {
-                return Result.No;
-            }
+            throw new NotImplementedException();
+            //if (symbol == null)
+            //{
+            //    return Result.No;
+            //}
 
-            var result = Analyzers.Result.No;
-            for (var i = 0; i < pooled.Item.Values.Count; i++)
-            {
-                var assignment = pooled.Item.Values[i];
-                if (!ReferenceEquals(assignment.Symbol, symbol))
-                {
-                    continue;
-                }
+            //var result = Analyzers.Result.No;
+            //for (var i = 0; i < pooled.Item.Values.Count; i++)
+            //{
+            //    var assignment = pooled.Item.Values[i];
+            //    if (!ReferenceEquals(assignment.Symbol, symbol))
+            //    {
+            //        continue;
+            //    }
 
-                var value = assignment.Value;
-                var returnedSymbol = semanticModel.GetSymbolSafe(assignment.Value, cancellationToken);
-                var parameter = returnedSymbol as IParameterSymbol;
-                if (parameter != null)
-                {
-                    if ((invocation as InvocationExpressionSyntax)?.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value) != true)
-                    {
-                        result = Result.Unknown;
-                        continue;
-                    }
-                }
+            //    var value = assignment.Value;
+            //    var returnedSymbol = semanticModel.GetSymbolSafe(assignment.Value, cancellationToken);
+            //    var parameter = returnedSymbol as IParameterSymbol;
+            //    if (parameter != null)
+            //    {
+            //        ExpressionSyntax arg = null;
+            //        if ((invocation as InvocationExpressionSyntax)?.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out arg) == true)
+            //        {
+            //            switch (IsCreation(arg, semanticModel, cancellationToken, pooled))
+            //            {
+            //                case Analyzers.Result.Unknown:
+            //                    result = Analyzers.Result.Unknown;
+            //                    break;
+            //                case Analyzers.Result.Yes:
+            //                    return Result.Yes;
+            //                case Analyzers.Result.No:
+            //                    break;
+            //                case Analyzers.Result.Maybe:
+            //                    result = Analyzers.Result.Maybe;
+            //                    break;
+            //                default:
+            //                    throw new ArgumentOutOfRangeException();
+            //            }
+            //        }
+            //    }
 
-                var local = returnedSymbol as ILocalSymbol;
-                if (local != null)
-                {
-                    pooled.Item.AppendAssignedValuesFor(value);
-                    switch (IsReturnValueCreation(invocation, local, pooled, semanticModel, cancellationToken))
-                    {
-                        case Analyzers.Result.Unknown:
-                            result = Analyzers.Result.Unknown;
-                            break;
-                        case Analyzers.Result.Yes:
-                            return Result.Yes;
-                        case Analyzers.Result.No:
-                            break;
-                        case Analyzers.Result.Maybe:
-                            result = Analyzers.Result.Maybe;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
+            //    var local = returnedSymbol as ILocalSymbol;
+            //    if (local != null || parameter != null)
+            //    {
+            //        if (pooled.Item.AddAssignedValuesFor(value))
+            //        {
+            //            switch (IsReturnValueCreation(value, (ISymbol)local ?? parameter, pooled, semanticModel, cancellationToken))
+            //            {
+            //                case Analyzers.Result.Unknown:
+            //                    result = Analyzers.Result.Unknown;
+            //                    break;
+            //                case Analyzers.Result.Yes:
+            //                    return Result.Yes;
+            //                case Analyzers.Result.No:
+            //                    break;
+            //                case Analyzers.Result.Maybe:
+            //                    result = Analyzers.Result.Maybe;
+            //                    break;
+            //                default:
+            //                    throw new ArgumentOutOfRangeException();
+            //            }
+            //        }
 
-                    continue;
-                }
+            //        continue;
+            //    }
 
-                switch (IsCreation(value, semanticModel, cancellationToken, pooled))
-                {
-                    case Analyzers.Result.Unknown:
-                        result = Analyzers.Result.Unknown;
-                        break;
-                    case Analyzers.Result.Yes:
-                        return Result.Yes;
-                    case Analyzers.Result.No:
-                        break;
-                    case Analyzers.Result.Maybe:
-                        result = Analyzers.Result.Maybe;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
+            //    switch (IsCreation(value, semanticModel, cancellationToken, pooled))
+            //    {
+            //        case Analyzers.Result.Unknown:
+            //            result = Analyzers.Result.Unknown;
+            //            break;
+            //        case Analyzers.Result.Yes:
+            //            return Result.Yes;
+            //        case Analyzers.Result.No:
+            //            break;
+            //        case Analyzers.Result.Maybe:
+            //            result = Analyzers.Result.Maybe;
+            //            break;
+            //        default:
+            //            throw new ArgumentOutOfRangeException();
+            //    }
+            //}
 
-            return result;
+            //return result;
         }
 
         private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -276,9 +293,8 @@ namespace Gu.Analyzers
         private static Result IsCreation(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var result = Analyzers.Result.No;
-            for (var i = 0; i < pooled.Item.Values.Count; i++)
+            foreach (var assignment in pooled.Item)
             {
-                var assignment = pooled.Item.Values[i];
                 switch (IsCreation(assignment.Value, semanticModel, cancellationToken, pooled))
                 {
                     case Analyzers.Result.Unknown:

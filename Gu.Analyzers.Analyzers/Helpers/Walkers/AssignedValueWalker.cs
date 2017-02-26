@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
 
@@ -7,16 +9,14 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : CSharpSyntaxWalker
+    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IEnumerable<Assignment>
     {
         private static readonly Pool<AssignedValueWalker> Pool = new Pool<AssignedValueWalker>(
             () => new AssignedValueWalker(),
             x =>
             {
                 x.values.Clear();
-                x.checkedSymbols.Clear();
-                x.visitedMembers.Clear();
-                x.visitedCalls.Clear();
+                x.visitedLocations.Clear();
                 x.currentSymbol = null;
                 x.context = null;
                 x.semanticModel = null;
@@ -25,8 +25,7 @@
 
         private readonly List<Assignment> values = new List<Assignment>();
         private readonly HashSet<ISymbol> checkedSymbols = new HashSet<ISymbol>();
-        private readonly HashSet<SyntaxNode> visitedMembers = new HashSet<SyntaxNode>();
-        private readonly HashSet<SyntaxNode> visitedCalls = new HashSet<SyntaxNode>();
+        private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
 
         private ISymbol currentSymbol;
         private SyntaxNode context;
@@ -38,13 +37,13 @@
         {
         }
 
-        public IReadOnlyList<Assignment> Values => this.values;
+        public IEnumerator<Assignment> GetEnumerator() => new AssignmentEnumerator(this);
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.visitedMembers.AddIfNotNull(node as MemberDeclarationSyntax) == false ||
-                this.visitedMembers.AddIfNotNull(node as AccessorDeclarationSyntax) == false ||
-                !this.IsBeforeInScope(node))
+            if (!this.IsBeforeInScope(node))
             {
                 return;
             }
@@ -76,6 +75,11 @@
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
+            if (!this.visitedLocations.Add(node))
+            {
+                return;
+            }
+
             if (node.Initializer != null)
             {
                 var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
@@ -153,15 +157,18 @@
             if (this.currentSymbol is IFieldSymbol ||
                 this.currentSymbol is IPropertySymbol)
             {
-                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (method != null)
+                if (this.visitedLocations.Add(node))
                 {
-                    if (method.ContainingType.Is(this.currentSymbol.ContainingType) ||
-                        this.currentSymbol.ContainingType.Is(method.ContainingType))
+                    var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                    if (method != null)
                     {
-                        foreach (var reference in method.DeclaringSyntaxReferences)
+                        if (method.ContainingType.Is(this.currentSymbol.ContainingType) ||
+                            this.currentSymbol.ContainingType.Is(method.ContainingType))
                         {
-                            this.Visit(reference.GetSyntax(this.cancellationToken));
+                            foreach (var reference in method.DeclaringSyntaxReferences)
+                            {
+                                this.Visit(reference.GetSyntax(this.cancellationToken));
+                            }
                         }
                     }
                 }
@@ -222,7 +229,8 @@
             if (symbol is IFieldSymbol ||
                 symbol is IPropertySymbol ||
                 symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
+                symbol is IParameterSymbol ||
+                symbol is IMethodSymbol)
             {
                 return CreateCore(symbol, value, semanticModel, cancellationToken);
             }
@@ -243,20 +251,26 @@
             return Pool.GetOrCreate();
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled CreateEmpty(SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<AssignedValueWalker>.Pooled CreateEmpty(SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
-            pooled.Item.context = semanticModel.SyntaxTree.GetRoot(cancellationToken);
+            pooled.Item.context = context;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             return pooled;
         }
 
-        internal bool HasChecked(ISymbol symbol) => this.checkedSymbols.Contains(symbol);
-
-        internal void AppendAssignedValuesFor(ExpressionSyntax assignedValue)
+        internal bool AddAssignedValuesFor(ExpressionSyntax assignedValue)
         {
-            this.currentSymbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
+            var symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
+            if (symbol == null ||
+                !this.visitedLocations.Add(assignedValue))
+            {
+                return false;
+            }
+
+            this.currentSymbol = symbol;
+            var before = this.values.Count;
             this.Run();
             var parameter = this.currentSymbol as IParameterSymbol;
             if (parameter?.Name == "value")
@@ -264,6 +278,8 @@
                 this.currentSymbol = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
                 this.Run();
             }
+
+            return before != this.values.Count;
         }
 
         internal bool AddReturnValues(IPropertySymbol property, SyntaxNode call)
@@ -271,7 +287,7 @@
             if (property == null ||
                 property.DeclaringSyntaxReferences.Length == 0 ||
                 property.GetMethod == null ||
-                !this.visitedCalls.Add(call))
+                !this.visitedLocations.Add(call))
             {
                 return false;
             }
@@ -310,7 +326,7 @@
         {
             if (method == null ||
                 method.DeclaringSyntaxReferences.Length == 0 ||
-                !this.visitedCalls.Add(call))
+                !this.visitedLocations.Add(call))
             {
                 return false;
             }
@@ -381,7 +397,6 @@
                 return;
             }
 
-            this.visitedMembers.Clear();
             if (this.currentSymbol is IFieldSymbol ||
                 this.currentSymbol is IPropertySymbol)
             {
@@ -488,6 +503,41 @@
             }
 
             return node.IsBeforeInScope(this.context);
+        }
+
+        private class AssignmentEnumerator : IEnumerator<Assignment>
+        {
+            private readonly AssignedValueWalker walker;
+            private int index = -1;
+
+            public AssignmentEnumerator(AssignedValueWalker walker)
+            {
+                this.walker = walker;
+            }
+
+            public Assignment Current => this.walker.values[this.index];
+
+            object IEnumerator.Current => this.Current;
+
+            public bool MoveNext()
+            {
+                if (this.index >= this.walker.values.Count - 1)
+                {
+                    return false;
+                }
+
+                this.index++;
+                return true;
+            }
+
+            public void Reset()
+            {
+                this.index = -1;
+            }
+
+            void IDisposable.Dispose()
+            {
+            }
         }
     }
 }
