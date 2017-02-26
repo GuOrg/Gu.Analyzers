@@ -109,7 +109,8 @@
 
         internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
-            if (invocation?.ArgumentList == null)
+            if (invocation?.ArgumentList == null ||
+                parameter == null)
             {
                 value = null;
                 return false;

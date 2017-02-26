@@ -107,7 +107,7 @@
 
             var block = variable.FirstAncestorOrSelf<BlockSyntax>();
             ExpressionSyntax returnValue = null;
-            if (block?.TryGetReturnExpression(out returnValue) == true)
+            if (block?.TryGetReturnExpression(semanticModel, cancellationToken, out returnValue) == true)
             {
                 var returned = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
                 if (symbol.Equals(returned))

@@ -93,23 +93,6 @@ namespace Gu.Analyzers
             }
         }
 
-        internal static bool IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources) &&
-                       !IsCachedInMember(sources, semanticModel, cancellationToken);
-            }
-        }
-
         internal static bool IsAssignedWithCreatedAndInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (field == null ||

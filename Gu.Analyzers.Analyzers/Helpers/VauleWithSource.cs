@@ -403,9 +403,9 @@ namespace Gu.Analyzers
                     }
                     else
                     {
-                        using (var pooledReturns = ReturnExpressionsWalker.Create(methodDeclaration.Body))
+                        using (var pooledReturns = ReturnValueWalker.Create(methodDeclaration.Body, true, semanticModel, cancellationToken))
                         {
-                            foreach (var returnValue in pooledReturns.Item.ReturnValues)
+                            foreach (var returnValue in pooledReturns.Item.Values)
                             {
                                 AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                             }
@@ -475,9 +475,9 @@ namespace Gu.Analyzers
                                 else
                                 {
                                     result.Add(new VauleWithSource(value, ValueSource.Calculated));
-                                    using (var pooledReturns = ReturnExpressionsWalker.Create(getter.Body))
+                                    using (var pooledReturns = ReturnValueWalker.Create(getter.Body, true, semanticModel, cancellationToken))
                                     {
-                                        foreach (var returnValue in pooledReturns.Item.ReturnValues)
+                                        foreach (var returnValue in pooledReturns.Item.Values)
                                         {
                                             AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                                         }

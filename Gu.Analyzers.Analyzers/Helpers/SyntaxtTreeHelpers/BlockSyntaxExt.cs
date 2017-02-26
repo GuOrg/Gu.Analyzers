@@ -6,18 +6,9 @@ namespace Gu.Analyzers
 
     internal static class BlockSyntaxExt
     {
-        internal static bool TryGetReturnExpression(this BlockSyntax body, out ExpressionSyntax returnValue)
+        internal static bool TryGetReturnExpression(this BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
-            using (var pooled = ReturnExpressionsWalker.Create(body))
-            {
-                if (pooled.Item.ReturnValues.Count > 1)
-                {
-                    returnValue = null;
-                    return false;
-                }
-
-                return pooled.Item.ReturnValues.TryGetSingle(out returnValue);
-            }
+            return ReturnValueWalker.TrygetSingle(body, semanticModel, cancellationToken, out returnValue);
         }
 
         internal static bool TryGetAssignment(this BlockSyntax body, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax result)

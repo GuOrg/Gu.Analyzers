@@ -122,7 +122,7 @@
     <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
     <Compile Include="Helpers\Walkers\ObjectCreationWalker.cs" />
     <Compile Include="Helpers\Walkers\PropertyImplementationWalker.cs" />
-    <Compile Include="Helpers\Walkers\ReturnExpressionsWalker.cs" />
+    <Compile Include="Helpers\Walkers\ReturnValueWalker.cs" />
     <Compile Include="Helpers\Walkers\InvocationWalker.cs" />
     <Compile Include="Helpers\Pooled\Pool.cs" />
     <Compile Include="Helpers\Pooled\SetPool.cs" />

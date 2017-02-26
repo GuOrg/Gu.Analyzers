@@ -38,6 +38,13 @@ namespace Gu.Analyzers
         internal static bool TryGetMatchingArgumentValue(this ArgumentListSyntax arguments, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
             value = null;
+            if (arguments == null ||
+                arguments.Arguments.Count == 0 ||
+                parameter == null)
+            {
+                return false;
+            }
+
             ArgumentSyntax argument;
             if (TryGetMatchingArgument(arguments, parameter, out argument))
             {

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.Helpers
+namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Linq;
     using System.Threading;

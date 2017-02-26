@@ -1,10 +1,8 @@
-namespace Gu.Analyzers.Test.Helpers
+namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Linq;
     using System.Threading;
-
     using Microsoft.CodeAnalysis.CSharp;
-
     using NUnit.Framework;
 
     internal partial class AssignedValueWalkerTests

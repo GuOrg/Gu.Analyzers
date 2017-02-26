@@ -116,12 +116,12 @@
                 MethodDeclarationSyntax declaration;
                 if (method.TryGetSingleDeclaration(cancellationToken, out declaration))
                 {
-                    using (var pooled = ReturnExpressionsWalker.Create(declaration))
+                    using (var pooled = ReturnValueWalker.Create(declaration, true, semanticModel, cancellationToken))
                     {
                         if (method.IsExtensionMethod)
                         {
                             var identifier = declaration.ParameterList.Parameters[0].Identifier;
-                            foreach (var returnValue in pooled.Item.ReturnValues)
+                            foreach (var returnValue in pooled.Item.Values)
                             {
                                 if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
                                 {
@@ -132,7 +132,7 @@
                             return true;
                         }
 
-                        foreach (var returnValue in pooled.Item.ReturnValues)
+                        foreach (var returnValue in pooled.Item.Values)
                         {
                             if (!returnValue.IsKind(SyntaxKind.ThisExpression))
                             {
