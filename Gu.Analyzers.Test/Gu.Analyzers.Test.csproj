@@ -82,12 +82,13 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
-    <Compile Include="Helpers\AssignedValueWalkerTests.AddReturnValues.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.ReturnValues.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Constructors.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Indexer.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Local.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests.Property.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests.RefAndOut.cs" />
     <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />

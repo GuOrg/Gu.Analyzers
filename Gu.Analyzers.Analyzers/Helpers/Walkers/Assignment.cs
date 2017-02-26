@@ -16,5 +16,10 @@ namespace Gu.Analyzers
             this.Symbol = symbol;
             this.Value = value;
         }
+
+        public Assignment WithValue(ExpressionSyntax value)
+        {
+            return new Assignment(this.Symbol, value);
+        }
     }
 }

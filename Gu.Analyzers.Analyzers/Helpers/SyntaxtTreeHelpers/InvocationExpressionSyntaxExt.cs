@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -103,6 +105,17 @@
             }
 
             return false;
+        }
+
+        internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
+        {
+            if (invocation?.ArgumentList == null)
+            {
+                value = null;
+                return false;
+            }
+
+            return invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value);
         }
     }
 }

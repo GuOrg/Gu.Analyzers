@@ -2,8 +2,6 @@
 {
     using System.Threading.Tasks;
 
-    using Microsoft.CodeAnalysis.CSharp;
-
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<GU0034ReturntypeShouldIndicateIDisposable>

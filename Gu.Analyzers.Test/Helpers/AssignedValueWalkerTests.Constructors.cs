@@ -112,15 +112,15 @@ internal class Foo<T>
             }
 
             [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, initArg, 3, initArg, 5, arg")]
-            [TestCase("var temp3 = this.value;", "1, initArg, 3, initArg, 5, arg")]
-            [TestCase("var temp4 = this.value;", "1, initArg")]
-            [TestCase("var temp5 = this.value;", "1, initArg, 3")]
-            [TestCase("var temp6 = this.value;", "1, initArg, 3, initArg")]
-            [TestCase("var temp7 = this.value;", "1, initArg, 3, initArg, 5, arg")]
-            [TestCase("var temp8 = this.value;", "1, initArg, 3, initArg, 5, arg")]
-            [TestCase("var temp9 = this.value;", "1, initArg, 3, initArg, 5, arg")]
-            public void FieldCtorCallingInitializeMethod(string code, string expected)
+            [TestCase("var temp2 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp3 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp4 = this.value;", "1, 2")]
+            [TestCase("var temp5 = this.value;", "1, 2, 3")]
+            [TestCase("var temp6 = this.value;", "1, 2, 3, 4")]
+            [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp9 = this.value;", "1, 2, 3, 4, 5, arg")]
+            public void FieldCtorCallingPrivateInitializeMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -164,16 +164,70 @@ internal class Foo
                 }
             }
 
+            [TestCase("var temp1 = this.value;", "1")]
+            [TestCase("var temp2 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
+            [TestCase("var temp3 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
+            [TestCase("var temp4 = this.value;", "1, 2")]
+            [TestCase("var temp5 = this.value;", "1, 2, 3")]
+            [TestCase("var temp6 = this.value;", "1, 2, 3, 4")]
+            [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
+            [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
+            [TestCase("var temp9 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
+            public void FieldCtorCallingProtectedInitializeMethod(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    public int value = 1;
+
+    internal Foo()
+    {
+        var temp1 = this.value;
+        this.Initialize(2);
+        var temp4 = this.value;
+        this.value = 3;
+        var temp5 = this.value;
+        this.Initialize(4);
+        var temp6 = this.value;
+    }
+
+    internal void Bar(int arg)
+    {
+        var temp7 = this.value;
+        this.value = 5;
+        var temp8 = this.value;
+        this.value = arg;
+        var temp9 = this.value;
+    }
+
+    protected void Initialize(int initArg)
+    {
+        var temp2 = this.value;
+        this.value = initArg;
+        var temp3 = this.value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item.Select(x => x.Value));
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
             [TestCase("var temp1 = this.Value;", "1")]
             [TestCase("var temp2 = this.Value;", "1, 2")]
-            [TestCase("var temp3 = this.Value;", "1, 2")]
-            [TestCase("var temp4 = this.Value;", "1, 2, 3")]
-            [TestCase("var temp5 = this.Value;", "1, 2, 3, 4")]
-            [TestCase("var temp6 = this.Value;", "1, 2, 3, 4, 5, arg")]
-            [TestCase("var temp7 = this.Value;", "1, 2, 3, 4, 5, arg")]
-            [TestCase("var temp8 = this.Value;", "1, 2, 3, 4, 5, arg")]
-            [TestCase("var temp9 = this.Value;", "1, 2, 3, 4, 5, arg")]
-            [TestCase("var temp10 = this.Value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp3 = this.Value;", "1, 2, 8, 3")]
+            [TestCase("var temp4 = this.Value;", "1, 2, 8, 3")]
+            [TestCase("var temp5 = this.Value;", "1, 2, 8, 3, 4")]
+            [TestCase("var temp6 = this.Value;", "1, 2, 8, 3, 4, 5")]
+            [TestCase("var temp7 = this.Value;", "1, 2, 8, 3, 4, 5, 8, 6")]
+            [TestCase("var temp8 = this.Value;", "1, 2, 8, 3, 4, 5, 8, 6, 8, 7")]
+            [TestCase("var temp9 = this.Value;", "1, 2, 8, 3, 4, 5, 8, 6, 8, 7, 8, arg")]
+            [TestCase("var temp10 = this.Value;", "1, 2, 8, 3, 4, 5, 8, 6, 8, 7, 8, arg")]
+            [TestCase("var temp11 = this.Value;", "1, 2, 8, 3, 4, 5, 8, 6, 8, 7, 8, arg")]
             public void AutoPropertyChainedCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -184,31 +238,33 @@ internal class Foo
         var temp1 = this.Value;
         this.Value = 2;
         var temp2 = this.Value;
+        this.Bar(3);
+        var temp3 = this.Value;
     }
 
     internal Foo(string text)
         : this()
     {
-        var temp3 = this.Value;
-        this.Value = 3;
         var temp4 = this.Value;
         this.Value = 4;
         var temp5 = this.Value;
-        this.Bar(5);
+        this.Value = 5;
         var temp6 = this.Value;
         this.Bar(6);
         var temp7 = this.Value;
+        this.Bar(7);
+        var temp8 = this.Value;
     }
 
     public int Value { get; set; } = 1;
 
     internal void Bar(int arg)
     {
-        var temp8 = this.Value;
-        this.Value = 7;
         var temp9 = this.Value;
-        this.Value = arg;
+        this.Value = 8;
         var temp10 = this.Value;
+        this.Value = arg;
+        var temp11 = this.Value;
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -248,92 +304,6 @@ internal class Foo
     {
         var temp5 = this.value;
         var temp6 = this.temp1;
-    }
-}");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code).Value;
-                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", pooled.Item.Select(x => x.Value));
-                    Assert.AreEqual(expected, actual);
-                }
-            }
-
-            [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2, 3")]
-            [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public void FieldAssignedWithOutParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
-{
-    internal class Foo
-    {
-        private int value = 1;
-
-        public Foo()
-        {
-            var temp1 = this.value;
-            this.Assign(out this.value, 2);
-            var temp2 = this.value;
-        }
-
-        internal void Bar()
-        {
-            var temp3 = this.value;
-            this.Assign(out this.value, 3);
-            var temp4 = this.value;
-        }
-
-        private void Assign(out int outValue, int arg)
-        {
-            outValue = arg;
-        }
-    }
-}");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code).Value;
-                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", pooled.Item.Select(x => x.Value));
-                    Assert.AreEqual(expected, actual);
-                }
-            }
-
-            [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, this.Assign(ref this.value)")]
-            [TestCase("var temp3 = this.value;", "1, this.Assign(ref this.value), this.Assign(ref this.value)")]
-            [TestCase("var temp4 = this.value;", "1, this.Assign(ref this.value), this.Assign(ref this.value)")]
-            public void FieldAssignedWithRefParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
-{
-    internal class Foo
-    {
-        private int value = 1;
-
-        public Foo()
-        {
-            var temp1 = this.value;
-            this.Assign(ref this.value);
-            var temp2 = this.value;
-        }
-
-        internal void Bar()
-        {
-            var temp3 = this.value;
-            this.Assign(ref this.value);
-            var temp4 = this.value;
-        }
-
-        private void Assign(ref int refValue)
-        {
-            refValue = 2;
-        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);

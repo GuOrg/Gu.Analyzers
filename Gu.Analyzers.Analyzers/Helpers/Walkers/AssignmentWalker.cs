@@ -1,6 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Generic;
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -33,6 +35,29 @@
         {
             this.assignments.Add(node);
             base.VisitAssignmentExpression(node);
+        }
+
+        internal static bool Assigns(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (symbol == null ||
+                scope == null)
+            {
+                return false;
+            }
+
+            using (var pooledAssignments = Create(scope))
+            {
+                foreach (var assignment in pooledAssignments.Item.Assignments)
+                {
+                    var assignedSymbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                    if (SymbolComparer.Equals(symbol, assignedSymbol))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

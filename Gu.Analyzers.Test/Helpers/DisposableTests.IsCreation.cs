@@ -132,7 +132,7 @@ namespace RoslynSandBox
             [TestCase("CreateDisposableExpressionBodyReturnTypeObject()", Result.Yes)]
             [TestCase("CreateDisposableInIf(true)", Result.Yes)]
             [TestCase("CreateDisposableInElse(true)", Result.Yes)]
-            [TestCase("ReturningLocal()", Result.Yes)]
+            [TestCase("ReturningLocal()", Result.Maybe)]
             public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
             {
                 var testCode = @"
@@ -279,7 +279,7 @@ namespace RoslynSandBox
             [TestCase("await Task.Run(() => new Disposable())", Result.Yes)]
             [TestCase("await Task.FromResult(new Disposable())", Result.Yes)]
             [TestCase("await CreateDisposableAsync()", Result.Yes)]
-            public void AwaitAsyncStuff(string code, Result expected)
+            public void AsyncAwait(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandBox
