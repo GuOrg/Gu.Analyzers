@@ -68,6 +68,57 @@ internal class Foo
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
+            public void FieldChainedPrivateCtor(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    public int value = 1;
+
+    internal Foo()
+        : this(2)
+    {
+        var temp3 = this.value;
+        this.value = 3;
+        var temp4 = this.value;
+        this.value = 4;
+        var temp5 = this.value;
+    }
+
+    private Foo(int ctorArg)
+    {
+        var temp1 = this.value;
+        this.value = ctorArg;
+        var temp2 = this.value;
+    }
+
+    internal void Bar(int arg)
+    {
+        var temp6 = this.value;
+        this.value = 5;
+        var temp7 = this.value;
+        this.value = arg;
+        var temp8 = this.value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "1")]
+            [TestCase("var temp2 = this.value;", "1, 2")]
+            [TestCase("var temp3 = this.value;", "1, 2")]
+            [TestCase("var temp4 = this.value;", "1, 2, 3")]
+            [TestCase("var temp5 = this.value;", "1, 2, 3, 4")]
+            [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
+            [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
             public void FieldChainedCtorGenericClass(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
