@@ -69,6 +69,7 @@
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />
+    <Compile Include="Helpers\ListExt.cs" />
     <Compile Include="Helpers\Pooled\SetExt.cs" />
     <Compile Include="Helpers\Property.cs" />
     <Compile Include="Helpers\Result.cs" />

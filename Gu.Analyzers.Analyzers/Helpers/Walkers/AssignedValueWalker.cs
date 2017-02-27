@@ -9,7 +9,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IEnumerable<Assignment>
+    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IReadOnlyList<Assignment>
     {
         private static readonly Pool<AssignedValueWalker> Pool = new Pool<AssignedValueWalker>(
             () => new AssignedValueWalker(),
@@ -36,7 +36,11 @@
         {
         }
 
-        public IEnumerator<Assignment> GetEnumerator() => new AssignmentEnumerator(this);
+        public int Count => this.values.Count;
+
+        public Assignment this[int index] => this.values[index];
+
+        public IEnumerator<Assignment> GetEnumerator() => this.values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
@@ -558,41 +562,6 @@
             }
 
             return node.IsBeforeInScope(this.context);
-        }
-
-        private class AssignmentEnumerator : IEnumerator<Assignment>
-        {
-            private readonly AssignedValueWalker walker;
-            private int index = -1;
-
-            public AssignmentEnumerator(AssignedValueWalker walker)
-            {
-                this.walker = walker;
-            }
-
-            public Assignment Current => this.walker.values[this.index];
-
-            object IEnumerator.Current => this.Current;
-
-            public bool MoveNext()
-            {
-                if (this.index >= this.walker.values.Count - 1)
-                {
-                    return false;
-                }
-
-                this.index++;
-                return true;
-            }
-
-            public void Reset()
-            {
-                this.index = -1;
-            }
-
-            void IDisposable.Dispose()
-            {
-            }
         }
     }
 }

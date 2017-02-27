@@ -84,41 +84,72 @@
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            if (this.isRecursive)
+            var before = this.values.Count;
+            this.values.AddIfNotExits(value)
+                .IgnoreReturnValue();
+
+            if (this.isRecursive && value is InvocationExpressionSyntax)
             {
-                this.TryHandleInvocation(value as InvocationExpressionSyntax)
-                    .IgnoreReturnValue();
+                using (var pooled = Pool.GetOrCreate())
+                {
+                    pooled.Item.isRecursive = true;
+                    pooled.Item.semanticModel = this.semanticModel;
+                    pooled.Item.cancellationToken = this.cancellationToken;
+                    pooled.Item.checkedLocations.UnionWith(this.checkedLocations);
+                    pooled.Item.Run(value);
+                    this.checkedLocations.UnionWith(pooled.Item.checkedLocations);
+                    if (pooled.Item.values.Count != 0)
+                    {
+                        this.values.Remove(value);
+                        foreach (var returnValue in pooled.Item.values)
+                        {
+                            this.values.AddIfNotExits(returnValue)
+                                       .IgnoreReturnValue();
+                        }
+                    }
+                }
             }
 
             var symbol = this.semanticModel.GetSymbolSafe(value, this.cancellationToken);
-            if (this.current != null && symbol is IParameterSymbol)
-            {
-                var parameter = symbol as IParameterSymbol;
-                ExpressionSyntax arg;
-                if (this.current.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
-                {
-                    this.values.Add(arg);
-                }
-                else
-                {
-                    this.values.Add(value);
-                }
-            }
-
             if (symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
                 using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
                 {
-                    foreach (var assignment in pooled.Item)
+                    if (pooled.Item.Count != 0)
                     {
-                        this.values.Add(assignment.Value);
+                        if (symbol is ILocalSymbol)
+                        {
+                            this.values.Remove(value);
+                        }
+
+                        foreach (var assignment in pooled.Item)
+                        {
+                            this.values.AddIfNotExits(assignment.Value)
+                                       .IgnoreReturnValue();
+                        }
                     }
                 }
             }
-            else
+
+            if (this.current != null)
             {
-                this.values.Add(value);
+                for (var i = before; i < this.values.Count; i++)
+                {
+                    var returnValue = this.values[i];
+                    ExpressionSyntax arg;
+                    if (this.current.TryGetArgumentValue(this.semanticModel.GetSymbolSafe(returnValue, this.cancellationToken) as IParameterSymbol, this.cancellationToken, out arg))
+                    {
+                        if (this.values.Contains(arg))
+                        {
+                            this.values.RemoveAt(i);
+                        }
+                        else
+                        {
+                            this.values[i] = arg;
+                        }
+                    }
+                }
             }
         }
 
