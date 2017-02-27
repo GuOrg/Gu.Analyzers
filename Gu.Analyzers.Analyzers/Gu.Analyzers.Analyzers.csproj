@@ -74,6 +74,7 @@
     <Compile Include="Helpers\Pooled\SetExt.cs" />
     <Compile Include="Helpers\Property.cs" />
     <Compile Include="Helpers\Result.cs" />
+    <Compile Include="Helpers\ResultExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\Constructor.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ConstructorDeclarationSyntaxExt.cs" />

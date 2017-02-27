@@ -46,7 +46,7 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (!this.IsBeforeInScope(node))
+            if (this.IsBeforeInScope(node) != Result.Yes)
             {
                 return;
             }
@@ -444,13 +444,13 @@
             }
         }
 
-        private bool IsBeforeInScope(SyntaxNode node)
+        private Result IsBeforeInScope(SyntaxNode node)
         {
             if (this.context == null ||
                 node is BlockSyntax ||
                 node.FirstAncestorOrSelf<StatementSyntax>() == null)
             {
-                return true;
+                return Result.Yes;
             }
 
             if (this.currentSymbol is IParameterSymbol ||
@@ -459,10 +459,9 @@
                 return node.IsBeforeInScope(this.context);
             }
 
-            if (
-                !this.context.SharesAncestor<ConstructorDeclarationSyntax>(node))
+            if (!this.context.SharesAncestor<ConstructorDeclarationSyntax>(node))
             {
-                return true;
+                return Result.Yes;
             }
 
             return node.IsBeforeInScope(this.context);

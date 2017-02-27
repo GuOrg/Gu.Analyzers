@@ -130,7 +130,10 @@ namespace Gu.Analyzers
                         : Result.No;
                 }
 
-                return Result.No;
+                using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
+                {
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
+                }
             }
 
             var method = symbol as IMethodSymbol;
@@ -146,7 +149,10 @@ namespace Gu.Analyzers
                         return Result.No;
                     }
 
-                    return IsAssignableTo(method.ReturnType) ? Result.Maybe : Result.No;
+                    return !IsAssignableTo(method.ReturnType) ||
+                           method.IsGenericMethod
+                               ? Result.No
+                               : Result.Maybe;
                 }
 
                 using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))

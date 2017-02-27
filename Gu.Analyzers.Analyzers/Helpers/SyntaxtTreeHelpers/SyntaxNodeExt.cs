@@ -31,19 +31,19 @@
                        : ancestor;
         }
 
-        internal static bool IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
+        internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
         {
             var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
             var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
             if (statement == null ||
                 otherStatement == null)
             {
-                return false;
+                return Result.Maybe;
             }
 
             if (statement.SpanStart >= otherStatement.SpanStart)
             {
-                return false;
+                return Result.No;
             }
 
             var block = statement.Parent as BlockSyntax;
@@ -53,7 +53,7 @@
                 if (SharesAncestor<IfStatementSyntax>(statement, otherStatement) ||
                     SharesAncestor<SwitchStatementSyntax>(statement, otherStatement))
                 {
-                    return false;
+                    return Result.No;
                 }
             }
 
@@ -61,17 +61,17 @@
             otherblock = otherStatement.FirstAncestor<BlockSyntax>();
             if (block == null || otherblock == null)
             {
-                return false;
+                return Result.No;
             }
 
             if (ReferenceEquals(block, otherblock) ||
                 otherblock.Span.Contains(block.Span) ||
                 block.Span.Contains(otherblock.Span))
             {
-                return true;
+                return Result.Yes;
             }
 
-            return false;
+            return Result.No;
         }
 
         internal static bool SharesAncestor<T>(this SyntaxNode first, SyntaxNode other)

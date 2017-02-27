@@ -123,7 +123,7 @@
             {
                 foreach (var invocation in pooled.Item.Invocations)
                 {
-                    if (!invocation.IsBeforeInScope(assignment))
+                    if (invocation.IsBeforeInScope(assignment) != Result.Yes)
                     {
                         continue;
                     }
