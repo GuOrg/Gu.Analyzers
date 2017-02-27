@@ -14,7 +14,8 @@
             {
                 x.values.Clear();
                 x.checkedLocations.Clear();
-                x.current = null;
+                x.isRecursive = false;
+                x.awaits = false;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
             });
@@ -23,7 +24,8 @@
         private readonly HashSet<SyntaxNode> checkedLocations = new HashSet<SyntaxNode>();
 
         private bool isRecursive;
-        private InvocationExpressionSyntax current;
+        private bool awaits;
+        private ExpressionSyntax current;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -35,6 +37,12 @@
 
         public override void Visit(SyntaxNode node)
         {
+            if (node == this.current)
+            {
+                base.Visit(node);
+                return;
+            }
+
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleLambdaExpression:
@@ -57,16 +65,6 @@
             this.AddReturnValue(node.Expression);
         }
 
-        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var pooled = Pool.GetOrCreate();
-            pooled.Item.isRecursive = recursive;
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.Run(node);
-            return pooled;
-        }
-
         internal static bool TrygetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
             using (var pooled = Create(body, false, semanticModel, cancellationToken))
@@ -82,19 +80,50 @@
             }
         }
 
+        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var pooled = Pool.GetOrCreate();
+            pooled.Item.isRecursive = recursive;
+            pooled.Item.semanticModel = semanticModel;
+            pooled.Item.cancellationToken = cancellationToken;
+            pooled.Item.Run(node);
+            return pooled;
+        }
+
+        internal Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
+        {
+            var pooled = Pool.GetOrCreate();
+            pooled.Item.isRecursive = this.isRecursive;
+            pooled.Item.awaits = this.awaits;
+            pooled.Item.semanticModel = this.semanticModel;
+            pooled.Item.cancellationToken = this.cancellationToken;
+            pooled.Item.checkedLocations.UnionWith(this.checkedLocations);
+            pooled.Item.Run(node);
+            this.checkedLocations.UnionWith(pooled.Item.checkedLocations);
+            return pooled;
+        }
+
         private void AddReturnValue(ExpressionSyntax value)
         {
-            this.values.Add(value);
-            if (this.isRecursive && value is InvocationExpressionSyntax)
+            var isTaskRun = false;
+            if (this.awaits)
             {
-                using (var pooled = Pool.GetOrCreate())
+                ExpressionSyntax awaited;
+                isTaskRun = AsyncAwait.TryAwaitTaskRun(value as InvocationExpressionSyntax, this.semanticModel, this.cancellationToken, out awaited);
+                if (isTaskRun ||
+                    AsyncAwait.TryAwaitTaskFromResult(value as InvocationExpressionSyntax, this.semanticModel, this.cancellationToken, out awaited))
                 {
-                    pooled.Item.isRecursive = true;
-                    pooled.Item.semanticModel = this.semanticModel;
-                    pooled.Item.cancellationToken = this.cancellationToken;
-                    pooled.Item.checkedLocations.UnionWith(this.checkedLocations);
-                    pooled.Item.Run(value);
-                    this.checkedLocations.UnionWith(pooled.Item.checkedLocations);
+                    value = awaited;
+                }
+            }
+
+            this.values.Add(value);
+            if ((this.isRecursive && 
+                 value is InvocationExpressionSyntax) ||
+                isTaskRun)
+            {
+                using (var pooled = this.GetRecursive(value))
+                {
                     if (pooled.Item.values.Count != 0)
                     {
                         this.values.Remove(value);
@@ -130,19 +159,24 @@
 
         private void Run(SyntaxNode node)
         {
-            if (this.TryHandleInvocation(node as InvocationExpressionSyntax))
+            if (!this.checkedLocations.Add(node))
             {
                 return;
             }
 
-            this.checkedLocations.Add(node).IgnoreReturnValue();
+            if (this.TryHandleInvocation(node as InvocationExpressionSyntax) ||
+                this.TryHandleAwait(node as AwaitExpressionSyntax) ||
+                this.TryHandleLambda(node as LambdaExpressionSyntax))
+            {
+                return;
+            }
+
             this.Visit(node);
         }
 
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation)
         {
-            if (invocation == null ||
-                !this.checkedLocations.Add(invocation))
+            if (invocation == null)
             {
                 return false;
             }
@@ -167,7 +201,6 @@
                 {
                     ExpressionSyntax arg;
                     var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-
                     if (this.isRecursive &&
                         SymbolComparer.Equals(symbol, method))
                     {
@@ -175,26 +208,81 @@
                         continue;
                     }
 
-                    if (this.current.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out arg))
+                    if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out arg))
                     {
                         this.values[i] = arg;
                     }
                 }
 
-                for (var i = 0; i < this.values.Count; i++)
-                {
-                    for (var j = this.values.Count - 1; j > i; j--)
-                    {
-                        if (this.values[i] == this.values[j])
-                        {
-                            this.values.RemoveAt(j);
-                        }
-                    }
-                }
+                this.PurgeDupes();
             }
 
             this.current = old;
             return true;
+        }
+
+        private bool TryHandleAwait(AwaitExpressionSyntax @await)
+        {
+            if (@await == null)
+            {
+                return false;
+            }
+
+            InvocationExpressionSyntax invocation;
+            if (AsyncAwait.TryGetAwaitedInvocation(@await, this.semanticModel, this.cancellationToken, out invocation))
+            {
+                this.awaits = true;
+                var symbol = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
+                if (symbol != null)
+                {
+                    if (symbol.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        this.AddReturnValue(invocation);
+                    }
+
+                    return this.TryHandleInvocation(invocation);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool TryHandleLambda(LambdaExpressionSyntax lambda)
+        {
+            if (lambda == null)
+            {
+                return false;
+            }
+
+            this.current = lambda;
+            var expressionBody = lambda.Body as ExpressionSyntax;
+            if (expressionBody != null)
+            {
+                this.AddReturnValue(expressionBody);
+            }
+            else
+            {
+                this.Visit(lambda);
+            }
+
+            this.PurgeDupes();
+            return true;
+        }
+
+        private void PurgeDupes()
+        {
+            for (var i = 0; i < this.values.Count; i++)
+            {
+                for (var j = this.values.Count - 1; j > i; j--)
+                {
+                    if (this.values[i] == this.values[j])
+                    {
+                        this.values.RemoveAt(j);
+                    }
+                }
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
@@ -184,6 +185,7 @@
             base.VisitArgument(node);
         }
 
+        [Obsolete("Remove this, use ReturnValueWalker")]
         public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
         {
             if (this.isSamplingRetunValues)
@@ -194,6 +196,7 @@
             base.VisitArrowExpressionClause(node);
         }
 
+        [Obsolete("Remove this, use ReturnValueWalker")]
         public override void VisitReturnStatement(ReturnStatementSyntax node)
         {
             if (this.isSamplingRetunValues)

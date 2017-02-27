@@ -1,6 +1,5 @@
 namespace Gu.Analyzers.Test.Helpers
 {
-    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,6 +29,8 @@ namespace Gu.Analyzers.Test.Helpers
         [TestCase("Recursive(1)", false, "Recursive(arg)")]
         [TestCase("Recursive(true)", true, "!flag, true")]
         [TestCase("Recursive(true)", false, "Recursive(!flag), true")]
+        [TestCase("Task.Run(() => 1)", true, "")]
+        [TestCase("Task.Run(() => 1)", false, "")]
         public void Call(string code, bool recursive, string expected)
         {
             var testCode = @"
@@ -137,19 +138,102 @@ namespace RoslynSandBox
             }
         }
 
-        [TestCase("Task.Run(() => 1)", "1")]
-        [TestCase("Task.Run(() => new Disposable())", "new Disposable()")]
-        [TestCase("CreateStringAsync()", "CreateStringAsync()")]
-        [TestCase("await CreateStringAsync()", "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => new string(' ', 1))", "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", "new string(' ', 1)")]
-        [TestCase("await Task.FromResult(new string(' ', 1))", "new string(' ', 1)")]
-        public void AsyncAwait(string code, string expected)
+        [TestCase("Func<int> temp = () => 1", true, "1")]
+        [TestCase("Func<int> temp = () => 1", false, "1")]
+        [TestCase("Func<int, int> temp = x => 1", true, "1")]
+        [TestCase("Func<int, int> temp = x => 1", false, "1")]
+        [TestCase("Func<int, int> temp = x => x", true, "x")]
+        [TestCase("Func<int, int> temp = x => x", false, "x")]
+        [TestCase("Func<int> temp = () => { return 1; }", true, "1")]
+        [TestCase("Func<int> temp = () => { return 1; }", false, "1")]
+        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", true, "1, 2")]
+        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", false, "1, 2")]
+        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", true, "x, 1")]
+        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", false, "x, 1")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", true, "1, x")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", false, "1, x")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", true, "1, 2")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", false, "1, 2")]
+        public void Lambda(string code, bool recursive, string expected)
         {
             var testCode = @"
 namespace RoslynSandBox
 {
+    using System;
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            Func<int> temp = () => 1;
+        }
+
+        internal static int StaticCreateIntStatementBody()
+        {
+            return 1;
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("Func<int> temp = () => 1", code);
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item.Values);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("await Task.Run(() => 1)", true, "1")]
+        [TestCase("await Task.Run(() => 1)", false, "1")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", true, "1")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", false, "1")]
+        [TestCase("await Task.Run(() => new Disposable())", true, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable())", false, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", true, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", false, "new Disposable()")]
+        [TestCase("await Task.Run(() => new string(' ', 1))", true, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1))", false, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", true, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", false, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => CreateInt())", true, "1")]
+        [TestCase("await Task.Run(() => CreateInt())", false, "CreateInt()")]
+        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", true, "1")]
+        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", false, "CreateInt()")]
+        [TestCase("await Task.FromResult(new string(' ', 1))", true, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1))", false, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", true, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", false, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(CreateInt())", true, "1")]
+        [TestCase("await Task.FromResult(CreateInt())", false, "CreateInt()")]
+        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", true, "1")]
+        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", false, "CreateInt()")]
+        [TestCase("await CreateAsync(0)", true, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0)", false, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", true, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", false, "1, 0, 2, 3")]
+        [TestCase("await CreateStringAsync()", true, "new string(' ', 1)")]
+        [TestCase("await CreateStringAsync()", false, "new string(' ', 1)")]
+        [TestCase("await RecursiveAsync()", true, "")]
+        [TestCase("await RecursiveAsync()", false, "RecursiveAsync()")]
+        [TestCase("await RecursiveAsync(1)", true, "")]
+        [TestCase("await RecursiveAsync(1)", false, "RecursiveAsync(arg)")]
+        public void AsyncAwait(string code, bool recursive, string expected)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
     using System.Threading.Tasks;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
 
     internal class Foo
     {
@@ -158,11 +242,36 @@ namespace RoslynSandBox
             var value = // Meh();
         }
 
+        internal static async Task<int> RecursiveAsync() => RecursiveAsync();
+
+        internal static async Task<int> RecursiveAsync(int arg) => RecursiveAsync(arg);
+
         internal static async Task<string> CreateStringAsync()
         {
             await Task.Delay(0);
             return new string(' ', 1);
         }
+
+        internal static Task<int> CreateAsync(int arg)
+        {
+            switch (arg)
+            {
+                case 0:
+                    return Task.FromResult(1);
+                case 1:
+                    return Task.FromResult(arg);
+                case 2:
+                    return Task.Run(() => 2);
+                case 3:
+                    return Task.Run(() => arg);
+                case 4:
+                    return Task.Run(() => { return 3; });
+                default:
+                    return Task.Run(() => { return arg; });
+            }
+        }
+
+        internal static async int CreateInt() => 1;
     }
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
@@ -170,9 +279,9 @@ namespace RoslynSandBox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual(expected, string.Join(", ", pooled.Item.Select(x => x.Value)));
+                Assert.AreEqual(expected, string.Join(", ", pooled.Item.Values));
             }
         }
     }
