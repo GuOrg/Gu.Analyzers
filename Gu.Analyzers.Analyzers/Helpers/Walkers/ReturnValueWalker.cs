@@ -84,10 +84,7 @@
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            var before = this.values.Count;
-            this.values.AddIfNotExits(value)
-                .IgnoreReturnValue();
-
+            this.values.Add(value);
             if (this.isRecursive && value is InvocationExpressionSyntax)
             {
                 using (var pooled = Pool.GetOrCreate())
@@ -103,8 +100,7 @@
                         this.values.Remove(value);
                         foreach (var returnValue in pooled.Item.values)
                         {
-                            this.values.AddIfNotExits(returnValue)
-                                       .IgnoreReturnValue();
+                            this.values.Add(returnValue);
                         }
                     }
                 }
@@ -125,28 +121,7 @@
 
                         foreach (var assignment in pooled.Item)
                         {
-                            this.values.AddIfNotExits(assignment.Value)
-                                       .IgnoreReturnValue();
-                        }
-                    }
-                }
-            }
-
-            if (this.current != null)
-            {
-                for (var i = before; i < this.values.Count; i++)
-                {
-                    var returnValue = this.values[i];
-                    ExpressionSyntax arg;
-                    if (this.current.TryGetArgumentValue(this.semanticModel.GetSymbolSafe(returnValue, this.cancellationToken) as IParameterSymbol, this.cancellationToken, out arg))
-                    {
-                        if (this.values.Contains(arg))
-                        {
-                            this.values.RemoveAt(i);
-                        }
-                        else
-                        {
-                            this.values[i] = arg;
+                            this.values.Add(assignment.Value);
                         }
                     }
                 }
@@ -184,6 +159,38 @@
             foreach (var reference in method.DeclaringSyntaxReferences)
             {
                 this.Visit(reference.GetSyntax(this.cancellationToken));
+            }
+
+            if (this.current != null)
+            {
+                for (var i = this.values.Count - 1; i >= 0; i--)
+                {
+                    ExpressionSyntax arg;
+                    var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+
+                    if (this.isRecursive &&
+                        SymbolComparer.Equals(symbol, method))
+                    {
+                        this.values.RemoveAt(i);
+                        continue;
+                    }
+
+                    if (this.current.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out arg))
+                    {
+                        this.values[i] = arg;
+                    }
+                }
+
+                for (var i = 0; i < this.values.Count; i++)
+                {
+                    for (var j = this.values.Count - 1; j > i; j--)
+                    {
+                        if (this.values[i] == this.values[j])
+                        {
+                            this.values.RemoveAt(j);
+                        }
+                    }
+                }
             }
 
             this.current = old;

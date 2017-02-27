@@ -20,16 +20,16 @@ namespace Gu.Analyzers.Test.Helpers
         [TestCase("AssigningToParameter(1)", false, "1, 2, 3, 4")]
         [TestCase("CallingIdExpressionBody(1)", true, "1")]
         [TestCase("CallingIdExpressionBody(1)", false, "IdExpressionBody(arg)")]
-        [TestCase("ReturnLocal()", true, "5")]
-        [TestCase("ReturnLocal()", false, "5")]
-        [TestCase("ReturnLocalAssignedTwice(true)", true, "1, 2, 4")]
-        [TestCase("ReturnLocalAssignedTwice(true)", false, "1, 2, 4")]
-        [TestCase("Recursive()", true, "Recursive()")]
+        [TestCase("ReturnLocal()", true, "1")]
+        [TestCase("ReturnLocal()", false, "1")]
+        [TestCase("ReturnLocalAssignedTwice(true)", true, "1, 2, 3")]
+        [TestCase("ReturnLocalAssignedTwice(true)", false, "1, 2, 3")]
+        [TestCase("Recursive()", true, "")]
         [TestCase("Recursive()", false, "Recursive()")]
-        [TestCase("Recursive(1)", true, "Recursive(arg)")]
+        [TestCase("Recursive(1)", true, "")]
         [TestCase("Recursive(1)", false, "Recursive(arg)")]
-        [TestCase("Recursive(true)", true, "Recursive(!flag), !flag, true")]
-        [TestCase("Recursive(true)", false, "Recursive(!flag), true, !flag")]
+        [TestCase("Recursive(true)", true, "!flag, true")]
+        [TestCase("Recursive(true)", false, "Recursive(!flag), true")]
         public void Call(string code, bool recursive, string expected)
         {
             var testCode = @"
@@ -93,7 +93,7 @@ namespace RoslynSandBox
 
         public static int ReturnLocal()
         {
-            var local = 5;
+            var local = 1;
             return local;
         }
 
@@ -106,8 +106,8 @@ namespace RoslynSandBox
                 return local;
             }
 
-            local = 3;
-            return 4;
+            local = 5;
+            return 3;
         }
 
         public static int Recursive() => Recursive();

@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
@@ -113,7 +112,15 @@
 
         public override void VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
         {
-            this.HandleAssignedValue(this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken), node);
+            switch (node.Kind())
+            {
+                case SyntaxKind.LogicalNotExpression:
+                    break;
+                default:
+                    this.HandleAssignedValue(this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken), node);
+                    break;
+            }
+
             base.VisitPrefixUnaryExpression(node);
         }
 
