@@ -1,6 +1,5 @@
 namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
 {
-    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
@@ -12,7 +11,7 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
             [TestCase("var temp3 = value;", "")]
-            [TestCase("var temp4 = value;", "1, 2")]
+            [TestCase("var temp4 = value;", "2")]
             public void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -73,7 +72,7 @@ internal class Foo<T>
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item);
-                    Assert.AreEqual("Assign(out value)", actual);
+                    Assert.AreEqual("default(T)", actual);
                 }
             }
 
@@ -116,7 +115,7 @@ namespace RoslynSandBox
             }
 
             [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "Assign1(ref value)")]
+            [TestCase("var temp2 = value;", "1")]
             public void LocalAssignedWithChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -151,7 +150,7 @@ internal class Foo
             }
 
             [TestCase("var temp1 = value", "")]
-            [TestCase("var temp2 = value", "Assign(ref value)")]
+            [TestCase("var temp2 = value", "1")]
             public void LocalAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"

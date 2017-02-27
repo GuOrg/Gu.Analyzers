@@ -2,7 +2,6 @@
 {
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -17,14 +16,16 @@
             {
                 x.values.Clear();
                 x.visitedLocations.Clear();
+                x.parameters.Clear();
                 x.currentSymbol = null;
                 x.context = null;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
             });
 
-        private readonly List<Assignment> values = new List<Assignment>();
+        private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
+        private readonly HashSet<IParameterSymbol> parameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
 
         private ISymbol currentSymbol;
         private SyntaxNode context;
@@ -37,10 +38,9 @@
 
         public int Count => this.values.Count;
 
-        public ExpressionSyntax this[int index] => this.values[index].Value;
+        public ExpressionSyntax this[int index] => this.values[index];
 
-        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.Select(x => x.Value)
-                                                                    .GetEnumerator();
+        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
@@ -65,7 +65,7 @@
             if (node.Initializer != null &&
                 SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken)))
             {
-                this.values.Add(new Assignment(this.currentSymbol, node.Initializer.Value));
+                this.values.Add(node.Initializer.Value);
             }
 
             base.VisitPropertyDeclaration(node);
@@ -133,6 +133,7 @@
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
+            base.VisitInvocationExpression(node);
             if (this.visitedLocations.Add(node))
             {
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
@@ -152,21 +153,19 @@
                     {
                         for (var i = before; i < this.values.Count; i++)
                         {
-                            var parameter = this.semanticModel.GetSymbolSafe(this.values[i].Value, this.cancellationToken) as IParameterSymbol;
+                            var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
                             if (parameter != null)
                             {
                                 ExpressionSyntax arg;
                                 if (node.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
                                 {
-                                    this.values[i] = this.values[i].WithValue(arg);
+                                    this.values[i] = arg;
                                 }
                             }
                         }
                     }
                 }
             }
-
-            base.VisitInvocationExpression(node);
         }
 
         public override void VisitArgument(ArgumentSyntax node)
@@ -175,10 +174,37 @@
                 node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
             {
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
+                var argSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
                 if (invocation != null &&
-                    SymbolComparer.Equals(this.currentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
+                    (SymbolComparer.Equals(this.currentSymbol, argSymbol) ||
+                     this.parameters.Contains(argSymbol as IParameterSymbol)))
                 {
-                    this.values.Add(new Assignment(this.currentSymbol, invocation));
+                    var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
+                    if (method == null ||
+                        method.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        this.values.Add(invocation);
+                    }
+                    else
+                    {
+                        foreach (var reference in method.DeclaringSyntaxReferences)
+                        {
+                            var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
+                            ParameterSyntax parameterSyntax;
+                            if (methodDeclaration.TryGetMatchingParameter(node, out parameterSyntax))
+                            {
+                                var parameter = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken) as IParameterSymbol;
+                                if (parameter == null)
+                                {
+                                    this.values.Add(invocation);
+                                }
+                                else
+                                {
+                                    this.parameters.Add(parameter).IgnoreReturnValue();
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -231,22 +257,33 @@
                 return false;
             }
 
-            var oldSymbol = this.currentSymbol;
-            this.currentSymbol = symbol;
             var before = this.values.Count;
-            this.Run();
-            var parameter = this.currentSymbol as IParameterSymbol;
-            if (parameter?.Name == "value")
+            using (var pooled = Pool.GetOrCreate())
             {
-                var property = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
-                if (property != null)
+                pooled.Item.currentSymbol = symbol;
+                pooled.Item.context = this.context;
+                pooled.Item.semanticModel = this.semanticModel;
+                pooled.Item.cancellationToken = this.cancellationToken;
+                pooled.Item.visitedLocations.UnionWith(this.visitedLocations);
+
+                pooled.Item.Run();
+                var parameter = this.currentSymbol as IParameterSymbol;
+                if (parameter?.Name == "value")
                 {
-                    this.currentSymbol = property;
-                    this.Run();
+                    var property = (parameter.ContainingSymbol as IMethodSymbol)?.AssociatedSymbol as IPropertySymbol;
+                    if (property != null)
+                    {
+                        pooled.Item.currentSymbol = property;
+                        pooled.Item.Run();
+                    }
+                }
+
+                foreach (var value in pooled.Item)
+                {
+                    this.values.Add(value);
                 }
             }
 
-            this.currentSymbol = oldSymbol;
             return before != this.values.Count;
         }
 
@@ -410,7 +447,7 @@
             }
 
             var property = assignedSymbol as IPropertySymbol;
-            if (!ReferenceEquals(this.currentSymbol, property) &&
+            if (!SymbolComparer.Equals(this.currentSymbol, property) &&
                 (this.currentSymbol is IFieldSymbol || this.currentSymbol is IPropertySymbol) &&
                 property != null &&
                 Property.AssignsSymbolInSetter(property, this.currentSymbol, this.semanticModel, this.cancellationToken))
@@ -428,18 +465,19 @@
 
                 for (var i = before; i < this.values.Count; i++)
                 {
-                    var parameter = this.semanticModel.GetSymbolSafe(this.values[i].Value, this.cancellationToken) as IParameterSymbol;
+                    var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
                     if (Equals(parameter?.ContainingSymbol, property.SetMethod))
                     {
-                        this.values[i] = this.values[i].WithValue(value);
+                        this.values[i] = value;
                     }
                 }
             }
             else
             {
-                if (SymbolComparer.Equals(this.currentSymbol, assignedSymbol))
+                if (SymbolComparer.Equals(this.currentSymbol, assignedSymbol) ||
+                    this.parameters.Contains(assignedSymbol as IParameterSymbol))
                 {
-                    this.values.Add(new Assignment(this.currentSymbol, value));
+                    this.values.Add(value);
                 }
             }
         }
@@ -456,6 +494,11 @@
             if (this.currentSymbol is IParameterSymbol ||
                 this.currentSymbol is ILocalSymbol)
             {
+                if (!this.context.SharesAncestor<MemberDeclarationSyntax>(node))
+                {
+                    return Result.Yes;
+                }
+
                 return node.IsBeforeInScope(this.context);
             }
 

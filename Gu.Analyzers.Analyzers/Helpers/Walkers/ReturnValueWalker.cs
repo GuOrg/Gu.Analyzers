@@ -97,7 +97,7 @@
             return pooled;
         }
 
-        internal Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
+        private Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
         {
             var pooled = Pool.GetOrCreate();
             pooled.Item.isRecursive = this.isRecursive;
@@ -237,19 +237,20 @@
             }
 
             var property = this.semanticModel.GetSymbolSafe(propertyGet, this.cancellationToken) as IPropertySymbol;
-            if (property == null)
+            var getter = property?.GetMethod;
+            if (getter == null)
             {
                 return false;
             }
 
-            if (property.DeclaringSyntaxReferences.Length == 0)
+            if (getter.DeclaringSyntaxReferences.Length == 0)
             {
                 return true;
             }
 
             var old = this.current;
             this.current = propertyGet;
-            foreach (var reference in property.DeclaringSyntaxReferences)
+            foreach (var reference in getter.DeclaringSyntaxReferences)
             {
                 this.Visit(reference.GetSyntax(this.cancellationToken));
             }
@@ -263,7 +264,6 @@
                         SymbolComparer.Equals(symbol, property))
                     {
                         this.values.RemoveAt(i);
-                        continue;
                     }
                 }
 
