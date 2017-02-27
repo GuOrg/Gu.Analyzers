@@ -121,7 +121,7 @@
                         if (method.IsExtensionMethod)
                         {
                             var identifier = declaration.ParameterList.Parameters[0].Identifier;
-                            foreach (var returnValue in pooled.Item.Values)
+                            foreach (var returnValue in pooled.Item)
                             {
                                 if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
                                 {
@@ -132,7 +132,7 @@
                             return true;
                         }
 
-                        foreach (var returnValue in pooled.Item.Values)
+                        foreach (var returnValue in pooled.Item)
                         {
                             if (!returnValue.IsKind(SyntaxKind.ThisExpression))
                             {

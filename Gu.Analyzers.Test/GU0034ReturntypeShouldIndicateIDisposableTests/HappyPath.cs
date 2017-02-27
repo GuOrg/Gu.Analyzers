@@ -252,6 +252,53 @@ public class Foo
         }
 
         [Test]
+        public async Task MethodReturningFromResultOfDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            Meh();
+        }
+
+        private static Task<IDisposable> Meh()
+        {
+            return Task.FromResult<IDisposable>(new Disposable());
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodReturningRunOfDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        private static Task<IDisposable> Meh()
+        {
+            return Task.Run<IDisposable>(() => new Disposable());
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task GenericMethod()
         {
             var testCode = @"

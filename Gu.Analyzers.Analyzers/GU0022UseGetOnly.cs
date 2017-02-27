@@ -61,7 +61,7 @@
             {
                 foreach (var value in pooled.Item)
                 {
-                    if (MeansPropertyIsMutable(value.Value))
+                    if (MeansPropertyIsMutable(value))
                     {
                         return;
                     }

@@ -29,7 +29,7 @@ internal class Foo
                                       .Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.Select(x => x.Value));
+                    var actual = string.Join(", ", pooled.Item);
                     Assert.AreEqual("1", actual);
                 }
             }
@@ -60,7 +60,7 @@ namespace RoslynSandBox
                                       .Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", pooled.Item.Select(x => x.Value));
+                    var actual = string.Join(", ", pooled.Item);
                     Assert.AreEqual(expected, actual);
                 }
             }

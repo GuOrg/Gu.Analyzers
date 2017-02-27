@@ -152,6 +152,34 @@ namespace RoslynSandBox
                 var other = syntaxTree.Statement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
+
+            [TestCase("a = 1;", "a = 2;", true)]
+            [TestCase("a = 1;", "a = 2;", true)]
+            [TestCase("a = 2;", "a = 3;", true)]
+            [TestCase("a = 3;", "a = 2;", true)]
+            public void Lambda(string firstStatement, string otherStatement, bool expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            var a = 1;
+            this.E += (_, __) => a = 2;
+            a = 3;
+        }
+
+        public event EventHandler E;
+    }
+}");
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
         }
     }
 }

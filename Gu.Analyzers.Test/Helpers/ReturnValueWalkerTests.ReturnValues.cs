@@ -7,6 +7,91 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
+        [TestCase("StaticRecursiveExpressionBody", true, "")]
+        [TestCase("StaticRecursiveExpressionBody", false, "StaticRecursiveExpressionBody")]
+        [TestCase("StaticRecursiveStatementBody)", true, "")]
+        [TestCase("StaticRecursiveStatementBody)", false, "StaticRecursiveStatementBody")]
+        [TestCase("this.RecursiveExpressionBody", true, "")]
+        [TestCase("this.RecursiveExpressionBody", false, "this.RecursiveExpressionBody")]
+        [TestCase("this.RecursiveStatementBody)", true, "")]
+        [TestCase("this.RecursiveStatementBody)", false, "this.RecursiveStatementBody")]
+        [TestCase("this.CalculatedExpressionBody)", true, "1")]
+        [TestCase("this.CalculatedExpressionBody)", false, "1")]
+        [TestCase("this.CalculatedStatementBody)", true, "1")]
+        [TestCase("this.CalculatedStatementBody)", false, "1")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody)", true, "this.value")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody)", false, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody)", true, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody)", false, "this.value")]
+        public void Property(string code, bool recursive, string expected)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    internal class Foo
+    {
+        private readonly int value = 1;
+
+        internal Foo()
+        {
+            var temp = // Meh();
+        }
+
+
+        public static int StaticRecursiveExpressionBody => StaticRecursiveExpressionBody;
+
+        public static int StaticRecursiveStatementBody
+        {
+            get
+            {
+                return StaticRecursiveStatementBody;
+            }
+        }
+
+        public int RecursiveExpressionBody => this.RecursiveExpressionBody;
+
+        public int RecursiveStatementBody
+        {
+            get
+            {
+                return this.RecursiveStatementBody;
+            }
+        }
+
+
+        public int CalculatedExpressionBody => 1;
+
+        public int CalculatedStatementBody
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        public int CalculatedReturningFieldExpressionBody => this.value;
+
+        public int CalculatedReturningFieldStatementBody
+        {
+            get
+            {
+                return this.value;
+            }
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("// Meh()", code);
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
         [TestCase("StaticCreateIntStatementBody()", true, "1")]
         [TestCase("StaticCreateIntStatementBody()", false, "1")]
         [TestCase("StaticCreateIntExpressionBody()", true, "2")]
@@ -133,7 +218,7 @@ namespace RoslynSandBox
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.Values);
+                var actual = string.Join(", ", pooled.Item);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -181,7 +266,7 @@ namespace RoslynSandBox
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.Values);
+                var actual = string.Join(", ", pooled.Item);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -281,7 +366,7 @@ namespace RoslynSandBox
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual(expected, string.Join(", ", pooled.Item.Values));
+                Assert.AreEqual(expected, string.Join(", ", pooled.Item));
             }
         }
     }

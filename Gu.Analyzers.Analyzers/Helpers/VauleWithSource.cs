@@ -40,7 +40,7 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in pooled.Item)
                 {
-                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
@@ -57,7 +57,7 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in pooled.Item)
                 {
-                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, pooledList.Item);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, pooledList.Item);
                 }
             }
 
@@ -163,7 +163,7 @@ namespace Gu.Analyzers
                                 {
                                     foreach (var assignedValue in assignments.Item)
                                     {
-                                        AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
+                                        AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
                                     }
                                 }
                             }
@@ -405,7 +405,7 @@ namespace Gu.Analyzers
                     {
                         using (var pooledReturns = ReturnValueWalker.Create(methodDeclaration.Body, true, semanticModel, cancellationToken))
                         {
-                            foreach (var returnValue in pooledReturns.Item.Values)
+                            foreach (var returnValue in pooledReturns.Item)
                             {
                                 AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                             }
@@ -477,7 +477,7 @@ namespace Gu.Analyzers
                                     result.Add(new VauleWithSource(value, ValueSource.Calculated));
                                     using (var pooledReturns = ReturnValueWalker.Create(getter.Body, true, semanticModel, cancellationToken))
                                     {
-                                        foreach (var returnValue in pooledReturns.Item.Values)
+                                        foreach (var returnValue in pooledReturns.Item)
                                         {
                                             AddSourcesRecursively(returnValue, semanticModel, cancellationToken, result);
                                         }
@@ -673,7 +673,7 @@ namespace Gu.Analyzers
             {
                 foreach (var assignedValue in assignments.Item)
                 {
-                    AddSourcesRecursively(assignedValue.Value, semanticModel, cancellationToken, result);
+                    AddSourcesRecursively(assignedValue, semanticModel, cancellationToken, result);
                 }
             }
         }

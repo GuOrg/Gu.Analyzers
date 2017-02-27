@@ -1,12 +1,13 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ReturnValueWalker : CSharpSyntaxWalker
+    internal sealed class ReturnValueWalker : CSharpSyntaxWalker, IReadOnlyList<ExpressionSyntax>
     {
         private static readonly Pool<ReturnValueWalker> Pool = new Pool<ReturnValueWalker>(
             () => new ReturnValueWalker(),
@@ -33,7 +34,13 @@
         {
         }
 
-        public IReadOnlyList<ExpressionSyntax> Values => this.values;
+        public int Count => this.values.Count;
+
+        public ExpressionSyntax this[int index] => this.values[index];
+
+        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public override void Visit(SyntaxNode node)
         {
@@ -69,7 +76,7 @@
         {
             using (var pooled = Create(body, false, semanticModel, cancellationToken))
             {
-                if (pooled.Item.Values.Count > 1)
+                if (pooled.Item.values.Count != 1)
                 {
                     returnValue = null;
                     return false;
@@ -118,7 +125,7 @@
             }
 
             this.values.Add(value);
-            if ((this.isRecursive && 
+            if ((this.isRecursive &&
                  value is InvocationExpressionSyntax) ||
                 isTaskRun)
             {
@@ -150,7 +157,7 @@
 
                         foreach (var assignment in pooled.Item)
                         {
-                            this.values.Add(assignment.Value);
+                            this.values.Add(assignment);
                         }
                     }
                 }
@@ -166,6 +173,7 @@
 
             if (this.TryHandleInvocation(node as InvocationExpressionSyntax) ||
                 this.TryHandleAwait(node as AwaitExpressionSyntax) ||
+                this.TryHandlePropertyGet(node as ExpressionSyntax) ||
                 this.TryHandleLambda(node as LambdaExpressionSyntax))
             {
                 return;
@@ -214,7 +222,52 @@
                     }
                 }
 
-                this.PurgeDupes();
+                this.values.PurgeDuplicates();
+            }
+
+            this.current = old;
+            return true;
+        }
+
+        private bool TryHandlePropertyGet(ExpressionSyntax propertyGet)
+        {
+            if (propertyGet == null)
+            {
+                return false;
+            }
+
+            var property = this.semanticModel.GetSymbolSafe(propertyGet, this.cancellationToken) as IPropertySymbol;
+            if (property == null)
+            {
+                return false;
+            }
+
+            if (property.DeclaringSyntaxReferences.Length == 0)
+            {
+                return true;
+            }
+
+            var old = this.current;
+            this.current = propertyGet;
+            foreach (var reference in property.DeclaringSyntaxReferences)
+            {
+                this.Visit(reference.GetSyntax(this.cancellationToken));
+            }
+
+            if (this.current != null)
+            {
+                for (var i = this.values.Count - 1; i >= 0; i--)
+                {
+                    var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                    if (this.isRecursive &&
+                        SymbolComparer.Equals(symbol, property))
+                    {
+                        this.values.RemoveAt(i);
+                        continue;
+                    }
+                }
+
+                this.values.PurgeDuplicates();
             }
 
             this.current = old;
@@ -267,22 +320,8 @@
                 this.Visit(lambda);
             }
 
-            this.PurgeDupes();
+            this.values.PurgeDuplicates();
             return true;
-        }
-
-        private void PurgeDupes()
-        {
-            for (var i = 0; i < this.values.Count; i++)
-            {
-                for (var j = this.values.Count - 1; j > i; j--)
-                {
-                    if (this.values[i] == this.values[j])
-                    {
-                        this.values.RemoveAt(j);
-                    }
-                }
-            }
         }
     }
 }

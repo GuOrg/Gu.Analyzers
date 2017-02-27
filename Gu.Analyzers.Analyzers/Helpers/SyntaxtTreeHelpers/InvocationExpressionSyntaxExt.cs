@@ -46,6 +46,18 @@
             return invocation.Name() == "nameof";
         }
 
+        internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
+        {
+            if (invocation?.ArgumentList == null ||
+                parameter == null)
+            {
+                value = null;
+                return false;
+            }
+
+            return invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value);
+        }
+
         private static bool TryFindInvokee(ExpressionSyntax expression, out ExpressionSyntax invokee)
         {
             invokee = null;
@@ -105,18 +117,6 @@
             }
 
             return false;
-        }
-
-        internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
-        {
-            if (invocation?.ArgumentList == null ||
-                parameter == null)
-            {
-                value = null;
-                return false;
-            }
-
-            return invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value);
         }
     }
 }

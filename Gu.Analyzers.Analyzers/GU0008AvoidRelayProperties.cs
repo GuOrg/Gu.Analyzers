@@ -124,12 +124,12 @@
                 {
                     foreach (var assignedValue in pooled.Item)
                     {
-                        if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
                             continue;
                         }
 
-                        if (semanticModel.GetSymbolSafe(assignedValue.Value, cancellationToken) is IParameterSymbol)
+                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
                         {
                             return true;
                         }
@@ -144,12 +144,12 @@
                 {
                     foreach (var assignedValue in pooled.Item)
                     {
-                        if (assignedValue.Value.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
+                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
                             continue;
                         }
 
-                        if (semanticModel.GetSymbolSafe(assignedValue.Value, cancellationToken) is IParameterSymbol)
+                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
                         {
                             return true;
                         }

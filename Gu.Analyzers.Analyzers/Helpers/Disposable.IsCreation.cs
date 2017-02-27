@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -23,7 +24,7 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                return IsCreation(pooled, semanticModel, cancellationToken);
+                return IsCreation(pooled.Item, semanticModel, cancellationToken);
             }
         }
 
@@ -37,14 +38,14 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                return IsCreation(pooled, semanticModel, cancellationToken);
+                return IsCreation(pooled.Item, semanticModel, cancellationToken);
             }
         }
 
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, Pool<AssignedValueWalker>.Pooled pooled = null)
+        internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (candidate == null ||
                 candidate.IsMissing ||
@@ -79,9 +80,9 @@ namespace Gu.Analyzers
                 switch (binaryExpression.Kind())
                 {
                     case SyntaxKind.CoalesceExpression:
-                        return IsEitherCreation(binaryExpression.Left, binaryExpression.Right, pooled, semanticModel, cancellationToken);
+                        return IsEitherCreation(binaryExpression.Left, binaryExpression.Right, semanticModel, cancellationToken);
                     case SyntaxKind.AsExpression:
-                        return IsCreation(binaryExpression.Left, semanticModel, cancellationToken, pooled);
+                        return IsCreation(binaryExpression.Left, semanticModel, cancellationToken);
                     default:
                         return Result.Unknown;
                 }
@@ -90,13 +91,22 @@ namespace Gu.Analyzers
             var cast = candidate as CastExpressionSyntax;
             if (cast != null)
             {
-                return IsCreation(cast.Expression, semanticModel, cancellationToken, pooled);
+                return IsCreation(cast.Expression, semanticModel, cancellationToken);
             }
 
             var conditional = candidate as ConditionalExpressionSyntax;
             if (conditional != null)
             {
-                return IsEitherCreation(conditional.WhenTrue, conditional.WhenFalse, pooled, semanticModel, cancellationToken);
+                return IsEitherCreation(conditional.WhenTrue, conditional.WhenFalse, semanticModel, cancellationToken);
+            }
+
+            var @await = candidate as AwaitExpressionSyntax;
+            if (@await != null)
+            {
+                using (var returnValues = ReturnValueWalker.Create(@await, true, semanticModel, cancellationToken))
+                {
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
+                }
             }
 
             var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
@@ -139,21 +149,16 @@ namespace Gu.Analyzers
                     return IsAssignableTo(method.ReturnType) ? Result.Maybe : Result.No;
                 }
 
-                if (pooled == null)
+                using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
                 {
-                    using (pooled = AssignedValueWalker.CreateWithReturnValues(candidate, method, semanticModel, cancellationToken))
-                    {
-                        return IsCreation(pooled, semanticModel, cancellationToken);
-                    }
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
                 }
-
-                return Result.No;
             }
 
             return Result.Unknown;
         }
 
-        private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (value1 == null || value2 == null)
             {
@@ -166,7 +171,7 @@ namespace Gu.Analyzers
                 var value = i == 0
                                 ? value1
                                 : value2;
-                switch (IsCreation(value, semanticModel, cancellationToken, pooled))
+                switch (IsCreation(value, semanticModel, cancellationToken))
                 {
                     case Analyzers.Result.Unknown:
                         result = Analyzers.Result.Unknown;
@@ -186,12 +191,12 @@ namespace Gu.Analyzers
             return result;
         }
 
-        private static Result IsCreation(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsCreation(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var result = Analyzers.Result.No;
-            foreach (var assignment in pooled.Item)
+            foreach (var value in values)
             {
-                switch (IsCreation(assignment.Value, semanticModel, cancellationToken, pooled))
+                switch (IsCreation(value, semanticModel, cancellationToken))
                 {
                     case Analyzers.Result.Unknown:
                         result = Analyzers.Result.Unknown;

@@ -1,15 +1,15 @@
 ﻿namespace Gu.Analyzers
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IReadOnlyList<Assignment>
+    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IReadOnlyList<ExpressionSyntax>
     {
         private static readonly Pool<AssignedValueWalker> Pool = new Pool<AssignedValueWalker>(
             () => new AssignedValueWalker(),
@@ -30,7 +30,6 @@
         private SyntaxNode context;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
-        private bool isSamplingRetunValues;
 
         private AssignedValueWalker()
         {
@@ -38,9 +37,10 @@
 
         public int Count => this.values.Count;
 
-        public Assignment this[int index] => this.values[index];
+        public ExpressionSyntax this[int index] => this.values[index].Value;
 
-        public IEnumerator<Assignment> GetEnumerator() => this.values.GetEnumerator();
+        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.Select(x => x.Value)
+                                                                    .GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
@@ -185,28 +185,6 @@
             base.VisitArgument(node);
         }
 
-        [Obsolete("Remove this, use ReturnValueWalker")]
-        public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
-        {
-            if (this.isSamplingRetunValues)
-            {
-                this.values.Add(new Assignment(this.currentSymbol, node.Expression));
-            }
-
-            base.VisitArrowExpressionClause(node);
-        }
-
-        [Obsolete("Remove this, use ReturnValueWalker")]
-        public override void VisitReturnStatement(ReturnStatementSyntax node)
-        {
-            if (this.isSamplingRetunValues)
-            {
-                this.values.Add(new Assignment(this.currentSymbol, node.Expression));
-            }
-
-            base.VisitReturnStatement(node);
-        }
-
         internal static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return CreateCore(property, null, semanticModel, cancellationToken);
@@ -244,16 +222,6 @@
             return Pool.GetOrCreate();
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled CreateWithReturnValues(SyntaxNode context, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var pooled = Pool.GetOrCreate();
-            pooled.Item.context = context;
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.AddReturnValues(method, context).IgnoreReturnValue();
-            return pooled;
-        }
-
         internal bool AddAssignedValuesFor(ExpressionSyntax assignedValue)
         {
             var symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
@@ -280,11 +248,6 @@
 
             this.currentSymbol = oldSymbol;
             return before != this.values.Count;
-        }
-
-        internal bool AddReturnValues(IPropertySymbol property, SyntaxNode call)
-        {
-            return this.AddReturnValues(property?.GetMethod, call);
         }
 
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -334,7 +297,6 @@
                     var memberDeclaration = reference.GetSyntax(this.cancellationToken)?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                     if (memberDeclaration != null)
                     {
-                        this.AddReturnValues((this.currentSymbol as IPropertySymbol)?.GetMethod, memberDeclaration).IgnoreReturnValue();
                         this.Visit(memberDeclaration);
                     }
                 }
@@ -436,6 +398,8 @@
                     this.Visit(memnber);
                 }
             }
+
+            this.values.PurgeDuplicates();
         }
 
         private void HandleAssignedValue(ISymbol assignedSymbol, ExpressionSyntax value)
@@ -475,79 +439,9 @@
             {
                 if (SymbolComparer.Equals(this.currentSymbol, assignedSymbol))
                 {
-                    if (value is InvocationExpressionSyntax)
-                    {
-                        var method = this.semanticModel.GetSymbolSafe(value, this.cancellationToken) as IMethodSymbol;
-                        if (method != null &&
-                            method.DeclaringSyntaxReferences.Length > 0)
-                        {
-                            this.AddReturnValues(method, value).IgnoreReturnValue();
-                            return;
-                        }
-                    }
-
                     this.values.Add(new Assignment(this.currentSymbol, value));
                 }
             }
-        }
-
-        private bool AddReturnValues(IMethodSymbol method, SyntaxNode call)
-        {
-            if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0 ||
-                !this.visitedLocations.Add(call))
-            {
-                return false;
-            }
-
-            var oldSymbol = this.currentSymbol;
-            this.currentSymbol = method;
-            var before = this.values.Count;
-            foreach (var reference in method.DeclaringSyntaxReferences)
-            {
-                this.isSamplingRetunValues = true;
-                this.Visit(reference.GetSyntax(this.cancellationToken));
-                this.isSamplingRetunValues = false;
-            }
-
-            if (before != this.values.Count)
-            {
-                for (var i = before; i < this.values.Count; i++)
-                {
-                    var value = this.values[i].Value;
-                    var returnedSymbol = this.semanticModel.GetSymbolSafe(value, this.cancellationToken);
-                    var parameter = returnedSymbol as IParameterSymbol;
-                    if (parameter != null)
-                    {
-                        ExpressionSyntax arg = null;
-                        if ((call as InvocationExpressionSyntax)?.TryGetArgumentValue(parameter, this.cancellationToken, out arg) == true)
-                        {
-                            this.values[i] = this.values[i].WithValue(arg);
-                        }
-                    }
-
-                    var local = returnedSymbol as ILocalSymbol;
-                    if (local != null || parameter != null)
-                    {
-                        var beforeLocal = this.values.Count;
-                        if (this.AddAssignedValuesFor(value))
-                        {
-                            if (this.values[i].Value == value)
-                            {
-                                this.values.RemoveAt(i);
-                            }
-
-                            for (var j = 0; j < this.values.Count - beforeLocal - 1; j++)
-                            {
-                                this.values.Insert(i, this.values[beforeLocal + j]);
-                            }
-                        }
-                    }
-                }
-            }
-
-            this.currentSymbol = oldSymbol;
-            return before != this.values.Count;
         }
 
         private bool IsBeforeInScope(SyntaxNode node)
