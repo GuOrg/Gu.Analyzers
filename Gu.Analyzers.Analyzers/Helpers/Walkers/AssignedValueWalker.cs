@@ -16,7 +16,7 @@
             {
                 x.values.Clear();
                 x.visitedLocations.Clear();
-                x.parameters.Clear();
+                x.refParameters.Clear();
                 x.currentSymbol = null;
                 x.context = null;
                 x.semanticModel = null;
@@ -25,7 +25,7 @@
 
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
-        private readonly HashSet<IParameterSymbol> parameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
+        private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
 
         private ISymbol currentSymbol;
         private SyntaxNode context;
@@ -56,7 +56,7 @@
 
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
-            this.HandleAssignedValue(this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken), node.Initializer?.Value);
+            this.HandleAssignedValue(node, node.Initializer?.Value);
             base.VisitVariableDeclarator(node);
         }
 
@@ -107,7 +107,7 @@
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
-            this.HandleAssignedValue(this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken), node.Right);
+            this.HandleAssignedValue(node.Left, node.Right);
             base.VisitAssignmentExpression(node);
         }
 
@@ -118,7 +118,7 @@
                 case SyntaxKind.LogicalNotExpression:
                     break;
                 default:
-                    this.HandleAssignedValue(this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken), node);
+                    this.HandleAssignedValue(node.Operand, node);
                     break;
             }
 
@@ -127,7 +127,7 @@
 
         public override void VisitPostfixUnaryExpression(PostfixUnaryExpressionSyntax node)
         {
-            this.HandleAssignedValue(this.semanticModel.GetSymbolSafe(node.Operand, this.cancellationToken), node);
+            this.HandleAssignedValue(node.Operand, node);
             base.VisitPostfixUnaryExpression(node);
         }
 
@@ -154,7 +154,8 @@
                         for (var i = before; i < this.values.Count; i++)
                         {
                             var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
-                            if (parameter != null)
+                            if (parameter != null &&
+                                parameter.RefKind != RefKind.Out)
                             {
                                 ExpressionSyntax arg;
                                 if (node.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
@@ -170,22 +171,19 @@
 
         public override void VisitArgument(ArgumentSyntax node)
         {
-            if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) ||
-                node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
+            if (this.visitedLocations.Add(node) &&
+                (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) ||
+                 node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword)))
             {
                 var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
                 var argSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
                 if (invocation != null &&
                     (SymbolComparer.Equals(this.currentSymbol, argSymbol) ||
-                     this.parameters.Contains(argSymbol as IParameterSymbol)))
+                     this.refParameters.Contains(argSymbol as IParameterSymbol)))
                 {
                     var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                    if (method == null ||
-                        method.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        this.values.Add(invocation);
-                    }
-                    else
+                    if (method != null &&
+                        method.DeclaringSyntaxReferences.Length > 0)
                     {
                         foreach (var reference in method.DeclaringSyntaxReferences)
                         {
@@ -194,13 +192,17 @@
                             if (methodDeclaration.TryGetMatchingParameter(node, out parameterSyntax))
                             {
                                 var parameter = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken) as IParameterSymbol;
-                                if (parameter == null)
+                                if (parameter != null)
                                 {
-                                    this.values.Add(invocation);
-                                }
-                                else
-                                {
-                                    this.parameters.Add(parameter).IgnoreReturnValue();
+                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
+                                    {
+                                        this.refParameters.Add(parameter).IgnoreReturnValue();
+                                    }
+
+                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
+                                    {
+                                        this.values.Add(invocation);
+                                    }
                                 }
                             }
                         }
@@ -439,9 +441,16 @@
             this.values.PurgeDuplicates();
         }
 
-        private void HandleAssignedValue(ISymbol assignedSymbol, ExpressionSyntax value)
+        private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
         {
             if (value == null)
+            {
+                return;
+            }
+
+            var assignedSymbol = this.semanticModel.GetSymbolSafe(assignee, this.cancellationToken) ??
+                                 this.semanticModel.GetDeclaredSymbolSafe(assignee, this.cancellationToken);
+            if (assignedSymbol == null)
             {
                 return;
             }
@@ -475,7 +484,7 @@
             else
             {
                 if (SymbolComparer.Equals(this.currentSymbol, assignedSymbol) ||
-                    this.parameters.Contains(assignedSymbol as IParameterSymbol))
+                    this.refParameters.Contains(assignedSymbol as IParameterSymbol))
                 {
                     this.values.Add(value);
                 }
