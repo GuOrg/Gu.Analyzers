@@ -59,8 +59,8 @@
                 return;
             }
 
-            var isCreation = Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken);
-            if (isCreation == Result.Yes || isCreation == Result.Maybe)
+            if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.Yes, Result.Maybe))
             {
                 if (variableDeclaration.Parent is UsingStatementSyntax ||
                     variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -105,37 +105,41 @@
                 return false;
             }
 
-            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
-            ExpressionSyntax returnValue = null;
-            if (block?.TryGetReturnExpression(semanticModel, cancellationToken, out returnValue) == true)
+            using (var pooled = ReturnValueWalker.Create(variable.FirstAncestorOrSelf<BlockSyntax>(), false, semanticModel, cancellationToken))
             {
-                var returned = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
-                if (symbol.Equals(returned))
+                foreach (var value in pooled.Item)
                 {
-                    return true;
-                }
-
-                var objectCreation = returnValue as ObjectCreationExpressionSyntax;
-                if (objectCreation?.ArgumentList != null)
-                {
-                    foreach (var argument in objectCreation.ArgumentList.Arguments)
+                    var returnedSymbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                    if (SymbolComparer.Equals(symbol, returnedSymbol))
                     {
-                        var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
-                        if (symbol.Equals(arg))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
-                }
 
-                if (objectCreation?.Initializer != null)
-                {
-                    foreach (var argument in objectCreation.Initializer.Expressions)
+                    var objectCreation = value as ObjectCreationExpressionSyntax;
+                    if (objectCreation != null)
                     {
-                        var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
-                        if (symbol.Equals(arg))
+                        if (objectCreation.ArgumentList != null)
                         {
-                            return true;
+                            foreach (var argument in objectCreation.ArgumentList.Arguments)
+                            {
+                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                                if (SymbolComparer.Equals(symbol, arg))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (objectCreation.Initializer != null)
+                        {
+                            foreach (var argument in objectCreation.Initializer.Expressions)
+                            {
+                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
+                                if (SymbolComparer.Equals(symbol, arg))
+                                {
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }

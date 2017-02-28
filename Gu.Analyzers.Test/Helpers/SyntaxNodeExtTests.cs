@@ -153,6 +153,7 @@ namespace RoslynSandBox
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
+            [Explicit("Not sure here.")]
             [TestCase("a = 1;", "a = 2;", Result.Yes)]
             [TestCase("a = 1;", "a = 2;", Result.Yes)]
             [TestCase("a = 2;", "a = 3;", Result.Yes)]
@@ -169,8 +170,13 @@ namespace RoslynSandBox
         public Foo()
         {
             var a = 1;
-            this.E += (_, __) => a = 2;
-            a = 3;
+            this.E += (_, __) => a = 3;
+            this.E += (_, __) =>
+            {
+                a = 4;
+                a = 5;
+            };
+            a = 2;
         }
 
         public event EventHandler E;

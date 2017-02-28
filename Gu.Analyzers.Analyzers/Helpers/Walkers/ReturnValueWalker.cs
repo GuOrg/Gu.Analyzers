@@ -143,18 +143,12 @@
             }
 
             var symbol = this.semanticModel.GetSymbolSafe(value, this.cancellationToken);
-            if (symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
+            if (symbol is IParameterSymbol)
             {
                 using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
                 {
                     if (pooled.Item.Count != 0)
                     {
-                        if (symbol is ILocalSymbol)
-                        {
-                            this.values.Remove(value);
-                        }
-
                         foreach (var assignment in pooled.Item)
                         {
                             this.values.Add(assignment);

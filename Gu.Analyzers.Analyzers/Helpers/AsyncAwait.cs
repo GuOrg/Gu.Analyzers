@@ -24,26 +24,6 @@
             return result != null;
         }
 
-        internal static bool TryGetAwaitedSymbol(AwaitExpressionSyntax @await, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol result)
-        {
-            result = null;
-            if (@await?.Expression == null)
-            {
-                return false;
-            }
-
-            var expression = @await.Expression;
-            result = semanticModel.GetSymbolSafe(expression, cancellationToken);
-            if (result is IMethodSymbol &&
-                result.Name == "ConfigureAwait")
-            {
-                expression = ((InvocationExpressionSyntax)expression).Expression;
-                result = semanticModel.GetSymbolSafe(expression, cancellationToken);
-            }
-
-            return result != null;
-        }
-
         internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
             result = null;

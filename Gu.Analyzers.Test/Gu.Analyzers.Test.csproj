@@ -57,6 +57,7 @@
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
+    <Compile Include="GU0030UseUsingTests\Diagnostics.AsyncAwait.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Assigned.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Cached.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Recursion.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Verifiers\Helpers\MetadataReferences.cs" />
     <Compile Include="Verifiers\Helpers\TestDiagnosticProvider.cs" />
     <Compile Include="Verifiers\Helpers\TestXmlReferenceResolver.cs" />
+    <Compile Include="Verifiers\NestedDiagnosticVerifier.cs" />
     <Compile Include="Verifiers\NestedHappyPathVerifier.cs" />
   </ItemGroup>
   <ItemGroup>

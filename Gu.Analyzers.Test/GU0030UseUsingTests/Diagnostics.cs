@@ -3,8 +3,18 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
+    internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+	{
+	}
+}";
+
         [Test]
         public async Task PropertyInitializedPasswordBoxSecurePassword()
         {
@@ -75,16 +85,6 @@
         [Test]
         public async Task NewDisposable()
         {
-            var disposableCode = @"
-    using System;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }";
-
             var testCode = @"
     public static class Foo
     {
@@ -97,7 +97,7 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use using.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode, disposableCode }, expected).ConfigureAwait(false);
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode, DisposableCode }, expected).ConfigureAwait(false);
         }
 
         [Test]
@@ -246,109 +246,6 @@
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use using.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task AwaitCreateAsync()
-        {
-            var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
-{
-    public void Dispose()
-	{
-	}
-}";
-
-            var testCode = @"
-using System;
-using System.Threading.Tasks;
-
-internal static class Foo
-{
-    internal static async Task Bar()
-    {
-        ↓var stream = await CreateAsync();
-    }
-
-    internal static async Task<IDisposable> CreateAsync()
-    {
-        return new Disposable();
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                   .WithLocationIndicated(ref testCode)
-                   .WithMessage("Use using.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task AwaitCreateAsyncTaskFromResult()
-        {
-            var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
-{
-    public void Dispose()
-	{
-	}
-}";
-
-            var testCode = @"
-using System;
-using System.Threading.Tasks;
-
-internal static class Foo
-{
-    internal static async Task Bar()
-    {
-        ↓var stream = await CreateAsync();
-    }
-
-    internal static Task<Disposable> CreateAsync()
-    {
-        return Task.FromResult(new Disposable());
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                   .WithLocationIndicated(ref testCode)
-                   .WithMessage("Use using.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task AwaitingReadAsync()
-        {
-            var testCode = @"
-using System.IO;
-using System.Threading.Tasks;
-  
-internal static class Foo
-{
-    internal static async Task Bar()
-    {
-        ↓var stream = await ReadAsync(string.Empty);
-    }
-
-    internal static async Task<Stream> ReadAsync(string file)
-    {
-        var stream = new MemoryStream();
-        using (var fileStream = File.OpenRead(file))
-        {
-            await fileStream.CopyToAsync(stream)
-                            .ConfigureAwait(false);
-        }
-
-        stream.Position = 0;
-        return stream;
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                   .WithLocationIndicated(ref testCode)
-                   .WithMessage("Use using.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
     }

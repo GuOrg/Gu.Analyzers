@@ -24,7 +24,10 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                return IsCreation(pooled.Item, semanticModel, cancellationToken);
+                using (var pooledSet = SetPool<ISymbol>.Create())
+                {
+                    return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
+                }
             }
         }
 
@@ -38,7 +41,10 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                return IsCreation(pooled.Item, semanticModel, cancellationToken);
+                using (var pooledSet = SetPool<ISymbol>.Create())
+                {
+                    return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
+                }
             }
         }
 
@@ -46,6 +52,17 @@ namespace Gu.Analyzers
         /// Check if any path returns a created IDisposable
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = SetPool<ISymbol>.Create())
+            {
+                return IsCreation(candidate, semanticModel, cancellationToken, pooled.Item);
+            }
+        }
+
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        private static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ISymbol> checkedSymbols)
         {
             if (candidate == null ||
                 candidate.IsMissing ||
@@ -80,9 +97,9 @@ namespace Gu.Analyzers
                 switch (binaryExpression.Kind())
                 {
                     case SyntaxKind.CoalesceExpression:
-                        return IsEitherCreation(binaryExpression.Left, binaryExpression.Right, semanticModel, cancellationToken);
+                        return IsEitherCreation(binaryExpression.Left, binaryExpression.Right, semanticModel, cancellationToken, checkedSymbols);
                     case SyntaxKind.AsExpression:
-                        return IsCreation(binaryExpression.Left, semanticModel, cancellationToken);
+                        return IsCreation(binaryExpression.Left, semanticModel, cancellationToken, checkedSymbols);
                     default:
                         return Result.Unknown;
                 }
@@ -91,26 +108,34 @@ namespace Gu.Analyzers
             var cast = candidate as CastExpressionSyntax;
             if (cast != null)
             {
-                return IsCreation(cast.Expression, semanticModel, cancellationToken);
+                return IsCreation(cast.Expression, semanticModel, cancellationToken, checkedSymbols);
             }
 
             var conditional = candidate as ConditionalExpressionSyntax;
             if (conditional != null)
             {
-                return IsEitherCreation(conditional.WhenTrue, conditional.WhenFalse, semanticModel, cancellationToken);
+                return IsEitherCreation(conditional.WhenTrue, conditional.WhenFalse, semanticModel, cancellationToken, checkedSymbols);
             }
 
             var @await = candidate as AwaitExpressionSyntax;
             if (@await != null)
             {
+                var awaitedSymbol = semanticModel.GetSymbolSafe(@await.Expression, cancellationToken);
+                if (awaitedSymbol == null ||
+                    !checkedSymbols.Add(awaitedSymbol))
+                {
+                    return Result.Unknown;
+                }
+
                 using (var returnValues = ReturnValueWalker.Create(@await, true, semanticModel, cancellationToken))
                 {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedSymbols);
                 }
             }
 
             var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-            if (symbol == null)
+            if (symbol == null ||
+                !checkedSymbols.Add(symbol))
             {
                 return Result.Unknown;
             }
@@ -118,6 +143,14 @@ namespace Gu.Analyzers
             if (symbol is IFieldSymbol)
             {
                 return Result.No;
+            }
+
+            if (symbol is ILocalSymbol)
+            {
+                using (var pooled = AssignedValueWalker.Create(candidate, semanticModel, cancellationToken))
+                {
+                    return IsCreation(pooled.Item, semanticModel, cancellationToken, checkedSymbols);
+                }
             }
 
             var property = symbol as IPropertySymbol;
@@ -132,7 +165,7 @@ namespace Gu.Analyzers
 
                 using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
                 {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedSymbols);
                 }
             }
 
@@ -157,14 +190,14 @@ namespace Gu.Analyzers
 
                 using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
                 {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken);
+                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedSymbols);
                 }
             }
 
             return Result.Unknown;
         }
 
-        private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ISymbol> checkedSymbols)
         {
             if (value1 == null || value2 == null)
             {
@@ -177,7 +210,7 @@ namespace Gu.Analyzers
                 var value = i == 0
                                 ? value1
                                 : value2;
-                switch (IsCreation(value, semanticModel, cancellationToken))
+                switch (IsCreation(value, semanticModel, cancellationToken, checkedSymbols))
                 {
                     case Analyzers.Result.Unknown:
                         result = Analyzers.Result.Unknown;
@@ -197,12 +230,12 @@ namespace Gu.Analyzers
             return result;
         }
 
-        private static Result IsCreation(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsCreation(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<ISymbol> checkedSymbols)
         {
             var result = Analyzers.Result.No;
             foreach (var value in values)
             {
-                switch (IsCreation(value, semanticModel, cancellationToken))
+                switch (IsCreation(value, semanticModel, cancellationToken, checkedSymbols))
                 {
                     case Analyzers.Result.Unknown:
                         result = Analyzers.Result.Unknown;
