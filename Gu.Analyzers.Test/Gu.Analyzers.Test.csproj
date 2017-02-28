@@ -82,7 +82,9 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
+    <Compile Include="Helpers\ConstructorsWalkerTests.cs" />
     <Compile Include="Helpers\AsyncAwaitTests.cs" />
+    <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />
     <Compile Include="Helpers\ReturnValueWalkerTests.ReturnValues.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Constructors.cs" />
@@ -90,7 +92,6 @@
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Local.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Property.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.RefAndOut.cs" />
-    <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
     <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />

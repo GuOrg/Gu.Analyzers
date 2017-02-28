@@ -59,29 +59,32 @@ public sealed class Foo
         public void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+namespace RoslynSandBox
 {
-    private int bar = 1;
-
-    public Foo()
+    public sealed class Foo
     {
-        var temp1 = this.bar;
-        var temp2 = this.Bar;
-        this.bar = 2;
-        var temp3 = this.bar;
-        var temp4 = this.Bar;
-    }
+        private int bar = 1;
 
-    public int Bar
-    {
-        get { return this.bar; }
-        set { this.bar = value; }
-    }
+        public Foo()
+        {
+            var temp1 = this.bar;
+            var temp2 = this.Bar;
+            this.bar = 2;
+            var temp3 = this.bar;
+            var temp4 = this.Bar;
+        }
 
-    public void Meh()
-    {
-        var temp5 = this.bar;
-        var temp6 = this.Bar;
+        public int Bar
+        {
+            get { return this.bar; }
+            set { this.bar = value; }
+        }
+
+        public void Meh()
+        {
+            var temp5 = this.bar;
+            var temp6 = this.Bar;
+        }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -91,6 +94,70 @@ public sealed class Foo
             {
                 var actual = string.Join(", ", pooled.Item);
                 Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [Test]
+        public void BackingFieldPublicSetSimple()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    public sealed class Foo
+    {
+        private int bar;
+
+        public int Bar
+        {
+            get { return this.bar; }
+            set { this.bar = value; }
+        }
+
+        public void Meh()
+        {
+            var temp = this.bar;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause("var temp = this.bar").Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item);
+                Assert.AreEqual("value", actual);
+            }
+        }
+
+        [Test]
+        public void BackingFieldPrivateSetSimple()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandBox
+{
+    public sealed class Foo
+    {
+        private int bar;
+
+        public int Bar
+        {
+            get { return this.bar; }
+            private set { this.bar = value; }
+        }
+
+        public void Meh()
+        {
+            var temp = this.bar;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause("var temp = this.bar").Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item);
+                Assert.AreEqual("", actual);
             }
         }
 

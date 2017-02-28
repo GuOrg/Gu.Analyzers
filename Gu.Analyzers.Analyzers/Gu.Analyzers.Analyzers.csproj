@@ -77,7 +77,6 @@
     <Compile Include="Helpers\ResultExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\Constructor.cs" />
-    <Compile Include="Helpers\SyntaxtTreeHelpers\ConstructorDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\VauleWithSource.cs" />
     <Compile Include="Helpers\Ignore.cs" />
@@ -92,6 +91,7 @@
     <Compile Include="Helpers\ValueSource.cs" />
     <Compile Include="Helpers\Walkers\Assignment.cs" />
     <Compile Include="Helpers\Walkers\CallsWalker.cs" />
+    <Compile Include="Helpers\Walkers\ConstructorsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
     <Compile Include="Helpers\EnumerableExt.cs" />

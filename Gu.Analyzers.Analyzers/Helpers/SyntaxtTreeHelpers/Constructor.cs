@@ -9,31 +9,56 @@
 
     internal static class Constructor
     {
-        internal static bool IsCalledByOther(IMethodSymbol ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsRunBefore(this ConstructorDeclarationSyntax firstDeclaration, ConstructorDeclarationSyntax otherDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (ctor == null)
+            if (firstDeclaration == otherDeclaration)
             {
                 return false;
             }
 
-            foreach (var other in ctor.ContainingType.Constructors)
+            var first = semanticModel.GetDeclaredSymbolSafe(firstDeclaration, cancellationToken);
+            var other = semanticModel.GetDeclaredSymbolSafe(otherDeclaration, cancellationToken);
+            if (first == null ||
+                other == null)
             {
-                if (ReferenceEquals(ctor, other))
+                return false;
+            }
+
+            if (SymbolComparer.Equals(first.ContainingType, other.ContainingType))
+            {
+                if (otherDeclaration.Initializer == null ||
+                    !otherDeclaration.Initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
                 {
-                    continue;
+                    return false;
+                }
+            }
+            else if (!other.ContainingType.Is(first.ContainingType))
+            {
+                return false;
+            }
+
+            var next = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
+            if (SymbolComparer.Equals(first, next))
+            {
+                return true;
+            }
+
+            if (next == null)
+            {
+                if (TryGetDefault(other.ContainingType?.BaseType, out next))
+                {
+                   return SymbolComparer.Equals(first, next);
                 }
 
-                foreach (var reference in other.DeclaringSyntaxReferences)
+                return false;
+            }
+
+            foreach (var reference in next.DeclaringSyntaxReferences)
+            {
+                otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                if (IsRunBefore(firstDeclaration, otherDeclaration, semanticModel, cancellationToken))
                 {
-                    var otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                    if (otherDeclaration.Initializer?.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword) == true)
-                    {
-                        var chained = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
-                        if (ctor.Equals(chained))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
 
@@ -42,21 +67,31 @@
 
         internal static bool TryGetDefault(INamedTypeSymbol type, out IMethodSymbol result)
         {
+            result = null;
             while (type != null && type != KnownSymbol.Object)
             {
+                bool found = false;
                 foreach (var ctorSymbol in type.Constructors)
                 {
                     if (ctorSymbol.Parameters.Length == 0)
                     {
-                        result = ctorSymbol;
-                        return true;
+                        found = true;
+                        if (ctorSymbol.DeclaringSyntaxReferences.Length != 0)
+                        {
+                            result = ctorSymbol;
+                            return true;
+                        }
                     }
+                }
+
+                if (!found)
+                {
+                    return false;
                 }
 
                 type = type.BaseType;
             }
 
-            result = null;
             return false;
         }
 
