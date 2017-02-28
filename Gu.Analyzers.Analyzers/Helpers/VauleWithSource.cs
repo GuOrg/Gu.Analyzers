@@ -550,7 +550,7 @@ namespace Gu.Analyzers
                 {
                     wasCalled = true;
                     ExpressionSyntax argumentValue;
-                    if (invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                    if (invocation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out argumentValue))
                     {
                         var argValueSymbol = semanticModel.GetSymbolSafe(argumentValue, cancellationToken);
                         if (ReferenceEquals(parameter, argValueSymbol))
@@ -626,7 +626,7 @@ namespace Gu.Analyzers
                     ExpressionSyntax argumentValue;
                     foreach (var call in calls.Item.Invocations)
                     {
-                        if (call.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                        if (call.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
                             AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }
@@ -638,7 +638,7 @@ namespace Gu.Analyzers
 
                     foreach (var initializer in calls.Item.Initializers)
                     {
-                        if (initializer.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                        if (initializer.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
                             AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }
@@ -650,7 +650,7 @@ namespace Gu.Analyzers
 
                     foreach (var objectCreation in calls.Item.ObjectCreations)
                     {
-                        if (objectCreation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out argumentValue))
+                        if (objectCreation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out argumentValue))
                         {
                             AddSourcesRecursively(argumentValue, semanticModel, cancellationToken, result);
                         }

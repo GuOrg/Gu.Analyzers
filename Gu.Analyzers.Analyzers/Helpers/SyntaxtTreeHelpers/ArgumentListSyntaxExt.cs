@@ -35,7 +35,7 @@ namespace Gu.Analyzers
             return true;
         }
 
-        internal static bool TryGetMatchingArgumentValue(this ArgumentListSyntax arguments, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
+        internal static bool TryGetArgumentValue(this ArgumentListSyntax arguments, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
             value = null;
             if (arguments == null ||

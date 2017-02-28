@@ -55,7 +55,7 @@
                 return false;
             }
 
-            return invocation.ArgumentList.TryGetMatchingArgumentValue(parameter, cancellationToken, out value);
+            return invocation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out value);
         }
 
         private static bool TryFindInvokee(ExpressionSyntax expression, out ExpressionSyntax invokee)
