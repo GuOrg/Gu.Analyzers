@@ -397,11 +397,11 @@ namespace Gu.Analyzers
                         continue;
                     }
 
-                    if (methodDeclaration.ExpressionBody != null)
+                    if (methodDeclaration.ExpressionBody?.Expression != null)
                     {
                         AddSourcesRecursively(methodDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, result);
                     }
-                    else
+                    else if(methodDeclaration.Body != null)
                     {
                         using (var pooledReturns = ReturnValueWalker.Create(methodDeclaration.Body, true, semanticModel, cancellationToken))
                         {

@@ -71,13 +71,15 @@ public class Foo
     public void Update()
     {
         Stream stream;
-        TryGetStream(out stream);
-        ↓stream = File.OpenRead(string.Empty);
+        if (TryGetStream(out stream))
+        {
+            ↓stream = File.OpenRead(string.Empty);
+        }
     }
 
-    public bool TryGetStream(out Stream stream)
+    public bool TryGetStream(out Stream result)
     {
-        stream = File.OpenRead(string.Empty);
+        result = File.OpenRead(string.Empty);
         return true;
     }
 }";
@@ -160,7 +162,7 @@ public class Foo
             }
 
             [Test]
-            public async Task RefParameter()
+            public async Task PublicMethodRefParameter()
             {
                 var testCode = @"
 using System;
@@ -191,6 +193,65 @@ public class Foo
         stream?.Dispose();
         stream = File.OpenRead(string.Empty);
         return true;
+    }
+}";
+                await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task CallPrivateMethodRefParameter()
+            {
+                var testCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    private Stream stream = File.OpenRead(string.Empty);
+
+    private Foo()
+    {
+        this.Assign(ref this.stream);
+    }
+
+    public void Dispose()
+    {
+        stream?.Dispose();
+    }
+
+    private void Assign(ref Stream stream)
+    {
+        ↓stream = File.OpenRead(string.Empty);
+    }
+}";
+
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Dispose before re-assigning.");
+                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+                var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo : IDisposable
+{
+    private Stream stream = File.OpenRead(string.Empty);
+
+    private Foo()
+    {
+        this.Assign(ref this.stream);
+    }
+
+    public void Dispose()
+    {
+        stream?.Dispose();
+    }
+
+    private void Assign(ref Stream stream)
+    {
+        stream?.Dispose();
+        stream = File.OpenRead(string.Empty);
     }
 }";
                 await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);

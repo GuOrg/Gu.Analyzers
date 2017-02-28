@@ -24,6 +24,11 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
+                if (pooled.Item.Count == 0)
+                {
+                    return Result.No;
+                }
+
                 using (var pooledSet = SetPool<ISymbol>.Create())
                 {
                     return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
@@ -41,6 +46,11 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
+                if (pooled.Item.Count == 0)
+                {
+                    return Result.No;
+                }
+
                 using (var pooledSet = SetPool<ISymbol>.Create())
                 {
                     return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
@@ -174,6 +184,11 @@ namespace Gu.Analyzers
             {
                 if (method.DeclaringSyntaxReferences.Length == 0)
                 {
+                    if (method == KnownSymbol.IEnumerableOfT.GetEnumerator)
+                    {
+                        return Result.Yes;
+                    }
+
                     if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
                         method.ContainingType == KnownSymbol.Enumerable ||
                         method == KnownSymbol.IEnumerable.GetEnumerator ||

@@ -90,6 +90,11 @@
         internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
+            if (node == null)
+            {
+                return pooled;
+            }
+
             pooled.Item.isRecursive = recursive;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;

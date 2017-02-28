@@ -33,7 +33,7 @@ public class Foo
             }
 
             [Test]
-            public async Task AssigningFieldViaCachedOutParameter()
+            public async Task AssigningFieldViaConcurrentDictionaryTryGetValue()
             {
                 var testCode = @"
 namespace RoslynSandBox

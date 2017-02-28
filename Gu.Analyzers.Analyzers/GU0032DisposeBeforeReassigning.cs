@@ -48,15 +48,14 @@
             }
 
             var assignment = (AssignmentExpressionSyntax)context.Node;
-            var isCreation = Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken);
-            if (isCreation == Result.No ||
-                isCreation == Result.Unknown)
+            if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }
 
-            var isAssignedWithCreated = Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken);
-            if (isAssignedWithCreated == Result.No || isAssignedWithCreated == Result.Unknown)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }

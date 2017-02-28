@@ -121,7 +121,7 @@ public sealed class Foo : IDisposable
             }
 
             [Test]
-            public async Task FieldAssignedWExtensionMethodFactoryAssigningInCtor()
+            public async Task FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 using System;
@@ -141,7 +141,7 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -163,7 +163,7 @@ public sealed class Foo : IDisposable
 {
     private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -178,7 +178,7 @@ public sealed class Foo : IDisposable
             }
 
             [Test]
-            public async Task FieldAssignedWGenericExtensionMethodFactoryAssigningInCtor()
+            public async Task FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 using System;
@@ -198,7 +198,7 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -220,7 +220,7 @@ public sealed class Foo : IDisposable
 {
     private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -270,7 +270,7 @@ namespace RoslynSandBox
 
     public class Foo : IDisposable
     {
-        ↓private readonly IEnumerator<int> current;
+        private readonly IEnumerator<int> current;
 
         public Foo(List<int> list)
         {

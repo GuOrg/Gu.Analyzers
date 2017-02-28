@@ -35,8 +35,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (left.Name == right.Name &&
-                left.ContainingType == right.ContainingType)
+            if (left.ContainingType == right.ContainingType)
             {
                 return true;
             }
