@@ -162,14 +162,8 @@
                     return false;
                 }
 
-                if (!SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
-                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
-                {
-                    return false;
-                }
-
                 if (!other.ContainingType.Is(first.ContainingType) &&
-                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
+                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.BaseKeyword))
                 {
                     return false;
                 }
