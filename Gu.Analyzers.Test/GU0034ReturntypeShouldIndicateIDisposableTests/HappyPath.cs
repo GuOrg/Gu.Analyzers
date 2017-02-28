@@ -6,6 +6,19 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0034ReturntypeShouldIndicateIDisposable>
     {
+        private static readonly string DisposableCode = @"
+namespace RoslynSandBox
+    {
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
         [Test]
         public async Task RealisticExtensionMethodClass()
         {
@@ -252,7 +265,7 @@ public class Foo
         }
 
         [Test]
-        public async Task MethodReturningFromResultOfDisposable()
+        public async Task MethodReturningTaskFromResultOfDisposable()
         {
             var testCode = @"
 namespace RoslynSandBox
@@ -264,21 +277,21 @@ namespace RoslynSandBox
     {
         public void Bar()
         {
-            Meh();
+            CreateDisposableAsync();
         }
 
-        private static Task<IDisposable> Meh()
+        private static Task<IDisposable> CreateDisposableAsync()
         {
             return Task.FromResult<IDisposable>(new Disposable());
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
 
         [Test]
-        public async Task MethodReturningRunOfDisposable()
+        public async Task MethodReturningTaskRunOfDisposable()
         {
             var testCode = @"
 namespace RoslynSandBox
@@ -294,7 +307,7 @@ namespace RoslynSandBox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
 

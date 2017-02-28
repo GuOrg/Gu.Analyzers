@@ -76,7 +76,7 @@
                 IMethodSymbol baseCtor;
                 if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out baseCtor))
                 {
-                    this.HandleInvoke(ctor, null);
+                    this.HandleInvoke(baseCtor, null);
                 }
             }
 
@@ -286,6 +286,7 @@
                     }
                 }
 
+                var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
                     using (var pooled = ConstructorsWalker.Create((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
@@ -298,17 +299,26 @@
 
                         foreach (var creation in pooled.Item.ObjectCreations)
                         {
-                            if (this.visitedLocations.Add(creation))
+                            if (contextCtor == null ||
+                                creation.Creates(contextCtor, true, this.semanticModel, this.cancellationToken))
                             {
-                                this.VisitObjectCreationExpression(creation);
-                                var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                this.HandleInvoke(method, creation.ArgumentList);
+                                if (this.visitedLocations.Add(creation))
+                                {
+                                    this.VisitObjectCreationExpression(creation);
+                                    var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
+                                    this.HandleInvoke(method, creation.ArgumentList);
+                                }
                             }
                         }
 
                         foreach (var ctor in pooled.Item.NonPrivateCtors)
                         {
-                            this.Visit(ctor);
+                            if (contextCtor == null ||
+                                ctor == contextCtor ||
+                                contextCtor.IsRunBefore(ctor, this.semanticModel, this.cancellationToken))
+                            {
+                                this.Visit(ctor);
+                            }
                         }
                     }
                 }
@@ -403,7 +413,7 @@
                 {
                     foreach (var reference in method.DeclaringSyntaxReferences)
                     {
-                        this.Visit(reference.GetSyntax(this.cancellationToken));
+                        base.Visit(reference.GetSyntax(this.cancellationToken));
                     }
                 }
 

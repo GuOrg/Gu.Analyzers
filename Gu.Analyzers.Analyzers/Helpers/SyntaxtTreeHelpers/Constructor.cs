@@ -9,60 +9,28 @@
 
     internal static class Constructor
     {
-        internal static bool IsRunBefore(this ConstructorDeclarationSyntax firstDeclaration, ConstructorDeclarationSyntax otherDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (firstDeclaration == otherDeclaration)
-            {
-                return false;
-            }
-
-            var first = semanticModel.GetDeclaredSymbolSafe(firstDeclaration, cancellationToken);
-            var other = semanticModel.GetDeclaredSymbolSafe(otherDeclaration, cancellationToken);
-            if (first == null ||
-                other == null)
-            {
-                return false;
-            }
-
-            if (SymbolComparer.Equals(first.ContainingType, other.ContainingType))
-            {
-                if (otherDeclaration.Initializer == null ||
-                    !otherDeclaration.Initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
-                {
-                    return false;
-                }
-            }
-            else if (!other.ContainingType.Is(first.ContainingType))
-            {
-                return false;
-            }
-
-            var next = semanticModel.GetSymbolSafe(otherDeclaration.Initializer, cancellationToken);
-            if (SymbolComparer.Equals(first, next))
+            var created = semanticModel.GetSymbolSafe(creation, cancellationToken) as IMethodSymbol;
+            var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
+            if (SymbolComparer.Equals(ctorSymbol, created))
             {
                 return true;
             }
 
-            if (next == null)
-            {
-                if (TryGetDefault(other.ContainingType?.BaseType, out next))
-                {
-                   return SymbolComparer.Equals(first, next);
-                }
+            return recursive && IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
+        }
 
+        internal static bool IsRunBefore(this ConstructorDeclarationSyntax ctor, ConstructorDeclarationSyntax otherDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (ctor == otherDeclaration)
+            {
                 return false;
             }
 
-            foreach (var reference in next.DeclaringSyntaxReferences)
-            {
-                otherDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                if (IsRunBefore(firstDeclaration, otherDeclaration, semanticModel, cancellationToken))
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            var first = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
+            var other = semanticModel.GetDeclaredSymbolSafe(otherDeclaration, cancellationToken);
+            return IsRunBefore(first, other, semanticModel, cancellationToken);
         }
 
         internal static bool TryGetDefault(INamedTypeSymbol type, out IMethodSymbol result)
@@ -175,6 +143,85 @@
                     }
                 }
             }
+        }
+
+        private static bool IsRunBefore(IMethodSymbol first, IMethodSymbol other, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (first == null ||
+                other == null)
+            {
+                return false;
+            }
+
+            ConstructorInitializerSyntax initializer;
+            if (TryGetInitializer(other, cancellationToken, out initializer))
+            {
+                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
+                   !initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
+                {
+                    return false;
+                }
+
+                if (!SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
+                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
+                {
+                    return false;
+                }
+
+                if (!other.ContainingType.Is(first.ContainingType) &&
+                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) ||
+                    !other.ContainingType.Is(first.ContainingType))
+                {
+                    return false;
+                }
+            }
+
+            var next = semanticModel.GetSymbolSafe(initializer, cancellationToken);
+            if (SymbolComparer.Equals(first, next))
+            {
+                return true;
+            }
+
+            if (next == null)
+            {
+                if (TryGetDefault(other.ContainingType?.BaseType, out next))
+                {
+                    return SymbolComparer.Equals(first, next);
+                }
+
+                return false;
+            }
+
+            return IsRunBefore(first, next, semanticModel, cancellationToken);
+        }
+
+        private static bool TryGetInitializer(IMethodSymbol ctor, CancellationToken cancellationToken, out ConstructorInitializerSyntax initializer)
+        {
+            initializer = null;
+            if (ctor == null ||
+                ctor.MethodKind != MethodKind.Constructor)
+            {
+                return false;
+            }
+
+            foreach (var reference in ctor.DeclaringSyntaxReferences)
+            {
+                var declaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                initializer = declaration.Initializer;
+                if (initializer != null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
