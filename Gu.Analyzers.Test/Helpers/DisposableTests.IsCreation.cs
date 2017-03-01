@@ -324,7 +324,7 @@ namespace RoslynSandBox
             }
 
             [TestCase("File.OpenRead(string.Empty)", Result.Maybe)]
-            [TestCase("this.ints.GetEnumerator()", Result.No)]
+            [TestCase("this.ints.GetEnumerator()", Result.Yes)]
             [TestCase("((IList)this.ints).GetEnumerator()", Result.No)]
             [TestCase("this.disposables.First()", Result.No)]
             [TestCase("this.disposableMap[1]", Result.No)]

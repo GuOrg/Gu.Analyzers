@@ -14,6 +14,15 @@
                                 default(SymbolInfo);
         }
 
+        internal static bool IsEither<T1, T2>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
+                where T1 : ISymbol
+                where T2 : ISymbol
+        {
+            return semanticModel.GetSymbolSafe(node, cancellationToken).IsEither<T1, T2>() ||
+                   semanticModel.GetDeclaredSymbolSafe(node, cancellationToken).IsEither<T1, T2>()||
+                   semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
+        }
+
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
             var awaitExpression = node as AwaitExpressionSyntax;

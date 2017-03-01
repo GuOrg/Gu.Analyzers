@@ -117,49 +117,81 @@
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            var isTaskRun = false;
             if (this.awaits)
             {
                 ExpressionSyntax awaited;
-                isTaskRun = AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out awaited);
-                if (isTaskRun ||
-                    AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
+                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out awaited))
                 {
-                    value = awaited;
+                    using (var pooled = this.GetRecursive(awaited))
+                    {
+                        if (pooled.Item.values.Count == 0)
+                        {
+                            this.values.Add(awaited);
+                        }
+                        else
+                        {
+                            foreach (var returnValue in pooled.Item.values)
+                            {
+                                this.AddReturnValue(returnValue);
+                            }
+                        }
+                    }
+
+                    return;
+                }
+
+                if (AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
+                {
+                    this.AddReturnValue(awaited);
+                    return;
                 }
             }
 
-            this.values.Add(value);
-            if ((this.isRecursive &&
-                 value is InvocationExpressionSyntax) ||
-                isTaskRun)
+            if (this.isRecursive)
             {
-                using (var pooled = this.GetRecursive(value))
+                if (value is InvocationExpressionSyntax)
                 {
-                    if (pooled.Item.values.Count != 0)
+                    using (var pooled = this.GetRecursive(value))
                     {
-                        this.values.Remove(value);
-                        foreach (var returnValue in pooled.Item.values)
+                        if (pooled.Item.values.Count == 0)
                         {
-                            this.values.Add(returnValue);
+                            this.values.Add(value);
+                        }
+                        else
+                        {
+                            foreach (var returnValue in pooled.Item.values)
+                            {
+                                this.AddReturnValue(returnValue);
+                            }
                         }
                     }
+                }
+                else if (this.checkedLocations.Add(value) &&
+                         this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(value, this.cancellationToken))
+                {
+                    using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
+                    {
+                        if (pooled.Item.Count == 0)
+                        {
+                            this.values.Add(value);
+                        }
+                        else
+                        {
+                            foreach (var assignment in pooled.Item)
+                            {
+                                this.AddReturnValue(assignment);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    this.values.Add(value);
                 }
             }
-
-            var symbol = this.semanticModel.GetSymbolSafe(value, this.cancellationToken);
-            if (symbol is IParameterSymbol)
+            else
             {
-                using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
-                {
-                    if (pooled.Item.Count != 0)
-                    {
-                        foreach (var assignment in pooled.Item)
-                        {
-                            this.values.Add(assignment);
-                        }
-                    }
-                }
+                this.values.Add(value);
             }
         }
 

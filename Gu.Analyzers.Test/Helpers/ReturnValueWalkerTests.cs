@@ -101,12 +101,12 @@ namespace RoslynSandBox
         [TestCase("IdExpressionBody(1)", true, "1")]
         [TestCase("IdExpressionBody(1)", false, "1")]
         [TestCase("AssigningToParameter(1)", true, "1, 2, 3, 4")]
-        [TestCase("AssigningToParameter(1)", false, "1, 2, 3, 4")]
+        [TestCase("AssigningToParameter(1)", false, "1, 4")]
         [TestCase("CallingIdExpressionBody(1)", true, "1")]
-        [TestCase("CallingIdExpressionBody(1)", false, "IdExpressionBody(arg)")]
-        [TestCase("ReturnLocal()", true, "local")]
+        [TestCase("CallingIdExpressionBody(1)", false, "IdExpressionBody(arg1)")]
+        [TestCase("ReturnLocal()", true, "1")]
         [TestCase("ReturnLocal()", false, "local")]
-        [TestCase("ReturnLocalAssignedTwice(true)", true, "local, 3")]
+        [TestCase("ReturnLocalAssignedTwice(true)", true, "1, 2, 3")]
         [TestCase("ReturnLocalAssignedTwice(true)", false, "local, 3")]
         [TestCase("Recursive()", true, "")]
         [TestCase("Recursive()", false, "Recursive()")]
@@ -142,7 +142,7 @@ namespace RoslynSandBox
 
         internal static int IdExpressionBody(int arg) => arg;
 
-        internal static int CallingIdExpressionBody(int arg) => IdExpressionBody(arg);
+        internal static int CallingIdExpressionBody(int arg1) => IdExpressionBody(arg1);
 
         public static int AssigningToParameter(int arg)
         {
