@@ -51,13 +51,6 @@
             }
 
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            var isCreation = Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken);
-            if (isCreation == Result.No ||
-                isCreation == Result.Unknown)
-            {
-                return;
-            }
-
             if (MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
@@ -80,13 +73,6 @@
                 return;
             }
 
-            var isCreation = Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken);
-            if (isCreation == Result.No ||
-                isCreation == Result.Unknown)
-            {
-                return;
-            }
-
             if (MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
@@ -94,10 +80,16 @@
         }
 
         private static bool MustBeHandled(
-            SyntaxNode node,
+            ExpressionSyntax node,
             SemanticModel semanticModel,
             CancellationToken cancellationToken)
         {
+            if (Disposable.IsCreation(node, semanticModel, cancellationToken)
+               .IsEither(Result.No, Result.Unknown))
+            {
+                return false;
+            }
+
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
                 node.Parent is UsingStatementSyntax)
             {
