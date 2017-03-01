@@ -24,6 +24,24 @@
             return result != null;
         }
 
+        internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        {
+            var invocation = expression as InvocationExpressionSyntax;
+            if (invocation != null)
+            {
+                return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
+            }
+
+            var @await = expression as AwaitExpressionSyntax;
+            if (@await != null)
+            {
+                return TryAwaitTaskFromResult(@await.Expression, semanticModel, cancellationToken, out result);
+            }
+
+            result = null;
+            return false;
+        }
+
         internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
             result = null;
@@ -46,6 +64,24 @@
             }
 
             return result != null;
+        }
+
+        internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        {
+            var invocation = expression as InvocationExpressionSyntax;
+            if (invocation != null)
+            {
+                return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
+            }
+
+            var @await = expression as AwaitExpressionSyntax;
+            if (@await != null)
+            {
+                return TryAwaitTaskRun(@await.Expression, semanticModel, cancellationToken, out result);
+            }
+
+            result = null;
+            return false;
         }
 
         internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)

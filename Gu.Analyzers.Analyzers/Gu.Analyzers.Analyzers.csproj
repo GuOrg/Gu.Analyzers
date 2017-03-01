@@ -90,7 +90,6 @@
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
     <Compile Include="Helpers\Pooled\ListPool.cs" />
     <Compile Include="Helpers\ValueSource.cs" />
-    <Compile Include="Helpers\Walkers\Assignment.cs" />
     <Compile Include="Helpers\Walkers\CallsWalker.cs" />
     <Compile Include="Helpers\Walkers\ConstructorsWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />

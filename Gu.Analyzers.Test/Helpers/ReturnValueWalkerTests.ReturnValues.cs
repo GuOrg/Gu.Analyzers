@@ -301,6 +301,8 @@ namespace RoslynSandBox
         [TestCase("await CreateAsync(0).ConfigureAwait(false)", false, "1, 0, 2, 3")]
         [TestCase("await CreateStringAsync()", true, "new string(' ', 1)")]
         [TestCase("await CreateStringAsync()", false, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", true, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", false, "new string(' ', 1)")]
         [TestCase("await RecursiveAsync()", true, "")]
         [TestCase("await RecursiveAsync()", false, "RecursiveAsync()")]
         [TestCase("await RecursiveAsync(1)", true, "")]
@@ -335,6 +337,12 @@ namespace RoslynSandBox
         {
             await Task.Delay(0);
             return new string(' ', 1);
+        }
+
+        internal static async Task<string> ReturnAwaitTaskRunAsync()
+        {
+            await Task.Delay(0);
+            return await Task.Run(() => new string(' ', 1)).ConfigureAwait(false);
         }
 
         internal static Task<int> CreateAsync(int arg)

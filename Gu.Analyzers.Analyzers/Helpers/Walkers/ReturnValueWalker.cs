@@ -121,9 +121,9 @@
             if (this.awaits)
             {
                 ExpressionSyntax awaited;
-                isTaskRun = AsyncAwait.TryAwaitTaskRun(value as InvocationExpressionSyntax, this.semanticModel, this.cancellationToken, out awaited);
+                isTaskRun = AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out awaited);
                 if (isTaskRun ||
-                    AsyncAwait.TryAwaitTaskFromResult(value as InvocationExpressionSyntax, this.semanticModel, this.cancellationToken, out awaited))
+                    AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
                 {
                     value = awaited;
                 }
