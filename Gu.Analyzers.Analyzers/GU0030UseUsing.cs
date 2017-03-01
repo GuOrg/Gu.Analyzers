@@ -46,49 +46,46 @@
             }
 
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
-            VariableDeclaratorSyntax declarator;
-            if (!variableDeclaration.Variables.TryGetSingle(out declarator) ||
-                declarator.Initializer == null)
+            foreach (var declarator in variableDeclaration.Variables)
             {
-                return;
-            }
-
-            var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
-            if (symbol == null)
-            {
-                return;
-            }
-
-            if (Disposable.IsCreation(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.Yes, Result.Maybe))
-            {
-                if (variableDeclaration.Parent is UsingStatementSyntax ||
-                    variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
+                var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
+                if (symbol == null)
                 {
                     return;
                 }
 
-                if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
+                var value = declarator.Initializer?.Value;
+                if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.Yes, Result.Maybe))
                 {
-                    return;
-                }
+                    if (variableDeclaration.Parent is UsingStatementSyntax ||
+                        variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
+                    {
+                        return;
+                    }
 
-                if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
-                {
-                    return;
-                }
+                    if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
 
-                if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
-                {
-                    return;
-                }
+                    if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
 
-                if (IsDisposedAfter(symbol, declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
-                {
-                    return;
-                }
+                    if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
 
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                    if (IsDisposedAfter(symbol, value, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                }
             }
         }
 
