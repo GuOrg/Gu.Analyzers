@@ -19,9 +19,9 @@
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable arg)
         {
-            this.disposable = disposable;
+            this.disposable = arg;
         }
 
         public void Dispose()

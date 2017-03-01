@@ -1,132 +1,13 @@
 namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
     {
-        internal static bool IsMemberDisposed(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!(member is IFieldSymbol || member is IPropertySymbol))
-            {
-                return false;
-            }
-
-            var containingType = member.ContainingType;
-            IMethodSymbol disposeMethod;
-            if (!IsAssignableTo(containingType) || !TryGetDisposeMethod(containingType, true, out disposeMethod))
-            {
-                return false;
-            }
-
-            return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
-        }
-
-        internal static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
-            {
-                using (var pooled = IdentifierNameWalker.Create(reference.GetSyntax(cancellationToken)))
-                {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
-                    {
-                        var memberAccess = identifier.Parent as MemberAccessExpressionSyntax;
-                        if (memberAccess?.Expression is BaseExpressionSyntax)
-                        {
-                            var baseMethod = semanticModel.GetSymbolSafe(identifier, cancellationToken) as IMethodSymbol;
-                            if (baseMethod?.Name == "Dispose")
-                            {
-                                if (IsMemberDisposed(member, baseMethod, semanticModel, cancellationToken))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        if (identifier.Identifier.ValueText != member.Name)
-                        {
-                            continue;
-                        }
-
-                        var symbol = semanticModel.GetSymbolSafe(identifier, cancellationToken);
-                        if (member.Equals(symbol) || (member as IPropertySymbol)?.OverriddenProperty?.Equals(symbol) == true)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        internal static bool IsAssignedWithCreatedAndNotCachedOrInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources);
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndNotCachedOrInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (property == null ||
-                 !IsPotentiallyAssignableTo(property.Type))
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       !IsPotentiallyCachedOrInjected(sources);
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources);
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (property == null ||
-                !IsPotentiallyAssignableTo(property.Type))
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(property, semanticModel, cancellationToken))
-            {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources);
-            }
-        }
-
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
-        internal static bool IsPotentiallyCachedOrInjected(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsPotentiallyAssignableTo(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (disposable == null ||
                 disposable.IsMissing ||
@@ -135,29 +16,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            using (var sources = VauleWithSource.GetRecursiveSources(disposable, semanticModel, cancellationToken))
-            {
-                return !IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources);
-            }
-        }
-
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
-        internal static bool IsPotentiallyCachedOrInjected(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (disposeCall == null ||
-                disposeCall.IsMissing)
-            {
-                return false;
-            }
-
-            using (var sources = VauleWithSource.GetRecursiveSources(disposeCall.Expression, semanticModel, cancellationToken))
-            {
-                return !IsAssignedWithCreated(sources, semanticModel, cancellationToken) &&
-                       IsPotentiallyCachedOrInjected(sources);
-            }
+            return true;
         }
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
@@ -184,6 +43,11 @@ namespace Gu.Analyzers
 
         internal static bool IsAssignableTo(ITypeSymbol type)
         {
+            if (type == null)
+            {
+                return false;
+            }
+
             var typeParameter = type as ITypeParameterSymbol;
             if (typeParameter != null)
             {
@@ -195,11 +59,6 @@ namespace Gu.Analyzers
                     }
                 }
 
-                return false;
-            }
-
-            if (type == null)
-            {
                 return false;
             }
 
@@ -285,100 +144,6 @@ namespace Gu.Analyzers
                 }
 
                 baseType = baseType.BaseType;
-            }
-
-            return false;
-        }
-
-        [Obsolete]
-        private static bool IsAssignedWithCreated(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            foreach (var vauleWithSource in sources.Item)
-            {
-                if (IsAssignedWithCreated(vauleWithSource, semanticModel, cancellationToken))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsAssignedWithCreated(VauleWithSource vauleWithSource, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
-            {
-                return false;
-            }
-
-            switch (vauleWithSource.Source)
-            {
-                case ValueSource.Created:
-                case ValueSource.PotentiallyCreated:
-                    return true;
-                case ValueSource.External:
-                    {
-                        var symbol = semanticModel.GetSymbolSafe(vauleWithSource.Value, cancellationToken);
-                        var property = symbol as IPropertySymbol;
-                        if (property != null)
-                        {
-                            return property == KnownSymbol.PasswordBox.SecurePassword;
-                        }
-
-                        var method = symbol as IMethodSymbol;
-                        if (method != null)
-                        {
-                            return !method.ContainingType.Is(KnownSymbol.IDictionary);
-                        }
-
-                        return true;
-                    }
-
-                case ValueSource.Calculated:
-                    {
-                        var symbol = semanticModel.GetSymbolSafe(vauleWithSource.Value, cancellationToken);
-                        if (symbol == null)
-                        {
-                            return true;
-                        }
-
-                        return symbol.IsAbstract || symbol.IsVirtual;
-                    }
-            }
-
-            return false;
-        }
-
-        private static bool IsPotentiallyCachedOrInjected(Pool<List<VauleWithSource>>.Pooled sources)
-        {
-            foreach (var vauleWithSource in sources.Item)
-            {
-                switch (vauleWithSource.Source)
-                {
-                    case ValueSource.Injected:
-                    case ValueSource.PotentiallyInjected:
-                    case ValueSource.Cached:
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsCachedInMember(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            foreach (var vauleWithSource in sources.Item)
-            {
-                switch (vauleWithSource.Source)
-                {
-                    case ValueSource.Member:
-                        if (IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
-                        {
-                            return true;
-                        }
-
-                        break;
-                }
             }
 
             return false;

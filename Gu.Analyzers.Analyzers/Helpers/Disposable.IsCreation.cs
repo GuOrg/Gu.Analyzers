@@ -15,46 +15,53 @@ namespace Gu.Analyzers
         /// </summary>
         internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
+            if (!IsPotentiallyAssignableTo(disposable, semanticModel, cancellationToken))
             {
                 return Result.No;
             }
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                if (pooled.Item.Count == 0)
-                {
-                    return Result.No;
-                }
-
-                using (var pooledSet = SetPool<SyntaxNode>.Create())
-                {
-                    return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
-                }
+                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
             }
         }
 
         internal static Result IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
+            if (!IsPotentiallyAssignableTo(field?.Type))
             {
                 return Result.No;
             }
 
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                if (pooled.Item.Count == 0)
-                {
-                    return Result.No;
-                }
+                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
+            }
+        }
 
-                using (var pooledSet = SetPool<SyntaxNode>.Create())
-                {
-                    return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
-                }
+        internal static Result IsAssignedWithCreated(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!IsPotentiallyAssignableTo(property?.Type))
+            {
+                return Result.No;
+            }
+
+            using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+            {
+                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
+            }
+        }
+
+        internal static Result IsAssignedWithCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (pooled.Item.Count == 0)
+            {
+                return Result.No;
+            }
+
+            using (var pooledSet = SetPool<SyntaxNode>.Create())
+            {
+                return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
             }
         }
 
@@ -63,6 +70,11 @@ namespace Gu.Analyzers
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (!IsPotentiallyAssignableTo(candidate, semanticModel, cancellationToken))
+            {
+                return Result.No;
+            }
+
             using (var pooled = SetPool<SyntaxNode>.Create())
             {
                 return IsCreation(candidate, semanticModel, cancellationToken, pooled.Item);
@@ -188,8 +200,12 @@ namespace Gu.Analyzers
 
                     if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
                         method.ContainingType == KnownSymbol.Enumerable ||
+                        method.ContainingType == KnownSymbol.ConditionalWeakTable ||
                         method == KnownSymbol.IEnumerable.GetEnumerator ||
-                        method.ContainingType.Name.StartsWith("ConditionalWeakTable"))
+                        method == KnownSymbol.Task.Run ||
+                        method == KnownSymbol.Task.RunOfT ||
+                        method == KnownSymbol.Task.ConfigureAwait ||
+                        method == KnownSymbol.Task.FromResult)
                     {
                         return Result.No;
                     }
@@ -250,7 +266,11 @@ namespace Gu.Analyzers
                 switch (IsCreation(value, semanticModel, cancellationToken, checkedLocations))
                 {
                     case Analyzers.Result.Unknown:
-                        result = Analyzers.Result.Unknown;
+                        if (result == Result.No)
+                        {
+                            result = Analyzers.Result.Unknown;
+                        }
+
                         break;
                     case Analyzers.Result.Yes:
                         return Result.Yes;

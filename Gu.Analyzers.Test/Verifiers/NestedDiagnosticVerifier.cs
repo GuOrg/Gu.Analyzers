@@ -1,6 +1,5 @@
 ﻿namespace Gu.Analyzers.Test
 {
-    using System.Threading;
     using System.Threading.Tasks;
 
     public abstract class NestedDiagnosticVerifier<T>

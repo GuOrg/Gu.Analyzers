@@ -67,6 +67,8 @@
     <Compile Include="Helpers\AsyncAwait.cs" />
     <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\Disposable.IsCreation.cs" />
+    <Compile Include="Helpers\Disposable.IsMemberDisposed.cs" />
+    <Compile Include="Helpers\Disposable.Source.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableOfTType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />

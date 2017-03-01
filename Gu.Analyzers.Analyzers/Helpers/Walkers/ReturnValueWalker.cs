@@ -323,8 +323,10 @@
                     {
                         this.AddReturnValue(invocation);
                     }
-
-                    return this.TryHandleInvocation(invocation);
+                    else
+                    {
+                        return this.TryHandleInvocation(invocation);
+                    }
                 }
 
                 return true;

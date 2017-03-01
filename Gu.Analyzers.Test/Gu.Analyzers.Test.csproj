@@ -86,6 +86,7 @@
     <Compile Include="Helpers\ConstructorsWalkerTests.cs" />
     <Compile Include="Helpers\AsyncAwaitTests.cs" />
     <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />
+    <Compile Include="Helpers\DisposableTests.IsMemberDisposed.cs" />
     <Compile Include="Helpers\ReturnValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Constructors.cs" />

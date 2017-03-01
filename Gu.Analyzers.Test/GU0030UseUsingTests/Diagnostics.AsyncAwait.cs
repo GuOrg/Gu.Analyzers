@@ -3,7 +3,7 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal partial class Diagnostics
+    internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
     {
         internal class AsyncAwait : NestedDiagnosticVerifier<Diagnostics>
         {

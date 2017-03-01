@@ -20,7 +20,6 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType IDictionary = Create("System.Collections.IDictionary");
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
 
-        internal static readonly TaskType Task = new TaskType();
         internal static readonly TextReaderType TextReader = new TextReaderType();
         internal static readonly QualifiedType StreamReader = new QualifiedType("System.IO.StreamReader");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
@@ -29,12 +28,13 @@ namespace Gu.Analyzers
         internal static readonly IListType IList = new IListType();
         internal static readonly EnumerableType Enumerable = new EnumerableType();
         internal static readonly QualifiedType Expression = Create("System.Linq.Expressions.Expression");
+        internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
+        internal static readonly TaskType Task = new TaskType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
 
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
-
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
 
         private static QualifiedType Create(string qualifiedName)
