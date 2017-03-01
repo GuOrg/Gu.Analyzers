@@ -11,19 +11,19 @@
     {
         internal class IsMemberDisposed
         {
-            [TestCase("stream.Dispose()", "stream")]
-            [TestCase("this.stream.Dispose()", "stream")]
-            [TestCase("this.stream?.Dispose()", "stream")]
-            [TestCase("this.foo.foo.Dispose()", "foo")]
-            [TestCase("this.Inner.foo.Dispose()", "foo")]
-            [TestCase("this.foo?.foo.Dispose()", "foo")]
-            [TestCase("this.Inner?.foo.Dispose()", "foo")]
-            [TestCase("this.foo?.foo?.Dispose()", "foo")]
-            [TestCase("this.Inner?.foo?.Dispose()", "foo")]
-            [TestCase("(this.meh as IDisposable)?.Dispose()", "meh")]
-            [TestCase("((IDisposable)this.meh).Dispose()", "meh")]
-            [TestCase("((IDisposable)this.meh)?.Dispose()", "meh")]
-            public void TryGetDisposed(string code, string expected)
+            [TestCase("stream.Dispose()", "stream", "stream")]
+            [TestCase("this.stream.Dispose()", "stream", "stream")]
+            [TestCase("this.stream?.Dispose()", "stream", "stream")]
+            [TestCase("this.foo.foo.Dispose()", "foo", "foo, foo")]
+            [TestCase("this.Inner.foo.Dispose()", "foo", "Inner, foo")]
+            [TestCase("this.foo?.foo.Dispose()", "foo", "foo, foo")]
+            [TestCase("this.Inner?.foo.Dispose()", "foo", "Inner, foo")]
+            [TestCase("this.foo?.foo?.Dispose()", "foo", "foo, foo")]
+            [TestCase("this.Inner?.foo?.Dispose()", "foo", "Inner, foo")]
+            [TestCase("(this.meh as IDisposable)?.Dispose()", "meh", "meh")]
+            [TestCase("((IDisposable)this.meh).Dispose()", "meh", "meh")]
+            [TestCase("((IDisposable)this.meh)?.Dispose()", "meh", "meh")]
+            public void TryGetDisposed(string code, string expected, string expectedPath)
             {
                 var testCode = @"
 namespace RoslynSandBox
@@ -53,6 +53,11 @@ namespace RoslynSandBox
                 IdentifierNameSyntax value;
                 Assert.AreEqual(true, Disposable.TryGetDisposed(statement, semanticModel, CancellationToken.None, out value));
                 Assert.AreEqual(expected, value.ToString());
+
+                using (var pooled = Disposable.GetDisposedPath(statement, semanticModel, CancellationToken.None))
+                {
+                    Assert.AreEqual(expectedPath, string.Join(", ", pooled.Item));
+                }
             }
         }
     }

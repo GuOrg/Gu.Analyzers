@@ -70,7 +70,12 @@ namespace Gu.Analyzers
             return DisposeWalker.TryGetDisposeInvocation(disposeCall, semanticModel, cancellationToken, out value);
         }
 
-        private sealed class DisposeWalker : CSharpSyntaxWalker, IReadOnlyList<IdentifierNameSyntax>
+        internal static Pool<DisposeWalker>.Pooled GetDisposedPath(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return DisposeWalker.Create(disposeCall, semanticModel, cancellationToken);
+        }
+
+        internal sealed class DisposeWalker : CSharpSyntaxWalker, IReadOnlyList<IdentifierNameSyntax>
         {
             private static readonly Pool<DisposeWalker> Pool = new Pool<DisposeWalker>(
                 () => new DisposeWalker(),
@@ -116,6 +121,11 @@ namespace Gu.Analyzers
                 }
 
                 base.VisitInvocationExpression(node);
+            }
+
+            public override void VisitCastExpression(CastExpressionSyntax node)
+            {
+                this.Visit(node.Expression);
             }
 
             public override void VisitBinaryExpression(BinaryExpressionSyntax node)
