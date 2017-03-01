@@ -73,10 +73,15 @@ namespace Gu.Analyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            IdentifierNameSyntax disposable;
-            if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out disposable))
+            using (var pooled = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
             {
-                return IsPotentiallyCachedOrInjected(disposable, semanticModel, cancellationToken);
+                foreach (var value in pooled.Item)
+                {
+                    if (IsPotentiallyCachedOrInjected(value, semanticModel, cancellationToken))
+                    {
+                        return true;
+                    }
+                }
             }
 
             return false;

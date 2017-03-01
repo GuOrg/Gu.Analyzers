@@ -251,6 +251,52 @@ public sealed class Bar : IDisposable
                       .ConfigureAwait(false);
         }
 
+        [TestCase("this.foo.Disposable.Dispose()")]
+        [TestCase("this.foo?.Disposable.Dispose()")]
+        [TestCase("this.foo?.Disposable?.Dispose()")]
+        [TestCase("this.foo.Disposable?.Dispose()")]
+        public async Task DisposingNestedField(string disposeCall)
+        {
+            var fooCode = @"
+using System;
+
+public sealed class Foo
+{
+    public Foo(IDisposable disposable)
+    {
+        this.Disposable = disposable;
+    }
+
+    public IDisposable Disposable { get; }
+}";
+
+            var testCode = @"
+using System;
+
+public sealed class Bar : IDisposable
+{
+    private readonly Foo foo;
+
+    public Bar(Foo foo)
+    {
+        this.foo = foo;
+    }
+
+    public void Dispose()
+    {
+        ↓this.foo.Disposable.Dispose();
+    }
+}";
+
+            testCode = testCode.AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
         [TestCase("this.Disposable.Dispose();")]
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]

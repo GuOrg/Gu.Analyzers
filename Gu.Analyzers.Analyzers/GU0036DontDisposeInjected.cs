@@ -83,7 +83,8 @@
             }
 
             var invocation = context.Node as InvocationExpressionSyntax;
-            if (invocation == null)
+            if (invocation == null ||
+                invocation?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() != null)
             {
                 return;
             }
