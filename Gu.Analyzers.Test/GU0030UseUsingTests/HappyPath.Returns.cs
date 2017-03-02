@@ -57,6 +57,32 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
+            public async Task LocalInIfAndEnd()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (true)
+            {
+                return stream;
+            }
+
+            return stream;
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
