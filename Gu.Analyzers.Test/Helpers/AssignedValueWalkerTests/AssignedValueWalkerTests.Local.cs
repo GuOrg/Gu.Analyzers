@@ -91,6 +91,72 @@ internal class Foo
             }
 
             [Test]
+            public void AssignedWithArg()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo(int meh)
+    {
+        var temp = meh;
+        var value = temp;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual("meh", actual);
+                }
+            }
+
+            [Test]
+            public void AssignedWithArgGenericMethod()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo<T>(T meh)
+    {
+        var temp = meh;
+        var value = temp;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual("meh", actual);
+                }
+            }
+
+            [Test]
+            public void AssignedWithArgGenericClass()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo<T>
+{
+    internal Foo(T meh)
+    {
+        var temp = meh;
+        var value = temp;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual("meh", actual);
+                }
+            }
+
+            [Test]
             public void AssignedInLock()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
