@@ -15,6 +15,8 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("default(int)")]
             [TestCase("typeof(int)")]
             [TestCase("nameof(int)")]
+            [TestCase("new int[] { 1 , 2 , 3 }")]
+            [TestCase("new int[2]")]
             public void InitializedWithConstant(string code)
             {
                 var testCode = @"

@@ -10,7 +10,7 @@
         [TestCase("this.disposable?.Dispose();")]
         [TestCase("disposable.Dispose();")]
         [TestCase("disposable?.Dispose();")]
-        public async Task DisposingField(string disposeCall)
+        public async Task DisposingFieldAssignedWithInjected(string disposeCall)
         {
             var testCode = @"
     using System;
@@ -63,6 +63,30 @@
     }";
             testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
 
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("Disposable.Dispose();")]
+        [TestCase("Disposable?.Dispose();")]
+        public async Task DisposingStaticField(string disposeCall)
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private static readonly IDisposable Disposable;
+
+        public void Dispose()
+        {
+            ↓Disposable.Dispose();
+        }
+    }";
+            testCode = testCode.AssertReplace("Disposable.Dispose();", disposeCall);
             var expected = this.CSharpDiagnostic()
                    .WithLocationIndicated(ref testCode)
                    .WithMessage("Don't dispose injected.");

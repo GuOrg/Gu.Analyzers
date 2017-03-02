@@ -131,6 +131,10 @@ namespace RoslynSandBox
         [TestCase("IdStatementBody(1)", false, "1")]
         [TestCase("IdExpressionBody(1)", true, "1")]
         [TestCase("IdExpressionBody(1)", false, "1")]
+        [TestCase("OptionalIdExpressionBody()", true, "1")]
+        [TestCase("OptionalIdExpressionBody()", false, "1")]
+        [TestCase("OptionalIdExpressionBody(1)", true, "1")]
+        [TestCase("OptionalIdExpressionBody(1)", false, "1")]
         [TestCase("AssigningToParameter(1)", true, "1, 2, 3, 4")]
         [TestCase("AssigningToParameter(1)", false, "1, 4")]
         [TestCase("CallingIdExpressionBody(1)", true, "1")]
@@ -145,6 +149,12 @@ namespace RoslynSandBox
         [TestCase("Recursive(1)", false, "Recursive(arg)")]
         [TestCase("Recursive(true)", true, "!flag, true")]
         [TestCase("Recursive(true)", false, "Recursive(!flag), true")]
+        [TestCase("RecursiveWithOptional(1)", true, "1")]
+        [TestCase("RecursiveWithOptional(1)", false, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, null)", true, "1")]
+        [TestCase("RecursiveWithOptional(1, null)", false, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", true, "1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", false, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("Task.Run(() => 1)", true, "")]
         [TestCase("Task.Run(() => 1)", false, "")]
         public void Call(string code, bool recursive, string expected)
@@ -152,6 +162,9 @@ namespace RoslynSandBox
             var testCode = @"
 namespace RoslynSandBox
 {
+    using System;
+    using System.Collections.Generic;
+
     internal class Foo
     {
         internal Foo()
@@ -172,6 +185,8 @@ namespace RoslynSandBox
         }
 
         internal static int IdExpressionBody(int arg) => arg;
+
+        internal static int OptionalIdExpressionBody(int arg = 1) => arg;
 
         internal static int CallingIdExpressionBody(int arg1) => IdExpressionBody(arg1);
 
@@ -239,6 +254,16 @@ namespace RoslynSandBox
             }
 
             return flag;
+        }
+
+        private static int RecursiveWithOptional(int arg, IEnumerable<int> args = null)
+        {
+            if (arg == null)
+            {
+                return RecursiveWithOptional(arg, new[] { arg });
+            }
+
+            return arg;
         }
     }
 }";

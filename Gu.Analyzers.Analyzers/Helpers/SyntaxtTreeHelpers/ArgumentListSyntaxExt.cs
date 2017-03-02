@@ -39,7 +39,6 @@ namespace Gu.Analyzers
         {
             value = null;
             if (arguments == null ||
-                arguments.Arguments.Count == 0 ||
                 parameter == null)
             {
                 return false;

@@ -10,58 +10,6 @@
     [Explicit]
     internal partial class ValueWithSourceTests
     {
-        [TestCase("1", "1 Constant")]
-        [TestCase(@"""1""", @"""1"" Constant")]
-        [TestCase("new string('1', 1)", "new string('1', 1) Created")]
-        [TestCase("new int[2]", "new int[2] Created")]
-        [TestCase("new int[] { 1 , 2 , 3 }", "new int[] { 1 , 2 , 3 } Created")]
-        [TestCase("new []{ 1 , 2 , 3 }", "new []{ 1 , 2 , 3 } Created")]
-        [TestCase("{ 1 , 2 , 3 }", "{ 1 , 2 , 3 } Created")]
-        public void SimpleAssign(string code, string expected)
-        {
-            var testCode = @"
-internal class Foo
-{
-    internal void Bar()
-    {
-        var text = 1;
-    }
-}";
-            testCode = testCode.AssertReplace("1", code);
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var node = syntaxTree.EqualsValueClause($"var text = {code}").Value;
-            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual(expected, actual);
-            }
-        }
-
-        [Test]
-        public void AssigningWithStaticField()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-using System;
-internal class Foo
-{
-    private static readonly int Cache = 1;
-    internal void Bar()
-    {
-        var value = Cache;
-    }
-}");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var node = syntaxTree.EqualsValueClause("var value = Cache;").Value;
-            using (var sources = VauleWithSource.GetRecursiveSources(node, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", sources.Item.Select(x => $"{x.Value} {x.Source}"));
-                Assert.AreEqual("Cache Cached", actual);
-            }
-        }
-
         [Test]
         public void AssigningWithStaticFieldIndexer()
         {

@@ -97,13 +97,11 @@
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.RefAndOut.cs" />
     <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Nested.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Recursion.cs" />
     <Compile Include="ReproBox.cs" />
