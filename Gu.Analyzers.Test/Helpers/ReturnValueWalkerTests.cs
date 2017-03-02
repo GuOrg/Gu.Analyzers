@@ -147,6 +147,10 @@ namespace RoslynSandBox
         [TestCase("Recursive()", false, "Recursive()")]
         [TestCase("Recursive(1)", true, "")]
         [TestCase("Recursive(1)", false, "Recursive(arg)")]
+        [TestCase("Recursive1(1)", true, "")]
+        [TestCase("Recursive1(1)", false, "Recursive2(value)")]
+        [TestCase("Recursive2(1)", true, "")]
+        [TestCase("Recursive2(1)", false, "Recursive1(value)")]
         [TestCase("Recursive(true)", true, "!flag, true")]
         [TestCase("Recursive(true)", false, "Recursive(!flag), true")]
         [TestCase("RecursiveWithOptional(1)", true, "1")]
@@ -246,7 +250,7 @@ namespace RoslynSandBox
 
         public static int Recursive(int arg) => Recursive(arg);
 
-        public static int Recursive(bool flag)
+        public static bool Recursive(bool flag)
         {
             if (flag)
             {
@@ -264,6 +268,16 @@ namespace RoslynSandBox
             }
 
             return arg;
+        }
+
+		private static int Recursive1(int value)
+        {
+            return Recursive2(value);
+        }
+		
+        private static int Recursive2(int value)
+        {
+            return Recursive1(value);
         }
     }
 }";
