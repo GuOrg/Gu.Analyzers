@@ -76,6 +76,7 @@
     <Compile Include="Helpers\Collection\ListExt.cs" />
     <Compile Include="Helpers\Pooled\SetExt.cs" />
     <Compile Include="Helpers\Property.cs" />
+    <Compile Include="Helpers\RecursionLoop.cs" />
     <Compile Include="Helpers\Result.cs" />
     <Compile Include="Helpers\ResultExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
