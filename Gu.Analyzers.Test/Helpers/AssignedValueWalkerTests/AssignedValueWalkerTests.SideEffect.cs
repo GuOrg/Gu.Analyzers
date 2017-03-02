@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2, arg")]
+            [TestCase("var temp4 = this.value;", "1, 2, arg")]
             public void MethodInjected(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -53,7 +53,7 @@ internal class Foo
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2, arg")]
+            [TestCase("var temp4 = this.value;", "1, 2, arg")]
             public void MethodInjectedWithOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -93,7 +93,7 @@ internal class Foo
             [TestCase("var temp1 = this.text;", "")]
             [TestCase("var temp2 = this.text;", "null")]
             [TestCase("var temp3 = this.text;", "null, \"abc\"")]
-            [TestCase("var temp3 = this.text;", "null, \"abc\", textArg")]
+            [TestCase("var temp4 = this.text;", "null, \"abc\", textArg")]
             public void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
