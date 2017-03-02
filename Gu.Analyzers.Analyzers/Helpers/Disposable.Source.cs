@@ -71,21 +71,21 @@ namespace Gu.Analyzers
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        internal static bool IsPotentiallyCachedOrInjected(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
+            using (var disposedPath = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
             {
-                if (pooled.Item.Count == 0)
+                if (disposedPath.Item.Count == 0)
                 {
                     return false;
                 }
 
-                if (IsCreation(pooled.Item[pooled.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
+                if (IsCreation(disposedPath.Item[disposedPath.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
                 {
                     return false;
                 }
 
-                foreach (var value in pooled.Item)
+                foreach (var value in disposedPath.Item)
                 {
                     if (IsPotentiallyCachedOrInjectedCore(value, semanticModel, cancellationToken))
                     {
@@ -160,10 +160,31 @@ namespace Gu.Analyzers
 
             foreach (var value in values)
             {
-                var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+                using (var path = MemberPathWalker.Create(value))
                 {
-                    return Result.Yes;
+                    if (path.Item.Count == 0)
+                    {
+                        var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                        if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+                        {
+                            return Result.Yes;
+                        }
+
+                        continue;
+                    }
+
+                    if (IsCreation(path.Item[path.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
+                    {
+                        return Result.No;
+                    }
+
+                    foreach (var member in path.Item)
+                    {
+                        if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
+                        {
+                            return Result.Yes;
+                        }
+                    }
                 }
             }
 

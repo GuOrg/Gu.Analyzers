@@ -90,5 +90,26 @@ namespace Gu.Analyzers
                 return pooledList;
             }
         }
+
+        internal static Pool<List<NameSyntax>>.Pooled GetDisposedPath(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = MemberPathWalker.Create(disposeCall))
+            {
+                if (pooled.Item.Count < 2 ||
+                    semanticModel.GetSymbolSafe(pooled.Item[pooled.Item.Count - 1], cancellationToken) != KnownSymbol.IDisposable.Dispose)
+                {
+                    return ListPool<NameSyntax>.Create();
+                }
+
+                var pooledList = ListPool<NameSyntax>.Create();
+                for (var i = 0; i < pooled.Item.Count - 1; i++)
+                {
+                    pooledList.Item.Add(pooled.Item[i]);
+                }
+
+                return pooledList;
+            }
+        }
+
     }
 }

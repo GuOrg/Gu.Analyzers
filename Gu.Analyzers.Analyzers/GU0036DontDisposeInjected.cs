@@ -96,8 +96,7 @@
                 return;
             }
 
-            var statement = invocation.FirstAncestor<ExpressionStatementSyntax>();
-            if (Disposable.IsPotentiallyCachedOrInjected(statement, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
             }
