@@ -8,6 +8,72 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
     {
         internal class Constructors
         {
+            [TestCase("var temp1 = this.value;", "")]
+            [TestCase("var temp2 = this.value;", "arg")]
+            [TestCase("var temp3 = this.value;", "arg")]
+            public void FieldCtorArgSimple(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    private readonly int value;
+
+    internal Foo(int arg)
+    {
+        var temp1 = this.value;
+        this.value = arg;
+        var temp2 = this.value;
+    }
+
+    internal void Bar(int arg)
+    {
+        var temp3 = this.value;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "")]
+            [TestCase("var temp2 = this.value;", "Id(arg)")]
+            [TestCase("var temp3 = this.value;", "Id(arg)")]
+            public void FieldCtorArgThenIdMethod(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    private readonly int value;
+
+    internal Foo(int arg)
+    {
+        var temp1 = this.value;
+        this.value = Id(arg);
+        var temp2 = this.value;
+    }
+
+    internal void Bar(int arg)
+    {
+        var temp3 = this.value;
+    }
+
+    private static T Id(T genericArg) => genericArg;
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
             [TestCase("var temp1 = this.value;", "1")]
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2")]

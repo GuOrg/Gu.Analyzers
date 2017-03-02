@@ -90,7 +90,8 @@
             }
 
             var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-            if (call != KnownSymbol.IDisposable.Dispose)
+            if (call != KnownSymbol.IDisposable.Dispose ||
+                call?.Parameters.Length != 0)
             {
                 return;
             }

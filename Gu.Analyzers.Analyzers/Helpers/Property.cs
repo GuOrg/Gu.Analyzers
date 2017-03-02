@@ -31,5 +31,31 @@
 
             return false;
         }
+
+        internal static bool IsAutoProperty(this IPropertySymbol propertySymbol, CancellationToken cancellationToken)
+        {
+            if (propertySymbol == null)
+            {
+                return false;
+            }
+
+            foreach (var reference in propertySymbol.DeclaringSyntaxReferences)
+            {
+                var declaration = (BasePropertyDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                if ((declaration as PropertyDeclarationSyntax)?.ExpressionBody != null)
+                {
+                    return false;
+                }
+
+                AccessorDeclarationSyntax getter;
+                if (declaration.TryGetGetAccessorDeclaration(out getter) &&
+                    getter.Body == null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

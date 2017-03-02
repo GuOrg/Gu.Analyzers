@@ -277,9 +277,9 @@ public sealed class Bar : IDisposable
 {
     private readonly Foo foo;
 
-    public Bar(Foo foo)
+    public Bar(Foo arg)
     {
-        this.foo = foo;
+        this.foo = arg;
     }
 
     public void Dispose()

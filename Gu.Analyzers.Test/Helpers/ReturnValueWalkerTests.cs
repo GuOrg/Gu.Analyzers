@@ -7,6 +7,37 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
+        [TestCase(true, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        [TestCase(false, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        public void AwaitSyntaxError(bool recursive, string expected)
+        {
+            var testCode = @"
+using System.Threading.Tasks;
+
+internal class Foo
+{
+    internal static async Task Bar()
+    {
+        var text = await CreateAsync().ConfigureAwait(false);
+    }
+
+    internal static async Task<string> CreateAsync()
+    {
+        await Task.Delay(0);
+        return await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false);
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var text = await CreateAsync()").Value;
+            using (var pooled = ReturnValueWalker.Create(value, recursive, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
         [TestCase("StaticRecursiveExpressionBody", true, "")]
         [TestCase("StaticRecursiveExpressionBody", false, "StaticRecursiveExpressionBody")]
         [TestCase("StaticRecursiveStatementBody)", true, "")]

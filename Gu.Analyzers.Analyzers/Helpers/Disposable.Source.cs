@@ -19,7 +19,7 @@ namespace Gu.Analyzers
             using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
                 return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken) == Result.No;
+                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.No;
             }
         }
 
@@ -34,7 +34,7 @@ namespace Gu.Analyzers
             using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
                 return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken) == Result.No;
+                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.No;
             }
         }
 
@@ -49,7 +49,7 @@ namespace Gu.Analyzers
             using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
                 return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Gu.Analyzers
             using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
                 return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
             }
         }
 
@@ -75,9 +75,19 @@ namespace Gu.Analyzers
         {
             using (var pooled = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
             {
+                if (pooled.Item.Count == 0)
+                {
+                    return false;
+                }
+
+                if (IsCreation(pooled.Item[pooled.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
+                {
+                    return false;
+                }
+
                 foreach (var value in pooled.Item)
                 {
-                    if (IsPotentiallyCachedOrInjected(value, semanticModel, cancellationToken))
+                    if (IsPotentiallyCachedOrInjectedCore(value, semanticModel, cancellationToken))
                     {
                         return true;
                     }
@@ -99,28 +109,59 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (IsCachedOrInjected(semanticModel.GetSymbolSafe(disposable, cancellationToken)) == Result.Yes)
+            if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(disposable, cancellationToken)) == Result.Yes)
             {
                 return true;
             }
 
-            using (var sources = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
-            {
-                return IsPotentiallyCachedOrInjected(sources, semanticModel, cancellationToken) == Result.Yes;
-            }
+            return IsPotentiallyCachedOrInjectedCore(disposable, semanticModel, cancellationToken);
         }
 
-        private static Result IsPotentiallyCachedOrInjected(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (pooled.Item.Count == 0)
+            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+            if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+            {
+                return true;
+            }
+
+            var property = symbol as IPropertySymbol;
+            if (property != null &&
+                !property.IsAutoProperty(cancellationToken))
+            {
+                using (var returnValues = ReturnValueWalker.Create(value, false, semanticModel, cancellationToken))
+                {
+                    if (IsPotentiallyCachedOrInjectedCore(returnValues.Item, semanticModel, cancellationToken) == Result.Yes)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                using (var sources = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
+                {
+                    if (IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.Yes)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static Result IsPotentiallyCachedOrInjectedCore(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (values.Count == 0)
             {
                 return Result.No;
             }
 
-            foreach (var value in pooled.Item)
+            foreach (var value in values)
             {
                 var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                if (IsCachedOrInjected(symbol) == Result.Yes)
+                if (IsCachedOrInjectedCore(symbol) == Result.Yes)
                 {
                     return Result.Yes;
                 }
@@ -129,7 +170,7 @@ namespace Gu.Analyzers
             return Result.No;
         }
 
-        private static Result IsCachedOrInjected(ISymbol symbol)
+        private static Result IsCachedOrInjectedCore(ISymbol symbol)
         {
             if (symbol is IParameterSymbol)
             {
@@ -159,25 +200,6 @@ namespace Gu.Analyzers
             }
 
             return Result.No;
-        }
-
-        private static bool IsCachedInMember(Pool<List<VauleWithSource>>.Pooled sources, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            foreach (var vauleWithSource in sources.Item)
-            {
-                switch (vauleWithSource.Source)
-                {
-                    case ValueSource.Member:
-                        if (IsAssignableTo(semanticModel.GetTypeInfoSafe(vauleWithSource.Value, cancellationToken).Type))
-                        {
-                            return true;
-                        }
-
-                        break;
-                }
-            }
-
-            return false;
         }
     }
 }

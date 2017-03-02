@@ -83,6 +83,7 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.SideEffect.cs" />
     <Compile Include="Helpers\ConstructorsWalkerTests.cs" />
     <Compile Include="Helpers\AsyncAwaitTests.cs" />
     <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />
@@ -100,7 +101,6 @@
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Nested.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.cs" />
     <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
