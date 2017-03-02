@@ -2,10 +2,12 @@ namespace Gu.Analyzers
 {
     using System.Collections;
     using System.Collections.Generic;
+
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class MemberPathWalker : CSharpSyntaxWalker, IReadOnlyList<IdentifierNameSyntax>
+    internal sealed class MemberPathWalker : CSharpSyntaxWalker, IReadOnlyList<NameSyntax>
     {
         private static readonly Pool<MemberPathWalker> Pool = new Pool<MemberPathWalker>(
             () => new MemberPathWalker(),
@@ -14,7 +16,7 @@ namespace Gu.Analyzers
                     x.names.Clear();
                 });
 
-        private readonly List<IdentifierNameSyntax> names = new List<IdentifierNameSyntax>();
+        private readonly List<NameSyntax> names = new List<NameSyntax>();
 
         private MemberPathWalker()
         {
@@ -22,9 +24,9 @@ namespace Gu.Analyzers
 
         public int Count => this.names.Count;
 
-        public IdentifierNameSyntax this[int index] => this.names[index];
+        public NameSyntax this[int index] => this.names[index];
 
-        public IEnumerator<IdentifierNameSyntax> GetEnumerator()
+        public IEnumerator<NameSyntax> GetEnumerator()
         {
             return this.names.GetEnumerator();
         }
@@ -57,12 +59,37 @@ namespace Gu.Analyzers
             base.VisitIdentifierName(node);
         }
 
+        public override void VisitGenericName(GenericNameSyntax node)
+        {
+            this.names.Add(node);
+            base.VisitGenericName(node);
+        }
+
         internal static Pool<MemberPathWalker>.Pooled Create(ExpressionStatementSyntax node)
         {
             var pooled = Pool.GetOrCreate();
             if (node != null)
             {
                 pooled.Item.Visit(node);
+            }
+
+            return pooled;
+        }
+
+        internal static Pool<MemberPathWalker>.Pooled Create(InvocationExpressionSyntax node) => Create((ExpressionSyntax)node);
+
+        internal static Pool<MemberPathWalker>.Pooled Create(ExpressionSyntax node)
+        {
+            SyntaxNode root = node;
+            while (root.Parent is ConditionalAccessExpressionSyntax)
+            {
+                root = root.Parent;
+            }
+
+            var pooled = Pool.GetOrCreate();
+            if (root != null)
+            {
+                pooled.Item.Visit(root);
             }
 
             return pooled;

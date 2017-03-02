@@ -50,7 +50,7 @@ namespace RoslynSandBox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var statement = syntaxTree.BestMatch<ExpressionStatementSyntax>(code);
-                IdentifierNameSyntax value;
+                NameSyntax value;
                 Assert.AreEqual(true, Disposable.TryGetDisposed(statement, semanticModel, CancellationToken.None, out value));
                 Assert.AreEqual(expected, value.ToString());
 
