@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers.Test.Helpers
 {
+    using System.Threading.Tasks;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -161,6 +162,31 @@ namespace RoslynSandBox
             testCode = testCode.AssertReplace("Foo<double>.foo.Get<int>(1)", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var invocation = syntaxTree.BestMatch<InvocationExpressionSyntax>("Get<int>(1)");
+            using (var pooled = MemberPathWalker.Create(invocation))
+            {
+                Assert.AreEqual(expectedPath, string.Join(", ", pooled.Item));
+            }
+        }
+
+        [TestCase("Task.FromResult(string.Empty)", "Task, FromResult")]
+        public void Misc(string code, string expectedPath)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.Threading.Tasks;
+
+    public sealed class Foo
+    {
+        public static void Bar()
+        {
+            Task.FromResult(string.Empty);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("Task.FromResult(string.Empty)", code);
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var invocation = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
             using (var pooled = MemberPathWalker.Create(invocation))
             {
                 Assert.AreEqual(expectedPath, string.Join(", ", pooled.Item));
