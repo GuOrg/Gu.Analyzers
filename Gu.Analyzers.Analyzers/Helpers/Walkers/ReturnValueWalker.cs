@@ -14,7 +14,7 @@
             x =>
             {
                 x.values.Clear();
-                x.checkedLocations.Clear();
+                x.recursionLoop.Clear();
                 x.isRecursive = false;
                 x.awaits = false;
                 x.semanticModel = null;
@@ -22,7 +22,7 @@
             });
 
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly HashSet<SyntaxNode> checkedLocations = new HashSet<SyntaxNode>();
+        private readonly RecursionLoop recursionLoop = new RecursionLoop();
 
         private bool isRecursive;
         private bool awaits;
@@ -109,9 +109,9 @@
             pooled.Item.awaits = this.awaits;
             pooled.Item.semanticModel = this.semanticModel;
             pooled.Item.cancellationToken = this.cancellationToken;
-            pooled.Item.checkedLocations.UnionWith(this.checkedLocations);
+            pooled.Item.recursionLoop.Outer = this.recursionLoop;
             pooled.Item.Run(node);
-            this.checkedLocations.UnionWith(pooled.Item.checkedLocations);
+            pooled.Item.recursionLoop.Outer = null;
             return pooled;
         }
 
@@ -166,7 +166,7 @@
                         }
                     }
                 }
-                else if (this.checkedLocations.Add(value) &&
+                else if (this.recursionLoop.Add(value) &&
                          this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(value, this.cancellationToken))
                 {
                     using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
@@ -197,7 +197,7 @@
 
         private void Run(SyntaxNode node)
         {
-            if (!this.checkedLocations.Add(node))
+            if (!this.recursionLoop.Add(node))
             {
                 return;
             }
