@@ -15,6 +15,7 @@
             {
                 x.values.Clear();
                 x.recursionLoop.Clear();
+                x.recursionLoop.Outer = null;
                 x.isRecursive = false;
                 x.awaits = false;
                 x.semanticModel = null;
