@@ -59,6 +59,32 @@ namespace Gu.Analyzers
             return pooled;
         }
 
+        internal static bool TryFindRootMember(ExpressionSyntax node, out ExpressionSyntax member)
+        {
+            if (TryPeel(node, out member) &&
+                IsRootMember(member))
+            {
+                return true;
+            }
+
+            if (!TryFindMember(node, out member))
+            {
+                return false;
+            }
+
+            do
+            {
+                if (IsRootMember(member))
+                {
+                    return true;
+                }
+            }
+            while (TryFindMemberCore(member, out member));
+
+            member = null;
+            return false;
+        }
+
         internal static bool TryFindMember(ExpressionSyntax expression, out ExpressionSyntax member)
         {
             member = null;
@@ -70,12 +96,24 @@ namespace Gu.Analyzers
             var invocation = expression as InvocationExpressionSyntax;
             if (invocation != null)
             {
+                if (invocation.Parent != null &&
+                    invocation.Parent.IsKind(SyntaxKind.ConditionalAccessExpression) &&
+                    TryPeel(invocation.Parent as ExpressionSyntax, out member))
+                {
+                    if (IsRootMember(member))
+                    {
+                        return true;
+                    }
+
+                    return TryFindMemberCore(member, out member);
+                }
+
                 return TryFindMemberCore(invocation.Expression, out member);
             }
 
             if (TryPeel(expression, out member))
             {
-                if (member is IdentifierNameSyntax)
+                if (IsRootMember(member))
                 {
                     return true;
                 }
@@ -84,6 +122,33 @@ namespace Gu.Analyzers
             }
 
             member = null;
+            return false;
+        }
+
+        internal static bool IsRootMember(ExpressionSyntax expression)
+        {
+            ExpressionSyntax member;
+            if (!TryPeel(expression, out member))
+            {
+                return false;
+            }
+
+            if (member is IdentifierNameSyntax)
+            {
+                return true;
+            }
+
+            var memberAccess = member as MemberAccessExpressionSyntax;
+            if (memberAccess?.Expression != null)
+            {
+                switch (memberAccess.Expression.Kind())
+                {
+                    case SyntaxKind.ThisExpression:
+                    case SyntaxKind.BaseExpression:
+                        return true;
+                }
+            }
+
             return false;
         }
 
