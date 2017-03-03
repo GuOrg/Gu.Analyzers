@@ -6,6 +6,43 @@
 
     internal class Diagnostics : DiagnosticVerifier<GU0036DontDisposeInjected>
     {
+        [TestCase("stream ?? File.OpenRead(string.Empty)")]
+        [TestCase("Stream ?? File.OpenRead(string.Empty)")]
+        [TestCase("File.OpenRead(string.Empty) ?? stream")]
+        [TestCase("File.OpenRead(string.Empty) ?? Stream")]
+        [TestCase("true ? stream : File.OpenRead(string.Empty)")]
+        [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
+        [TestCase("true ? File.OpenRead(string.Empty) : stream")]
+        [TestCase("true ? File.OpenRead(string.Empty) : Stream")]
+        public async Task InjectedAndCreatedField(string code)
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private static readonly Stream Stream = File.OpenRead(string.Empty);
+    ↓private readonly Stream stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream ?? File.OpenRead(string.Empty);
+    }
+
+
+    public void Dispose()
+    {
+        ↓this.stream.Dispose();
+    }
+}";
+            testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't assign member with injected and created disposables.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
         [TestCase("this.disposable.Dispose();")]
         [TestCase("this.disposable?.Dispose();")]
         [TestCase("disposable.Dispose();")]

@@ -76,14 +76,15 @@ namespace Gu.Analyzers
             ExpressionSyntax member;
             if (TryGetDisposedRootMember(disposeCall, out member))
             {
-                if (IsCreation(member, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
-                {
-                    return false;
-                }
-
-                if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
+                if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken))
+                    .IsEither(Result.Yes, Result.Maybe))
                 {
                     return true;
+                }
+
+                using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
+                {
+                    return IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                 }
             }
 
@@ -153,26 +154,10 @@ namespace Gu.Analyzers
 
             foreach (var value in values)
             {
-                ExpressionSyntax member;
-                if (MemberPath.TryFindRootMember(value, out member))
+                var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                if (IsCachedOrInjectedCore(symbol) == Result.Yes)
                 {
-                    if (IsCreation(member, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
-                    {
-                        return Result.No;
-                    }
-
-                    if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
-                    {
-                        return Result.Yes;
-                    }
-                }
-                else
-                {
-                    var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                    if (IsCachedOrInjectedCore(symbol) == Result.Yes)
-                    {
-                        return Result.Yes;
-                    }
+                    return Result.Yes;
                 }
             }
 

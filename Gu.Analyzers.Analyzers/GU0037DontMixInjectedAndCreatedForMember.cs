@@ -52,14 +52,14 @@
             }
 
             if (field.DeclaredAccessibility != Accessibility.Private &&
-                !field.IsReadOnly &&
-                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
+                !field.IsReadOnly)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                return;
+                if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.Maybe))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
-
-            if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
+            else if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -94,14 +94,15 @@
             }
 
             if (property.SetMethod != null &&
-                property.SetMethod.DeclaredAccessibility != Accessibility.Private &&
-                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
+                property.SetMethod.DeclaredAccessibility != Accessibility.Private)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                return;
+                if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.Yes, Result.Maybe))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
-
-            if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
+            else if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

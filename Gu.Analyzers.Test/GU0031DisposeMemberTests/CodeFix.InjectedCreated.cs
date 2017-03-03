@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFix : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
     {
         internal class InjectedCreated : NestedCodeFixVerifier<CodeFix>
         {
