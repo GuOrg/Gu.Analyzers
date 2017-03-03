@@ -232,7 +232,7 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            var result = Analyzers.Result.No;
+            var result = Result.No;
             for (var i = 0; i < 2; i++)
             {
                 var value = i == 0
@@ -240,15 +240,15 @@ namespace Gu.Analyzers
                                 : value2;
                 switch (IsCreation(value, semanticModel, cancellationToken, checkedLocations))
                 {
-                    case Analyzers.Result.Unknown:
-                        result = Analyzers.Result.Unknown;
+                    case Result.Unknown:
+                        result = Result.Unknown;
                         break;
-                    case Analyzers.Result.Yes:
+                    case Result.Yes:
                         return Result.Yes;
-                    case Analyzers.Result.No:
+                    case Result.No:
                         break;
-                    case Analyzers.Result.Maybe:
-                        result = Analyzers.Result.Maybe;
+                    case Result.Maybe:
+                        result = Result.Maybe;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -260,24 +260,24 @@ namespace Gu.Analyzers
 
         private static Result IsCreation(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<SyntaxNode> checkedLocations)
         {
-            var result = Analyzers.Result.No;
+            var result = Result.No;
             foreach (var value in values)
             {
                 switch (IsCreation(value, semanticModel, cancellationToken, checkedLocations))
                 {
-                    case Analyzers.Result.Unknown:
+                    case Result.Unknown:
                         if (result == Result.No)
                         {
-                            result = Analyzers.Result.Unknown;
+                            result = Result.Unknown;
                         }
 
                         break;
-                    case Analyzers.Result.Yes:
+                    case Result.Yes:
                         return Result.Yes;
-                    case Analyzers.Result.No:
+                    case Result.No:
                         break;
-                    case Analyzers.Result.Maybe:
-                        result = Analyzers.Result.Maybe;
+                    case Result.Maybe:
+                        result = Result.Maybe;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();

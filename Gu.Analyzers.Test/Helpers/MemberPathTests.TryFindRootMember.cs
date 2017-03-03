@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
-    internal partial class MemberPathTests
+    internal class MemberPathTests
     {
         internal class TryFindRootMember
         {

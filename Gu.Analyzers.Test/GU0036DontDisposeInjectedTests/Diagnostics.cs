@@ -14,6 +14,10 @@
         [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
         [TestCase("true ? File.OpenRead(string.Empty) : stream")]
         [TestCase("true ? File.OpenRead(string.Empty) : Stream")]
+        [TestCase("(object) stream")]
+        [TestCase("(object) Stream")]
+        [TestCase("stream as object")]
+        [TestCase("Stream as object")]
         public async Task InjectedAndCreatedField(string code)
         {
             var testCode = @"
