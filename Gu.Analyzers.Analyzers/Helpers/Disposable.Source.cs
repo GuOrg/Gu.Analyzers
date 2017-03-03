@@ -73,24 +73,17 @@ namespace Gu.Analyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var disposedPath = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
+            ExpressionSyntax member;
+            if (TryGetDisposedRootMember(disposeCall, out member))
             {
-                if (disposedPath.Item.Count == 0)
+                if (IsCreation(member, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
                 {
                     return false;
                 }
 
-                if (IsCreation(disposedPath.Item[disposedPath.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
+                if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
                 {
-                    return false;
-                }
-
-                foreach (var value in disposedPath.Item)
-                {
-                    if (IsPotentiallyCachedOrInjectedCore(value, semanticModel, cancellationToken))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
@@ -160,30 +153,25 @@ namespace Gu.Analyzers
 
             foreach (var value in values)
             {
-                using (var path = MemberPath.Create(value))
+                ExpressionSyntax member;
+                if (MemberPath.TryFindRootMember(value, out member))
                 {
-                    if (path.Item.Count == 0)
-                    {
-                        var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                        if (IsCachedOrInjectedCore(symbol) == Result.Yes)
-                        {
-                            return Result.Yes;
-                        }
-
-                        continue;
-                    }
-
-                    if (IsCreation(path.Item[path.Item.Count - 1], semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
+                    if (IsCreation(member, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe))
                     {
                         return Result.No;
                     }
 
-                    foreach (var member in path.Item)
+                    if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
                     {
-                        if (IsPotentiallyCachedOrInjectedCore(member, semanticModel, cancellationToken))
-                        {
-                            return Result.Yes;
-                        }
+                        return Result.Yes;
+                    }
+                }
+                else
+                {
+                    var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                    if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+                    {
+                        return Result.Yes;
                     }
                 }
             }

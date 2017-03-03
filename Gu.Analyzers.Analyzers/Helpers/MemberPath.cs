@@ -9,56 +9,6 @@ namespace Gu.Analyzers
 
     internal static class MemberPath
     {
-        internal static Pool<List<ExpressionSyntax>>.Pooled Create(ExpressionStatementSyntax node)
-        {
-            throw new NotImplementedException();
-            //var pooled = ListPool<ExpressionSyntax>.Create();
-            //if (node != null)
-            //{
-            //    pooled.Item.Visit(node);
-            //}
-
-            //return pooled;
-        }
-
-        internal static Pool<List<ExpressionSyntax>>.Pooled Create(ExpressionSyntax node)
-        {
-            ExpressionSyntax member;
-            if (!TryFindMember(node, out member))
-            {
-                return ListPool<ExpressionSyntax>.Create();
-            }
-
-            var pooled = ListPool<ExpressionSyntax>.Create();
-            do
-            {
-                switch (member.Kind())
-                {
-                    case SyntaxKind.ThisExpression:
-                    case SyntaxKind.BaseExpression:
-                        return pooled;
-                    case SyntaxKind.IdentifierName:
-                    case SyntaxKind.GenericName:
-                        pooled.Item.Add(member);
-                        return pooled;
-                    case SyntaxKind.SimpleMemberAccessExpression:
-                        if ((member as MemberAccessExpressionSyntax)?.Expression.IsEitherKind(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) == true)
-                        {
-                            pooled.Item.Add(member);
-                            return pooled;
-                        }
-
-                        break;
-                }
-
-                pooled.Item.Add(member);
-            }
-            while (TryFindMemberCore(member, out member));
-
-            pooled.Item.Clear();
-            return pooled;
-        }
-
         internal static bool TryFindRootMember(ExpressionSyntax node, out ExpressionSyntax member)
         {
             if (TryPeel(node, out member) &&
@@ -85,7 +35,34 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal static bool TryFindMember(ExpressionSyntax expression, out ExpressionSyntax member)
+        internal static bool IsRootMember(ExpressionSyntax expression)
+        {
+            ExpressionSyntax member;
+            if (!TryPeel(expression, out member))
+            {
+                return false;
+            }
+
+            if (member is IdentifierNameSyntax)
+            {
+                return true;
+            }
+
+            var memberAccess = member as MemberAccessExpressionSyntax;
+            if (memberAccess?.Expression != null)
+            {
+                switch (memberAccess.Expression.Kind())
+                {
+                    case SyntaxKind.ThisExpression:
+                    case SyntaxKind.BaseExpression:
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryFindMember(ExpressionSyntax expression, out ExpressionSyntax member)
         {
             member = null;
             if (expression == null)
@@ -122,33 +99,6 @@ namespace Gu.Analyzers
             }
 
             member = null;
-            return false;
-        }
-
-        internal static bool IsRootMember(ExpressionSyntax expression)
-        {
-            ExpressionSyntax member;
-            if (!TryPeel(expression, out member))
-            {
-                return false;
-            }
-
-            if (member is IdentifierNameSyntax)
-            {
-                return true;
-            }
-
-            var memberAccess = member as MemberAccessExpressionSyntax;
-            if (memberAccess?.Expression != null)
-            {
-                switch (memberAccess.Expression.Kind())
-                {
-                    case SyntaxKind.ThisExpression:
-                    case SyntaxKind.BaseExpression:
-                        return true;
-                }
-            }
-
             return false;
         }
 

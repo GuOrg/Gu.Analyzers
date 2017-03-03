@@ -57,7 +57,6 @@ namespace RoslynSandBox
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);
             }
 
-            [TestCase("this.Get<int>(1)", "this.Get<int>(1)")]
             [TestCase("foo.Get<int>(1)", "foo")]
             [TestCase("this.foo.Get<int>(1)", "this.foo")]
             [TestCase("this.foo.Inner.Get<int>(1)", "this.foo")]

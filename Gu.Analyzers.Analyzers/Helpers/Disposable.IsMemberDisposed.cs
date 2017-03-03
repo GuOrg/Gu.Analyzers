@@ -63,53 +63,9 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal static bool TryGetDisposed(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax value)
+        private static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, out ExpressionSyntax disposedMember)
         {
-            using (var pooled = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
-            {
-                return pooled.Item.TryGetLast(out value);
-            }
+            return MemberPath.TryFindRootMember(disposeCall, out disposedMember);
         }
-
-        internal static Pool<List<ExpressionSyntax>>.Pooled GetDisposedPath(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var pooled = MemberPath.Create(disposeCall))
-            {
-                if (pooled.Item.Count < 2 ||
-                    semanticModel.GetSymbolSafe(pooled.Item[pooled.Item.Count - 1], cancellationToken) != KnownSymbol.IDisposable.Dispose)
-                {
-                    return ListPool<ExpressionSyntax>.Create();
-                }
-
-                var pooledList = ListPool<ExpressionSyntax>.Create();
-                for (var i = 0; i < pooled.Item.Count - 1; i++)
-                {
-                    pooledList.Item.Add(pooled.Item[i]);
-                }
-
-                return pooledList;
-            }
-        }
-
-        internal static Pool<List<ExpressionSyntax>>.Pooled GetDisposedPath(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var pooled = MemberPath.Create(disposeCall))
-            {
-                if (pooled.Item.Count < 2 ||
-                    semanticModel.GetSymbolSafe(pooled.Item[pooled.Item.Count - 1], cancellationToken) != KnownSymbol.IDisposable.Dispose)
-                {
-                    return ListPool<ExpressionSyntax>.Create();
-                }
-
-                var pooledList = ListPool<ExpressionSyntax>.Create();
-                for (var i = 0; i < pooled.Item.Count - 1; i++)
-                {
-                    pooledList.Item.Add(pooled.Item[i]);
-                }
-
-                return pooledList;
-            }
-        }
-
     }
 }
