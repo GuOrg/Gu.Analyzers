@@ -63,7 +63,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal static bool TryGetDisposed(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out NameSyntax value)
+        internal static bool TryGetDisposed(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
             using (var pooled = GetDisposedPath(disposeCall, semanticModel, cancellationToken))
             {
@@ -71,17 +71,17 @@ namespace Gu.Analyzers
             }
         }
 
-        internal static Pool<List<NameSyntax>>.Pooled GetDisposedPath(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<List<ExpressionSyntax>>.Pooled GetDisposedPath(ExpressionStatementSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = MemberPathWalker.Create(disposeCall))
+            using (var pooled = MemberPath.Create(disposeCall))
             {
                 if (pooled.Item.Count < 2 ||
                     semanticModel.GetSymbolSafe(pooled.Item[pooled.Item.Count - 1], cancellationToken) != KnownSymbol.IDisposable.Dispose)
                 {
-                    return ListPool<NameSyntax>.Create();
+                    return ListPool<ExpressionSyntax>.Create();
                 }
 
-                var pooledList = ListPool<NameSyntax>.Create();
+                var pooledList = ListPool<ExpressionSyntax>.Create();
                 for (var i = 0; i < pooled.Item.Count - 1; i++)
                 {
                     pooledList.Item.Add(pooled.Item[i]);
@@ -91,17 +91,17 @@ namespace Gu.Analyzers
             }
         }
 
-        internal static Pool<List<NameSyntax>>.Pooled GetDisposedPath(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<List<ExpressionSyntax>>.Pooled GetDisposedPath(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = MemberPathWalker.Create(disposeCall))
+            using (var pooled = MemberPath.Create(disposeCall))
             {
                 if (pooled.Item.Count < 2 ||
                     semanticModel.GetSymbolSafe(pooled.Item[pooled.Item.Count - 1], cancellationToken) != KnownSymbol.IDisposable.Dispose)
                 {
-                    return ListPool<NameSyntax>.Create();
+                    return ListPool<ExpressionSyntax>.Create();
                 }
 
-                var pooledList = ListPool<NameSyntax>.Create();
+                var pooledList = ListPool<ExpressionSyntax>.Create();
                 for (var i = 0; i < pooled.Item.Count - 1; i++)
                 {
                     pooledList.Item.Add(pooled.Item[i]);

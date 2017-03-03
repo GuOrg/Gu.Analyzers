@@ -160,7 +160,7 @@ namespace Gu.Analyzers
 
             foreach (var value in values)
             {
-                using (var path = MemberPathWalker.Create(value))
+                using (var path = MemberPath.Create(value))
                 {
                     if (path.Item.Count == 0)
                     {

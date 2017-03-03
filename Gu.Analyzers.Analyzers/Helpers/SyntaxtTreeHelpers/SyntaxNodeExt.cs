@@ -3,6 +3,7 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class SyntaxNodeExt
@@ -15,6 +16,12 @@
         internal static int StartingLineNumber(this SyntaxToken token, CancellationToken cancellationToken)
         {
             return token.SyntaxTree.GetLineSpan(token.Span, cancellationToken).Span.Start.Line;
+        }
+
+        internal static bool IsEitherKind(this SyntaxNode node, SyntaxKind first, SyntaxKind other)
+        {
+            var kind = node?.Kind();
+            return kind == first || kind == other;
         }
 
         internal static T FirstAncestor<T>(this SyntaxNode node)

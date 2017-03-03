@@ -88,7 +88,8 @@
     <Compile Include="Helpers\AsyncAwaitTests.cs" />
     <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />
     <Compile Include="Helpers\DisposableTests.IsMemberDisposed.cs" />
-    <Compile Include="Helpers\MemberPathWalkerTests.cs" />
+    <Compile Include="Helpers\MemberPathTests.Create.cs" />
+    <Compile Include="Helpers\MemberPathTests.TryFindMember.cs" />
     <Compile Include="Helpers\RecursionLoopTests.cs" />
     <Compile Include="Helpers\ReturnValueWalkerTests.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.cs" />
