@@ -84,16 +84,17 @@
             SemanticModel semanticModel,
             CancellationToken cancellationToken)
         {
-            if (Disposable.IsCreation(node, semanticModel, cancellationToken)
-                          .IsEither(Result.No, Result.Unknown))
+            if (node.Parent is AnonymousFunctionExpressionSyntax ||
+                node.Parent is UsingStatementSyntax ||
+                node.Parent is EqualsValueClauseSyntax ||
+                node.Parent is ReturnStatementSyntax ||
+                node.Parent is ArrowExpressionClauseSyntax)
             {
                 return false;
             }
 
-            if (node.Parent is AnonymousFunctionExpressionSyntax ||
-                node.Parent is UsingStatementSyntax ||
-                node.Parent is ReturnStatementSyntax ||
-                node.Parent is ArrowExpressionClauseSyntax)
+            if (Disposable.IsCreation(node, semanticModel, cancellationToken)
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return false;
             }

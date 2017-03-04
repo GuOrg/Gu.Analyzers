@@ -76,6 +76,8 @@
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.RefAndOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Rx.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Recursion.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Returned.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Using.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposableTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.Recursion.cs" />
