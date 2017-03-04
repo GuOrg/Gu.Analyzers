@@ -96,6 +96,7 @@
 
             var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
             if (method == null ||
+                method.DeclaredAccessibility == Accessibility.Private ||
                 method.DeclaringSyntaxReferences.Length == 0)
             {
                 return;

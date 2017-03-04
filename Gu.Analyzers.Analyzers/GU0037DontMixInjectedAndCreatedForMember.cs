@@ -36,6 +36,7 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
             context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(HandleParameter, SyntaxKind.Parameter);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
@@ -103,6 +104,27 @@
                 }
             }
             else if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+            }
+        }
+
+        private static void HandleParameter(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            var parameter = context.SemanticModel.GetDeclaredSymbolSafe(context.Node, context.CancellationToken) as IParameterSymbol;
+            if (parameter == null ||
+                parameter.ContainingSymbol.DeclaredAccessibility == Accessibility.Private ||
+                parameter.RefKind != RefKind.Ref)
+            {
+                return;
+            }
+
+            if (Disposable.IsAssignedWithCreated(parameter, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.Maybe))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

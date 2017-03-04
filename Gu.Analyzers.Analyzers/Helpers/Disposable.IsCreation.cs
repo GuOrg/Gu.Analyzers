@@ -43,6 +43,22 @@ namespace Gu.Analyzers
             }
         }
 
+        internal static Result IsAssignedWithCreated(IParameterSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!IsPotentiallyAssignableTo(field?.Type))
+            {
+                return Result.No;
+            }
+
+            using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                }
+            }
+        }
+
         internal static Result IsAssignedWithCreated(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (!IsPotentiallyAssignableTo(property?.Type))

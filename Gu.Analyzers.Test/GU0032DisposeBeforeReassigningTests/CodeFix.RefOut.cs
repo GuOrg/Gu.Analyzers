@@ -63,24 +63,27 @@ public class Foo
             public async Task AssigningVariableViaOutParameterBefore()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Update()
-    {
-        Stream stream;
-        if (TryGetStream(out stream))
-        {
-            ↓stream = File.OpenRead(string.Empty);
-        }
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream result)
+    public class Foo
     {
-        result = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                ↓stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
 
@@ -90,23 +93,28 @@ public class Foo
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Update()
-    {
-        Stream stream;
-        TryGetStream(out stream);
-        stream?.Dispose();
-        stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream stream)
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -165,15 +173,17 @@ public class Foo
             public async Task PublicMethodRefParameter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public bool TryGetStream(ref Stream stream)
+    using System.IO;
+
+    public class Foo
     {
-        ↓stream = File.OpenRead(string.Empty);
-        return true;
+        public bool TryGetStream(ref Stream stream)
+        {
+            ↓stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
 
@@ -183,18 +193,20 @@ public class Foo
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public bool TryGetStream(ref Stream stream)
+    using System.IO;
+
+    public class Foo
     {
-        stream?.Dispose();
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public bool TryGetStream(ref Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
+                // should perhaps be a separate rule.
                 await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
             }
 
