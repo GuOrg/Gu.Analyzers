@@ -13,7 +13,7 @@
         public const string DiagnosticId = "GU0030";
         private const string Title = "Use using.";
         private const string MessageFormat = "Use using.";
-        private const string Description = "Use using.";
+        private const string Description = "Use using for created `IDisposable` that is not assigned to a field or property.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(

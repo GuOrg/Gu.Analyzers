@@ -13,7 +13,7 @@
         public const string DiagnosticId = "GU0031";
         private const string Title = "Dispose member.";
         private const string MessageFormat = "Dispose member.";
-        private const string Description = "Dispose the member as it is assigned with a created `IDisposable`s within the type.";
+        private const string Description = "Dispose the member as it is assigned with a created `IDisposable` within the type.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(

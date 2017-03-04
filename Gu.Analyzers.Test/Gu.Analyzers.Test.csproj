@@ -59,6 +59,7 @@
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
     <Compile Include="GU0030UseUsingTests\Diagnostics.AsyncAwait.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Assigned.cs" />
+    <Compile Include="GU0030UseUsingTests\HappyPath.Assigns.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Cached.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Returns.cs" />
