@@ -74,10 +74,9 @@ namespace Gu.Analyzers
         internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             ExpressionSyntax member;
-            if (TryGetDisposedRootMember(disposeCall, out member))
+            if (TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out member))
             {
-                if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken))
-                    .IsEither(Result.Yes, Result.Maybe))
+                if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
                 {
                     return true;
                 }

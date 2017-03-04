@@ -10,21 +10,40 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         [TestCase("this.stream?.Dispose();")]
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
+        [TestCase("this.Stream.Dispose();")]
+        [TestCase("this.Stream?.Dispose();")]
+        [TestCase("Stream.Dispose();")]
+        [TestCase("Stream?.Dispose();")]
+        [TestCase("this.Calculated.Dispose();")]
+        [TestCase("this.Calculated?.Dispose();")]
+        [TestCase("Calculated.Dispose();")]
+        [TestCase("Calculated?.Dispose();")]
         public async Task DisposingField(string disposeCall)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
     public sealed class Foo : IDisposable
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-        
+        private Stream stream = File.OpenRead(string.Empty);
+
+        public Stream Calculated => this.stream;
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set { this.stream = value; }
+        }
+
         public void Dispose()
         {
             this.stream.Dispose();
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

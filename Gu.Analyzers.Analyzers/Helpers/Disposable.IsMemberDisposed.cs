@@ -62,9 +62,38 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, out ExpressionSyntax disposedMember)
+        internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax disposedMember)
         {
-            return MemberPath.TryFindRootMember(disposeCall, out disposedMember);
+            if (MemberPath.TryFindRootMember(disposeCall, out disposedMember))
+            {
+                var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
+                if (property == null ||
+                    property.IsAutoProperty(cancellationToken))
+                {
+                    return true;
+                }
+
+                if (property.GetMethod == null)
+                {
+                    return false;
+                }
+
+                foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
+                {
+                    var node = reference.GetSyntax(cancellationToken);
+                    using (var pooled = ReturnValueWalker.Create(node, false, semanticModel, cancellationToken))
+                    {
+                        if (pooled.Item.Count == 0)
+                        {
+                            return false;
+                        }
+
+                        return MemberPath.TryFindRootMember(pooled.Item[0], out disposedMember);
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
