@@ -32,14 +32,14 @@ internal class Foo
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item);
-                    Assert.AreEqual("Assign(out value, 1)", actual);
+                    Assert.AreEqual("value", actual);
                 }
             }
 
             [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "Assign(out value, 1)")]
+            [TestCase("var temp2 = value;", "value")]
             [TestCase("var temp3 = value;", "")]
-            [TestCase("var temp4 = value;", "Assign(out value, 2)")]
+            [TestCase("var temp4 = value;", "value")]
             public void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -100,12 +100,12 @@ internal class Foo<T>
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item);
-                    Assert.AreEqual("Assign(out value)", actual);
+                    Assert.AreEqual("value", actual);
                 }
             }
 
             [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "Assign1(out value, 1)")]
+            [TestCase("var temp2 = value;", "value")]
             public void LocalAssignedWithChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -208,9 +208,9 @@ internal class Foo
             }
 
             [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, this.Assign(out this.value, 2)")]
-            [TestCase("var temp3 = this.value;", "1, this.Assign(out this.value, 2), this.Assign(out this.value, 3)")]
-            [TestCase("var temp4 = this.value;", "1, this.Assign(out this.value, 2), this.Assign(out this.value, 3)")]
+            [TestCase("var temp2 = this.value;", "1, this.value")]
+            [TestCase("var temp3 = this.value;", "1, this.value, this.value")]
+            [TestCase("var temp4 = this.value;", "1, this.value, this.value")]
             public void FieldAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"

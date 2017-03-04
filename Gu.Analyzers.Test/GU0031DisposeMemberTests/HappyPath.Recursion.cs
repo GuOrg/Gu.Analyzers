@@ -114,6 +114,86 @@ public class Foo
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
+
+            [Test]
+            public async Task IgnoresWhenDisposingRecursiveMethodChain()
+            {
+                var testCode = @"
+using System;
+
+public class Foo
+{
+    public IDisposable Recursive1() => Recursive2();
+
+    public IDisposable Recursive2() => Recursive1();
+
+    public void Dispose()
+    {
+        this.RecursiveMethod().Dispose();
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoresRecursiveOutParameter()
+            {
+                var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo()
+    {
+        if(TryGetStream(out this.stream))
+        {
+        }
+    }
+
+    public bool TryGetStream(out Stream outValue)
+    {
+        return TryGetStream(out Stream outValue);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoresRecursiveOutParameterChain()
+            {
+                var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream stream;
+
+    public Foo()
+    {
+        if(TryGetStream(out this.stream))
+        {
+        }
+    }
+
+    public bool TryGetStream1(out Stream outValue)
+    {
+        return TryGetStream2(out Stream outValue);
+    }
+
+    public bool TryGetStream2(out Stream outValue)
+    {
+        return TryGetStream1(out Stream outValue);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
         }
     }
 }

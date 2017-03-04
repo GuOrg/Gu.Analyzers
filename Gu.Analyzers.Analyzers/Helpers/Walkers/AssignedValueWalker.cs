@@ -163,7 +163,7 @@
 
                                     if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
                                     {
-                                        this.values.Add(invocation);
+                                        this.values.Add(node.Expression);
                                     }
                                 }
                             }

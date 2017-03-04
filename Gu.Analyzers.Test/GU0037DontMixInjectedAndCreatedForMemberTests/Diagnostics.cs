@@ -168,5 +168,27 @@ public class Foo
                                .WithMessage("Don't assign member with injected and created disposables.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task PublicMethodRefParameter()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public bool TryGetStream(ref Stream stream)
+    {
+        ↓stream = File.OpenRead(string.Empty);
+        return true;
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't assign member with injected and created disposables.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
     }
 }

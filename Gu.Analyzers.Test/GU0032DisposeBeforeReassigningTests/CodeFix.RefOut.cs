@@ -211,7 +211,7 @@ public class Foo : IDisposable
 
     private Foo()
     {
-        this.Assign(ref this.stream);
+        this.Assign(↓ref this.stream);
     }
 
     public void Dispose()
@@ -221,7 +221,7 @@ public class Foo : IDisposable
 
     private void Assign(ref Stream stream)
     {
-        ↓stream = File.OpenRead(string.Empty);
+        stream = File.OpenRead(string.Empty);
     }
 }";
 
@@ -240,6 +240,7 @@ public class Foo : IDisposable
 
     private Foo()
     {
+        this.stream?.Dispose();
         this.Assign(ref this.stream);
     }
 
@@ -250,7 +251,6 @@ public class Foo : IDisposable
 
     private void Assign(ref Stream stream)
     {
-        stream?.Dispose();
         stream = File.OpenRead(string.Empty);
     }
 }";
