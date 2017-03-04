@@ -1,6 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -18,8 +17,11 @@ namespace Gu.Analyzers
 
             using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.No;
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken) == Result.No;
+                }
             }
         }
 
@@ -33,8 +35,11 @@ namespace Gu.Analyzers
 
             using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.No;
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken) == Result.No;
+                }
             }
         }
 
@@ -48,8 +53,11 @@ namespace Gu.Analyzers
 
             using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                }
             }
         }
 
@@ -63,8 +71,11 @@ namespace Gu.Analyzers
 
             using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(sources, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                       IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                }
             }
         }
 
@@ -76,14 +87,17 @@ namespace Gu.Analyzers
             ExpressionSyntax member;
             if (TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out member))
             {
-                if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
+                if (IsInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
                 {
                     return true;
                 }
 
                 using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
                 {
-                    return IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                    {
+                        return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    }
                 }
             }
 
@@ -102,7 +116,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (IsCachedOrInjectedCore(semanticModel.GetSymbolSafe(disposable, cancellationToken)) == Result.Yes)
+            if (IsInjectedCore(semanticModel.GetSymbolSafe(disposable, cancellationToken)) == Result.Yes)
             {
                 return true;
             }
@@ -113,7 +127,7 @@ namespace Gu.Analyzers
         private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-            if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+            if (IsInjectedCore(symbol) == Result.Yes)
             {
                 return true;
             }
@@ -124,37 +138,34 @@ namespace Gu.Analyzers
             {
                 using (var returnValues = ReturnValueWalker.Create(value, false, semanticModel, cancellationToken))
                 {
-                    if (IsPotentiallyCachedOrInjectedCore(returnValues.Item, semanticModel, cancellationToken) == Result.Yes)
+                    using (var recursive = RecursiveValues.Create(returnValues.Item, semanticModel, cancellationToken))
                     {
-                        return true;
-                    }
-                }
-            }
-            else
-            {
-                using (var sources = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
-                {
-                    if (IsPotentiallyCachedOrInjectedCore(sources.Item, semanticModel, cancellationToken) == Result.Yes)
-                    {
-                        return true;
+                        return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                     }
                 }
             }
 
-            return false;
+            using (var sources = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                }
+            }
         }
 
-        private static Result IsPotentiallyCachedOrInjectedCore(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Result IsInjectedCore(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (values.Count == 0)
             {
                 return Result.No;
             }
 
-            foreach (var value in values)
+            values.Reset();
+            while (values.MoveNext())
             {
-                var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                if (IsCachedOrInjectedCore(symbol) == Result.Yes)
+                var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
+                if (IsInjectedCore(symbol) == Result.Yes)
                 {
                     return Result.Yes;
                 }
@@ -163,7 +174,7 @@ namespace Gu.Analyzers
             return Result.No;
         }
 
-        private static Result IsCachedOrInjectedCore(ISymbol symbol)
+        private static Result IsInjectedCore(ISymbol symbol)
         {
             if (symbol is ILocalSymbol)
             {

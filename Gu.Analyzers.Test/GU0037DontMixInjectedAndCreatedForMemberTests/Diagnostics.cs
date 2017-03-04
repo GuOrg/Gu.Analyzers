@@ -5,30 +5,34 @@
 
     internal class Diagnostics : DiagnosticVerifier<GU0037DontMixInjectedAndCreatedForMember>
     {
-        [TestCase("stream ?? File.OpenRead(string.Empty)")]
-        [TestCase("Stream ?? File.OpenRead(string.Empty)")]
-        [TestCase("File.OpenRead(string.Empty) ?? stream")]
-        [TestCase("File.OpenRead(string.Empty) ?? Stream")]
-        [TestCase("true ? stream : File.OpenRead(string.Empty)")]
-        [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
-        [TestCase("true ? File.OpenRead(string.Empty) : stream")]
-        [TestCase("true ? File.OpenRead(string.Empty) : Stream")]
+        [TestCase("arg ?? File.OpenRead(string.Empty)")]
+        [TestCase("arg ?? File.OpenRead(string.Empty)")]
+        [TestCase("File.OpenRead(string.Empty) ?? arg")]
+        [TestCase("File.OpenRead(string.Empty) ?? arg")]
+        [TestCase("true ? arg : File.OpenRead(string.Empty)")]
+        [TestCase("true ? arg : File.OpenRead(string.Empty)")]
+        [TestCase("true ? File.OpenRead(string.Empty) : arg")]
+        [TestCase("true ? File.OpenRead(string.Empty) : arg")]
         public async Task InjectedAndCreatedField(string code)
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandBox
 {
-    private static readonly Stream Stream = File.OpenRead(string.Empty);
-    ↓private readonly Stream stream;
+    using System.IO;
 
-    public Foo(Stream stream)
+    public sealed class Foo
     {
-        this.stream = stream ?? File.OpenRead(string.Empty);
+        private static readonly Stream Stream = File.OpenRead(string.Empty);
+
+        ↓private readonly Stream stream;
+
+        public Foo(Stream arg)
+        {
+            this.stream = arg ?? File.OpenRead(string.Empty);
+        }
     }
 }";
-            testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
+            testCode = testCode.AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't assign member with injected and created disposables.");

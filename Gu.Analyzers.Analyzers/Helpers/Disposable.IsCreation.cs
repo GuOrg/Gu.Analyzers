@@ -1,11 +1,9 @@
 namespace Gu.Analyzers
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -22,7 +20,10 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                }
             }
         }
 
@@ -35,7 +36,10 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                }
             }
         }
 
@@ -48,20 +52,10 @@ namespace Gu.Analyzers
 
             using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
             {
-                return IsAssignedWithCreated(pooled, semanticModel, cancellationToken);
-            }
-        }
-
-        internal static Result IsAssignedWithCreated(Pool<AssignedValueWalker>.Pooled pooled, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (pooled.Item.Count == 0)
-            {
-                return Result.No;
-            }
-
-            using (var pooledSet = SetPool<SyntaxNode>.Create())
-            {
-                return IsCreation(pooled.Item, semanticModel, cancellationToken, pooledSet.Item);
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                }
             }
         }
 
@@ -75,20 +69,67 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            using (var pooled = SetPool<SyntaxNode>.Create())
+            using (var pooled = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
             {
-                return IsCreation(candidate, semanticModel, cancellationToken, pooled.Item);
+                if (pooled.Item.Count == 0)
+                {
+                    return IsCreationCore(candidate, semanticModel, cancellationToken);
+                }
+
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsCreationCore(recursive, semanticModel, cancellationToken);
+                }
             }
+        }
+
+        private static Result IsAssignedWithCreated(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (walker.Count == 0)
+            {
+                return Result.No;
+            }
+
+            return IsCreationCore(walker, semanticModel, cancellationToken);
+        }
+
+        private static Result IsCreationCore(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            values.Reset();
+            var result = Result.No;
+            while (values.MoveNext())
+            {
+                switch (IsCreationCore(values.Current, semanticModel, cancellationToken))
+                {
+                    case Result.Unknown:
+                        if (result == Result.No)
+                        {
+                            result = Result.Unknown;
+                        }
+
+                        break;
+                    case Result.Yes:
+                        return Result.Yes;
+                    case Result.No:
+                        break;
+                    case Result.Maybe:
+                        result = Result.Maybe;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        private static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<SyntaxNode> checkedLocations)
+        private static Result IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (candidate == null ||
-                candidate.IsMissing ||
-                !checkedLocations.Add(candidate))
+                candidate.IsMissing)
             {
                 return Result.Unknown;
             }
@@ -118,43 +159,9 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            var binaryExpression = candidate as BinaryExpressionSyntax;
-            if (binaryExpression != null)
-            {
-                switch (binaryExpression.Kind())
-                {
-                    case SyntaxKind.CoalesceExpression:
-                        return IsEitherCreation(binaryExpression.Left, binaryExpression.Right, semanticModel, cancellationToken, checkedLocations);
-                    case SyntaxKind.AsExpression:
-                        return IsCreation(binaryExpression.Left, semanticModel, cancellationToken, checkedLocations);
-                    default:
-                        return Result.Unknown;
-                }
-            }
-
-            var cast = candidate as CastExpressionSyntax;
-            if (cast != null)
-            {
-                return IsCreation(cast.Expression, semanticModel, cancellationToken, checkedLocations);
-            }
-
-            var conditional = candidate as ConditionalExpressionSyntax;
-            if (conditional != null)
-            {
-                return IsEitherCreation(conditional.WhenTrue, conditional.WhenFalse, semanticModel, cancellationToken, checkedLocations);
-            }
-
-            var @await = candidate as AwaitExpressionSyntax;
-            if (@await != null)
-            {
-                using (var returnValues = ReturnValueWalker.Create(@await, true, semanticModel, cancellationToken))
-                {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedLocations);
-                }
-            }
-
             var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-            if (symbol == null)
+            if (symbol == null ||
+                symbol is ILocalSymbol)
             {
                 return Result.Unknown;
             }
@@ -162,14 +169,6 @@ namespace Gu.Analyzers
             if (symbol is IFieldSymbol)
             {
                 return Result.No;
-            }
-
-            if (symbol is ILocalSymbol)
-            {
-                using (var pooled = AssignedValueWalker.Create(candidate, semanticModel, cancellationToken))
-                {
-                    return IsCreation(pooled.Item, semanticModel, cancellationToken, checkedLocations);
-                }
             }
 
             var property = symbol as IPropertySymbol;
@@ -182,10 +181,7 @@ namespace Gu.Analyzers
                         : Result.No;
                 }
 
-                using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
-                {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedLocations);
-                }
+                return Result.Unknown;
             }
 
             var method = symbol as IMethodSymbol;
@@ -216,75 +212,10 @@ namespace Gu.Analyzers
                                : Result.Maybe;
                 }
 
-                using (var returnValues = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
-                {
-                    return IsCreation(returnValues.Item, semanticModel, cancellationToken, checkedLocations);
-                }
+                return Result.Unknown;
             }
 
             return Result.Unknown;
-        }
-
-        private static Result IsEitherCreation(ExpressionSyntax value1, ExpressionSyntax value2, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<SyntaxNode> checkedLocations)
-        {
-            if (value1 == null || value2 == null)
-            {
-                return Result.No;
-            }
-
-            var result = Result.No;
-            for (var i = 0; i < 2; i++)
-            {
-                var value = i == 0
-                                ? value1
-                                : value2;
-                switch (IsCreation(value, semanticModel, cancellationToken, checkedLocations))
-                {
-                    case Result.Unknown:
-                        result = Result.Unknown;
-                        break;
-                    case Result.Yes:
-                        return Result.Yes;
-                    case Result.No:
-                        break;
-                    case Result.Maybe:
-                        result = Result.Maybe;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return result;
-        }
-
-        private static Result IsCreation(IReadOnlyList<ExpressionSyntax> values, SemanticModel semanticModel, CancellationToken cancellationToken, HashSet<SyntaxNode> checkedLocations)
-        {
-            var result = Result.No;
-            foreach (var value in values)
-            {
-                switch (IsCreation(value, semanticModel, cancellationToken, checkedLocations))
-                {
-                    case Result.Unknown:
-                        if (result == Result.No)
-                        {
-                            result = Result.Unknown;
-                        }
-
-                        break;
-                    case Result.Yes:
-                        return Result.Yes;
-                    case Result.No:
-                        break;
-                    case Result.Maybe:
-                        result = Result.Maybe;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return result;
         }
     }
 }

@@ -43,7 +43,7 @@ public sealed class Foo : IDisposable
             testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
+                               .WithMessage("Don't dispose injected.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
