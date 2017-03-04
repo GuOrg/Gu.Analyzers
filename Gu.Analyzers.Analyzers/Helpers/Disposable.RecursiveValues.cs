@@ -103,6 +103,36 @@ namespace Gu.Analyzers
                     return true;
                 }
 
+                var argument = assignedValue.Parent as ArgumentSyntax;
+                if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) == true)
+                {
+                    var invocation = assignedValue.FirstAncestor<InvocationExpressionSyntax>();
+                    var invokedMethod = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
+                    if (invokedMethod == null ||
+                        invokedMethod.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        this.values.Add(invocation);
+                        return true;
+                    }
+
+                    var before = this.values.Count;
+                    foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
+                    {
+                        var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
+                        ParameterSyntax parameter;
+                        if (methodDeclaration.TryGetMatchingParameter(argument, out parameter))
+                        {
+                            using (var pooled = AssignedValueWalker.Create(this.semanticModel.GetDeclaredSymbol(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
+                            {
+                                pooled.Item.HandleInvoke(invokedMethod, invocation.ArgumentList);
+                                return this.AddManyRecursively(pooled.Item);
+                            }
+                        }
+                    }
+
+                    return before != this.values.Count;
+                }
+
                 var binaryExpression = assignedValue as BinaryExpressionSyntax;
                 if (binaryExpression != null)
                 {

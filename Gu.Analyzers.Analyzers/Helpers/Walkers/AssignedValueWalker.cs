@@ -212,6 +212,40 @@
             return Pool.GetOrCreate();
         }
 
+        internal void HandleInvoke(ISymbol method, ArgumentListSyntax argumentList)
+        {
+            if (method != null)
+            {
+                var before = this.values.Count;
+                if (method.ContainingType.Is(this.currentSymbol.ContainingType) ||
+                    this.currentSymbol.ContainingType.Is(method.ContainingType))
+                {
+                    foreach (var reference in method.DeclaringSyntaxReferences)
+                    {
+                        base.Visit(reference.GetSyntax(this.cancellationToken));
+                    }
+                }
+
+                if (before != this.values.Count &&
+                    argumentList != null)
+                {
+                    for (var i = before; i < this.values.Count; i++)
+                    {
+                        var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
+                        if (parameter != null &&
+                            parameter.RefKind != RefKind.Out)
+                        {
+                            ExpressionSyntax arg;
+                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
+                            {
+                                this.values[i] = arg;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private static Pool<AssignedValueWalker>.Pooled CreateCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
@@ -399,40 +433,6 @@
                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
                 {
                     this.values.Add(value);
-                }
-            }
-        }
-
-        private void HandleInvoke(ISymbol method, ArgumentListSyntax argumentList)
-        {
-            if (method != null)
-            {
-                var before = this.values.Count;
-                if (method.ContainingType.Is(this.currentSymbol.ContainingType) ||
-                    this.currentSymbol.ContainingType.Is(method.ContainingType))
-                {
-                    foreach (var reference in method.DeclaringSyntaxReferences)
-                    {
-                        base.Visit(reference.GetSyntax(this.cancellationToken));
-                    }
-                }
-
-                if (before != this.values.Count &&
-                    argumentList != null)
-                {
-                    for (var i = before; i < this.values.Count; i++)
-                    {
-                        var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
-                        if (parameter != null &&
-                            parameter.RefKind != RefKind.Out)
-                        {
-                            ExpressionSyntax arg;
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
-                            {
-                                this.values[i] = arg;
-                            }
-                        }
-                    }
                 }
             }
         }
