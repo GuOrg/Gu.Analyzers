@@ -20,7 +20,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        if(TryGetStream(out stream))
+        if(TryGetStream(out this.stream))
         {
         }
     }
@@ -52,7 +52,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        if(TryGetStream(out stream))
+        if(TryGetStream(out this.stream))
         {
         }
     }
@@ -85,7 +85,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        if(TryGetStream(ref stream))
+        if(TryGetStream(ref this.stream))
         {
         }
     }
@@ -117,7 +117,7 @@ public sealed class Foo : IDisposable
 
     public Foo()
     {
-        if(TryGetStream(ref stream))
+        if(TryGetStream(ref this.stream))
         {
         }
     }
