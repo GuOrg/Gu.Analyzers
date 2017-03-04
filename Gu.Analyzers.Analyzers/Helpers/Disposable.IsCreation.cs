@@ -73,7 +73,16 @@ namespace Gu.Analyzers
             {
                 if (pooled.Item.Count == 0)
                 {
-                    return IsCreationCore(candidate, semanticModel, cancellationToken);
+                    var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
+                    if (symbol != null && symbol.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        return IsCreationCore(candidate, semanticModel, cancellationToken);
+                    }
+
+                    using (var recursive = RecursiveValues.Create(new[] { candidate }, semanticModel, cancellationToken))
+                    {
+                        return IsCreationCore(recursive, semanticModel, cancellationToken);
+                    }
                 }
 
                 using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
