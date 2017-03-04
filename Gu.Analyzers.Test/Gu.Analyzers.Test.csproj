@@ -68,6 +68,7 @@
     <Compile Include="GU0031DisposeMemberTests\HappyPath.Injected.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPathRx.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFix.RefOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFix.RefOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Recursion.cs" />

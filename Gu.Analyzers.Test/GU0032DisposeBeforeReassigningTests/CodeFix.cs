@@ -410,7 +410,6 @@ public class Foo
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
-
         [Test]
         public async Task NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
         {
