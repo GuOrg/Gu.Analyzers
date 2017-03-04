@@ -26,9 +26,39 @@ namespace Gu.Analyzers
 
         internal static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (member == null ||
+                disposeMethod == null)
+            {
+                return false;
+            }
+
             foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
             {
-                using (var pooled = IdentifierNameWalker.Create(reference.GetSyntax(cancellationToken)))
+                var node = reference.GetSyntax(cancellationToken);
+                using (var pooled = InvocationWalker.Create(node))
+                {
+                    foreach (var invocation in pooled.Item)
+                    {
+                        var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
+                        if (method == null ||
+                            method.Parameters.Length != 0 ||
+                            method != KnownSymbol.IDisposable.Dispose)
+                        {
+                            continue;
+                        }
+
+                        ExpressionSyntax disposed;
+                        if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out disposed))
+                        {
+                            if (SymbolComparer.Equals(member, semanticModel.GetSymbolSafe(disposed, cancellationToken)))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                using (var pooled = IdentifierNameWalker.Create(node))
                 {
                     foreach (var identifier in pooled.Item.IdentifierNames)
                     {
