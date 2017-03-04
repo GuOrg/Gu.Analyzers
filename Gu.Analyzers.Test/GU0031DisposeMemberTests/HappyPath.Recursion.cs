@@ -129,7 +129,7 @@ public class Foo
 
     public void Dispose()
     {
-        this.RecursiveMethod().Dispose();
+        this.Recursive1().Dispose();
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -140,23 +140,27 @@ public class Foo
             public async Task IgnoresRecursiveOutParameter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo
     {
-        if(TryGetStream(out this.stream))
+        private readonly Stream stream;
+
+        public Foo()
         {
+            if (this.TryGetStream(out this.stream))
+            {
+            }
         }
-    }
 
-    public bool TryGetStream(out Stream outValue)
-    {
-        return TryGetStream(out Stream outValue);
+        public bool TryGetStream(out Stream outValue)
+        {
+            outValue = null;
+            return this.TryGetStream(out outValue);
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -167,28 +171,30 @@ public sealed class Foo : IDisposable
             public async Task IgnoresRecursiveOutParameterChain()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo 
     {
-        if(TryGetStream(out this.stream))
+        private readonly Stream stream;
+
+        public Foo()
         {
+            if (this.TryGetStream1(out this.stream))
+            {
+            }
         }
-    }
 
-    public bool TryGetStream1(out Stream outValue)
-    {
-        return TryGetStream2(out Stream outValue);
-    }
+        public bool TryGetStream1(out Stream outValue1)
+        {
+            return this.TryGetStream2(out outValue1);
+        }
 
-    public bool TryGetStream2(out Stream outValue)
-    {
-        return TryGetStream1(out Stream outValue);
+        public bool TryGetStream2(out Stream outValue2)
+        {
+            return this.TryGetStream1(out outValue2);
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
