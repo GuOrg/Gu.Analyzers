@@ -53,7 +53,8 @@
 
             if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
             {
-                if (!Disposable.IsMemberDisposed(field, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsMemberDisposed(field, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.No, Result.Unknown))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
@@ -90,7 +91,8 @@
 
             if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
             {
-                if (!Disposable.IsMemberDisposed(property, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.No, Result.Unknown))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }

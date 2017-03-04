@@ -19,7 +19,7 @@
                 where T2 : ISymbol
         {
             return semanticModel.GetSymbolSafe(node, cancellationToken).IsEither<T1, T2>() ||
-                   semanticModel.GetDeclaredSymbolSafe(node, cancellationToken).IsEither<T1, T2>()||
+                   semanticModel.GetDeclaredSymbolSafe(node, cancellationToken).IsEither<T1, T2>() ||
                    semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
         }
 

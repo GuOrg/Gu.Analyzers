@@ -1,28 +1,33 @@
 namespace Gu.Analyzers
 {
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
     {
-        internal static bool IsMemberDisposed(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsMemberDisposed(ISymbol member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!(member is IFieldSymbol || member is IPropertySymbol))
+            return IsMemberDisposed(member, semanticModel.GetDeclaredSymbolSafe(context, cancellationToken), semanticModel, cancellationToken);
+        }
+
+        internal static Result IsMemberDisposed(ISymbol member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (!(member is IFieldSymbol ||
+                member is IPropertySymbol) ||
+                context == null)
             {
-                return false;
+                return Result.Unknown;
             }
 
-            var containingType = member.ContainingType;
-            IMethodSymbol disposeMethod;
-            if (!IsAssignableTo(containingType) ||
-                !TryGetDisposeMethod(containingType, true, out disposeMethod))
+            using (var pooled = DisposeWalker.Create(context, semanticModel, cancellationToken))
             {
-                return false;
+                return pooled.Item.IsMemberDisposed(member);
             }
-
-            return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
         }
 
         internal static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -35,8 +40,8 @@ namespace Gu.Analyzers
 
             foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
             {
-                var node = reference.GetSyntax(cancellationToken);
-                using (var pooled = InvocationWalker.Create(node))
+                var node = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+                using (var pooled = DisposeWalker.Create(disposeMethod, semanticModel, cancellationToken))
                 {
                     foreach (var invocation in pooled.Item)
                     {
@@ -125,6 +130,125 @@ namespace Gu.Analyzers
             }
 
             return false;
+        }
+
+        internal sealed class DisposeWalker : CSharpSyntaxWalker, IReadOnlyList<InvocationExpressionSyntax>
+        {
+            private static readonly Pool<DisposeWalker> Pool = new Pool<DisposeWalker>(
+                () => new DisposeWalker(),
+                x =>
+                    {
+                        x.invocations.Clear();
+                        x.identifiers.Clear();
+                        x.semanticModel = null;
+                        x.cancellationToken = CancellationToken.None;
+                    });
+
+            private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
+            private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
+
+            private SemanticModel semanticModel;
+            private CancellationToken cancellationToken;
+
+            private DisposeWalker()
+            {
+            }
+
+            public int Count => this.invocations.Count;
+
+            public InvocationExpressionSyntax this[int index] => this.invocations[index];
+
+            public IEnumerator<InvocationExpressionSyntax> GetEnumerator() => this.invocations.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.invocations).GetEnumerator();
+
+            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var symbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
+                if (symbol == KnownSymbol.IDisposable.Dispose &&
+                    symbol?.Parameters.Length == 0)
+                {
+                    this.invocations.Add(node);
+                }
+                else if (symbol != null)
+                {
+                    foreach (var reference in symbol.DeclaringSyntaxReferences)
+                    {
+                        this.Visit(reference.GetSyntax(this.cancellationToken));
+                    }
+                }
+
+                base.VisitInvocationExpression(node);
+            }
+
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                this.identifiers.Add(node);
+                base.VisitIdentifierName(node);
+            }
+
+            internal static Pool<DisposeWalker>.Pooled Create(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                if (!IsAssignableTo(type))
+                {
+                    return Create(semanticModel, cancellationToken);
+                }
+
+                IMethodSymbol disposeMethod;
+                if (TryGetDisposeMethod(type, true, out disposeMethod))
+                {
+                    return Create(disposeMethod, semanticModel, cancellationToken);
+                }
+
+                return Create(semanticModel, cancellationToken);
+            }
+
+            internal static Pool<DisposeWalker>.Pooled Create(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                if (disposeMethod != KnownSymbol.IDisposable.Dispose)
+                {
+                    return Create(semanticModel, cancellationToken);
+                }
+
+                var pooled = Create(semanticModel, cancellationToken);
+                foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
+                {
+                    pooled.Item.Visit(reference.GetSyntax(cancellationToken));
+                }
+
+                return pooled;
+            }
+
+            internal Result IsMemberDisposed(ISymbol member)
+            {
+                foreach (var invocation in this.invocations)
+                {
+                    ExpressionSyntax disposed;
+                    if (TryGetDisposedRootMember(invocation, this.semanticModel, this.cancellationToken, out disposed) &&
+                        SymbolComparer.Equals(member, this.semanticModel.GetSymbolSafe(disposed, this.cancellationToken)))
+                    {
+                        return Result.Yes;
+                    }
+                }
+
+                foreach (var name in this.identifiers)
+                {
+                    if (SymbolComparer.Equals(member, this.semanticModel.GetSymbolSafe(name, this.cancellationToken)))
+                    {
+                        return Result.Maybe;
+                    }
+                }
+
+                return Result.No;
+            }
+
+            private static Pool<DisposeWalker>.Pooled Create(SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                var pooled = Pool.GetOrCreate();
+                pooled.Item.semanticModel = semanticModel;
+                pooled.Item.cancellationToken = cancellationToken;
+                return pooled;
+            }
         }
     }
 }

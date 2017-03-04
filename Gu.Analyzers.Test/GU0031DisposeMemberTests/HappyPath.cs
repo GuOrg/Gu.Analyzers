@@ -6,18 +6,18 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
-        [TestCase("this.stream.Dispose();")]
-        [TestCase("this.stream?.Dispose();")]
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        [TestCase("this.Stream.Dispose();")]
-        [TestCase("this.Stream?.Dispose();")]
+        [TestCase("this.stream.Dispose();")]
+        [TestCase("this.stream?.Dispose();")]
         [TestCase("Stream.Dispose();")]
         [TestCase("Stream?.Dispose();")]
-        [TestCase("this.Calculated.Dispose();")]
-        [TestCase("this.Calculated?.Dispose();")]
+        [TestCase("this.Stream.Dispose();")]
+        [TestCase("this.Stream?.Dispose();")]
         [TestCase("Calculated.Dispose();")]
         [TestCase("Calculated?.Dispose();")]
+        [TestCase("this.Calculated.Dispose();")]
+        [TestCase("this.Calculated?.Dispose();")]
         public async Task DisposingField(string disposeCall)
         {
             var testCode = @"

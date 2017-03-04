@@ -108,7 +108,8 @@
                 if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out member) &&
                     member != null)
                 {
-                    if (Disposable.IsMemberDisposed(member, semanticModel, cancellationToken))
+                    if (Disposable.IsMemberDisposed(member, argument.FirstAncestorOrSelf<TypeDeclarationSyntax>(), semanticModel, cancellationToken)
+                                  .IsEither(Result.Yes, Result.Maybe))
                     {
                         return false;
                     }
