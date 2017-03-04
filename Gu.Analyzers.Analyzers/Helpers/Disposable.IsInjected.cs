@@ -165,6 +165,11 @@ namespace Gu.Analyzers
 
         private static Result IsCachedOrInjectedCore(ISymbol symbol)
         {
+            if (symbol is ILocalSymbol)
+            {
+                return Result.Unknown;
+            }
+
             if (symbol is IParameterSymbol)
             {
                 return Result.Yes;
@@ -173,23 +178,39 @@ namespace Gu.Analyzers
             var field = symbol as IFieldSymbol;
             if (field != null)
             {
-                return field.IsStatic ||
-                       field.DeclaredAccessibility != Accessibility.Private
-                           ? Result.Yes
+                if (field.IsStatic)
+                {
+                    return Result.Yes;
+                }
+
+                if (field.IsReadOnly)
+                {
+                    return Result.No;
+                }
+
+                return field.DeclaredAccessibility != Accessibility.Private
+                           ? Result.Maybe
                            : Result.No;
             }
 
             var property = symbol as IPropertySymbol;
             if (property != null)
             {
-                if (property.DeclaredAccessibility != Accessibility.Private &&
-                    property.SetMethod != null &&
-                    property.SetMethod.DeclaredAccessibility != Accessibility.Private)
+                if (property.IsStatic)
                 {
                     return Result.Yes;
                 }
 
-                return Result.No;
+                if (property.IsReadOnly ||
+                    property.SetMethod == null)
+                {
+                    return Result.No;
+                }
+
+                return property.DeclaredAccessibility != Accessibility.Private &&
+                       property.SetMethod.DeclaredAccessibility != Accessibility.Private
+                           ? Result.Maybe
+                           : Result.No;
             }
 
             return Result.No;

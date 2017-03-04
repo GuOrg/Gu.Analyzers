@@ -85,7 +85,7 @@
             CancellationToken cancellationToken)
         {
             if (Disposable.IsCreation(node, semanticModel, cancellationToken)
-               .IsEither(Result.No, Result.Unknown))
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return false;
             }
