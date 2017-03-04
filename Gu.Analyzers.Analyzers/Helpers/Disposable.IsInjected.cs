@@ -165,7 +165,7 @@ namespace Gu.Analyzers
             while (values.MoveNext())
             {
                 var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
-                if (IsInjectedCore(symbol) == Result.Yes)
+                if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
                 {
                     return Result.Yes;
                 }
@@ -176,6 +176,11 @@ namespace Gu.Analyzers
 
         private static Result IsInjectedCore(ISymbol symbol)
         {
+            if (symbol == null)
+            {
+                return Result.Unknown;
+            }
+
             if (symbol is ILocalSymbol)
             {
                 return Result.Unknown;
