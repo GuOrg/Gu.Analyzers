@@ -405,9 +405,11 @@ public sealed class Foo : FooBase
         }
 
         [Test]
-        public async Task Returning()
+        public async Task ReturningStatementBody()
         {
             var testCode = @"
+namespace RoslynSandBox
+{
     using System.IO;
 
     public class Foo
@@ -416,13 +418,52 @@ public sealed class Foo : FooBase
         {
             return File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
 
         [Test]
-        public async Task ReturningAssigning()
+        public async Task ReturningLocalStatementBody()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Stream Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return stream;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Stream Bar() => File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningNewAssigningAndDispsing()
         {
             var fooCode = @"
 using System;

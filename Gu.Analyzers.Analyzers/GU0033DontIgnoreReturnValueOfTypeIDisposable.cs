@@ -91,14 +91,16 @@
             }
 
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
-                node.Parent is UsingStatementSyntax)
+                node.Parent is UsingStatementSyntax ||
+                node.Parent is ReturnStatementSyntax ||
+                node.Parent is ArrowExpressionClauseSyntax)
             {
                 return false;
             }
 
             if (node.Parent is StatementSyntax)
             {
-                return !(node.Parent is ReturnStatementSyntax);
+                return true;
             }
 
             var argument = node.Parent as ArgumentSyntax;
