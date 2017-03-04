@@ -36,7 +36,7 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
             context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
-            context.RegisterSyntaxNodeAction(HandleParameter, SyntaxKind.Parameter);
+            context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
@@ -109,14 +109,20 @@
             }
         }
 
-        private static void HandleParameter(SyntaxNodeAnalysisContext context)
+        private static void HandleAssignment(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            var parameter = context.SemanticModel.GetDeclaredSymbolSafe(context.Node, context.CancellationToken) as IParameterSymbol;
+            var assignment = context.Node as AssignmentExpressionSyntax;
+            if (assignment == null)
+            {
+                return;
+            }
+
+            var parameter = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken) as IParameterSymbol;
             if (parameter == null ||
                 parameter.ContainingSymbol.DeclaredAccessibility == Accessibility.Private ||
                 parameter.RefKind != RefKind.Ref)
@@ -124,7 +130,7 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(parameter, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.Maybe))
+            if (Disposable.IsAssignableTo(context.SemanticModel.GetTypeInfoSafe(assignment.Right, context.CancellationToken).Type))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
