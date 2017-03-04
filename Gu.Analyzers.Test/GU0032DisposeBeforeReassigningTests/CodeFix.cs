@@ -292,5 +292,161 @@ public class Foo
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnMethodStatementBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh()
+    {
+        return ↓this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public void Meh()
+    {
+        this.stream?.Dispose();
+        return this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnMethodExpressionBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh() => ↓this.stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public void Meh()
+    {
+        this.stream?.Dispose();
+        return this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnStatementInPropertyStamementBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh
+    {
+        get
+        {
+            return ↓this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public void Meh
+    {
+        get
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh => ↓this.stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public void Meh
+    {
+        get
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
     }
 }

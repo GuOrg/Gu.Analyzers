@@ -27,7 +27,7 @@ using System.IO;
 public sealed class Foo : IDisposable
 {
     private static readonly Stream Stream = File.OpenRead(string.Empty);
-    ↓private readonly Stream stream;
+    private readonly object stream;
 
     public Foo(Stream stream)
     {
@@ -37,7 +37,7 @@ public sealed class Foo : IDisposable
 
     public void Dispose()
     {
-        ↓this.stream.Dispose();
+        ↓(this.stream as IDisposable)?.Dispose();
     }
 }";
             testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
