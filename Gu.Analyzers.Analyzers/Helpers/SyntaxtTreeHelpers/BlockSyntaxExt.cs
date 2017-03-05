@@ -19,20 +19,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            using (var pooled = AssignmentWalker.Create(body))
-            {
-                foreach (var assignment in pooled.Item.Assignments)
-                {
-                    var right = semanticModel.GetSymbolSafe(assignment.Right, cancellationToken);
-                    if (symbol.Equals(right))
-                    {
-                        result = assignment;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return Assigns.With(symbol, body, false, semanticModel, cancellationToken, out result);
         }
     }
 }
