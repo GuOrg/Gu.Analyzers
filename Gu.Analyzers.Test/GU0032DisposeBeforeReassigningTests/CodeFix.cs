@@ -322,7 +322,7 @@ public class Foo
 {
     private Stream stream;
 
-    public void Meh()
+    public IDisposable Meh()
     {
         this.stream?.Dispose();
         return this.stream = File.OpenRead(string.Empty);
@@ -357,7 +357,7 @@ public class Foo
 {
     private Stream stream;
 
-    public void Meh()
+    public IDisposable Meh()
     {
         this.stream?.Dispose();
         return this.stream = File.OpenRead(string.Empty);
@@ -398,7 +398,7 @@ public class Foo
 {
     private Stream stream;
 
-    public void Meh
+    public IDisposable Meh
     {
         get
         {
@@ -436,7 +436,7 @@ public class Foo
 {
     private Stream stream;
 
-    public void Meh
+    public IDisposable Meh
     {
         get
         {

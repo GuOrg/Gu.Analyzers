@@ -42,7 +42,7 @@
                 var assignment = syntaxRoot.FindNode(diagnostic.Location.SourceSpan) as AssignmentExpressionSyntax;
                 if (assignment != null)
                 {
-                    if (!(assignment.Parent is ExpressionStatementSyntax && assignment.Parent.Parent is BlockSyntax))
+                    if (!(assignment.Parent is StatementSyntax && assignment.Parent.Parent is BlockSyntax))
                     {
                         continue;
                     }
