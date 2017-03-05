@@ -90,8 +90,13 @@
             }
 
             var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
-            var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock)
-                                       .WithUsingSystem();
+            var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock);
+            if (disposeStatement.ToString()
+                                .Contains("as IDisposable"))
+            {
+                syntaxNode = syntaxNode.WithUsingSystem();
+            }
+
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxNode));
         }
 

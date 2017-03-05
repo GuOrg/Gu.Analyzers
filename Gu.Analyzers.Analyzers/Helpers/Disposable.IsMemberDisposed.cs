@@ -5,7 +5,6 @@ namespace Gu.Analyzers
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -132,7 +131,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        internal sealed class DisposeWalker : CSharpSyntaxWalker, IReadOnlyList<InvocationExpressionSyntax>
+        internal sealed class DisposeWalker : ExecutionWalker, IReadOnlyList<InvocationExpressionSyntax>
         {
             private static readonly Pool<DisposeWalker> Pool = new Pool<DisposeWalker>(
                 () => new DisposeWalker(),
@@ -140,18 +139,15 @@ namespace Gu.Analyzers
                     {
                         x.invocations.Clear();
                         x.identifiers.Clear();
-                        x.semanticModel = null;
-                        x.cancellationToken = CancellationToken.None;
+                        x.Clear();
                     });
 
             private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
             private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
 
-            private SemanticModel semanticModel;
-            private CancellationToken cancellationToken;
-
             private DisposeWalker()
             {
+                this.recursive = true;
             }
 
             public int Count => this.invocations.Count;
@@ -164,21 +160,13 @@ namespace Gu.Analyzers
 
             public override void VisitInvocationExpression(InvocationExpressionSyntax node)
             {
+                base.VisitInvocationExpression(node);
                 var symbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
                 if (symbol == KnownSymbol.IDisposable.Dispose &&
                     symbol?.Parameters.Length == 0)
                 {
                     this.invocations.Add(node);
                 }
-                else if (symbol != null)
-                {
-                    foreach (var reference in symbol.DeclaringSyntaxReferences)
-                    {
-                        this.Visit(reference.GetSyntax(this.cancellationToken));
-                    }
-                }
-
-                base.VisitInvocationExpression(node);
             }
 
             public override void VisitIdentifierName(IdentifierNameSyntax node)
