@@ -42,7 +42,6 @@ public class Foo
         }
 
         [Test]
-        [Explicit]
         public async Task NotDisposingVariableOfTypeObject()
         {
             var testCode = @"
@@ -61,9 +60,7 @@ public class Foo
                                .WithMessage("Dispose before re-assigning.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
-            // keeping it safe and doing ?.Dispose()
-            // will require some work to figure out if it can be null
-            var fixedCode = @"
+            var fixedCode = @"using System;
 using System.IO;
 
 public class Foo

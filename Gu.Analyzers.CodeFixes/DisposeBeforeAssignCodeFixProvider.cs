@@ -25,7 +25,11 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                          .ConfigureAwait(false) as CompilationUnitSyntax;
+            if (syntaxRoot == null)
+            {
+                return;
+            }
 
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
@@ -75,7 +79,7 @@
             }
         }
 
-        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
+        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
         {
             var block = assignment.FirstAncestorOrSelf<BlockSyntax>();
             var statement = assignment.FirstAncestorOrSelf<StatementSyntax>();
@@ -86,7 +90,9 @@
             }
 
             var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(block, newBlock)));
+            var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock)
+                                       .WithUsingSystem();
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxNode));
         }
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)

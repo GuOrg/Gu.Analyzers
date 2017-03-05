@@ -28,7 +28,11 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                          .ConfigureAwait(false) as CompilationUnitSyntax;
+            if (syntaxRoot == null)
+            {
+                return;
+            }
 
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
@@ -83,7 +87,7 @@
                                     context,
                                     semanticModel,
                                     cancellationToken,
-                                    (CompilationUnitSyntax)syntaxRoot,
+                                    syntaxRoot,
                                     typeDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                         diagnostic);
@@ -100,7 +104,7 @@
                                     context,
                                     semanticModel,
                                     cancellationToken,
-                                     (CompilationUnitSyntax)syntaxRoot,
+                                     syntaxRoot,
                                     typeDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                         diagnostic);
@@ -115,7 +119,7 @@
                                 context,
                                 semanticModel,
                                 cancellationToken,
-                                 (CompilationUnitSyntax)syntaxRoot,
+                                 syntaxRoot,
                                 typeDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                     diagnostic);
@@ -128,7 +132,7 @@
                                 context,
                                 semanticModel,
                                 cancellationToken,
-                                 (CompilationUnitSyntax)syntaxRoot,
+                                 syntaxRoot,
                                 typeDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                     diagnostic);
