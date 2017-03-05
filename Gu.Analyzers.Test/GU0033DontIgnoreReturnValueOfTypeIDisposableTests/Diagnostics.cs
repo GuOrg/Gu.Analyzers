@@ -293,7 +293,7 @@ public class Meh
 {
     public Foo Bar()
     {
-        return new Foo(new Disposable());
+        return new Foo(↓new Disposable());
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -328,7 +328,7 @@ public class Meh
 {
     public Foo Bar()
     {
-        return new Foo(new Disposable());
+        return new Foo(↓new Disposable());
     }
 }";
             var expected = this.CSharpDiagnostic()
