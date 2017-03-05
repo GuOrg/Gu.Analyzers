@@ -102,8 +102,8 @@
                 return;
             }
 
-            var isAssignedWithCreated = Disposable.IsAssignedWithCreated(argument.Expression, context.SemanticModel, context.CancellationToken);
-            if (isAssignedWithCreated.IsEither(Result.No, Result.Unknown))
+            if (Disposable.IsAssignedWithCreated(argument.Expression, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }

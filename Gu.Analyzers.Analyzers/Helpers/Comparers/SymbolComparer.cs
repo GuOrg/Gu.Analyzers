@@ -25,7 +25,12 @@
                 return false;
             }
 
-            return DefinitionEquals(x, y) || DefinitionEquals(y, x);
+            return DefinitionEquals(x, y) ||
+                   DefinitionEquals(y, x) ||
+                   Equals((x as IPropertySymbol)?.OverriddenProperty, y) ||
+                   Equals(x, (y as IPropertySymbol)?.OverriddenProperty) ||
+                   Equals((x as IMethodSymbol)?.OverriddenMethod, y) ||
+                   Equals(x, (y as IMethodSymbol)?.OverriddenMethod);
         }
 
         bool IEqualityComparer<ISymbol>.Equals(ISymbol x, ISymbol y) => Equals(x, y);
