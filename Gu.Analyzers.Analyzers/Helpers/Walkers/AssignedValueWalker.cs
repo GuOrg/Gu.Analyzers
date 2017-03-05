@@ -503,6 +503,15 @@
                     this.inner.VisitAccessorDeclaration(node);
                 }
             }
+
+            public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
+            {
+                if (this.inner.semanticModel.GetDeclaredSymbolSafe(node, this.inner.cancellationToken)
+                        ?.DeclaredAccessibility != Accessibility.Private)
+                {
+                    this.inner.VisitArrowExpressionClause(node);
+                }
+            }
         }
     }
 }
