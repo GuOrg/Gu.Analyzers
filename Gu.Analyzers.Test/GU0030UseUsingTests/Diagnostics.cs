@@ -1,9 +1,7 @@
 ﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
-    using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+
     using NUnit.Framework;
 
     internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>

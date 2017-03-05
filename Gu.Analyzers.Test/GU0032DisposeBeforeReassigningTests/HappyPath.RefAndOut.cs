@@ -4,9 +4,9 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
 
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
-        internal class RefAndOut : NestedHappyPathVerifier<HappyPath>
+        internal class RefAndOut : NestedHappyPathVerifier<GU0030UseUsingTests.HappyPath>
         {
             [Test]
             public async Task AssigningVariableViaOutParameter()
