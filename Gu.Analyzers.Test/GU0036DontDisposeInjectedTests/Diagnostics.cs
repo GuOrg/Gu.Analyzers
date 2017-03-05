@@ -139,7 +139,7 @@ public sealed class Foo : IDisposable
         public async Task DisposingPublicFieldOutsideOfLock()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -221,7 +221,7 @@ namespace RoslynSandBox
         public async Task DisposingAbstractOrVirtualProperty(string property)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -655,7 +655,7 @@ namespace Gu.Reactive
         public async Task IgnoreLambdaUsageOnInjected(string disposeCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

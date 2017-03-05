@@ -42,6 +42,7 @@ public class Foo
         }
 
         [Test]
+        [Explicit]
         public async Task NotDisposingVariableOfTypeObject()
         {
             var testCode = @"
@@ -451,7 +452,7 @@ public class Foo
         public async Task NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -469,7 +470,7 @@ namespace RoslynSandBox
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
 ////            var fixedCode = @"
-////namespace RoslynSandBox
+////namespace RoslynSandbox
 ////{
 ////    using System;
 ////    using System.IO;

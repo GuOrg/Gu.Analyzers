@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
     internal partial class HappyPath : HappyPathVerifier<GU0034ReturntypeShouldIndicateIDisposable>
     {
         private static readonly string DisposableCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
     {
     using System;
 
@@ -268,7 +268,7 @@ public class Foo
         public async Task MethodReturningTaskFromResultOfDisposable()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Threading.Tasks;
@@ -294,7 +294,7 @@ namespace RoslynSandBox
         public async Task MethodReturningTaskRunOfDisposable()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Threading.Tasks;

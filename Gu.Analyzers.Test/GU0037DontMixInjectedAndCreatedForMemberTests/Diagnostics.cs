@@ -16,7 +16,7 @@
         public async Task InjectedAndCreatedField(string code)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 
@@ -173,7 +173,7 @@ public class Foo
         public async Task BackingFieldAssignedWithCreatedAndPropertyWithInjected()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 
@@ -203,7 +203,7 @@ namespace RoslynSandBox
         public async Task BackingFieldAssignedWithInjectedAndPropertyWithCreated()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 

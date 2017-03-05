@@ -49,7 +49,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         public async Task NotDisposingVariableOfTypeObject(string disposeCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -570,7 +570,7 @@ public class Foo
         public async Task WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -602,7 +602,7 @@ namespace RoslynSandBox
         public async Task ChainedCalls()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -639,7 +639,7 @@ namespace RoslynSandBox
         public async Task ChainedCallsWithHelper()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -655,7 +655,7 @@ namespace RoslynSandBox
 }";
 
             var helperCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;

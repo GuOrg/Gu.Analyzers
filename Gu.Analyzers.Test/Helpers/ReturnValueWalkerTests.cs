@@ -57,7 +57,7 @@ internal class Foo
         public void Property(string code, bool recursive, string expected)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -164,7 +164,7 @@ namespace RoslynSandBox
         public void Call(string code, bool recursive, string expected)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -312,7 +312,7 @@ namespace RoslynSandBox
         public void Lambda(string code, bool recursive, string expected)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -380,7 +380,7 @@ namespace RoslynSandBox
         public void AsyncAwait(string code, bool recursive, string expected)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Threading.Tasks;

@@ -229,7 +229,7 @@ public class Factory
         public async Task WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;

@@ -15,7 +15,7 @@
             public void ChainedDefaultValue(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {

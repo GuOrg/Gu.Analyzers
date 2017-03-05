@@ -60,7 +60,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             public async Task LocalInIfAndEnd()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 

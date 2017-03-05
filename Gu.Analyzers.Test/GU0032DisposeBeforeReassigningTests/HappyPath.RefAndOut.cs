@@ -36,7 +36,7 @@ public class Foo
             public async Task AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 
@@ -64,7 +64,7 @@ namespace RoslynSandBox
             public async Task AssigningFieldViaConcurrentDictionaryTryGetValue()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -88,7 +88,7 @@ namespace RoslynSandBox
             public async Task AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
     using System.IO;

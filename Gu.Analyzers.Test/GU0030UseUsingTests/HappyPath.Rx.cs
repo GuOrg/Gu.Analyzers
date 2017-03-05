@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             public async Task CompositeDisposableInitializer()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -41,7 +41,7 @@ namespace RoslynSandBox
             public async Task CompositeDisposableAdd()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -96,7 +96,7 @@ public sealed class Foo : IDisposable
             public async Task SerialDisposableObjectInitializer()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;

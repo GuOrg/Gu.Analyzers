@@ -238,7 +238,7 @@ public sealed class Foo : IDisposable
             public async Task FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -263,7 +263,7 @@ namespace RoslynSandBox
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;

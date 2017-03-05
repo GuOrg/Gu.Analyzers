@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.Helpers
         public void TwoInternalChained()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -43,7 +43,7 @@ namespace RoslynSandBox
         public void InternalPrivateChained()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -72,7 +72,7 @@ namespace RoslynSandBox
         public void PrivatePrivateFactory()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {

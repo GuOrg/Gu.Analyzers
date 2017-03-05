@@ -26,7 +26,7 @@ public class Disposable : IDisposable
         public async Task LanguageConstructs(string code)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;

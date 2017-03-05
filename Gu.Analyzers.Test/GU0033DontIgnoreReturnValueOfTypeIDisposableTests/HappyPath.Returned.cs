@@ -156,7 +156,7 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
             public async Task ReturningStatementBody()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 
@@ -176,7 +176,7 @@ namespace RoslynSandBox
             public async Task ReturningLocalStatementBody()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 
@@ -197,7 +197,7 @@ namespace RoslynSandBox
             public async Task ReturningExpressionBody()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.IO;
 

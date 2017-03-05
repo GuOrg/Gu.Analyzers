@@ -35,7 +35,7 @@ internal class Foo
             public void InsideIfBlock(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -67,7 +67,7 @@ namespace RoslynSandBox
             public void InsideIfBlockCurlyElse(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -100,7 +100,7 @@ namespace RoslynSandBox
             public void InsideIfBlockNoCurlies(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -128,7 +128,7 @@ namespace RoslynSandBox
             public void AfterIfBlock(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -161,7 +161,7 @@ namespace RoslynSandBox
             public void Lambda(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

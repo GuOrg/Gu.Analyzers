@@ -73,7 +73,7 @@ internal class Foo
             public void PrivateStaticMethodWithOptionalParameter1(string modifiers)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -107,7 +107,7 @@ namespace RoslynSandBox
             public void PrivateStaticMethodWithOptionalParameter2()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -154,7 +154,7 @@ namespace RoslynSandBox
             public void PrivateStaticMethodWithOptionalParameterConditionalRecursion(string modifiers)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -193,7 +193,7 @@ namespace RoslynSandBox
             public void AssigningLocalWithSelf()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -230,7 +230,7 @@ namespace RoslynSandBox
             public void AssigningFieldWithSelf(string code, string expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -266,7 +266,7 @@ namespace RoslynSandBox
             public void AssigningPropertyPrivateSetWithSelf(string code, string expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -302,7 +302,7 @@ namespace RoslynSandBox
             public void AssigningPropertyPublicSetWithSelf()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;

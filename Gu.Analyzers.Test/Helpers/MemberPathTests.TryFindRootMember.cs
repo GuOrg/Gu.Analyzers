@@ -27,7 +27,7 @@ namespace Gu.Analyzers.Test.Helpers
             public void ForPropertyOrField(string code, string expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -80,7 +80,7 @@ namespace RoslynSandBox
             public void ForMethodInvocation(string code, string expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

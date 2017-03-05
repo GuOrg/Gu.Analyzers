@@ -123,7 +123,7 @@ public sealed class Foo
         public void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     public sealed class Foo
     {
@@ -165,7 +165,7 @@ namespace RoslynSandBox
         public void BackingFieldPublicSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     public sealed class Foo
     {
@@ -197,7 +197,7 @@ namespace RoslynSandBox
         public void BackingFieldPrivateSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     public sealed class Foo
     {
@@ -322,7 +322,7 @@ public sealed class Foo
         public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     public sealed class Foo
     {

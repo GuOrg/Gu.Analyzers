@@ -133,7 +133,7 @@ public sealed class Foo
         public async Task StatementLambda()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -159,7 +159,7 @@ namespace RoslynSandBox
         public async Task ParenthesizedLambdaExpression()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -182,7 +182,7 @@ namespace RoslynSandBox
         public async Task SimpleLambdaExpression()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

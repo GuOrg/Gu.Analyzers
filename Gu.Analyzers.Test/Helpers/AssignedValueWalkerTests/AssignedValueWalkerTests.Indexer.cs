@@ -38,7 +38,7 @@ internal class Foo
             public void ListOfIntIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Generic;
 

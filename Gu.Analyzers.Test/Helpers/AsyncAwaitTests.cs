@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.Helpers
         public void TryAwaitTaskFromResult(string code, bool expected, string expectedCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 
@@ -48,7 +48,7 @@ namespace RoslynSandBox
         public void TryAwaitTaskRun(string code, bool expected, string expectedCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 

@@ -109,7 +109,7 @@ internal class Foo<T>
             public void LocalAssignedWithChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -214,7 +214,7 @@ internal class Foo
             public void FieldAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -257,7 +257,7 @@ namespace RoslynSandBox
             public void FieldAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {

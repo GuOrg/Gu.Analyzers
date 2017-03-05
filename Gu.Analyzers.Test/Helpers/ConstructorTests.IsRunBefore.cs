@@ -21,7 +21,7 @@ namespace Gu.Analyzers.Test.Helpers
             public void ChainedInSameType(string code1, string code2, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -65,7 +65,7 @@ namespace RoslynSandBox
             public void ImplicitDefaultBase(string code1, string code2, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class FooBase
     {
@@ -126,7 +126,7 @@ namespace RoslynSandBox
             public void ExplicitDefaultBase(string code1, string code2, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class FooBase
     {

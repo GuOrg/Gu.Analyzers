@@ -20,7 +20,7 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
             public void InitializedWithConstant(string code)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -162,7 +162,7 @@ internal class Foo<T>
             public void AssignedInLock()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

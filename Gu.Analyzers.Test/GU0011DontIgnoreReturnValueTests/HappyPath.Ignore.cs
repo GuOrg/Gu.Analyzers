@@ -111,7 +111,7 @@ public class Foo
 ////            public async Task HashSet(string operation)
 ////            {
 ////                var testCode = @"
-////namespace RoslynSandBox
+////namespace RoslynSandbox
 ////{
 ////    using System.Collections.Generic;
 
@@ -136,7 +136,7 @@ public class Foo
             public async Task IList(string operation)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections;
     using System.Collections.Generic;

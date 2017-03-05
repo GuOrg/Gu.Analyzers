@@ -23,7 +23,7 @@
             public void LanguageConstructs(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -65,7 +65,7 @@ namespace RoslynSandBox
             public void CallMethodInSyntaxTreeReturningNotDisposable(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -136,7 +136,7 @@ namespace RoslynSandBox
             public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -224,7 +224,7 @@ namespace RoslynSandBox
             public void CallRecursiveMethod(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -282,7 +282,7 @@ namespace RoslynSandBox
             public void AsyncAwait(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -336,7 +336,7 @@ namespace RoslynSandBox
             public void CallExternal(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections;

@@ -224,7 +224,7 @@ public class Foo
             public async Task CallPrivateMethodRefParameter()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -256,7 +256,7 @@ namespace RoslynSandBox
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -289,7 +289,7 @@ namespace RoslynSandBox
             public async Task CallPrivateMethodRefParameterTwice()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -322,7 +322,7 @@ namespace RoslynSandBox
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -356,7 +356,7 @@ namespace RoslynSandBox
             public async Task CallPublicMethodRefParameter()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -388,7 +388,7 @@ namespace RoslynSandBox
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;

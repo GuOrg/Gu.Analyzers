@@ -117,7 +117,7 @@ public static class Foo
             public async Task InjectedIEnumerableOfTGetEnumerator()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
@@ -180,7 +180,7 @@ public class Foo
             public async Task InjectedPasswordBoxSecurePassword()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
