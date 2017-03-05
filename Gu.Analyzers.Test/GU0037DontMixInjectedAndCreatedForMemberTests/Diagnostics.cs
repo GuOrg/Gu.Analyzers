@@ -170,6 +170,67 @@ public class Foo
         }
 
         [Test]
+        public async Task BackingFieldAssignedWithCreatedAndPropertyWithInjected()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        ↓private Stream stream = File.OpenRead(string.Empty);
+
+        public Foo(Stream arg)
+        {
+            this.Stream = arg;
+        }
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set { this.stream = value; }
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't assign member with injected and created disposables.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task BackingFieldAssignedWithInjectedAndPropertyWithCreated()
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        ↓private Stream stream;
+
+        public Foo(Stream arg)
+        {
+            this.stream = arg;
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set { this.stream = value; }
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't assign member with injected and created disposables.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task PublicMethodRefParameter()
         {
             var testCode = @"
