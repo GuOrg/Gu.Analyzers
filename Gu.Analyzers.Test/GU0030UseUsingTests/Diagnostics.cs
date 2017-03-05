@@ -1,6 +1,9 @@
 ﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
+    using System.Threading;
     using System.Threading.Tasks;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
@@ -14,6 +17,36 @@ public class Disposable : IDisposable
 	{
 	}
 }";
+
+        [TestCase("new Disposable()")]
+        [TestCase("new Disposable() as object")]
+        [TestCase("(object) new Disposable()")]
+        [TestCase("File.OpenRead(string.Empty) ?? null")]
+        [TestCase("null ?? File.OpenRead(string.Empty)")]
+        [TestCase("true ? null : File.OpenRead(string.Empty)")]
+        [TestCase("true ? File.OpenRead(string.Empty) : null")]
+        public async Task LanguageConstructs(string code)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            ↓var value = new Disposable();
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("new Disposable()", code);
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Use using.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+        }
 
         [Test]
         public async Task PropertyInitializedPasswordBoxSecurePassword()

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0030UseUsingTests
+﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
     using System.Threading.Tasks;
     using NUnit.Framework;
@@ -23,6 +23,30 @@ public class Disposable : IDisposable
     {
     }
 }";
+
+        [TestCase("1")]
+        [TestCase("new string(' ', 1)")]
+        [TestCase("typeof(IDisposable)")]
+        [TestCase("(IDisposable)null")]
+        public async Task LanguageConstructs(string code)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            var value = new string(' ', 1);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("new string(' ', 1)", code);
+            await this.VerifyHappyPathAsync(DisposableCode, testCode).ConfigureAwait(false);
+        }
 
         [Test]
         public async Task WhenDisposingVariable()
