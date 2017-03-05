@@ -327,6 +327,8 @@ class Goof : IDisposable {
         public async Task DisposingPropertyInVirtualDisposeInBaseClass()
         {
             var baseClassCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -335,7 +337,7 @@ class Goof : IDisposable {
         private bool disposed;
 
         public abstract Stream Stream { get; }
-        
+
         /// <inheritdoc/>
         public void Dispose()
         {
@@ -355,10 +357,12 @@ class Goof : IDisposable {
                 this.Stream?.Dispose();
             }
         }
-    }";
+    }
+}";
 
             var testCode = @"
-    using System;
+namespace RoslynSandbox
+{
     using System.IO;
 
     public sealed class Foo : FooBase
@@ -373,7 +377,8 @@ class Goof : IDisposable {
 
             base.Dispose(disposing);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(baseClassCode, testCode)
                       .ConfigureAwait(false);

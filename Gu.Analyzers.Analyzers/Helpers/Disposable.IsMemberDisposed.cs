@@ -147,7 +147,7 @@ namespace Gu.Analyzers
 
             private DisposeWalker()
             {
-                this.recursive = true;
+                this.IsRecursive = true;
             }
 
             public int Count => this.invocations.Count;

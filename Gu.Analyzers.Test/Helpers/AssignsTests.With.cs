@@ -13,7 +13,7 @@
         {
             [TestCase(true)]
             [TestCase(false)]
-            public void CtorArg(bool recursive)
+            public void FieldCtorArg(bool recursive)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -41,6 +41,36 @@ namespace RoslynSandbox
 
             [TestCase(true)]
             [TestCase(false)]
+            public void FieldCtorArgInNested(bool recursive)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    internal class Foo
+    {
+        private StreamReader reader;
+
+        internal Foo(Stream stream)
+        {
+            this.reader = new StreamReader(stream);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<ParameterSyntax>("stream");
+                var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(Stream stream)");
+                AssignmentExpressionSyntax result;
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, Assigns.FirstWith(symbol, ctor, recursive, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
+            }
+
+            [TestCase(true)]
+            [TestCase(false)]
             public void ChainedCtorArg(bool recursive)
             {
                 var testCode = @"
@@ -64,18 +94,59 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<AssignmentExpressionSyntax>("this.value = chainedArg").Right;
+                var value = syntaxTree.BestMatch<ParameterSyntax>("arg");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
                 AssignmentExpressionSyntax result;
-                var arg = semanticModel.GetSymbolSafe(value, CancellationToken.None);
+                var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
                 if (recursive)
                 {
-                    Assert.AreEqual(true, Assigns.FirstWith(arg, ctor, true, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, Assigns.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = chainedArg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, Assigns.FirstWith(arg, ctor, false, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, Assigns.FirstWith(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
+                }
+            }
+
+            [TestCase(true)]
+            [TestCase(false)]
+            public void FieldWithCtorArgViaProperty(bool recursive)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        private int number;
+
+        internal Foo(int arg)
+        {
+            this.Number = arg;
+        }
+
+        public int Number
+        {
+            get { return this.number; }
+            set { this.number = value; }
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<ParameterSyntax>("arg");
+                var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
+                AssignmentExpressionSyntax result;
+                var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
+                if (recursive)
+                {
+                    Assert.AreEqual(true, Assigns.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual("this.Number = arg", result?.ToString());
+                }
+                else
+                {
+                    Assert.AreEqual(false, Assigns.FirstSymbol(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

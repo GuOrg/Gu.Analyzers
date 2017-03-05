@@ -14,7 +14,7 @@
     {
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-        protected bool recursive;
+        protected bool IsRecursive;
         protected SemanticModel semanticModel;
         protected CancellationToken cancellationToken;
 
@@ -34,16 +34,32 @@
             this.VisitChained(node);
         }
 
+        public override void VisitIdentifierName(IdentifierNameSyntax node)
+        {
+            base.VisitIdentifierName(node);
+            if (this.IsRecursive)
+            {
+                IMethodSymbol getter;
+                if (this.TryGetPropertyGet(node, out getter))
+                {
+                    foreach (var reference in getter.DeclaringSyntaxReferences)
+                    {
+                        this.Visit(reference.GetSyntax(this.cancellationToken));
+                    }
+                }
+            }
+        }
+
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             base.VisitAssignmentExpression(node);
-            if (this.recursive)
+            if (this.IsRecursive)
             {
-                var property = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken) as IPropertySymbol;
-                if (property?.SetMethod != null &&
-                    this.visited.Add(node))
+                IMethodSymbol setter;
+                if (this.TryGetPropertySet(node.Left, out setter) &&
+                     this.visited.Add(node))
                 {
-                    foreach (var reference in property.SetMethod.DeclaringSyntaxReferences)
+                    foreach (var reference in setter.DeclaringSyntaxReferences)
                     {
                         this.Visit(reference.GetSyntax(this.cancellationToken));
                     }
@@ -66,14 +82,13 @@
         protected void Clear()
         {
             this.visited.Clear();
-            this.recursive = false;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
         }
 
         protected void VisitChained(SyntaxNode node)
         {
-            if (this.recursive &&
+            if (this.IsRecursive &&
                 this.visited.Add(node))
             {
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
@@ -82,6 +97,36 @@
                     this.Visit(reference.GetSyntax(this.cancellationToken));
                 }
             }
+        }
+
+        private bool TryGetPropertySet(SyntaxNode node, out IMethodSymbol setter)
+        {
+            var property = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IPropertySymbol;
+            setter = property?.SetMethod;
+            return setter != null;
+        }
+
+        private bool TryGetPropertyGet(SyntaxNode node, out IMethodSymbol getter)
+        {
+            getter = null;
+            var property = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IPropertySymbol;
+            if (property?.GetMethod == null)
+            {
+                return false;
+            }
+
+            if (node.Parent is MemberAccessExpressionSyntax)
+            {
+                return this.TryGetPropertyGet(node.Parent, out getter);
+            }
+
+            if (node.Parent is ArgumentSyntax ||
+                node.Parent is EqualsValueClauseSyntax)
+            {
+                getter = property.GetMethod;
+            }
+
+            return getter != null;
         }
     }
 }

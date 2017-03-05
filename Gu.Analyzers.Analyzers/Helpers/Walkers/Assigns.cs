@@ -14,7 +14,7 @@
                 {
                     x.assignments.Clear();
                     x.Clear();
-                    x.recursive = false;
+                    x.IsRecursive = false;
                     x.semanticModel = null;
                     x.cancellationToken = CancellationToken.None;
                 });
@@ -41,7 +41,7 @@
             var pooled = Cache.GetOrCreate();
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.recursive = recursive;
+            pooled.Item.IsRecursive = recursive;
             pooled.Item.Visit(node);
             return pooled;
         }
