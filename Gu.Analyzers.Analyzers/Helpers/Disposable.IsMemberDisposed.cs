@@ -161,7 +161,7 @@ namespace Gu.Analyzers
             public override void VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 base.VisitInvocationExpression(node);
-                var symbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken) as IMethodSymbol;
+                var symbol = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) as IMethodSymbol;
                 if (symbol == KnownSymbol.IDisposable.Dispose &&
                     symbol?.Parameters.Length == 0)
                 {
@@ -212,8 +212,8 @@ namespace Gu.Analyzers
                 foreach (var invocation in this.invocations)
                 {
                     ExpressionSyntax disposed;
-                    if (TryGetDisposedRootMember(invocation, this.semanticModel, this.cancellationToken, out disposed) &&
-                        SymbolComparer.Equals(member, this.semanticModel.GetSymbolSafe(disposed, this.cancellationToken)))
+                    if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out disposed) &&
+                        SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(disposed, this.CancellationToken)))
                     {
                         return Result.Yes;
                     }
@@ -221,7 +221,7 @@ namespace Gu.Analyzers
 
                 foreach (var name in this.identifiers)
                 {
-                    if (SymbolComparer.Equals(member, this.semanticModel.GetSymbolSafe(name, this.cancellationToken)))
+                    if (SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(name, this.CancellationToken)))
                     {
                         return Result.Maybe;
                     }
@@ -233,8 +233,8 @@ namespace Gu.Analyzers
             private static Pool<DisposeWalker>.Pooled Create(SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var pooled = Pool.GetOrCreate();
-                pooled.Item.semanticModel = semanticModel;
-                pooled.Item.cancellationToken = cancellationToken;
+                pooled.Item.SemanticModel = semanticModel;
+                pooled.Item.CancellationToken = cancellationToken;
                 return pooled;
             }
         }

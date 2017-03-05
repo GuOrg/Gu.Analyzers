@@ -15,8 +15,8 @@
                     x.assignments.Clear();
                     x.Clear();
                     x.IsRecursive = false;
-                    x.semanticModel = null;
-                    x.cancellationToken = CancellationToken.None;
+                    x.SemanticModel = null;
+                    x.CancellationToken = CancellationToken.None;
                 });
 
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
@@ -39,8 +39,8 @@
         internal static Pool<Assigns>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Cache.GetOrCreate();
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
+            pooled.Item.SemanticModel = semanticModel;
+            pooled.Item.CancellationToken = cancellationToken;
             pooled.Item.IsRecursive = recursive;
             pooled.Item.Visit(node);
             return pooled;
