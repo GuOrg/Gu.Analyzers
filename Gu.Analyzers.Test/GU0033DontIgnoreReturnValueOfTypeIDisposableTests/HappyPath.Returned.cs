@@ -257,14 +257,14 @@ public class Foo : IDisposable
 {
     private readonly IDisposable disposable;
 
-    public Foo(IDisposable disposable)
-        :this()
+    public Foo(int value, IDisposable disposable)
+        :this(disposable)
     {
-        this.disposable = disposable;
     }
 
     private Foo()
     {
+        this.disposable = disposable;
     }
 
     public void Dispose()
@@ -277,7 +277,7 @@ public class Meh
 {
     public Foo Bar()
     {
-        return new Foo(new Disposable());
+        return new Foo(1, new Disposable());
     }
 }";
                 await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
