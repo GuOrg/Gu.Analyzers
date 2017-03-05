@@ -23,9 +23,9 @@ public class Foo
         return TryGetStream(out stream);
     }
 
-    public bool TryGetStream(out Stream stream)
+    public bool TryGetStream(out Stream result)
     {
-        stream = File.OpenRead(string.Empty);
+        result = File.OpenRead(string.Empty);
         return true;
     }
 }";
@@ -50,9 +50,9 @@ namespace RoslynSandBox
             TryGetStream(out stream);
         }
 
-        public bool TryGetStream(out Stream stream)
+        public bool TryGetStream(out Stream result)
         {
-            stream = File.OpenRead(string.Empty);
+            result = File.OpenRead(string.Empty);
             return true;
         }
     }
@@ -85,6 +85,31 @@ namespace RoslynSandBox
             }
 
             [Test]
+            public async Task AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System.Collections.Concurrent;
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+        private Stream current;
+
+        public bool Update(int number)
+        {
+            return this.Cache.TryGetValue(number, out this.current);
+            return this.Cache.TryGetValue(number + 1, out this.current);
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task AssigningFieldWithCahcedViaOutParameter()
             {
                 var testCode = @"
@@ -107,6 +132,54 @@ public class Foo
     }
 }";
 
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task AssigningVariableViaRefParameter()
+            {
+                var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public void Bar()
+    {
+        Stream stream = null;
+        Assign(ref stream);
+    }
+
+    public void Assign(ref Stream result)
+    {
+        result = File.OpenRead(string.Empty);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
+            {
+                var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    public void Bar()
+    {
+        Stream stream = null;
+        Assign(ref stream);
+        stream?.Dispose();
+        Assign(ref stream);
+    }
+
+    public void Assign(ref Stream result)
+    {
+        result = File.OpenRead(string.Empty);
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
         }

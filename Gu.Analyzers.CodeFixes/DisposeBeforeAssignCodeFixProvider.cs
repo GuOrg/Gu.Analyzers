@@ -100,7 +100,6 @@
             var symbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
             if (symbol == null)
             {
-
                 return false;
             }
 
