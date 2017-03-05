@@ -23,7 +23,6 @@
 
         private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new List<ConstructorDeclarationSyntax>();
         private readonly List<ObjectCreationExpressionSyntax> objectCreations = new List<ObjectCreationExpressionSyntax>();
-        internal ConstructorDeclarationSyntax Default;
 
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -36,6 +35,8 @@
         public IReadOnlyList<ConstructorDeclarationSyntax> NonPrivateCtors => this.nonPrivateCtors;
 
         public IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
+
+        public ConstructorDeclarationSyntax Default { get; private set; }
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {

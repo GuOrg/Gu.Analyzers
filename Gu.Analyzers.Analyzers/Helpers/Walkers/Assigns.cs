@@ -4,28 +4,22 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class Assigns : CSharpSyntaxWalker
+    internal sealed class Assigns : ExecutionWalker
     {
         private static readonly Pool<Assigns> Cache = new Pool<Assigns>(
             () => new Assigns(),
             x =>
                 {
                     x.assignments.Clear();
-                    x.visited.Clear();
+                    x.Clear();
                     x.recursive = false;
                     x.semanticModel = null;
                     x.cancellationToken = CancellationToken.None;
                 });
 
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
-        private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
-
-        private bool recursive;
-        private SemanticModel semanticModel;
-        private CancellationToken cancellationToken;
 
         private Assigns()
         {
@@ -38,20 +32,8 @@
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
-            this.assignments.Add(node);
             base.VisitAssignmentExpression(node);
-        }
-
-        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-        {
-            base.VisitInvocationExpression(node);
-            this.VisitChained(node);
-        }
-
-        public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
-        {
-            base.VisitConstructorInitializer(node);
-            this.VisitChained(node);
+            this.assignments.Add(node);
         }
 
         internal static Pool<Assigns>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -64,13 +46,13 @@
             return pooled;
         }
 
-        internal static bool Symbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool FirstSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             AssignmentExpressionSyntax temp;
-            return Symbol(symbol, scope, recursive, semanticModel, cancellationToken, out temp);
+            return FirstSymbol(symbol, scope, recursive, semanticModel, cancellationToken, out temp);
         }
 
-        internal static bool Symbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -95,7 +77,7 @@
             return false;
         }
 
-        internal static bool With(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -118,19 +100,6 @@
             }
 
             return false;
-        }
-
-        private void VisitChained(SyntaxNode node)
-        {
-            if (this.recursive &&
-                this.visited.Add(node))
-            {
-                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                foreach (var reference in method.DeclaringSyntaxReferences)
-                {
-                    this.Visit(reference.GetSyntax(this.cancellationToken));
-                }
-            }
         }
     }
 }

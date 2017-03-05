@@ -98,6 +98,7 @@
     <Compile Include="Helpers\Walkers\CallsWalker.cs" />
     <Compile Include="Helpers\Walkers\ConstructorsWalker.cs" />
     <Compile Include="Helpers\MemberPath.cs" />
+    <Compile Include="Helpers\Walkers\ExecutionWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
     <Compile Include="Helpers\Collection\EnumerableExt.cs" />

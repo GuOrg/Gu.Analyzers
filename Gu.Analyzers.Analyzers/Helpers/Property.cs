@@ -22,7 +22,7 @@
                 AccessorDeclarationSyntax setter;
                 if (declaration.TryGetSetAccessorDeclaration(out setter))
                 {
-                    if (Assigns.Symbol(symbol, setter, true, semanticModel, cancellationToken))
+                    if (Assigns.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
                     {
                         return true;
                     }
