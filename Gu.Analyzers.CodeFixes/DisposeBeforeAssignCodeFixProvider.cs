@@ -42,11 +42,6 @@
                 var assignment = syntaxRoot.FindNode(diagnostic.Location.SourceSpan) as AssignmentExpressionSyntax;
                 if (assignment != null)
                 {
-                    if (!(assignment.Parent is StatementSyntax && assignment.Parent.Parent is BlockSyntax))
-                    {
-                        continue;
-                    }
-
                     StatementSyntax diposeStatement;
                     if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
                     {
@@ -96,10 +91,16 @@
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
+            result = null;
+            if (!(assignment.Parent is StatementSyntax && assignment.Parent.Parent is BlockSyntax))
+            {
+                return false;
+            }
+
             var symbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
             if (symbol == null)
             {
-                result = null;
+
                 return false;
             }
 
