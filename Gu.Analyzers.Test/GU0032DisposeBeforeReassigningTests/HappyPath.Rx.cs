@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
-        internal class Rx : NestedHappyPathVerifier<GU0030UseUsingTests.HappyPath>
+        internal class Rx : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
             public async Task SerialDisposable()

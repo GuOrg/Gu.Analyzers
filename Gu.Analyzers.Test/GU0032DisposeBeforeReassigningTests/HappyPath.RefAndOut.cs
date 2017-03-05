@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
-        internal class RefAndOut : NestedHappyPathVerifier<GU0030UseUsingTests.HappyPath>
+        internal class RefAndOut : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
             public async Task AssigningVariableViaOutParameter()
@@ -27,6 +27,34 @@ public class Foo
     {
         stream = File.OpenRead(string.Empty);
         return true;
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
+            {
+                var testCode = @"
+namespace RoslynSandBox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            Stream stream;
+            TryGetStream(out stream);
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
