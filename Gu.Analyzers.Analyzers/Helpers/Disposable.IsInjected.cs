@@ -194,7 +194,9 @@ namespace Gu.Analyzers
             var field = symbol as IFieldSymbol;
             if (field != null)
             {
-                if (field.IsStatic)
+                if (field.IsStatic ||
+                    field.IsAbstract ||
+                    field.IsVirtual)
                 {
                     return Result.Yes;
                 }
@@ -212,7 +214,9 @@ namespace Gu.Analyzers
             var property = symbol as IPropertySymbol;
             if (property != null)
             {
-                if (property.IsStatic)
+                if (property.IsStatic ||
+                    property.IsVirtual ||
+                    property.IsAbstract)
                 {
                     return Result.Yes;
                 }

@@ -186,7 +186,7 @@ namespace RoslynSandBox
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public async Task DisposingProperty(string disposeCall)
+        public async Task DisposingPropertyAssignedWithInjected(string disposeCall)
         {
             var testCode = @"
     using System;
@@ -211,6 +211,55 @@ namespace RoslynSandBox
                    .WithLocationIndicated(ref testCode)
                    .WithMessage("Don't dispose injected.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("public abstract Stream Stream { get; }")]
+        [TestCase("public abstract Stream Stream { get; set; }")]
+        [TestCase("public virtual Stream Stream { get; }")]
+        [TestCase("public virtual Stream Stream { get; set; }")]
+        public async Task DisposingAbstractOrVirtualProperty(string property)
+        {
+            var testCode = @"
+namespace RoslynSandBox
+{
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        private bool disposed;
+
+        public abstract Stream Stream { get; }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                ↓this.Stream?.Dispose();
+            }
+        }
+    }
+}";
+
+            testCode = testCode.AssertReplace("public abstract Stream Stream { get; }", property);
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
                       .ConfigureAwait(false);
         }
 
