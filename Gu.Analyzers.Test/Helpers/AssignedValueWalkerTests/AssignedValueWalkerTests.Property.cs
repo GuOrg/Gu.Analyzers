@@ -372,5 +372,45 @@ namespace RoslynSandbox
                 Assert.AreEqual(expected, actual);
             }
         }
+
+        [TestCase("var temp1 = this.Bar;", "")]
+        [TestCase("var temp2 = this.Bar;", "2")]
+        [TestCase("var temp3 = this.Bar;", "2, value")]
+        public void RecursiveGetAndSet(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public Foo()
+        {
+            var temp1 = this.Bar;
+            this.Bar = 2;
+            var temp2 = this.Bar;
+        }
+
+        public int Bar
+        {
+            get { return this.Bar; }
+            set { this.Bar = value; }
+        }
+
+        public void Meh()
+        {
+            var temp3 = this.Bar;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.EqualsValueClause(code).Value;
+            using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", pooled.Item);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
     }
 }
