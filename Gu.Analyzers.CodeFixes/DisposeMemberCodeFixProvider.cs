@@ -199,21 +199,16 @@
                 return false;
             }
 
-            var field = member as IFieldSymbol;
-            using (var sources = field != null
-                                     ? VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken)
-                                     : VauleWithSource.GetRecursiveSources((IPropertySymbol)member, semanticModel, cancellationToken))
+            using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
             {
-                foreach (var vauleWithSource in sources.Item)
+                foreach (var value in sources.Item)
                 {
-                    switch (vauleWithSource.Source)
+                    if (value is ObjectCreationExpressionSyntax)
                     {
-                        case ValueSource.Created:
-                        case ValueSource.Argument:
-                            continue;
-                        default:
-                            return false;
+                        continue;
                     }
+
+                    return false;
                 }
             }
 
