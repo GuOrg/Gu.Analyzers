@@ -9,14 +9,9 @@ namespace Gu.Analyzers
     {
         internal static bool IsPotentiallyAssignableTo(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
-            {
-                return false;
-            }
-
-            return true;
+            return disposable != null &&
+                   !disposable.IsMissing &&
+                   IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type);
         }
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
@@ -48,8 +43,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var typeParameter = type as ITypeParameterSymbol;
-            if (typeParameter != null)
+            if (type is ITypeParameterSymbol typeParameter)
             {
                 foreach (var constraintType in typeParameter.ConstraintTypes)
                 {
@@ -68,9 +62,8 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            ITypeSymbol _;
             return type == KnownSymbol.IDisposable ||
-                   type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out _);
+                   type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out ITypeSymbol _);
         }
 
         internal static bool TryGetDisposeMethod(ITypeSymbol type, bool recursive, out IMethodSymbol disposeMethod)
@@ -82,40 +75,36 @@ namespace Gu.Analyzers
             }
 
             var disposers = type.GetMembers("Dispose");
-            if (disposers.Length == 0)
+            switch (disposers.Length)
             {
-                var baseType = type.BaseType;
-                if (recursive && IsAssignableTo(baseType))
-                {
-                    return TryGetDisposeMethod(baseType, true, out disposeMethod);
-                }
+                case 0:
+                    var baseType = type.BaseType;
+                    if (recursive && IsAssignableTo(baseType))
+                    {
+                        return TryGetDisposeMethod(baseType, true, out disposeMethod);
+                    }
 
-                return false;
-            }
-
-            if (disposers.Length == 1)
-            {
-                disposeMethod = disposers[0] as IMethodSymbol;
-                if (disposeMethod == null)
-                {
                     return false;
-                }
+                case 1:
+                    disposeMethod = disposers[0] as IMethodSymbol;
+                    if (disposeMethod == null)
+                    {
+                        return false;
+                    }
 
-                return (disposeMethod.Parameters.Length == 0 &&
-                        disposeMethod.DeclaredAccessibility == Accessibility.Public) ||
-                       (disposeMethod.Parameters.Length == 1 &&
-                        disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
-            }
+                    return (disposeMethod.Parameters.Length == 0 &&
+                            disposeMethod.DeclaredAccessibility == Accessibility.Public) ||
+                           (disposeMethod.Parameters.Length == 1 &&
+                            disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
+                case 2:
+                    if (disposers.TryGetSingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
+                    {
+                        disposeMethod = temp as IMethodSymbol;
+                        return disposeMethod != null &&
+                               disposeMethod.Parameters[0].Type == KnownSymbol.Boolean;
+                    }
 
-            if (disposers.Length == 2)
-            {
-                ISymbol temp;
-                if (disposers.TryGetSingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out temp))
-                {
-                    disposeMethod = temp as IMethodSymbol;
-                    return disposeMethod != null &&
-                           disposeMethod.Parameters[0].Type == KnownSymbol.Boolean;
-                }
+                    break;
             }
 
             return false;

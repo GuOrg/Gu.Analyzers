@@ -84,24 +84,23 @@ namespace Gu.Analyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            ExpressionSyntax member;
-            if (TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out member))
+            if (!TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out ExpressionSyntax member))
             {
-                if (IsInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
-                {
-                    return true;
-                }
-
-                using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
-                    {
-                        return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
-                    }
-                }
+                return false;
             }
 
-            return false;
+            if (IsInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
+            {
+                return true;
+            }
+
+            using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                {
+                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                }
+            }
         }
 
         /// <summary>
@@ -132,15 +131,15 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            var property = symbol as IPropertySymbol;
-            if (property != null &&
+            if (symbol is IPropertySymbol property &&
                 !property.IsAutoProperty(cancellationToken))
             {
                 using (var returnValues = ReturnValueWalker.Create(value, false, semanticModel, cancellationToken))
                 {
                     using (var recursive = RecursiveValues.Create(returnValues.Item, semanticModel, cancellationToken))
                     {
-                        return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                        return IsInjectedCore(recursive, semanticModel, cancellationToken)
+                            .IsEither(Result.Yes, Result.Maybe);
                     }
                 }
             }
@@ -191,8 +190,7 @@ namespace Gu.Analyzers
                 return Result.Yes;
             }
 
-            var field = symbol as IFieldSymbol;
-            if (field != null)
+            if (symbol is IFieldSymbol field)
             {
                 if (field.IsStatic ||
                     field.IsAbstract ||
@@ -211,8 +209,7 @@ namespace Gu.Analyzers
                            : Result.No;
             }
 
-            var property = symbol as IPropertySymbol;
-            if (property != null)
+            if (symbol is IPropertySymbol property)
             {
                 if (property.IsStatic ||
                     property.IsVirtual ||

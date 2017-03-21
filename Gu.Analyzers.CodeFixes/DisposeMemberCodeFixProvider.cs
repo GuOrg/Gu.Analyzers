@@ -219,16 +219,14 @@
 
         private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
-            var field = member as FieldDeclarationSyntax;
-            VariableDeclaratorSyntax fieldDeclarator;
-            if (field != null && field.Declaration.Variables.TryGetSingle(out fieldDeclarator))
+            if (member is FieldDeclarationSyntax field && 
+                field.Declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax declarator))
             {
-                symbol = semanticModel.GetDeclaredSymbolSafe(fieldDeclarator, cancellationToken);
+                symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
                 return symbol != null;
             }
 
-            var property = member as PropertyDeclarationSyntax;
-            if (property != null)
+            if (member is PropertyDeclarationSyntax property)
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(property, cancellationToken);
                 return symbol != null;

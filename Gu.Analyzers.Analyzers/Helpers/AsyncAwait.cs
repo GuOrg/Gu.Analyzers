@@ -26,14 +26,12 @@
 
         internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
-            var invocation = expression as InvocationExpressionSyntax;
-            if (invocation != null)
+            if (expression is InvocationExpressionSyntax invocation)
             {
                 return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
             }
 
-            var @await = expression as AwaitExpressionSyntax;
-            if (@await != null)
+            if (expression is AwaitExpressionSyntax @await)
             {
                 return TryAwaitTaskFromResult(@await.Expression, semanticModel, cancellationToken, out result);
             }
@@ -45,8 +43,7 @@
         internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
             result = null;
-            InvocationExpressionSyntax inner;
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out inner))
+            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out InvocationExpressionSyntax inner))
             {
                 invocation = inner;
             }
@@ -68,14 +65,12 @@
 
         internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
-            var invocation = expression as InvocationExpressionSyntax;
-            if (invocation != null)
+            if (expression is InvocationExpressionSyntax invocation)
             {
                 return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
             }
 
-            var @await = expression as AwaitExpressionSyntax;
-            if (@await != null)
+            if (expression is AwaitExpressionSyntax @await)
             {
                 return TryAwaitTaskRun(@await.Expression, semanticModel, cancellationToken, out result);
             }
@@ -87,8 +82,7 @@
         internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
             result = null;
-            InvocationExpressionSyntax inner;
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out inner))
+            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out InvocationExpressionSyntax inner))
             {
                 invocation = inner;
             }
