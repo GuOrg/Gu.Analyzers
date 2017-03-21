@@ -221,7 +221,7 @@ namespace RoslynSandbox
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.Item);
-                Assert.AreEqual("", actual);
+                Assert.AreEqual(string.Empty, actual);
             }
         }
 
@@ -411,6 +411,5 @@ namespace RoslynSandbox
                 Assert.AreEqual(expected, actual);
             }
         }
-
     }
 }

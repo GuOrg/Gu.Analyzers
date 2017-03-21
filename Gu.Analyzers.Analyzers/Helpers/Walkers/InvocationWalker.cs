@@ -28,7 +28,13 @@
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.invocations).GetEnumerator();
 
-        public static Pool<InvocationWalker>.Pooled Create(SyntaxNode node)
+        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+        {
+            this.invocations.Add(node);
+            base.VisitInvocationExpression(node);
+        }
+
+        internal static Pool<InvocationWalker>.Pooled Create(SyntaxNode node)
         {
             var pooled = Pool.GetOrCreate();
             if (node != null)
@@ -37,12 +43,6 @@
             }
 
             return pooled;
-        }
-
-        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-        {
-            this.invocations.Add(node);
-            base.VisitInvocationExpression(node);
         }
     }
 }

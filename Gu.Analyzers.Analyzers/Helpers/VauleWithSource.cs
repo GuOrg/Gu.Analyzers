@@ -401,7 +401,7 @@ namespace Gu.Analyzers
                     {
                         AddSourcesRecursively(methodDeclaration.ExpressionBody.Expression, semanticModel, cancellationToken, result);
                     }
-                    else if(methodDeclaration.Body != null)
+                    else if (methodDeclaration.Body != null)
                     {
                         using (var pooledReturns = ReturnValueWalker.Create(methodDeclaration.Body, true, semanticModel, cancellationToken))
                         {

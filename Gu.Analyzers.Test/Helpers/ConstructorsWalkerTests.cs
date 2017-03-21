@@ -80,7 +80,7 @@ namespace RoslynSandbox
         {
         }
 
-        intarnal Foo Create()
+        internal Foo Create()
         {
             return new Foo();
         }
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));
-                Assert.AreEqual("", actual);
+                Assert.AreEqual(string.Empty, actual);
                 Assert.AreEqual("new Foo()", string.Join(", ", pooled.Item.ObjectCreations));
             }
         }
