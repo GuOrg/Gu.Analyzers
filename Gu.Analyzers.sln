@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
 	ProjectSection(SolutionItems) = preProject
@@ -23,12 +23,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83
 		.paket\tools\install.ps1 = .paket\tools\install.ps1
 		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
 	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Analyzers", "Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.CodeFixes", "Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj", "{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Test", "Gu.Analyzers.Test\Gu.Analyzers.Test.csproj", "{3EB54B68-A7AA-45E8-A97B-A0746712140B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{86B34826-9404-4170-A381-5855FB3BE4FA}"
 	ProjectSection(SolutionItems) = preProject
@@ -55,6 +49,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0037.md = documentation\GU0037.md
 		documentation\GU0050.md = documentation\GU0050.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Analyzers", "Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.CodeFixes", "Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj", "{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Test", "Gu.Analyzers.Test\Gu.Analyzers.Test.csproj", "{3EB54B68-A7AA-45E8-A97B-A0746712140B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gu.Analyzers.Vsix", "Gu.Analyzers.Vsix\Gu.Analyzers.Vsix.csproj", "{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}"
 EndProject
