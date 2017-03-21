@@ -34,8 +34,7 @@ namespace Gu.Analyzers
 
         internal static bool IsRootMember(ExpressionSyntax expression)
         {
-            ExpressionSyntax member;
-            if (!TryPeel(expression, out member))
+            if (!TryPeel(expression, out ExpressionSyntax member))
             {
                 return false;
             }

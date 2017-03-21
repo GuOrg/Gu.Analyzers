@@ -19,8 +19,7 @@
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
                 var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                AccessorDeclarationSyntax setter;
-                if (declaration.TryGetSetAccessorDeclaration(out setter))
+                if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
                 {
                     if (Assigns.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
                     {
@@ -47,8 +46,7 @@
                     return false;
                 }
 
-                AccessorDeclarationSyntax getter;
-                if (declaration.TryGetGetAccessorDeclaration(out getter) &&
+                if (declaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
                     getter.Body == null)
                 {
                     return true;

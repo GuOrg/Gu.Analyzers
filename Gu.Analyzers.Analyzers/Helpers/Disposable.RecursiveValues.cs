@@ -119,8 +119,7 @@ namespace Gu.Analyzers
                     foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
                     {
                         var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                        ParameterSyntax parameter;
-                        if (methodDeclaration.TryGetMatchingParameter(argument, out parameter))
+                        if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameter))
                         {
                             using (var pooled = AssignedValueWalker.Create(this.semanticModel.GetDeclaredSymbol(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                             {

@@ -17,8 +17,8 @@ namespace Gu.Analyzers
         internal static Result IsMemberDisposed(ISymbol member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (!(member is IFieldSymbol ||
-                member is IPropertySymbol) ||
-                context == null)
+                  member is IPropertySymbol) ||
+                  context == null)
             {
                 return Result.Unknown;
             }
@@ -52,8 +52,7 @@ namespace Gu.Analyzers
                             continue;
                         }
 
-                        ExpressionSyntax disposed;
-                        if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out disposed))
+                        if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out ExpressionSyntax disposed))
                         {
                             if (SymbolComparer.Equals(member, semanticModel.GetSymbolSafe(disposed, cancellationToken)))
                             {
@@ -182,8 +181,7 @@ namespace Gu.Analyzers
                     return Create(semanticModel, cancellationToken);
                 }
 
-                IMethodSymbol disposeMethod;
-                if (TryGetDisposeMethod(type, true, out disposeMethod))
+                if (TryGetDisposeMethod(type, true, out IMethodSymbol disposeMethod))
                 {
                     return Create(disposeMethod, semanticModel, cancellationToken);
                 }
@@ -211,8 +209,7 @@ namespace Gu.Analyzers
             {
                 foreach (var invocation in this.invocations)
                 {
-                    ExpressionSyntax disposed;
-                    if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out disposed) &&
+                    if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out ExpressionSyntax disposed) &&
                         SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(disposed, this.CancellationToken)))
                     {
                         return Result.Yes;
