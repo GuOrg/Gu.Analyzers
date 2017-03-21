@@ -258,11 +258,11 @@ public class Foo : IDisposable
     private readonly IDisposable disposable;
 
     public Foo(int value, IDisposable disposable)
-        :this(disposable)
+        : this(disposable)
     {
     }
 
-    private Foo()
+    private Foo(IDisposable disposable)
     {
         this.disposable = disposable;
     }

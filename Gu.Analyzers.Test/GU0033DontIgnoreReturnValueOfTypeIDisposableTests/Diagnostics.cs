@@ -311,7 +311,7 @@ using System;
 public class Foo : IDisposable
 {
     public Foo(IDisposable disposable)
-        :this()
+        : this()
     {
     }
 
