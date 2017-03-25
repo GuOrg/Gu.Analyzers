@@ -268,32 +268,33 @@ namespace RoslynSandbox
         public async Task ReturningNewAssigningNotDisposing()
         {
             var fooCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo(IDisposable disposable)
-        :this()
+    public class Foo : IDisposable
     {
-        this.disposable = disposable;
-    }
+        private readonly IDisposable disposable;
 
-    public Foo()
-    {
-    }
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
 
-    public void Dispose()
-    {
+        public void Dispose()
+        {
+        }
     }
 }";
             var testCode = @"
-public class Meh
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Meh
     {
-        return new Foo(↓new Disposable());
+        public Foo Bar()
+        {
+            return new Foo(↓new Disposable());
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -306,29 +307,30 @@ public class Meh
         public async Task ReturningNewNotAssigning()
         {
             var fooCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo(IDisposable disposable)
-        : this()
-    {
-    }
+    using System;
 
-    public Foo()
+    public class Foo : IDisposable
     {
-    }
+        public Foo(IDisposable disposable)
+        {
+        }
 
-    public void Dispose()
-    {
+        public void Dispose()
+        {
+        }
     }
 }";
             var testCode = @"
-public class Meh
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Meh
     {
-        return new Foo(↓new Disposable());
+        public Foo Bar()
+        {
+            return new Foo(↓new Disposable());
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()

@@ -11,13 +11,9 @@
     internal class GU0033DontIgnoreReturnValueOfTypeIDisposable : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0033";
-
         private const string Title = "Don't ignore returnvalue of type IDisposable.";
-
         private const string MessageFormat = "Don't ignore returnvalue of type IDisposable.";
-
         private const string Description = "Don't ignore returnvalue of type IDisposable.";
-
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -104,14 +100,12 @@
                 return true;
             }
 
-            var argument = node.Parent as ArgumentSyntax;
-            if (argument != null)
+            if (node.Parent is ArgumentSyntax argument)
             {
-                ISymbol member;
-                if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out member) &&
+                if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
                     member != null)
                 {
-                    if (Disposable.IsMemberDisposed(member, argument.FirstAncestorOrSelf<TypeDeclarationSyntax>(), semanticModel, cancellationToken)
+                    if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
                                   .IsEither(Result.Yes, Result.Maybe))
                     {
                         return false;
@@ -120,12 +114,10 @@
                     var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                     if (initializer != null)
                     {
-                        var ctor = semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) as IMethodSymbol;
-                        if (ctor != null &&
+                        if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                             ctor.ContainingType != member.ContainingType)
                         {
-                            IMethodSymbol disposeMethod;
-                            if (Disposable.TryGetDisposeMethod(ctor.ContainingType, false, out disposeMethod))
+                            if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
                             {
                                 return Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
                             }
@@ -134,6 +126,8 @@
 
                     return true;
                 }
+
+                return true;
             }
 
             return false;
@@ -159,9 +153,8 @@
             return false;
         }
 
-        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member)
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member, out IMethodSymbol ctor)
         {
-            IMethodSymbol ctor;
             if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor))
             {
                 return TryGetAssignedFieldOrProperty(argument, ctor, semanticModel, cancellationToken, out member);
@@ -193,15 +186,13 @@
                     continue;
                 }
 
-                ParameterSyntax paremeter;
-                if (!methodDeclaration.TryGetMatchingParameter(argument, out paremeter))
+                if (!methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax paremeter))
                 {
                     continue;
                 }
 
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
-                AssignmentExpressionSyntax assignment;
-                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out assignment))
+                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out AssignmentExpressionSyntax assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||

@@ -221,13 +221,8 @@ public class Foo : IDisposable
     private readonly IDisposable disposable;
 
     public Foo(IDisposable disposable)
-        :this()
     {
         this.disposable = disposable;
-    }
-
-    public Foo()
-    {
     }
 
     public void Dispose()
@@ -241,6 +236,48 @@ public class Meh
     public Foo Bar()
     {
         return new Foo(new Disposable());
+    }
+}";
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task ReturningCreateNewAssigningAndDisposing()
+            {
+                var fooCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Meh
+    {
+        public Foo Bar()
+        {
+            return Create(new Disposable());
+        }
+
+        private static Foo Create(IDisposable disposable) => new Foo(disposable);
     }
 }";
                 await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
