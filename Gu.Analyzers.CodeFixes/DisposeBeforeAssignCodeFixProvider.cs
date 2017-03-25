@@ -43,8 +43,7 @@
                     continue;
                 }
 
-                var assignment = syntaxRoot.FindNode(diagnostic.Location.SourceSpan) as AssignmentExpressionSyntax;
-                if (assignment != null)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is AssignmentExpressionSyntax assignment)
                 {
                     StatementSyntax diposeStatement;
                     if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
@@ -108,29 +107,32 @@
                 return false;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-            if (symbol == null)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out ISymbol assignedSymbol)
+                          .IsEither(Result.No, Result.Unknown))
             {
                 return false;
             }
 
-            if (!Disposable.IsAssignableTo(MemberType(symbol)))
+            var prefix = assignment.UsesUnderscoreNames(semanticModel, cancellationToken)
+                                          ? string.Empty
+                                          : "this.";
+            if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
             {
-                result = SyntaxFactory.ParseStatement($"({assignment.Left} as IDisposable)?.Dispose();")
+                result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as IDisposable)?.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
-            if (IsAlwaysAssigned(symbol))
+            if (IsAlwaysAssigned(assignedSymbol))
             {
-                result = SyntaxFactory.ParseStatement($"{assignment.Left}.Dispose();")
+                result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
-            result = SyntaxFactory.ParseStatement($"{assignment.Left}?.Dispose();")
+            result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
                                 .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                 .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             return true;

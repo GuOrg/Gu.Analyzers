@@ -16,15 +16,31 @@
                 return false;
             }
 
+            if (TryGetSetter(property, cancellationToken, out AccessorDeclarationSyntax setter))
+            {
+                if (Assigned.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool TryGetSetter(this IPropertySymbol property, CancellationToken cancellationToken, out AccessorDeclarationSyntax setter)
+        {
+            setter = null;
+            if (property == null)
+            {
+                return false;
+            }
+
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
-                var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
+                var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
+                if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter))
                 {
-                    if (Assigned.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 

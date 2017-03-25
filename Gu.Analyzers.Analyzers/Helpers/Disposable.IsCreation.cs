@@ -11,17 +11,70 @@ namespace Gu.Analyzers
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
         {
             if (!IsPotentiallyAssignableTo(disposable, semanticModel, cancellationToken))
             {
+                assignedSymbol = null;
                 return Result.No;
+            }
+
+            if (semanticModel.GetSymbolSafe(disposable, cancellationToken) is IPropertySymbol property &&
+                property.TryGetSetter(cancellationToken, out AccessorDeclarationSyntax setter))
+            {
+                using (var pooledSet = SetPool<ISymbol>.Create())
+                {
+                    using (var pooledAssigned = Assigned.Create(setter, true, semanticModel, cancellationToken))
+                    {
+                        foreach (var assigned in pooledAssigned.Item.Assignments)
+                        {
+                            var symbol = semanticModel.GetSymbolSafe(assigned.Left, cancellationToken);
+                            if (IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
+                                (symbol is IFieldSymbol ||
+                                symbol is IPropertySymbol))
+                            {
+                                pooledSet.Item.Add(symbol).IgnoreReturnValue();
+                            }
+                        }
+                    }
+
+                    assignedSymbol = null;
+                    var result = Result.No;
+                    foreach (var symbol in pooledSet.Item)
+                    {
+                        switch (IsAssignedWithCreated(symbol, disposable, semanticModel, cancellationToken))
+                        {
+                            case Result.Unknown:
+                                if (result == Result.No)
+                                {
+                                    assignedSymbol = symbol;
+                                    result = Result.Unknown;
+                                }
+
+                                break;
+                            case Result.Yes:
+                                assignedSymbol = symbol;
+                                return Result.Yes;
+                            case Result.No:
+                                break;
+                            case Result.Maybe:
+                                assignedSymbol = symbol;
+                                result = Result.Maybe;
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+
+                    return result;
+                }
             }
 
             using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
             {
                 using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
                 {
+                    assignedSymbol = pooled.Item.CurrentSymbol;
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }
             }
@@ -51,6 +104,17 @@ namespace Gu.Analyzers
             }
 
             using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                {
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                }
+            }
+        }
+
+        internal static Result IsAssignedWithCreated(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var pooled = AssignedValueWalker.Create(symbol, context, semanticModel, cancellationToken))
             {
                 using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
                 {

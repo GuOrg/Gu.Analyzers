@@ -54,20 +54,18 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out ISymbol assignedSymbol)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }
 
-            var left = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
-            if (left == KnownSymbol.SerialDisposable.Disposable ||
-                left == KnownSymbol.SingleAssignmentDisposable.Disposable)
+            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable)
             {
                 return;
             }
 
-            if (IsDisposedBefore(left, assignment, context.SemanticModel, context.CancellationToken))
+            if (IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -102,14 +100,13 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(argument.Expression, context.SemanticModel, context.CancellationToken)
+            if (Disposable.IsAssignedWithCreated(argument.Expression, context.SemanticModel, context.CancellationToken, out ISymbol assignedSymbol)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }
 
-            var argSymbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
-            if (IsDisposedBefore(argSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+            if (IsDisposedBefore(assignedSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
