@@ -1,9 +1,11 @@
 namespace Gu.Analyzers
 {
     using System;
+    using System.Diagnostics;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -154,6 +156,39 @@ namespace Gu.Analyzers
                     return IsCreationCore(recursive, semanticModel, cancellationToken);
                 }
             }
+        }
+
+        /// <summary>
+        /// Check if any path returns a created IDisposable
+        /// </summary>
+        internal static Result IsCreation(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (candidate == null)
+            {
+                return Result.No;
+            }
+
+            //Debug.Assert(candidate.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword), "Only valid for out parameter.");
+            var invocation = candidate.FirstAncestor<InvocationExpressionSyntax>();
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            {
+                foreach (var reference in method.DeclaringSyntaxReferences)
+                {
+                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+                    if (methodDeclaration != null)
+                    {
+                        if (methodDeclaration.TryGetMatchingParameter(candidate, out ParameterSyntax parameterSyntax))
+                        {
+                            var parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken);
+                            return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
+                        }
+                    }
+                }
+
+                return Result.Unknown;
+            }
+
+            return Result.No;
         }
 
         private static Result IsAssignedWithCreated(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)

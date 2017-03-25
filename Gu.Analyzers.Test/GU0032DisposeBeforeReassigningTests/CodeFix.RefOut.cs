@@ -233,7 +233,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        private Foo()
+        public Foo()
         {
             this.Assign(↓ref this.stream);
         }
@@ -265,10 +265,10 @@ namespace RoslynSandbox
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        private Foo()
+        public Foo()
         {
             this.stream?.Dispose();
-            this.Assign(↓ref this.stream);
+            this.Assign(ref this.stream);
         }
 
         public void Dispose()
@@ -298,7 +298,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream;
 
-        private Foo()
+        public Foo()
         {
             this.Assign(ref this.stream);
             this.Assign(↓ref this.stream);
@@ -306,12 +306,12 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            stream?.Dispose();
+            this.stream?.Dispose();
         }
 
-        private void Assign(ref Stream stream)
+        private void Assign(ref Stream arg)
         {
-            stream = File.OpenRead(string.Empty);
+            arg = File.OpenRead(string.Empty);
         }
     }
 }";
@@ -331,7 +331,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream;
 
-        private Foo()
+        public Foo()
         {
             this.Assign(ref this.stream);
             this.stream?.Dispose();
@@ -340,12 +340,89 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            stream?.Dispose();
+            this.stream?.Dispose();
         }
 
-        private void Assign(ref Stream stream)
+        private void Assign(ref Stream arg)
         {
-            stream = File.OpenRead(string.Empty);
+            arg = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task CallPrivateMethodRefParameterTwiceDifferentMethods()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            this.Assign1(ref this.stream);
+            this.Assign2(↓ref this.stream);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+
+        private void Assign1(ref Stream arg)
+        {
+            arg = File.OpenRead(string.Empty);
+        }
+
+        private void Assign2(ref Stream arg)
+        {
+            arg = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Dispose before re-assigning.");
+                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            this.Assign1(ref this.stream);
+            this.stream?.Dispose();
+            this.Assign2(ref this.stream);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+
+        private void Assign1(ref Stream arg)
+        {
+            arg = File.OpenRead(string.Empty);
+        }
+
+        private void Assign2(ref Stream arg)
+        {
+            arg = File.OpenRead(string.Empty);
         }
     }
 }";
@@ -372,7 +449,7 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            stream?.Dispose();
+            this.stream?.Dispose();
         }
 
         public void Assign(ref Stream stream)
@@ -400,12 +477,12 @@ namespace RoslynSandbox
         private Foo()
         {
             this.stream?.Dispose();
-            this.Assign(↓ref this.stream);
+            this.Assign(ref this.stream);
         }
 
         public void Dispose()
         {
-            stream?.Dispose();
+            this.stream?.Dispose();
         }
 
         public void Assign(ref Stream stream)

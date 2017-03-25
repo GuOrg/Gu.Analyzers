@@ -252,9 +252,52 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "1")]
             [TestCase("var temp2 = this.value;", "1, 2")]
+            [TestCase("var temp3 = this.value;", "1, 2")]
+            [TestCase("var temp4 = this.value;", "1, 2")]
+            public void FieldAssignedWithRefParameter(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        private int value = 1;
+
+        public Foo()
+        {
+            var temp1 = this.value;
+            this.Assign(ref this.value);
+            var temp2 = this.value;
+        }
+
+        internal void Bar()
+        {
+            var temp3 = this.value;
+            this.Assign(ref this.value);
+            var temp4 = this.value;
+        }
+
+        private void Assign(ref int refValue)
+        {
+            refValue = 2;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code).Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = this.value;", "1")]
+            [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2, 3")]
             [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public void FieldAssignedWithRefParameter(string code, string expected)
+            public void FieldAssignedWithRefParameterArgument(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

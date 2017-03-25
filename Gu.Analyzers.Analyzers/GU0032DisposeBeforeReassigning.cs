@@ -94,19 +94,25 @@
 
             var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
             if (method == null ||
-                method.DeclaredAccessibility == Accessibility.Private ||
                 method.DeclaringSyntaxReferences.Length == 0)
             {
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(argument.Expression, context.SemanticModel, context.CancellationToken, out ISymbol assignedSymbol)
+            if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return;
             }
 
-            if (IsDisposedBefore(assignedSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+            var symbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
+            if (Disposable.IsAssignedWithCreated(symbol, argument.FirstAncestor<InvocationExpressionSyntax>(), context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.No, Result.Unknown))
+            {
+                return;
+            }
+
+            if (IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }

@@ -455,6 +455,12 @@
                 }
             }
 
+            if (this.Context is InvocationExpressionSyntax &&
+                ReferenceEquals(node, this.Context))
+            {
+                return Result.No;
+            }
+
             switch (node.Kind())
             {
                 case SyntaxKind.ExpressionStatement:

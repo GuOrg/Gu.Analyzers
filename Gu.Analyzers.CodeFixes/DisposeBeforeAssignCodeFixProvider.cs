@@ -45,8 +45,7 @@
 
                 if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is AssignmentExpressionSyntax assignment)
                 {
-                    StatementSyntax diposeStatement;
-                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
+                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
@@ -63,8 +62,7 @@
                 var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ArgumentSyntax>();
                 if (argument != null)
                 {
-                    StatementSyntax diposeStatement;
-                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out diposeStatement))
+                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
@@ -113,9 +111,10 @@
                 return false;
             }
 
-            var prefix = assignment.UsesUnderscoreNames(semanticModel, cancellationToken)
-                                          ? string.Empty
-                                          : "this.";
+            var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
+                         !assignment.UsesUnderscoreNames(semanticModel, cancellationToken)
+                             ? "this."
+                             : string.Empty;
             if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
             {
                 result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as IDisposable)?.Dispose();")
