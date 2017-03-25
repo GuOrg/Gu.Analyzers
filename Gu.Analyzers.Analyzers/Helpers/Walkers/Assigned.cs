@@ -6,10 +6,10 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class Assigns : ExecutionWalker
+    internal sealed class Assigned : ExecutionWalker
     {
-        private static readonly Pool<Assigns> Cache = new Pool<Assigns>(
-            () => new Assigns(),
+        private static readonly Pool<Assigned> Cache = new Pool<Assigned>(
+            () => new Assigned(),
             x =>
                 {
                     x.assignments.Clear();
@@ -21,7 +21,7 @@
 
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
 
-        private Assigns()
+        private Assigned()
         {
         }
 
@@ -36,7 +36,7 @@
             this.assignments.Add(node);
         }
 
-        internal static Pool<Assigns>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<Assigned>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Cache.GetOrCreate();
             pooled.Item.SemanticModel = semanticModel;

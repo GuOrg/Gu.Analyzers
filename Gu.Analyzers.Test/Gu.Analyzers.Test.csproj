@@ -89,8 +89,8 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.SideEffect.cs" />
-    <Compile Include="Helpers\AssignsTests.Symbol.cs" />
-    <Compile Include="Helpers\AssignsTests.With.cs" />
+    <Compile Include="Helpers\AssignedTests.Symbol.cs" />
+    <Compile Include="Helpers\AssignedTests.With.cs" />
     <Compile Include="Helpers\ConstructorsWalkerTests.cs" />
     <Compile Include="Helpers\AsyncAwaitTests.cs" />
     <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />

@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public partial class AssignsTests
+    public partial class AssignedTests
     {
         [TestCase(true)]
         [TestCase(false)]
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
             AssignmentExpressionSyntax result;
             var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-            Assert.AreEqual(true, Assigns.FirstSymbol(field, ctor, recursive, semanticModel, CancellationToken.None, out result));
+            Assert.AreEqual(true, Assigned.FirstSymbol(field, ctor, recursive, semanticModel, CancellationToken.None, out result));
             Assert.AreEqual("this.value = arg", result?.ToString());
         }
 
@@ -68,12 +68,12 @@ namespace RoslynSandbox
             var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
             if (recursive)
             {
-                Assert.AreEqual(true, Assigns.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assigned.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
             else
             {
-                Assert.AreEqual(false, Assigns.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(false, Assigned.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
             }
         }
 
@@ -109,12 +109,12 @@ namespace RoslynSandbox
             var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
             if (recursive)
             {
-                Assert.AreEqual(true, Assigns.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assigned.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.number = value", result?.ToString());
             }
             else
             {
-                Assert.AreEqual(false, Assigns.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(false, Assigned.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
             }
         }
 
@@ -146,12 +146,12 @@ namespace RoslynSandbox
             var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
             if (recursive)
             {
-                Assert.AreEqual(true, Assigns.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assigned.FirstSymbol(field, ctor, true, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.number = 3", result?.ToString());
             }
             else
             {
-                Assert.AreEqual(false, Assigns.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(false, Assigned.FirstSymbol(field, ctor, false, semanticModel, CancellationToken.None, out result));
             }
         }
     }

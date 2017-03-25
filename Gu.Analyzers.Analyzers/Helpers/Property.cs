@@ -21,7 +21,7 @@
                 var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken);
                 if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
                 {
-                    if (Assigns.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
+                    if (Assigned.FirstSymbol(symbol, setter, true, semanticModel, cancellationToken))
                     {
                         return true;
                     }

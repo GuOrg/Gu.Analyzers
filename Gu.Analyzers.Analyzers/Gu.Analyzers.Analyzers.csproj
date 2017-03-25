@@ -127,7 +127,7 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\SimpleMemberAccessesWalker.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
-    <Compile Include="Helpers\Walkers\Assigns.cs" />
+    <Compile Include="Helpers\Walkers\Assigned.cs" />
     <Compile Include="Helpers\Walkers\ObjectCreationWalker.cs" />
     <Compile Include="Helpers\Walkers\PropertyImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\ReturnValueWalker.cs" />
