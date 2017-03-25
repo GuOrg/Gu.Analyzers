@@ -63,7 +63,7 @@ namespace Gu.Analyzers
             }
 
             return type == KnownSymbol.IDisposable ||
-                   type.AllInterfaces.TryGetSingle(x => x == KnownSymbol.IDisposable, out ITypeSymbol _);
+                   type.Is(KnownSymbol.IDisposable);
         }
 
         internal static bool TryGetDisposeMethod(ITypeSymbol type, bool recursive, out IMethodSymbol disposeMethod)
