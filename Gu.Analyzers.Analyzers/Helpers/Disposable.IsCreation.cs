@@ -168,7 +168,7 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            //Debug.Assert(candidate.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword), "Only valid for out parameter.");
+            Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
             var invocation = candidate.FirstAncestor<InvocationExpressionSyntax>();
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
