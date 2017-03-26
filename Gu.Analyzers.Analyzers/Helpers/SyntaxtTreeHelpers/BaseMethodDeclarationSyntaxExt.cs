@@ -21,11 +21,11 @@
                 return true;
             }
 
-            foreach (var canditate in method.ParameterList.Parameters)
+            foreach (var candidate in method.ParameterList.Parameters)
             {
-                if (canditate.Identifier.ValueText == argument.NameColon.Name.Identifier.ValueText)
+                if (candidate.Identifier.ValueText == argument.NameColon.Name.Identifier.ValueText)
                 {
-                    parameter = canditate;
+                    parameter = candidate;
                     return true;
                 }
             }

@@ -105,29 +105,29 @@
                 if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
                     member != null)
                 {
+                    var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+                    if (initializer != null)
+                    {
+                        if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
+                            chainedCtor.ContainingType != member.ContainingType)
+                        {
+                            if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
+                            {
+                                return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                            }
+                        }
+                    }
+
                     if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
                                   .IsEither(Result.Yes, Result.Maybe))
                     {
                         return false;
                     }
 
-                    var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
-                    if (initializer != null)
-                    {
-                        if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
-                            ctor.ContainingType != member.ContainingType)
-                        {
-                            if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
-                            {
-                                return Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
-                            }
-                        }
-                    }
-
                     return true;
                 }
 
-                return true;
+                return ctor?.ContainingType != KnownSymbol.StreamReader;
             }
 
             return false;

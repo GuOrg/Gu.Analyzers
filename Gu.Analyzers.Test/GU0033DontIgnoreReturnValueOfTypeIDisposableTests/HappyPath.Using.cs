@@ -3,25 +3,50 @@ namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable>
     {
         internal class Using : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task WhenCreatingStreamReader()
+            public async Task FileOpenRead()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
     {
         public void Bar()
         {
-            using(var reader = new StreamReader(File.OpenRead(string.Empty)))
-			{
-			}
+            using (var stream = File.OpenRead(string.Empty))
+            {
+            }
         }
-    }";
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task NewStreamReader()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            using (var reader = new StreamReader(File.OpenRead(string.Empty)))
+            {
+            }
+        }
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }

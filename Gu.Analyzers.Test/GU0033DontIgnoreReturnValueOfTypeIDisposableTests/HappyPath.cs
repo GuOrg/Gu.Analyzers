@@ -189,7 +189,6 @@ public class FooBase : IDisposable
     {
         get
         {
-            this.ThrowIfDisposed();
             return this.disposable;
         }
     }
@@ -207,14 +206,6 @@ public class FooBase : IDisposable
         }
 
         this.disposed = true;
-    }
-
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
-        {
-            throw new ObjectDisposedException(this.GetType().FullName);
-        }
     }
 }";
 
