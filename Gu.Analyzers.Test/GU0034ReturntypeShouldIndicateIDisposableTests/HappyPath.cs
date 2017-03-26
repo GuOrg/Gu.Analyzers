@@ -547,5 +547,32 @@ internal static class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task CallingOverload()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public Task Bar(string source, int expected, CancellationToken cancellationToken)
+        {
+            return this.Bar(source, new[] { expected }, cancellationToken);
+        }
+
+        public Task Bar(string source, int[] expected, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(0);
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
