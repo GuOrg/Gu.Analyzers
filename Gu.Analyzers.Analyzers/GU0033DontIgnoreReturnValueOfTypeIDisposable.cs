@@ -172,12 +172,6 @@
                 return false;
             }
 
-            if (method.ContainingType == KnownSymbol.SerialDisposable ||
-                method.ContainingType.Is(KnownSymbol.StreamReader))
-            {
-                return true;
-            }
-
             foreach (var reference in method.DeclaringSyntaxReferences)
             {
                 var methodDeclaration = reference.GetSyntax(cancellationToken) as BaseMethodDeclarationSyntax;

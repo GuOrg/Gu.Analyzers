@@ -250,7 +250,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public sealed class Foo : IDisposable
     {
         private readonly IDisposable disposable;
 
@@ -261,7 +261,7 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -281,6 +281,28 @@ namespace RoslynSandbox
     }
 }";
                 await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task ReturningCreateNewStreamReader()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Meh
+    {
+        public StreamReader Bar()
+        {
+            return Create(File.OpenRead(string.Empty));
+        }
+
+        private static StreamReader Create(Stream stream) => new StreamReader(stream);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
 

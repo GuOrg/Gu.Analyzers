@@ -6,6 +6,16 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
         [TestCase("this.stream.Dispose();")]
@@ -694,6 +704,50 @@ public class Bar : Foo
     public override Stream Stream { get; }
 }";
             await this.VerifyHappyPathAsync(fooCode, barCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenCallingBaseDispose()
+        {
+            var fooBaseCode = @"
+using System;
+
+public abstract class FooBase : IDisposable
+{
+    private readonly IDisposable disposable = new Disposable();
+    private bool disposed;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            var testCode = @"
+public class Foo : FooBase
+{
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, fooBaseCode, testCode)
                       .ConfigureAwait(false);
         }
     }
