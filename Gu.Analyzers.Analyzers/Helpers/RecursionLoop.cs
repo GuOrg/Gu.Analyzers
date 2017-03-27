@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+
     using Microsoft.CodeAnalysis;
 
     internal class RecursionLoop
@@ -14,7 +15,8 @@
             {
                 if (this.nodes.Count > 100)
                 {
-                    throw new InvalidOperationException();
+                    var loop = string.Join(Environment.NewLine, this.nodes);
+                    throw new InvalidOperationException("Recursion loop > 100\r\n" + loop);
                 }
 
                 if (this.nodes.Count < 2)
@@ -52,6 +54,11 @@
         {
             this.nodes.Add(node);
             return !this.IsRecursion;
+        }
+
+        public void Add(RecursionLoop parent)
+        {
+            this.nodes.AddRange(parent.nodes);
         }
 
         public void Clear() => this.nodes.Clear();

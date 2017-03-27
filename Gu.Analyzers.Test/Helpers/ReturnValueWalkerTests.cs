@@ -377,6 +377,10 @@ namespace RoslynSandbox
         [TestCase("await RecursiveAsync()", false, "RecursiveAsync()")]
         [TestCase("await RecursiveAsync(1)", true, "")]
         [TestCase("await RecursiveAsync(1)", false, "RecursiveAsync(arg)")]
+        [TestCase("await RecursiveAsync1(1)", true, "")]
+        [TestCase("await RecursiveAsync1(1)", false, "RecursiveAsync2(value)")]
+        [TestCase("await RecursiveAsync3(1)", true, "")]
+        [TestCase("await RecursiveAsync3(1)", false, "RecursiveAsync4(value)")]
         public void AsyncAwait(string code, bool recursive, string expected)
         {
             var testCode = @"
@@ -435,6 +439,26 @@ namespace RoslynSandbox
         }
 
         internal static async int CreateInt() => 1;
+
+		private static async Task<int> RecursiveAsync1(int value)
+        {
+            return await RecursiveAsync2(value);
+        }
+		
+        private static async Task<int> RecursiveAsync2(int value)
+        {
+            return await RecursiveAsync1(value);
+        }
+
+		private static async Task<int> RecursiveAsync3(int value)
+        {
+            return RecursiveAsync4(value);
+        }
+		
+        private static async Task<int> RecursiveAsync4(int value)
+        {
+            return await RecursiveAsync3(value);
+        }
     }
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
