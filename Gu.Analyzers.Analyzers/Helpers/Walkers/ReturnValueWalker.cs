@@ -226,7 +226,6 @@
                 return true;
             }
 
-            var old = this.current;
             this.current = invocation;
             foreach (var reference in method.DeclaringSyntaxReferences)
             {
@@ -255,7 +254,6 @@
                 this.values.PurgeDuplicates();
             }
 
-            this.current = old;
             return true;
         }
 
@@ -278,7 +276,6 @@
                 return true;
             }
 
-            var old = this.current;
             this.current = propertyGet;
             foreach (var reference in getter.DeclaringSyntaxReferences)
             {
@@ -300,7 +297,6 @@
                 this.values.PurgeDuplicates();
             }
 
-            this.current = old;
             return true;
         }
 
