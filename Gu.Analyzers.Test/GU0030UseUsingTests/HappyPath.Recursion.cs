@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
 
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0030UseUsing>
     {
         public class Recursion : NestedHappyPathVerifier<HappyPath>
         {
@@ -69,24 +69,55 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public async Task IgnoresRecursiveMethod()
+            public async Task MethodStatementBody()
+            {
+                var testCode = @"
+    using System;
+
+    public static class Foo
+    {
+        public static void Bar()
+        {
+            var disposable = Forever();
+            Forever();
+            using(var item = Forever())
+            {
+            }
+
+            using(Forever())
+            {
+            }
+        }
+
+        private static IDisposable Forever()
+        {
+            return Forever();
+        }
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task MethodExpressionBody()
             {
                 var testCode = @"
 using System;
 
 public class Foo
 {
-    public IDisposable RecursiveMethod() => RecursiveMethod();
+    public IDisposable Forever() => Forever();
 
     public void Meh()
     {
-        var meh = RecursiveMethod();
+        var meh = Forever();
+        Forever();
 
-        using(var item = RecursiveMethod())
+        using(var item = Forever())
         {
         }
 
-        using(RecursiveMethod())
+        using(Forever())
         {
         }
     }

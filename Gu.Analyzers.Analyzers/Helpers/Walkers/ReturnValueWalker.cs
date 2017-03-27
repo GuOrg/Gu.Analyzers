@@ -15,7 +15,6 @@
             {
                 x.values.Clear();
                 x.recursionLoop.Clear();
-                x.recursionLoop.Outer = null;
                 x.isRecursive = false;
                 x.awaits = false;
                 x.semanticModel = null;
@@ -23,7 +22,7 @@
             });
 
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly RecursionLoop recursionLoop = new RecursionLoop();
+        private readonly NestedLoop recursionLoop = new NestedLoop();
 
         private bool isRecursive;
         private bool awaits;
@@ -110,9 +109,8 @@
             pooled.Item.awaits = this.awaits;
             pooled.Item.semanticModel = this.semanticModel;
             pooled.Item.cancellationToken = this.cancellationToken;
-            pooled.Item.recursionLoop.Outer = this.recursionLoop;
+            pooled.Item.recursionLoop.SetOuter(this.recursionLoop);
             pooled.Item.Run(node);
-            pooled.Item.recursionLoop.Outer = null;
             return pooled;
         }
 
@@ -356,6 +354,29 @@
 
             this.values.PurgeDuplicates();
             return true;
+        }
+
+        private class NestedLoop
+        {
+            private readonly RecursionLoop inner = new RecursionLoop();
+            private RecursionLoop outer;
+
+            public void Clear()
+            {
+                this.inner.Clear();
+                this.outer = null;
+            }
+
+            public void SetOuter(NestedLoop parent)
+            {
+                this.outer = parent.outer ?? parent.inner;
+            }
+
+            public bool Add(SyntaxNode node)
+            {
+                var loop = this.outer ?? this.inner;
+                return loop.Add(node);
+            }
         }
     }
 }

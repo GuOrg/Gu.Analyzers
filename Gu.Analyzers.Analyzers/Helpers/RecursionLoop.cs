@@ -7,8 +7,6 @@
     {
         private readonly List<SyntaxNode> nodes = new List<SyntaxNode>();
 
-        internal RecursionLoop Outer { get; set; }
-
         private bool IsRecursion
         {
             get
@@ -46,11 +44,6 @@
 
         public bool Add(SyntaxNode node)
         {
-            if (this.Outer != null)
-            {
-                return this.Outer.Add(node);
-            }
-
             this.nodes.Add(node);
             return !this.IsRecursion;
         }
