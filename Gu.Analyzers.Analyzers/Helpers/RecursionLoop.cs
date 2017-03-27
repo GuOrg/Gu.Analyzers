@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using Microsoft.CodeAnalysis;
 
@@ -11,6 +12,11 @@
         {
             get
             {
+                if (this.nodes.Count > 100)
+                {
+                    throw new InvalidOperationException();
+                }
+
                 if (this.nodes.Count < 2)
                 {
                     return false;
