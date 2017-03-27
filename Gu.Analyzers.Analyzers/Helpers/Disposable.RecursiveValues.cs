@@ -121,7 +121,7 @@ namespace Gu.Analyzers
                         var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
                         if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameter))
                         {
-                            using (var pooled = AssignedValueWalker.Create(this.semanticModel.GetDeclaredSymbol(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
+                            using (var pooled = AssignedValueWalker.Create(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                             {
                                 pooled.Item.HandleInvoke(invokedMethod, invocation.ArgumentList);
                                 return this.AddManyRecursively(pooled.Item);
