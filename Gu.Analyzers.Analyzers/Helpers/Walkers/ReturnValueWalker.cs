@@ -26,7 +26,6 @@
 
         private bool isRecursive;
         private bool awaits;
-        private ExpressionSyntax current;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -44,12 +43,6 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (node == this.current)
-            {
-                base.Visit(node);
-                return;
-            }
-
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleLambdaExpression:
@@ -118,8 +111,7 @@
         {
             if (this.awaits)
             {
-                ExpressionSyntax awaited;
-                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out awaited))
+                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out ExpressionSyntax awaited))
                 {
                     using (var pooled = this.GetRecursive(awaited))
                     {
@@ -226,33 +218,28 @@
                 return true;
             }
 
-            this.current = invocation;
             foreach (var reference in method.DeclaringSyntaxReferences)
             {
-                this.Visit(reference.GetSyntax(this.cancellationToken));
+                base.Visit(reference.GetSyntax(this.cancellationToken));
             }
 
-            if (this.current != null)
+            for (var i = this.values.Count - 1; i >= 0; i--)
             {
-                for (var i = this.values.Count - 1; i >= 0; i--)
+                var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                if (this.isRecursive &&
+                    SymbolComparer.Equals(symbol, method))
                 {
-                    ExpressionSyntax arg;
-                    var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                    if (this.isRecursive &&
-                        SymbolComparer.Equals(symbol, method))
-                    {
-                        this.values.RemoveAt(i);
-                        continue;
-                    }
-
-                    if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out arg))
-                    {
-                        this.values[i] = arg;
-                    }
+                    this.values.RemoveAt(i);
+                    continue;
                 }
 
-                this.values.PurgeDuplicates();
+                if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out ExpressionSyntax arg))
+                {
+                    this.values[i] = arg;
+                }
             }
+
+            this.values.PurgeDuplicates();
 
             return true;
         }
@@ -276,26 +263,22 @@
                 return true;
             }
 
-            this.current = propertyGet;
             foreach (var reference in getter.DeclaringSyntaxReferences)
             {
-                this.Visit(reference.GetSyntax(this.cancellationToken));
+                base.Visit(reference.GetSyntax(this.cancellationToken));
             }
 
-            if (this.current != null)
+            for (var i = this.values.Count - 1; i >= 0; i--)
             {
-                for (var i = this.values.Count - 1; i >= 0; i--)
+                var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                if (this.isRecursive &&
+                    SymbolComparer.Equals(symbol, property))
                 {
-                    var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                    if (this.isRecursive &&
-                        SymbolComparer.Equals(symbol, property))
-                    {
-                        this.values.RemoveAt(i);
-                    }
+                    this.values.RemoveAt(i);
                 }
-
-                this.values.PurgeDuplicates();
             }
+
+            this.values.PurgeDuplicates();
 
             return true;
         }
@@ -307,8 +290,7 @@
                 return false;
             }
 
-            InvocationExpressionSyntax invocation;
-            if (AsyncAwait.TryGetAwaitedInvocation(@await, this.semanticModel, this.cancellationToken, out invocation))
+            if (AsyncAwait.TryGetAwaitedInvocation(@await, this.semanticModel, this.cancellationToken, out InvocationExpressionSyntax invocation))
             {
                 this.awaits = true;
                 var symbol = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
@@ -337,7 +319,6 @@
                 return false;
             }
 
-            this.current = lambda;
             var expressionBody = lambda.Body as ExpressionSyntax;
             if (expressionBody != null)
             {
@@ -345,7 +326,7 @@
             }
             else
             {
-                this.Visit(lambda);
+                base.Visit(lambda);
             }
 
             this.values.PurgeDuplicates();
