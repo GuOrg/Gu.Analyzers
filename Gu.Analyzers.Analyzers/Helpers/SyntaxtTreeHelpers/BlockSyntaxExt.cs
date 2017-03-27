@@ -19,7 +19,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            return Assigned.FirstWith(symbol, body, false, semanticModel, cancellationToken, out result);
+            return Assignment.FirstWith(symbol, body, false, semanticModel, cancellationToken, out result);
         }
     }
 }

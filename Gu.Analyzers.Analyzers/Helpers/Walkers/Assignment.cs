@@ -6,10 +6,10 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class Assigned : ExecutionWalker
+    internal sealed class Assignment : ExecutionWalker
     {
-        private static readonly Pool<Assigned> Cache = new Pool<Assigned>(
-            () => new Assigned(),
+        private static readonly Pool<Assignment> Cache = new Pool<Assignment>(
+            () => new Assignment(),
             x =>
                 {
                     x.assignments.Clear();
@@ -21,7 +21,7 @@
 
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
 
-        private Assigned()
+        private Assignment()
         {
         }
 
@@ -36,7 +36,7 @@
             this.assignments.Add(node);
         }
 
-        internal static Pool<Assigned>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<Assignment>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Cache.GetOrCreate();
             pooled.Item.SemanticModel = semanticModel;
@@ -46,13 +46,12 @@
             return pooled;
         }
 
-        internal static bool FirstSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            AssignmentExpressionSyntax temp;
-            return FirstSymbol(symbol, scope, recursive, semanticModel, cancellationToken, out temp);
+            return FirstForSymbol(symbol, scope, recursive, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
         }
 
-        internal static bool FirstSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||

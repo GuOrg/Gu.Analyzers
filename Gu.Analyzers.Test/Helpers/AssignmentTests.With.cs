@@ -7,7 +7,7 @@
 
     using NUnit.Framework;
 
-    public partial class AssignedTests
+    public partial class AssignmentTests
     {
         internal class With
         {
@@ -35,7 +35,7 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var arg = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, Assigned.FirstWith(arg, ctor, recursive, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstWith(arg, ctor, recursive, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(Stream stream)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Assigned.FirstWith(symbol, ctor, recursive, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, recursive, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
             }
 
@@ -100,12 +100,12 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
                 if (recursive)
                 {
-                    Assert.AreEqual(true, Assigned.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = chainedArg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, Assigned.FirstWith(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, Assignment.FirstWith(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
                 }
             }
 
@@ -141,12 +141,12 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
                 if (recursive)
                 {
-                    Assert.AreEqual(true, Assigned.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, true, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.Number = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, Assigned.FirstSymbol(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, Assignment.FirstForSymbol(symbol, ctor, false, semanticModel, CancellationToken.None, out result));
                 }
             }
         }
