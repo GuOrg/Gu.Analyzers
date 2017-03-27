@@ -378,7 +378,7 @@ namespace RoslynSandbox
         [TestCase("await RecursiveAsync(1)", true, "")]
         [TestCase("await RecursiveAsync(1)", false, "RecursiveAsync(arg)")]
         [TestCase("await RecursiveAsync1(1)", true, "")]
-        [TestCase("await RecursiveAsync1(1)", false, "RecursiveAsync2(value)")]
+        [TestCase("await RecursiveAsync1(1)", false, "await RecursiveAsync2(value)")]
         [TestCase("await RecursiveAsync3(1)", true, "")]
         [TestCase("await RecursiveAsync3(1)", false, "RecursiveAsync4(value)")]
         public void AsyncAwait(string code, bool recursive, string expected)

@@ -136,6 +136,12 @@
                     this.AddReturnValue(awaited);
                     return;
                 }
+
+                if (this.isRecursive &&
+                    value is AwaitExpressionSyntax @await)
+                {
+                    value = @await.Expression;
+                }
             }
 
             if (this.isRecursive)
