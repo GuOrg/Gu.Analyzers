@@ -7,7 +7,7 @@
 4.b PM> `.paket/paket.exe update group GROUPNAME` update packages.
 5. PM> `.paket/paket.exe install` install packages.
 6. PM> `.paket/paket.exe install -f --createnewbindingfiles` install packages and create app.configs with redirects.
-6. PM> `.paket/paket.exe outdated` Lists all dependencies that have newer versions available..
+6. PM> `.paket/paket.exe outdated` Lists all dependencies that have newer versions available.
 
 ## Create packages
 
