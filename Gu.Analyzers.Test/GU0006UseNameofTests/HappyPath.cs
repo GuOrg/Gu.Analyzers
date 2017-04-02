@@ -82,6 +82,28 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
         }
 
         [Test]
+        public async Task IgnoresVariableDeclaredAfter()
+        {
+            var testCode = @"
+    using System;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            var text = this.Meh(""text"");
+        }
+
+        public string Meh(string value)
+        {
+            throw new ArgumentException(nameof(value), value);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnoresNamespaceName()
         {
             var testCode = @"

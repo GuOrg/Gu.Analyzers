@@ -52,8 +52,7 @@
             }
 
             var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart);
-            ISymbol symbol;
-            if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out symbol))
+            if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out ISymbol symbol))
             {
                 if (symbol is IParameterSymbol ||
                     symbol is ILocalSymbol ||
@@ -62,6 +61,22 @@
                     symbol is IPropertySymbol ||
                     symbol is IMethodSymbol)
                 {
+                    if (symbol is ILocalSymbol local)
+                    {
+                        if (local.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference reference))
+                        {
+                            var statement = argument.FirstAncestor<StatementSyntax>();
+                            if (statement.Span.Start < reference.Span.Start)
+                            {
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+
                     if (symbol is IParameterSymbol ||
                         symbol is ILocalSymbol ||
                         symbol.IsStatic ||

@@ -30,6 +30,7 @@ public class Disposable : IDisposable
         [TestCase("(IDisposable)null")]
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)")]
         public async Task LanguageConstructs(string code)
         {
             var testCode = @"
