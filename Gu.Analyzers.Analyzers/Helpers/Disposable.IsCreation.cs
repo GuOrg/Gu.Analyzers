@@ -266,8 +266,7 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            var property = symbol as IPropertySymbol;
-            if (property != null)
+            if (symbol is IPropertySymbol property)
             {
                 if (property.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -279,8 +278,7 @@ namespace Gu.Analyzers
                 return Result.Unknown;
             }
 
-            var method = symbol as IMethodSymbol;
-            if (method != null)
+            if (symbol is IMethodSymbol method)
             {
                 if (method.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -299,6 +297,18 @@ namespace Gu.Analyzers
                         method == KnownSymbol.Task.FromResult)
                     {
                         return Result.No;
+                    }
+
+                    if (method.ReturnType == KnownSymbol.Task)
+                    {
+                        return Result.No;
+                    }
+
+                    if (method.ReturnType == KnownSymbol.TaskOfT)
+                    {
+                        return IsAssignableTo(((INamedTypeSymbol) method.ReturnType).TypeArguments[0])
+                            ? Result.Maybe
+                            : Result.No;
                     }
 
                     return !IsAssignableTo(method.ReturnType) ||

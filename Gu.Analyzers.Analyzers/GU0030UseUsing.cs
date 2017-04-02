@@ -49,7 +49,8 @@
             foreach (var declarator in variableDeclaration.Variables)
             {
                 var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
-                if (symbol == null)
+                if (symbol == null || 
+                    !Disposable.IsPotentiallyAssignableTo(symbol.Type))
                 {
                     return;
                 }
