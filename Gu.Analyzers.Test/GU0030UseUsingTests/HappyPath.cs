@@ -180,7 +180,31 @@ internal static class Foo
 }";
 
             await this.VerifyHappyPathAsync(testCode)
-            .ConfigureAwait(false);
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AwaitDownloadDataTaskAsync()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public async Task Bar()
+        {
+            using (var client = new WebClient())
+            {
+                var bytes = await client.DownloadDataTaskAsync(string.Empty);
+            }
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
         }
 
         [Test]

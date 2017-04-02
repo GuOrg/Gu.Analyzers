@@ -32,7 +32,9 @@ internal class Foo
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item);
+#pragma warning disable GU0006 // Use nameof.
                     Assert.AreEqual("value", actual);
+#pragma warning restore GU0006 // Use nameof.
                 }
             }
 
@@ -100,7 +102,9 @@ internal class Foo<T>
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled.Item);
+#pragma warning disable GU0006 // Use nameof.
                     Assert.AreEqual("value", actual);
+#pragma warning restore GU0006 // Use nameof.
                 }
             }
 

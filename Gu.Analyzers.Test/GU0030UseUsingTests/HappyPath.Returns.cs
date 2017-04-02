@@ -39,7 +39,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
-            public async Task Local()
+            public async Task LocalFileOpenRead()
             {
                 var testCode = @"
     using System.IO;
@@ -49,6 +49,25 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
         public static Stream Bar()
         {
             var stream = File.OpenRead(string.Empty);
+            return stream;
+        }
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task LocalFileOpenReadAfterAccessingLength()
+            {
+                var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            var length = stream.Length;
             return stream;
         }
     }";
