@@ -1105,7 +1105,7 @@ public sealed class Foo<T> : IDisposable
         }
 
         [Test]
-        public async Task WhenNotCallingBaseDispose()
+        public async Task WhenNotCallingBaseDisposeWithBaseCode()
         {
             var fooBaseCode = @"
 using System;
@@ -1156,6 +1156,46 @@ public class Foo : FooBase
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenNotCallingBaseDisposeWithoutBaseCode()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo : StreamReader
+{
+    public Foo(Stream stream)
+        : base(stream)
+    {
+    }
+
+    ↓protected override void Dispose(bool disposing)
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo : StreamReader
+{
+    public Foo(Stream stream)
+        : base(stream)
+    {
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
         }
     }
 }

@@ -61,19 +61,31 @@
             }
 
             var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-            ISymbol memberSymbol;
-            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out memberSymbol))
+            if (member is MethodDeclarationSyntax methodDeclaration)
+            {
+                var method = semanticModel.GetDeclaredSymbolSafe(methodDeclaration, cancellationToken);
+                if (method.Parameters.Length != 1)
+                {
+                    return default(Fix);
+                }
+
+                var overridden = method.OverriddenMethod;
+                var baseCall = SyntaxFactory.ParseStatement($"base.{overridden.Name}({method.Parameters[0].Name});")
+                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                return new Fix(baseCall, methodDeclaration);
+            }
+
+            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out ISymbol memberSymbol))
             {
                 return default(Fix);
             }
 
-            IMethodSymbol disposeMethodSymbol;
-            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, false, out disposeMethodSymbol))
+            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, false, out IMethodSymbol disposeMethodSymbol))
             {
-                MethodDeclarationSyntax disposeMethodDeclaration;
                 if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
                     disposeMethodSymbol.Parameters.Length == 0 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
+                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                 {
                     var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
                     return new Fix(disposeStatement, disposeMethodDeclaration);
@@ -124,6 +136,14 @@
 
             if (disposeMethod.ParameterList.Parameters.Count == 1 && disposeMethod.Body != null)
             {
+                if (fix.DisposeStatement is ExpressionStatementSyntax expressionStatement &&
+                    expressionStatement.Expression is InvocationExpressionSyntax)
+                {
+                    var statements = disposeMethod.Body.Statements.Add(fix.DisposeStatement);
+                    var newBlock = disposeMethod.Body.WithStatements(statements);
+                    return syntaxRoot.ReplaceNode(disposeMethod.Body, newBlock);
+                }
+
                 foreach (var statement in disposeMethod.Body.Statements)
                 {
                     var ifStatement = statement as IfStatementSyntax;
