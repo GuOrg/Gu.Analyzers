@@ -36,6 +36,7 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
             context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(HandleDisposeMethod, SyntaxKind.MethodDeclaration);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
@@ -95,6 +96,38 @@
                               .IsEither(Result.No, Result.Unknown))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
+            }
+        }
+
+        private static void HandleDisposeMethod(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            if (!(context.ContainingSymbol is IMethodSymbol method) ||
+                !method.IsOverride ||
+                 method.Name != "Dispose")
+            {
+                return;
+            }
+
+            var baseType = method.ContainingType.BaseType;
+            if (Disposable.TryGetDisposeMethod(baseType, true, out IMethodSymbol baseMethod))
+            {
+                return;
+            }
+
+            using (var invocations = InvocationWalker.Create(context.Node))
+            {
+                foreach (var invocation in invocations.Item)
+                {
+                    if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), baseMethod))
+                    {
+                        return;
+                    }
                 }
             }
         }
