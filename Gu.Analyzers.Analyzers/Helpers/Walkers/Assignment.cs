@@ -95,6 +95,14 @@
                         assignment = candidate;
                         return true;
                     }
+
+                    if (candidate.Right is ObjectCreationExpressionSyntax objectCreation &&
+                        objectCreation.ArgumentList != null &&
+                        objectCreation.ArgumentList.Arguments.TryGetFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _))
+                    {
+                        assignment = candidate;
+                        return true;
+                    }
                 }
             }
 
