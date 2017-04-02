@@ -82,7 +82,6 @@
             await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, mehCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
         }
 
-
         [Test]
         public async Task WhenNotInjectingChainedGeneric()
         {
