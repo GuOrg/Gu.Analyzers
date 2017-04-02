@@ -114,6 +114,8 @@
                             }
                         }
                     }
+
+                    return false;
                 }
 
                 if (argument.Parent.Parent is ObjectCreationExpressionSyntax objectcreation)
