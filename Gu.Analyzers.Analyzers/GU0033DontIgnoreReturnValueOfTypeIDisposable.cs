@@ -102,32 +102,51 @@
 
             if (node.Parent is ArgumentSyntax argument)
             {
-                if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
-                    member != null)
+                if (argument.Parent.Parent is InvocationExpressionSyntax invocation)
                 {
-                    var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
-                    if (initializer != null)
+                    using (var returnWalker = ReturnValueWalker.Create(invocation, true, semanticModel, cancellationToken))
                     {
-                        if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
-                            chainedCtor.ContainingType != member.ContainingType)
+                        foreach (var returnValue in returnWalker.Item)
                         {
-                            if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
+                            if (MustBeHandled(returnValue, semanticModel, cancellationToken))
                             {
-                                return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                                return true;
                             }
                         }
                     }
-
-                    if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
-                                  .IsEither(Result.Yes, Result.Maybe))
-                    {
-                        return false;
-                    }
-
-                    return true;
                 }
 
-                return ctor?.ContainingType != KnownSymbol.StreamReader;
+                if (argument.Parent.Parent is ObjectCreationExpressionSyntax objectcreation)
+                {
+                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
+                        member != null)
+                    {
+                        var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+                        if (initializer != null)
+                        {
+                            if (
+                                semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is
+                                    IMethodSymbol chainedCtor &&
+                                chainedCtor.ContainingType != member.ContainingType)
+                            {
+                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
+                                {
+                                    return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
+                                }
+                            }
+                        }
+
+                        if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
+                                      .IsEither(Result.Yes, Result.Maybe))
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
+                    return ctor?.ContainingType != KnownSymbol.StreamReader;
+                }
             }
 
             return false;
