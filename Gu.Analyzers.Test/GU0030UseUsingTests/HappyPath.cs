@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
+    using System;
     using System.Threading.Tasks;
     using NUnit.Framework;
 
@@ -31,6 +32,12 @@ public class Disposable : IDisposable
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
         [TestCase("await Task.Run(() => 1).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new object())")]
+        [TestCase("await Task.Run(() => new object()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty)).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => this.GetType())")]
+        [TestCase("await Task.Run(() => this.GetType()).ConfigureAwait(false)")]
         public async Task LanguageConstructs(string code)
         {
             var testCode = @"
