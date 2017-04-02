@@ -108,7 +108,8 @@
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfaces)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveLinq)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbols)
-                .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis);
+                .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis)
+                .AddMetadataReference(projectId, MetadataReferences.NUnit);
 
             solution.Workspace.Options =
                     solution.Workspace.Options

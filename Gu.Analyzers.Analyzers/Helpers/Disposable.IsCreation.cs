@@ -306,7 +306,7 @@ namespace Gu.Analyzers
 
                     if (method.ReturnType == KnownSymbol.TaskOfT)
                     {
-                        return IsAssignableTo(((INamedTypeSymbol) method.ReturnType).TypeArguments[0])
+                        return IsAssignableTo(((INamedTypeSymbol)method.ReturnType).TypeArguments[0])
                             ? Result.Maybe
                             : Result.No;
                     }

@@ -574,5 +574,32 @@ namespace RoslynSandbox
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+
+        [Test]
+        public async Task AssertThrows()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [Test]
+        [SuppressMessage(""ReSharper"", ""ObjectCreationAsStatement"")]
+        public void ThrowsIfPrerequisiteIsNull()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new Disposable());
+            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception.Message);
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

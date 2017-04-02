@@ -10,6 +10,7 @@ namespace Gu.Analyzers.Test
     using System.Net;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using NUnit.Framework;
 
     /// <summary>
     /// Metadata references used to create test projects.
@@ -30,6 +31,7 @@ namespace Gu.Analyzers.Test
         internal static readonly MetadataReference SystemXaml = MetadataReference.CreateFromFile(typeof(System.Xaml.XamlLanguage).Assembly.Location);
         internal static readonly MetadataReference CSharpSymbols = MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location);
         internal static readonly MetadataReference CodeAnalysis = MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location);
+        internal static readonly MetadataReference NUnit = MetadataReference.CreateFromFile(typeof(Assert).Assembly.Location);
 
         internal static IReadOnlyList<MetadataReference> All =>
                 new[]
@@ -47,7 +49,8 @@ namespace Gu.Analyzers.Test
                         WindowsBase,
                         SystemXaml,
                         CSharpSymbols,
-                        CodeAnalysis
+                        CodeAnalysis,
+                        NUnit
                     };
     }
 }

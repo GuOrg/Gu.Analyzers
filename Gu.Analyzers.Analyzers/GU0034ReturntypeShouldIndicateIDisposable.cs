@@ -134,9 +134,10 @@
 
         private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type)
         {
-            if (type == null)
+            if (type == null ||
+                type == KnownSymbol.Void)
             {
-                return false;
+                return true;
             }
 
             if (Disposable.IsAssignableTo(type))
