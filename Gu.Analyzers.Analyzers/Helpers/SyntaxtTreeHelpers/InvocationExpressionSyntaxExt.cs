@@ -52,5 +52,32 @@
 
             return invocation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out value);
         }
+
+        internal static bool TryGetMatchingParameter(this InvocationExpressionSyntax invocation, ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IParameterSymbol parameter)
+        {
+            parameter = null;
+            if (invocation?.ArgumentList == null)
+            {
+                return false;
+            }
+
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            {
+                foreach (var reference in method.DeclaringSyntaxReferences)
+                {
+                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+                    if (methodDeclaration != null)
+                    {
+                        if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameterSyntax))
+                        {
+                            parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken) as IParameterSymbol;
+                            return parameter != null;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

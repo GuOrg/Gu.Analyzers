@@ -135,14 +135,14 @@
 
         private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
         {
-            var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
+            var objectCreation = argument.FirstAncestor<ObjectCreationExpressionSyntax>();
             if (objectCreation != null)
             {
                 ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
                 return ctor != null;
             }
 
-            var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
+            var initializer = argument.FirstAncestor<ConstructorInitializerSyntax>();
             if (initializer != null)
             {
                 ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken);

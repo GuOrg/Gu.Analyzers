@@ -170,25 +170,12 @@ namespace Gu.Analyzers
 
             Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
             var invocation = candidate.FirstAncestor<InvocationExpressionSyntax>();
-            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            if (invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out IParameterSymbol parameter))
             {
-                foreach (var reference in method.DeclaringSyntaxReferences)
-                {
-                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
-                    if (methodDeclaration != null)
-                    {
-                        if (methodDeclaration.TryGetMatchingParameter(candidate, out ParameterSyntax parameterSyntax))
-                        {
-                            var parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken);
-                            return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
-                        }
-                    }
-                }
-
-                return Result.Unknown;
+                return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
             }
 
-            return Result.No;
+            return Result.Unknown;
         }
 
         private static Result IsAssignedWithCreated(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)

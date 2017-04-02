@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
-        [TestCase(true, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        [TestCase(true, "Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         [TestCase(false, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public void AwaitSyntaxError(bool recursive, string expected)
         {
