@@ -82,6 +82,49 @@
             await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, mehCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
         }
 
+
+        [Test]
+        public async Task WhenNotInjectingChainedGeneric()
+        {
+            var fooCode = @"
+    public class Foo
+    {
+        private readonly Bar<int> bar;
+
+        public Foo(Bar<int> bar)
+        {
+            this.bar = bar;
+        }
+    }";
+            var barCode = @"
+    public class Bar<T>
+    {
+    }";
+
+            var mehCode = @"
+    public class Meh : Foo
+    {
+        public Meh()
+           : base(↓new Bar<int>())
+        {
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref mehCode)
+                               .WithMessage("Prefer injecting.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, mehCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Meh : Foo
+    {
+        public Meh(Bar<int> bar)
+           : base(bar)
+        {
+        }
+    }";
+            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, mehCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
+        }
+
         [Test]
         public async Task WhenNotInjectingChainedNewWithInjectedArgument()
         {
