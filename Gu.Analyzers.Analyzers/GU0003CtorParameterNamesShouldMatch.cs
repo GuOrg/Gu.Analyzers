@@ -122,8 +122,7 @@
                             (left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
                             (left as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
                         {
-                            ParameterSyntax match;
-                            if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out match))
+                            if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out ParameterSyntax match))
                             {
                                 var symbol = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
                                 if (this.ParameterNameMap.ContainsKey(match))
@@ -150,8 +149,7 @@
                     for (var i = 0; i < node.ArgumentList.Arguments.Count; i++)
                     {
                         var arg = node.ArgumentList.Arguments[i].Expression as IdentifierNameSyntax;
-                        ParameterSyntax match;
-                        if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out match))
+                        if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out ParameterSyntax match))
                         {
                             if (this.ParameterNameMap.ContainsKey(match))
                             {
@@ -178,26 +176,24 @@
 
             private static string ParameterName(ISymbol symbol)
             {
-                var fieldSymbol = symbol as IFieldSymbol;
-                if (fieldSymbol != null)
+                if (symbol is IFieldSymbol field)
                 {
-                    if (IsAllCaps(fieldSymbol.Name))
+                    if (IsAllCaps(field.Name))
                     {
-                        return fieldSymbol.Name.ToLowerInvariant();
+                        return field.Name.ToLowerInvariant();
                     }
 
-                    return FirstCharLowercase(TrimLeadingUnderscore(fieldSymbol.Name));
+                    return FirstCharLowercase(TrimLeadingUnderscore(field.Name));
                 }
 
-                var propertySymbol = symbol as IPropertySymbol;
-                if (propertySymbol != null)
+                if (symbol is IPropertySymbol property)
                 {
-                    if (IsAllCaps(propertySymbol.Name))
+                    if (IsAllCaps(property.Name))
                     {
-                        return propertySymbol.Name.ToLowerInvariant();
+                        return property.Name.ToLowerInvariant();
                     }
 
-                    return FirstCharLowercase(propertySymbol.Name);
+                    return FirstCharLowercase(property.Name);
                 }
 
                 return null;
