@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox
-    {
+{
     using System;
 
     public class Disposable : IDisposable
@@ -366,6 +366,53 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task ReturningFileOpenReadExtensionMethod()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            return string.Empty.Bar();
+        }
+
+        public static Stream Bar(this string name)
+        {
+            return File.OpenRead(name);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningNewDisposableExtensionMethodId()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public static class Foo
+    {
+        public static IDisposable Bar()
+        {
+            return new Disposable().Id();
+        }
+
+        public static IDisposable Id(this IDisposable self)
+        {
+            return self;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ReturnDisposableFieldAsObject()
         {
             var testCode = @"
@@ -574,7 +621,6 @@ namespace RoslynSandbox
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
-
 
         [Test]
         public async Task AssertThrows()
