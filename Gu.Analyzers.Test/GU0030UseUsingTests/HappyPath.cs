@@ -28,6 +28,8 @@ public class Disposable : IDisposable
         [TestCase("new string(' ', 1)")]
         [TestCase("typeof(IDisposable)")]
         [TestCase("(IDisposable)null")]
+        [TestCase("await Task.FromResult(1)")]
+        [TestCase("await Task.Run(() => 1)")]
         public async Task LanguageConstructs(string code)
         {
             var testCode = @"
@@ -35,10 +37,11 @@ namespace RoslynSandbox
 {
     using System;
     using System.IO;
+    using System.Threading.Tasks;
 
     internal class Foo
     {
-        internal Foo()
+        internal async void Bar()
         {
             var value = new string(' ', 1);
         }
@@ -142,6 +145,30 @@ internal static class Foo
 
         stream.Position = 0;
         return stream;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+            .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AwaitingMethodReturningString()
+        {
+            var testCode = @"
+using System.IO;
+using System.Threading.Tasks;
+  
+internal static class Foo
+{
+    internal static async Task Bar()
+    {
+        var text = await ReadAsync(string.Empty);
+    }
+
+    internal static async Task<string> ReadAsync(string text)
+    {
+        return text;
     }
 }";
 

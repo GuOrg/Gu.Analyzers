@@ -107,47 +107,49 @@
                 return;
             }
 
-            if (!(context.ContainingSymbol is IMethodSymbol method) ||
-                !method.IsOverride ||
-                 method.Name != "Dispose")
+            if (context.ContainingSymbol is IMethodSymbol method &&
+                method.IsOverride &&
+                method.Name == "Dispose")
             {
-                return;
-            }
-
-            var overridden = method.OverriddenMethod;
-            if (overridden == null)
-            {
-                return;
-            }
-
-            using (var invocations = InvocationWalker.Create(context.Node))
-            {
-                foreach (var invocation in invocations.Item)
+                var overridden = method.OverriddenMethod;
+                if (overridden == null)
                 {
-                    if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
+                    return;
+                }
+
+                using (var invocations = InvocationWalker.Create(context.Node))
+                {
+                    foreach (var invocation in invocations.Item)
                     {
-                        return;
+                        if (
+                            SymbolComparer.Equals(
+                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
+                        {
+                            return;
+                        }
                     }
                 }
-            }
 
-            if (overridden.DeclaringSyntaxReferences.Length == 0)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                return;
-            }
-
-            using (var disposeWalker = Disposable.DisposeWalker.Create(overridden, context.SemanticModel, context.CancellationToken))
-            {
-                foreach (var disposeCall in disposeWalker.Item)
+                if (overridden.DeclaringSyntaxReferences.Length == 0)
                 {
-                    if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out ExpressionSyntax disposed))
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    return;
+                }
+
+                using (
+                    var disposeWalker = Disposable.DisposeWalker.Create(overridden, context.SemanticModel, context.CancellationToken))
+                {
+                    foreach (var disposeCall in disposeWalker.Item)
                     {
-                        var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
-                        if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                        if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out ExpressionSyntax disposed))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                            return;
+                            var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
+                            if (
+                                !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                                return;
+                            }
                         }
                     }
                 }
