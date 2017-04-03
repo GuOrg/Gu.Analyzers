@@ -25,7 +25,8 @@
                 return false;
             }
 
-            return DefinitionEquals(x, y) ||
+            return x.Equals(y) ||
+                   DefinitionEquals(x, y) ||
                    DefinitionEquals(y, x) ||
                    Equals((x as IPropertySymbol)?.OverriddenProperty, y) ||
                    Equals(x, (y as IPropertySymbol)?.OverriddenProperty) ||

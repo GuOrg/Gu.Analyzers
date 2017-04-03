@@ -33,7 +33,6 @@
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.VariableDeclaration);
         }
@@ -48,9 +47,9 @@
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
             foreach (var declarator in variableDeclaration.Variables)
             {
-                var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
-                if (symbol == null ||
-                    !Disposable.IsPotentiallyAssignableTo(symbol.Type))
+                var local = context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) as ILocalSymbol;
+                if (local == null ||
+                    !Disposable.IsPotentiallyAssignableTo(local.Type))
                 {
                     return;
                 }
@@ -65,22 +64,28 @@
                         return;
                     }
 
-                    if (IsReturned(declarator, context.SemanticModel, context.CancellationToken))
+                    var block = declarator.FirstAncestorOrSelf<BlockSyntax>();
+                    if (block == null)
                     {
                         return;
                     }
 
-                    if (IsAssignedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                    if (IsReturned(local, block, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
 
-                    if (IsAddedToFieldOrProperty(declarator, context.SemanticModel, context.CancellationToken))
+                    if (IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
 
-                    if (IsDisposedAfter(symbol, value, context.SemanticModel, context.CancellationToken))
+                    if (IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
+                    if (IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
@@ -90,20 +95,9 @@
             }
         }
 
-        private static bool IsReturned(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsReturned(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (variable == null)
-            {
-                return false;
-            }
-
-            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            using (var pooled = ReturnValueWalker.Create(variable.FirstAncestorOrSelf<BlockSyntax>(), false, semanticModel, cancellationToken))
+            using (var pooled = ReturnValueWalker.Create(block, false, semanticModel, cancellationToken))
             {
                 foreach (var value in pooled.Item)
                 {
@@ -145,20 +139,8 @@
             return false;
         }
 
-        private static bool IsAssignedToFieldOrProperty(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedToFieldOrProperty(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (variable == null)
-            {
-                return false;
-            }
-
-            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
             AssignmentExpressionSyntax assignment = null;
             if (block?.TryGetAssignment(symbol, semanticModel, cancellationToken, out assignment) == true)
             {
@@ -170,20 +152,8 @@
             return false;
         }
 
-        private static bool IsAddedToFieldOrProperty(VariableDeclaratorSyntax variable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAddedToFieldOrProperty(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (variable == null)
-            {
-                return false;
-            }
-
-            var symbol = semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-            if (symbol == null)
-            {
-                return false;
-            }
-
-            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
             using (var pooledInvocations = InvocationWalker.Create(block))
             {
                 foreach (var invocation in pooledInvocations.Item.Invocations)
