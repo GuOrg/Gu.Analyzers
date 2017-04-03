@@ -34,7 +34,7 @@ namespace RoslynSandbox
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)[0]));
+                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
                 Assert.AreEqual("internal Foo(), internal Foo(string text)", actual);
                 Assert.AreEqual(0, pooled.Item.ObjectCreations.Count);
             }
@@ -63,7 +63,7 @@ namespace RoslynSandbox
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)[0]));
+                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
                 Assert.AreEqual("internal Foo(string text)", actual);
                 Assert.AreEqual(0, pooled.Item.ObjectCreations.Count);
             }
