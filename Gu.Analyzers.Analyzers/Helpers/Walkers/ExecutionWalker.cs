@@ -41,8 +41,7 @@
             base.VisitIdentifierName(node);
             if (this.IsRecursive)
             {
-                IMethodSymbol getter;
-                if (this.TryGetPropertyGet(node, out getter))
+                if (this.TryGetPropertyGet(node, out IMethodSymbol getter))
                 {
                     foreach (var reference in getter.DeclaringSyntaxReferences)
                     {
@@ -57,9 +56,8 @@
             base.VisitAssignmentExpression(node);
             if (this.IsRecursive)
             {
-                IMethodSymbol setter;
-                if (this.TryGetPropertySet(node.Left, out setter) &&
-                     this.visited.Add(node))
+                if (this.TryGetPropertySet(node.Left, out IMethodSymbol setter) &&
+                    this.visited.Add(node))
                 {
                     foreach (var reference in setter.DeclaringSyntaxReferences)
                     {
@@ -90,10 +88,20 @@
 
         protected void VisitChained(SyntaxNode node)
         {
+            if (node == null)
+            {
+                return;
+            }
+
             if (this.IsRecursive &&
                 this.visited.Add(node))
             {
                 var method = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken);
+                if (method == null)
+                {
+                    return;
+                }
+
                 foreach (var reference in method.DeclaringSyntaxReferences)
                 {
                     this.Visit(reference.GetSyntax(this.CancellationToken));
