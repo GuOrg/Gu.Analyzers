@@ -102,6 +102,33 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public async Task LocalInIf()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar(string text)
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (text == null)
+            {
+                return stream;
+            }
+
+            var length = stream.Length;
+            return stream;
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
