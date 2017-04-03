@@ -69,6 +69,7 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
             }
 
+            [Explicit]
             [TestCase(true)]
             [TestCase(false)]
             public void ChainedCtorArg(bool recursive)
