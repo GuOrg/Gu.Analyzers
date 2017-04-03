@@ -113,8 +113,7 @@
                         return true;
                     }
 
-                    var objectCreation = value as ObjectCreationExpressionSyntax;
-                    if (objectCreation != null)
+                    if (value is ObjectCreationExpressionSyntax objectCreation)
                     {
                         if (objectCreation.ArgumentList != null)
                         {
