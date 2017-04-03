@@ -130,7 +130,9 @@ namespace Gu.Analyzers
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!IsPotentiallyAssignableTo(candidate, semanticModel, cancellationToken))
+            if (!IsPotentiallyAssignableTo(candidate, semanticModel, cancellationToken) ||
+                candidate is ThisExpressionSyntax ||
+                candidate is BaseExpressionSyntax)
             {
                 return Result.No;
             }

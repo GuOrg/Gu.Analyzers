@@ -40,20 +40,22 @@ internal class Foo
 
         [TestCase("StaticRecursiveExpressionBody", true, "")]
         [TestCase("StaticRecursiveExpressionBody", false, "StaticRecursiveExpressionBody")]
-        [TestCase("StaticRecursiveStatementBody)", true, "")]
-        [TestCase("StaticRecursiveStatementBody)", false, "StaticRecursiveStatementBody")]
+        [TestCase("StaticRecursiveStatementBody", true, "")]
+        [TestCase("StaticRecursiveStatementBody", false, "StaticRecursiveStatementBody")]
         [TestCase("this.RecursiveExpressionBody", true, "")]
         [TestCase("this.RecursiveExpressionBody", false, "this.RecursiveExpressionBody")]
-        [TestCase("this.RecursiveStatementBody)", true, "")]
-        [TestCase("this.RecursiveStatementBody)", false, "this.RecursiveStatementBody")]
-        [TestCase("this.CalculatedExpressionBody)", true, "1")]
-        [TestCase("this.CalculatedExpressionBody)", false, "1")]
-        [TestCase("this.CalculatedStatementBody)", true, "1")]
-        [TestCase("this.CalculatedStatementBody)", false, "1")]
-        [TestCase("this.CalculatedReturningFieldExpressionBody)", true, "this.value")]
-        [TestCase("this.CalculatedReturningFieldExpressionBody)", false, "this.value")]
-        [TestCase("this.CalculatedReturningFieldStatementBody)", true, "this.value")]
-        [TestCase("this.CalculatedReturningFieldStatementBody)", false, "this.value")]
+        [TestCase("this.RecursiveStatementBody", true, "")]
+        [TestCase("this.RecursiveStatementBody", false, "this.RecursiveStatementBody")]
+        [TestCase("this.CalculatedExpressionBody", true, "1")]
+        [TestCase("this.CalculatedExpressionBody", false, "1")]
+        [TestCase("this.CalculatedStatementBody", true, "1")]
+        [TestCase("this.CalculatedStatementBody", false, "1")]
+        [TestCase("this.ThisExpressionBody", true, "this")]
+        [TestCase("this.ThisExpressionBody", false, "this")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody", true, "this.value")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody", false, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody", true, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody", false, "this.value")]
         public void Property(string code, bool recursive, string expected)
         {
             var testCode = @"
@@ -99,6 +101,8 @@ namespace RoslynSandbox
                 return 1;
             }
         }
+
+        public Foo ThisExpressionBody => this;
 
         public int CalculatedReturningFieldExpressionBody => this.value;
 
@@ -161,6 +165,8 @@ namespace RoslynSandbox
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", false, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("Task.Run(() => 1)", true, "")]
         [TestCase("Task.Run(() => 1)", false, "")]
+        [TestCase("this.ThisExpressionBody()", true, "this")]
+        [TestCase("this.ThisExpressionBody()", false, "this")]
         public void Call(string code, bool recursive, string expected)
         {
             var testCode = @"
@@ -259,6 +265,8 @@ namespace RoslynSandbox
 
             return flag;
         }
+
+        public Foo ThisExpressionBody() => this;
 
         private static int RecursiveWithOptional(int arg, IEnumerable<int> args = null)
         {

@@ -180,6 +180,47 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task MethodReturningThis()
+        {
+            var chunkCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public class Chunk<T>
+    {
+        private readonly List<T> items = new List<T>();
+        private readonly object gate = new object();
+
+        public Chunk<T> Add(T item)
+        {
+            lock (this.gate)
+            {
+                this.items.Add(item);
+            }
+
+            return this;
+        }
+    }
+}";
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public object Meh()
+        {
+            var chunk = new Chunk<int>();
+            return chunk.Add(1);
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(chunkCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task MethodReturningFuncObject()
         {
             var testCode = @"
@@ -588,6 +629,32 @@ internal static class Foo
 	        var file = System.IO.File.OpenRead(null);
 	        return file;
         };
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task PassingFuncToMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        public Foo()
+        {
+            var text = Get(""abc"", 1, (s, i) => s.Substring(i));
+        }
+
+        public T Get<T>(T text, int i, Func<T, int, T> meh)
+        {
+            return meh(text, i);
+        }
     }
 }";
 
