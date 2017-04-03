@@ -44,7 +44,7 @@
                     }
 
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
-                                                       .WithType(SyntaxFactory.ParseTypeName(type.Name));
+                                                       .WithType(objectCreation.Type);
                     switch (GU0007PreferInjecting.CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
                     {
                         case GU0007PreferInjecting.Injectable.No:
@@ -75,7 +75,7 @@
                 {
                     var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(memberAccess, context.CancellationToken));
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
-                                                       .WithType(SyntaxFactory.ParseTypeName(type.Name));
+                                                       .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
                     switch (GU0007PreferInjecting.IsInjectable(memberAccess, memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
                     {
                         case GU0007PreferInjecting.Injectable.No:

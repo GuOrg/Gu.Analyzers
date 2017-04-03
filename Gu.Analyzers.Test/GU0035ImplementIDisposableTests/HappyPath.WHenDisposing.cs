@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0035ImplementIDisposableTests
 
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath : HappyPathVerifier<GU0035ImplementIDisposable>
     {
         public class WhenDisposing : NestedHappyPathVerifier<HappyPath>
         {

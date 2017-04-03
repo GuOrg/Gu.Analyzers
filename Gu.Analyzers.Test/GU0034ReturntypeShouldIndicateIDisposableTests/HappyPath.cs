@@ -6,6 +6,19 @@ namespace Gu.Analyzers.Test.GU0034ReturntypeShouldIndicateIDisposableTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0034ReturntypeShouldIndicateIDisposable>
     {
+        private static readonly string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
         [Test]
         public async Task RealisticExtensionMethodClass()
         {
@@ -252,6 +265,53 @@ public class Foo
         }
 
         [Test]
+        public async Task MethodReturningTaskFromResultOfDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            CreateDisposableAsync();
+        }
+
+        private static Task<IDisposable> CreateDisposableAsync()
+        {
+            return Task.FromResult<IDisposable>(new Disposable());
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodReturningTaskRunOfDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        private static Task<IDisposable> Meh()
+        {
+            return Task.Run<IDisposable>(() => new Disposable());
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task GenericMethod()
         {
             var testCode = @"
@@ -302,6 +362,53 @@ public class Foo
         }
     }";
             await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningFileOpenReadExtensionMethod()
+        {
+            var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            return string.Empty.Bar();
+        }
+
+        public static Stream Bar(this string name)
+        {
+            return File.OpenRead(name);
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningNewDisposableExtensionMethodId()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public static class Foo
+    {
+        public static IDisposable Bar()
+        {
+            return new Disposable().Id();
+        }
+
+        public static IDisposable Id(this IDisposable self)
+        {
+            return self;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
 
@@ -485,6 +592,59 @@ internal static class Foo
 }";
 
             await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task CallingOverload()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public Task Bar(string source, int expected, CancellationToken cancellationToken)
+        {
+            return this.Bar(source, new[] { expected }, cancellationToken);
+        }
+
+        public Task Bar(string source, int[] expected, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(0);
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AssertThrows()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [Test]
+        [SuppressMessage(""ReSharper"", ""ObjectCreationAsStatement"")]
+        public void ThrowsIfPrerequisiteIsNull()
+        {
+            var exception = Assert.Throws<ArgumentNullException>(() => new Disposable());
+            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception.Message);
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
     }

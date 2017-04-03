@@ -6,11 +6,13 @@ namespace Gu.Analyzers.Test.Helpers
 
     internal class SyntaxNodeExtTests
     {
-        [TestCase("var temp = 1;", "temp = 2;", true)]
-        [TestCase("temp = 2;", "var temp = 1;",  false)]
-        public void SameBlock(string firstStatement, string otherStatement, bool expected)
+        internal class IsBeforeInScope
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            [TestCase("var temp = 1;", "temp = 2;", Result.Yes)]
+            [TestCase("temp = 2;", "var temp = 1;", Result.No)]
+            public void SameBlock(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
 {
     internal Foo()
@@ -19,28 +21,28 @@ internal class Foo
         temp = 2;
     }
 }");
-            var first = syntaxTree.Statement(firstStatement);
-            var other = syntaxTree.Statement(otherStatement);
-            Assert.AreEqual(expected, first.IsBeforeInScope(other));
-        }
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
 
-        [TestCase("var temp = 1;", "temp = 2;", true)]
-        [TestCase("var temp = 1;", "temp = 3;", true)]
-        [TestCase("temp = 2;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "temp = 2;", false)]
-        [TestCase("temp = 2;", "temp = 3;", false)]
-        public void InsideIfBlock(string firstStatement, string otherStatement, bool expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+            [TestCase("var temp = 1;", "temp = 2;", Result.Yes)]
+            [TestCase("var temp = 1;", "temp = 3;", Result.Yes)]
+            [TestCase("temp = 2;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "temp = 2;", Result.No)]
+            [TestCase("temp = 2;", "temp = 3;", Result.No)]
+            public void InsideIfBlock(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
 {
     internal class Foo
     {
         internal Foo()
         {
             var temp = 1;
-            if (true)
+            if (Result.Yes)
             {
                 temp = 2;
             }
@@ -51,21 +53,21 @@ namespace RoslynSandBox
         }
     }
 }");
-            var first = syntaxTree.Statement(firstStatement);
-            var other = syntaxTree.Statement(otherStatement);
-            Assert.AreEqual(expected, first.IsBeforeInScope(other));
-        }
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
 
-        [TestCase("var temp = 1;", "temp = 2;", true)]
-        [TestCase("var temp = 1;", "temp = 3;", true)]
-        [TestCase("temp = 2;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "temp = 2;", false)]
-        [TestCase("temp = 2;", "temp = 3;", false)]
-        public void InsideIfBlockCurlyElse(string firstStatement, string otherStatement, bool expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+            [TestCase("var temp = 1;", "temp = 2;", Result.Yes)]
+            [TestCase("var temp = 1;", "temp = 3;", Result.Yes)]
+            [TestCase("temp = 2;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "temp = 2;", Result.No)]
+            [TestCase("temp = 2;", "temp = 3;", Result.No)]
+            public void InsideIfBlockCurlyElse(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -81,24 +83,24 @@ namespace RoslynSandBox
         }
     }
 }");
-            var first = syntaxTree.Statement(firstStatement);
-            var other = syntaxTree.Statement(otherStatement);
-            Assert.AreEqual(expected, first.IsBeforeInScope(other));
-        }
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
 
-        [TestCase("var temp = 1;", "temp = 2;", true)]
-        [TestCase("var temp = 1;", "temp = 3;", true)]
-        [TestCase("var temp = 1;", "temp = 4;", true)]
-        [TestCase("temp = 2;", "temp = 4;", true)]
-        [TestCase("temp = 3;", "temp = 4;", true)]
-        [TestCase("temp = 2;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "var temp = 1;", false)]
-        [TestCase("temp = 3;", "temp = 2;", false)]
-        [TestCase("temp = 2;", "temp = 3;", false)]
-        public void InsideIfBlockNoCurlies(string firstStatement, string otherStatement, bool expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+            [TestCase("var temp = 1;", "temp = 2;", Result.Yes)]
+            [TestCase("var temp = 1;", "temp = 3;", Result.Yes)]
+            [TestCase("var temp = 1;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 2;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 3;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 2;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 3;", "temp = 2;", Result.No)]
+            [TestCase("temp = 2;", "temp = 3;", Result.No)]
+            public void InsideIfBlockNoCurlies(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
 {
     internal class Foo
     {
@@ -113,27 +115,27 @@ namespace RoslynSandBox
         }
     }
 }");
-            var first = syntaxTree.Statement(firstStatement);
-            var other = syntaxTree.Statement(otherStatement);
-            Assert.AreEqual(expected, first.IsBeforeInScope(other));
-        }
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
 
-        [TestCase("var temp = 1;", "temp = 4;", true)]
-        [TestCase("temp = 2;", "temp = 4;", true)]
-        [TestCase("temp = 3;", "temp = 4;", true)]
-        [TestCase("temp = 4;", "temp = 2;", false)]
-        [TestCase("temp = 4;", "temp = 3;", false)]
-        public void AfterIfBlock(string firstStatement, string otherStatement, bool expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandBox
+            [TestCase("var temp = 1;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 2;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 3;", "temp = 4;", Result.Yes)]
+            [TestCase("temp = 4;", "temp = 2;", Result.No)]
+            [TestCase("temp = 4;", "temp = 3;", Result.No)]
+            public void AfterIfBlock(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
 {
     internal class Foo
     {
         internal Foo()
         {
             var temp = 1;
-            if (true)
+            if (Result.Yes)
             {
                 temp = 2;
             }
@@ -146,9 +148,44 @@ namespace RoslynSandBox
         }
     }
 }");
-            var first = syntaxTree.Statement(firstStatement);
-            var other = syntaxTree.Statement(otherStatement);
-            Assert.AreEqual(expected, first.IsBeforeInScope(other));
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
+
+            [Explicit("Not sure here.")]
+            [TestCase("a = 1;", "a = 2;", Result.Yes)]
+            [TestCase("a = 1;", "a = 2;", Result.Yes)]
+            [TestCase("a = 2;", "a = 3;", Result.Yes)]
+            [TestCase("a = 3;", "a = 2;", Result.Yes)]
+            public void Lambda(string firstStatement, string otherStatement, Result expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            var a = 1;
+            this.E += (_, __) => a = 3;
+            this.E += (_, __) =>
+            {
+                a = 4;
+                a = 5;
+            };
+            a = 2;
+        }
+
+        public event EventHandler E;
+    }
+}");
+                var first = syntaxTree.Statement(firstStatement);
+                var other = syntaxTree.Statement(otherStatement);
+                Assert.AreEqual(expected, first.IsBeforeInScope(other));
+            }
         }
     }
 }

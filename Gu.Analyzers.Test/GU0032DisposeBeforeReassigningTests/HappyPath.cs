@@ -24,6 +24,51 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
         }
 
         [Test]
+        public async Task AssignVariableInitializedWithNull()
+        {
+            var testCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            Stream stream = null;
+            stream = File.OpenRead(string.Empty);
+        }
+    }";
+
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [TestCase("(stream as IDisposable)?.Dispose()")]
+        [TestCase("(stream as IDisposable).Dispose()")]
+        [TestCase("((IDisposable)stream).Dispose()")]
+        [TestCase("((IDisposable)stream)?.Dispose()")]
+        public async Task NotDisposingVariableOfTypeObject(string disposeCode)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            object stream = File.OpenRead(string.Empty);
+            (stream as IDisposable)?.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("(stream as IDisposable)?.Dispose()", disposeCode);
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AssigningPropertyInCtor()
         {
             var testCode = @"
@@ -525,7 +570,7 @@ public class Foo
         public async Task WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -557,7 +602,7 @@ namespace RoslynSandBox
         public async Task ChainedCalls()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -594,7 +639,7 @@ namespace RoslynSandBox
         public async Task ChainedCallsWithHelper()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -610,7 +655,7 @@ namespace RoslynSandBox
 }";
 
             var helperCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;

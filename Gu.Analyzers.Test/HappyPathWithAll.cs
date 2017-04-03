@@ -182,7 +182,7 @@ public class Foo : IDisposable
     }";
 
             var withOptionalParameterCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -209,7 +209,7 @@ namespace RoslynSandBox
 }";
 
             var reactiveCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -252,7 +252,7 @@ namespace RoslynSandBox
         public async Task ReactiveSample()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -295,7 +295,7 @@ namespace RoslynSandBox
         public async Task RecursiveSample()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Generic;
 

@@ -6,25 +6,54 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0031DisposeMember>
     {
-        [TestCase("this.stream.Dispose();")]
-        [TestCase("this.stream?.Dispose();")]
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
+        [TestCase("this.stream.Dispose();")]
+        [TestCase("this.stream?.Dispose();")]
+        [TestCase("Stream.Dispose();")]
+        [TestCase("Stream?.Dispose();")]
+        [TestCase("this.Stream.Dispose();")]
+        [TestCase("this.Stream?.Dispose();")]
+        [TestCase("Calculated.Dispose();")]
+        [TestCase("Calculated?.Dispose();")]
+        [TestCase("this.Calculated.Dispose();")]
+        [TestCase("this.Calculated?.Dispose();")]
         public async Task DisposingField(string disposeCall)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
     public sealed class Foo : IDisposable
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-        
+        private Stream stream = File.OpenRead(string.Empty);
+
+        public Stream Calculated => this.stream;
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set { this.stream = value; }
+        }
+
         public void Dispose()
         {
             this.stream.Dispose();
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -308,6 +337,8 @@ class Goof : IDisposable {
         public async Task DisposingPropertyInVirtualDisposeInBaseClass()
         {
             var baseClassCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -316,7 +347,7 @@ class Goof : IDisposable {
         private bool disposed;
 
         public abstract Stream Stream { get; }
-        
+
         /// <inheritdoc/>
         public void Dispose()
         {
@@ -336,10 +367,12 @@ class Goof : IDisposable {
                 this.Stream?.Dispose();
             }
         }
-    }";
+    }
+}";
 
             var testCode = @"
-    using System;
+namespace RoslynSandbox
+{
     using System.IO;
 
     public sealed class Foo : FooBase
@@ -354,7 +387,8 @@ class Goof : IDisposable {
 
             base.Dispose(disposing);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(baseClassCode, testCode)
                       .ConfigureAwait(false);
@@ -670,6 +704,50 @@ public class Bar : Foo
     public override Stream Stream { get; }
 }";
             await this.VerifyHappyPathAsync(fooCode, barCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenCallingBaseDispose()
+        {
+            var fooBaseCode = @"
+using System;
+
+public abstract class FooBase : IDisposable
+{
+    private readonly IDisposable disposable = new Disposable();
+    private bool disposed;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            var testCode = @"
+public class Foo : FooBase
+{
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, fooBaseCode, testCode)
                       .ConfigureAwait(false);
         }
     }

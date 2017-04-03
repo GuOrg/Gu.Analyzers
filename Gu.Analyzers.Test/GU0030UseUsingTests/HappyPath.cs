@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0030UseUsingTests
+﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
 {
     using System.Threading.Tasks;
     using NUnit.Framework;
@@ -23,6 +23,40 @@ public class Disposable : IDisposable
     {
     }
 }";
+
+        [TestCase("1")]
+        [TestCase("new string(' ', 1)")]
+        [TestCase("typeof(IDisposable)")]
+        [TestCase("(IDisposable)null")]
+        [TestCase("await Task.FromResult(1)")]
+        [TestCase("await Task.Run(() => 1)")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new object())")]
+        [TestCase("await Task.Run(() => new object()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty)).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => this.GetType())")]
+        [TestCase("await Task.Run(() => this.GetType()).ConfigureAwait(false)")]
+        public async Task LanguageConstructs(string code)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    internal class Foo
+    {
+        internal async void Bar()
+        {
+            var value = new string(' ', 1);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("new string(' ', 1)", code);
+            await this.VerifyHappyPathAsync(DisposableCode, testCode).ConfigureAwait(false);
+        }
 
         [Test]
         public async Task WhenDisposingVariable()
@@ -92,28 +126,6 @@ public class Foo
         }
 
         [Test]
-        public async Task HandlesRecursion()
-        {
-            var testCode = @"
-    using System;
-
-    public static class Foo
-    {
-        public static void Bar()
-        {
-            var disposable = Forever();
-        }
-
-        private static IDisposable Forever()
-        {
-            return Forever();
-        }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
         public async Task Awaiting()
         {
             var testCode = @"
@@ -145,6 +157,54 @@ internal static class Foo
 
             await this.VerifyHappyPathAsync(testCode)
             .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AwaitingMethodReturningString()
+        {
+            var testCode = @"
+using System.IO;
+using System.Threading.Tasks;
+  
+internal static class Foo
+{
+    internal static async Task Bar()
+    {
+        var text = await ReadAsync(string.Empty);
+    }
+
+    internal static async Task<string> ReadAsync(string text)
+    {
+        return text;
+    }
+}";
+
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AwaitDownloadDataTaskAsync()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public async Task Bar()
+        {
+            using (var client = new WebClient())
+            {
+                var bytes = await client.DownloadDataTaskAsync(string.Empty);
+            }
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
         }
 
         [Test]
@@ -191,6 +251,7 @@ public class Disposal : IDisposable
         [TestCase("disposables.First(x => x != null);")]
         [TestCase("disposables.Where(x => x != null);")]
         [TestCase("disposables.Single();")]
+        [TestCase("Enumerable.Empty<IDisposable>();")]
         public async Task IgnoreLinq(string linq)
         {
             var testCode = @"

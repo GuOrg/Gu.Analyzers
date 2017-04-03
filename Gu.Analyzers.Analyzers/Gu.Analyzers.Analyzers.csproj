@@ -64,15 +64,26 @@
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
+    <Compile Include="Helpers\AsyncAwait.cs" />
     <Compile Include="Helpers\Break.cs" />
+    <Compile Include="Helpers\Collection\ConcurrentQueueExt.cs" />
+    <Compile Include="Helpers\Disposable.IsCreation.cs" />
+    <Compile Include="Helpers\Disposable.IsMemberDisposed.cs" />
+    <Compile Include="Helpers\Disposable.IsInjected.cs" />
+    <Compile Include="Helpers\Disposable.RecursiveValues.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
+    <Compile Include="Helpers\KnownSymbols\IEnumerableOfTType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />
+    <Compile Include="Helpers\Collection\ListExt.cs" />
+    <Compile Include="Helpers\Pooled\SetExt.cs" />
+    <Compile Include="Helpers\Property.cs" />
+    <Compile Include="Helpers\RecursionLoop.cs" />
+    <Compile Include="Helpers\Result.cs" />
+    <Compile Include="Helpers\ResultExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\Constructor.cs" />
-    <Compile Include="Helpers\SyntaxtTreeHelpers\ConstructorDeclarationSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
-    <Compile Include="Helpers\VauleWithSource.cs" />
     <Compile Include="Helpers\Ignore.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\IListType.cs" />
@@ -82,11 +93,13 @@
     <Compile Include="Helpers\KnownSymbols\TextReaderType.cs" />
     <Compile Include="Helpers\Pooled\DictionaryPool.cs" />
     <Compile Include="Helpers\Pooled\ListPool.cs" />
-    <Compile Include="Helpers\ValueSource.cs" />
     <Compile Include="Helpers\Walkers\CallsWalker.cs" />
+    <Compile Include="Helpers\Walkers\ConstructorsWalker.cs" />
+    <Compile Include="Helpers\MemberPath.cs" />
+    <Compile Include="Helpers\Walkers\ExecutionWalker.cs" />
     <Compile Include="Helpers\Walkers\MethodImplementationWalker.cs" />
     <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
-    <Compile Include="Helpers\EnumerableExt.cs" />
+    <Compile Include="Helpers\Collection\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
     <Compile Include="Helpers\Disposable.cs" />
     <Compile Include="Helpers\KnownSymbols\DisposableType.cs" />
@@ -114,10 +127,10 @@
     <Compile Include="Helpers\SyntaxtTreeHelpers\SimpleMemberAccessesWalker.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\SyntaxNodeExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\TypeSyntaxExt.cs" />
-    <Compile Include="Helpers\Walkers\AssignmentWalker.cs" />
+    <Compile Include="Helpers\Walkers\Assignment.cs" />
     <Compile Include="Helpers\Walkers\ObjectCreationWalker.cs" />
     <Compile Include="Helpers\Walkers\PropertyImplementationWalker.cs" />
-    <Compile Include="Helpers\Walkers\ReturnExpressionsWalker.cs" />
+    <Compile Include="Helpers\Walkers\ReturnValueWalker.cs" />
     <Compile Include="Helpers\Walkers\InvocationWalker.cs" />
     <Compile Include="Helpers\Pooled\Pool.cs" />
     <Compile Include="Helpers\Pooled\SetPool.cs" />
@@ -132,7 +145,6 @@
     <None Include="Gu.Analyzers.Analyzers.ruleset" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-  <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
       <Paket>True</Paket>
@@ -158,8 +170,8 @@
     </When>
     <When Condition="($(TargetFrameworkProfile) == 'Profile49') Or ($(TargetFrameworkProfile) == 'Profile84')">
       <ItemGroup>
-        <Reference Include="JetBrains.Annotations.NetStandard">
-          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\netstandard1.0\JetBrains.Annotations.NetStandard.dll</HintPath>
+        <Reference Include="JetBrains.Annotations">
+          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\netstandard1.0\JetBrains.Annotations.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -167,8 +179,8 @@
     </When>
     <When Condition="($(TargetFrameworkProfile) == 'Profile2') Or ($(TargetFrameworkProfile) == 'Profile3') Or ($(TargetFrameworkProfile) == 'Profile4') Or ($(TargetFrameworkProfile) == 'Profile5') Or ($(TargetFrameworkProfile) == 'Profile6') Or ($(TargetFrameworkProfile) == 'Profile7') Or ($(TargetFrameworkProfile) == 'Profile18') Or ($(TargetFrameworkProfile) == 'Profile23') Or ($(TargetFrameworkProfile) == 'Profile36') Or ($(TargetFrameworkProfile) == 'Profile41') Or ($(TargetFrameworkProfile) == 'Profile44') Or ($(TargetFrameworkProfile) == 'Profile46') Or ($(TargetFrameworkProfile) == 'Profile88') Or ($(TargetFrameworkProfile) == 'Profile95') Or ($(TargetFrameworkProfile) == 'Profile96') Or ($(TargetFrameworkProfile) == 'Profile104') Or ($(TargetFrameworkProfile) == 'Profile143') Or ($(TargetFrameworkProfile) == 'Profile154')">
       <ItemGroup>
-        <Reference Include="JetBrains.Annotations.PCL1">
-          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\portable-net4+sl4+wp7+netcore45\JetBrains.Annotations.PCL1.dll</HintPath>
+        <Reference Include="JetBrains.Annotations">
+          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\portable-net4+sl4+wp7+netcore45\JetBrains.Annotations.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -176,8 +188,8 @@
     </When>
     <When Condition="($(TargetFrameworkProfile) == 'Profile14') Or ($(TargetFrameworkProfile) == 'Profile19') Or ($(TargetFrameworkProfile) == 'Profile24') Or ($(TargetFrameworkProfile) == 'Profile31') Or ($(TargetFrameworkProfile) == 'Profile32') Or ($(TargetFrameworkProfile) == 'Profile37') Or ($(TargetFrameworkProfile) == 'Profile42') Or ($(TargetFrameworkProfile) == 'Profile47') Or ($(TargetFrameworkProfile) == 'Profile78') Or ($(TargetFrameworkProfile) == 'Profile92') Or ($(TargetFrameworkProfile) == 'Profile102') Or ($(TargetFrameworkProfile) == 'Profile111') Or ($(TargetFrameworkProfile) == 'Profile136') Or ($(TargetFrameworkProfile) == 'Profile147') Or ($(TargetFrameworkProfile) == 'Profile151') Or ($(TargetFrameworkProfile) == 'Profile157') Or ($(TargetFrameworkProfile) == 'Profile158') Or ($(TargetFrameworkProfile) == 'Profile225') Or ($(TargetFrameworkProfile) == 'Profile240') Or ($(TargetFrameworkProfile) == 'Profile255') Or ($(TargetFrameworkProfile) == 'Profile259') Or ($(TargetFrameworkProfile) == 'Profile328') Or ($(TargetFrameworkProfile) == 'Profile336') Or ($(TargetFrameworkProfile) == 'Profile344')">
       <ItemGroup>
-        <Reference Include="JetBrains.Annotations.PCL328">
-          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\JetBrains.Annotations.PCL328.dll</HintPath>
+        <Reference Include="JetBrains.Annotations">
+          <HintPath>..\packages\analyzers\JetBrains.Annotations\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\JetBrains.Annotations.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -203,7 +215,6 @@
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
-  <ItemGroup />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.5.2'">
       <ItemGroup>
@@ -458,4 +469,5 @@
       </ItemGroup>
     </When>
   </Choose>
+  <Import Project="..\.paket\paket.targets" />
 </Project>

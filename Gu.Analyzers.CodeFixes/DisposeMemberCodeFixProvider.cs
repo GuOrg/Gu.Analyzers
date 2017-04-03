@@ -61,19 +61,31 @@
             }
 
             var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-            ISymbol memberSymbol;
-            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out memberSymbol))
+            if (member is MethodDeclarationSyntax methodDeclaration)
+            {
+                var method = semanticModel.GetDeclaredSymbolSafe(methodDeclaration, cancellationToken);
+                if (method.Parameters.Length != 1)
+                {
+                    return default(Fix);
+                }
+
+                var overridden = method.OverriddenMethod;
+                var baseCall = SyntaxFactory.ParseStatement($"base.{overridden.Name}({method.Parameters[0].Name});")
+                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                return new Fix(baseCall, methodDeclaration);
+            }
+
+            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out ISymbol memberSymbol))
             {
                 return default(Fix);
             }
 
-            IMethodSymbol disposeMethodSymbol;
-            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, false, out disposeMethodSymbol))
+            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, false, out IMethodSymbol disposeMethodSymbol))
             {
-                MethodDeclarationSyntax disposeMethodDeclaration;
                 if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
                     disposeMethodSymbol.Parameters.Length == 0 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
+                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                 {
                     var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
                     return new Fix(disposeStatement, disposeMethodDeclaration);
@@ -124,6 +136,14 @@
 
             if (disposeMethod.ParameterList.Parameters.Count == 1 && disposeMethod.Body != null)
             {
+                if (fix.DisposeStatement is ExpressionStatementSyntax expressionStatement &&
+                    expressionStatement.Expression is InvocationExpressionSyntax)
+                {
+                    var statements = disposeMethod.Body.Statements.Add(fix.DisposeStatement);
+                    var newBlock = disposeMethod.Body.WithStatements(statements);
+                    return syntaxRoot.ReplaceNode(disposeMethod.Body, newBlock);
+                }
+
                 foreach (var statement in disposeMethod.Body.Statements)
                 {
                     var ifStatement = statement as IfStatementSyntax;
@@ -199,21 +219,16 @@
                 return false;
             }
 
-            var field = member as IFieldSymbol;
-            using (var sources = field != null
-                                     ? VauleWithSource.GetRecursiveSources(field, semanticModel, cancellationToken)
-                                     : VauleWithSource.GetRecursiveSources((IPropertySymbol)member, semanticModel, cancellationToken))
+            using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
             {
-                foreach (var vauleWithSource in sources.Item)
+                foreach (var value in sources.Item)
                 {
-                    switch (vauleWithSource.Source)
+                    if (value is ObjectCreationExpressionSyntax)
                     {
-                        case ValueSource.Created:
-                        case ValueSource.Argument:
-                            continue;
-                        default:
-                            return false;
+                        continue;
                     }
+
+                    return false;
                 }
             }
 
@@ -224,16 +239,14 @@
 
         private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
-            var field = member as FieldDeclarationSyntax;
-            VariableDeclaratorSyntax fieldDeclarator;
-            if (field != null && field.Declaration.Variables.TryGetSingle(out fieldDeclarator))
+            if (member is FieldDeclarationSyntax field &&
+                field.Declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax declarator))
             {
-                symbol = semanticModel.GetDeclaredSymbolSafe(fieldDeclarator, cancellationToken);
+                symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
                 return symbol != null;
             }
 
-            var property = member as PropertyDeclarationSyntax;
-            if (property != null)
+            if (member is PropertyDeclarationSyntax property)
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(property, cancellationToken);
                 return symbol != null;

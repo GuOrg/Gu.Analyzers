@@ -3,6 +3,7 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class SyntaxNodeExt
@@ -15,6 +16,12 @@
         internal static int StartingLineNumber(this SyntaxToken token, CancellationToken cancellationToken)
         {
             return token.SyntaxTree.GetLineSpan(token.Span, cancellationToken).Span.Start.Line;
+        }
+
+        internal static bool IsEitherKind(this SyntaxNode node, SyntaxKind first, SyntaxKind other)
+        {
+            var kind = node?.Kind();
+            return kind == first || kind == other;
         }
 
         internal static T FirstAncestor<T>(this SyntaxNode node)
@@ -31,19 +38,19 @@
                        : ancestor;
         }
 
-        internal static bool IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
+        internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
         {
             var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
             var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
             if (statement == null ||
                 otherStatement == null)
             {
-                return false;
+                return Result.Maybe;
             }
 
             if (statement.SpanStart >= otherStatement.SpanStart)
             {
-                return false;
+                return Result.No;
             }
 
             var block = statement.Parent as BlockSyntax;
@@ -53,7 +60,7 @@
                 if (SharesAncestor<IfStatementSyntax>(statement, otherStatement) ||
                     SharesAncestor<SwitchStatementSyntax>(statement, otherStatement))
                 {
-                    return false;
+                    return Result.No;
                 }
             }
 
@@ -61,20 +68,20 @@
             otherblock = otherStatement.FirstAncestor<BlockSyntax>();
             if (block == null || otherblock == null)
             {
-                return false;
+                return Result.No;
             }
 
             if (ReferenceEquals(block, otherblock) ||
                 otherblock.Span.Contains(block.Span) ||
                 block.Span.Contains(otherblock.Span))
             {
-                return true;
+                return Result.Yes;
             }
 
-            return false;
+            return Result.No;
         }
 
-        private static bool SharesAncestor<T>(StatementSyntax first, StatementSyntax other)
+        internal static bool SharesAncestor<T>(this SyntaxNode first, SyntaxNode other)
             where T : SyntaxNode
         {
             var firstAncestor = first.FirstAncestor<T>();

@@ -31,7 +31,7 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
             public async Task IgnoreDictionaryPassedInViaCtor()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
     using System.IO;

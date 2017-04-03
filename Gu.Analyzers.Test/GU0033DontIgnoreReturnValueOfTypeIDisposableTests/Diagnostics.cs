@@ -229,7 +229,7 @@ public class Factory
         public async Task WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -262,6 +262,81 @@ namespace RoslynSandBox
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Don't ignore returnvalue of type IDisposable.");
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningNewAssigningNotDisposing()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Meh
+    {
+        public Foo Bar()
+        {
+            return new Foo(↓new Disposable());
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooCode, testCode }, expected).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task ReturningNewNotAssigning()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : IDisposable
+    {
+        public Foo(IDisposable disposable)
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Meh
+    {
+        public Foo Bar()
+        {
+            return new Foo(↓new Disposable());
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooCode, testCode }, expected).ConfigureAwait(false);
         }
     }
 }

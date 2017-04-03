@@ -36,6 +36,7 @@
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
             context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
@@ -52,14 +53,14 @@
             }
 
             if (field.DeclaredAccessibility != Accessibility.Private &&
-                !field.IsReadOnly &&
-                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
+                !field.IsReadOnly)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                return;
+                if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.Maybe))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
-
-            if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
+            else if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -94,14 +95,42 @@
             }
 
             if (property.SetMethod != null &&
-                property.SetMethod.DeclaredAccessibility != Accessibility.Private &&
-                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
+                property.SetMethod.DeclaredAccessibility != Accessibility.Private)
+            {
+                if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.Yes, Result.Maybe))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
+            }
+            else if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+            }
+        }
+
+        private static void HandleAssignment(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
+            var assignment = context.Node as AssignmentExpressionSyntax;
+            if (assignment == null)
+            {
+                return;
+            }
+
+            var parameter = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken) as IParameterSymbol;
+            if (parameter == null ||
+                parameter.ContainingSymbol.DeclaredAccessibility == Accessibility.Private ||
+                parameter.RefKind != RefKind.Ref)
+            {
+                return;
+            }
+
+            if (Disposable.IsAssignableTo(context.SemanticModel.GetTypeInfoSafe(assignment.Right, context.CancellationToken).Type))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

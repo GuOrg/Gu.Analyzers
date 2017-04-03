@@ -409,7 +409,7 @@ public sealed class Foo : IDisposable
         public async Task IgnoreLambdaCreation()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -430,7 +430,7 @@ namespace RoslynSandBox
         public async Task IgnoreLambdaUsageOnLocal(string invokeCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.IO;
@@ -454,7 +454,7 @@ namespace RoslynSandBox
         public async Task IgnoreInLambdaMethod()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

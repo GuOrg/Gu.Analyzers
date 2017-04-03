@@ -25,7 +25,11 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                          .ConfigureAwait(false) as CompilationUnitSyntax;
+            if (syntaxRoot == null)
+            {
+                return;
+            }
 
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
@@ -39,16 +43,9 @@
                     continue;
                 }
 
-                var assignment = syntaxRoot.FindNode(diagnostic.Location.SourceSpan) as AssignmentExpressionSyntax;
-                if (assignment != null)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is AssignmentExpressionSyntax assignment)
                 {
-                    if (!(assignment.Parent is ExpressionStatementSyntax && assignment.Parent.Parent is BlockSyntax))
-                    {
-                        continue;
-                    }
-
-                    StatementSyntax diposeStatement;
-                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out diposeStatement))
+                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
@@ -65,8 +62,7 @@
                 var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ArgumentSyntax>();
                 if (argument != null)
                 {
-                    StatementSyntax diposeStatement;
-                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out diposeStatement))
+                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
@@ -80,7 +76,7 @@
             }
         }
 
-        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
+        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
         {
             var block = assignment.FirstAncestorOrSelf<BlockSyntax>();
             var statement = assignment.FirstAncestorOrSelf<StatementSyntax>();
@@ -91,35 +87,51 @@
             }
 
             var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(block, newBlock)));
+            var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock);
+            if (disposeStatement.ToString()
+                                .Contains("as IDisposable"))
+            {
+                syntaxNode = syntaxNode.WithUsingSystem();
+            }
+
+            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxNode));
         }
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
-            var symbol = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-            if (symbol == null)
+            result = null;
+            if (!(assignment.Parent is StatementSyntax && assignment.Parent.Parent is BlockSyntax))
             {
-                result = null;
                 return false;
             }
 
-            if (!Disposable.IsAssignableTo(MemberType(symbol)))
+            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out ISymbol assignedSymbol)
+                          .IsEither(Result.No, Result.Unknown))
             {
-                result = SyntaxFactory.ParseStatement($"({assignment.Left} as IDisposable)?.Dispose();")
+                return false;
+            }
+
+            var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
+                         !assignment.UsesUnderscoreNames(semanticModel, cancellationToken)
+                             ? "this."
+                             : string.Empty;
+            if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
+            {
+                result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as IDisposable)?.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
-            if (IsAlwaysAssigned(symbol))
+            if (IsAlwaysAssigned(assignedSymbol))
             {
-                result = SyntaxFactory.ParseStatement($"{assignment.Left}.Dispose();")
+                result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
-            result = SyntaxFactory.ParseStatement($"{assignment.Left}?.Dispose();")
+            result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
                                 .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                 .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             return true;

@@ -1,16 +1,13 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Threading;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class InvocationExpressionSyntaxExt
     {
-        internal static bool TryFindInvokee(this InvocationExpressionSyntax invocation, out ExpressionSyntax invokee)
-        {
-            return TryFindInvokee(invocation.Expression, out invokee);
-        }
-
         internal static string Name(this InvocationExpressionSyntax invocation)
         {
             if (invocation == null)
@@ -44,62 +41,40 @@
             return invocation.Name() == "nameof";
         }
 
-        private static bool TryFindInvokee(ExpressionSyntax expression, out ExpressionSyntax invokee)
+        internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
-            invokee = null;
-            var memberAccess = expression as MemberAccessExpressionSyntax;
-            if (memberAccess != null)
+            if (invocation?.ArgumentList == null ||
+                parameter == null)
             {
-                var parensExpr = memberAccess.Expression as ParenthesizedExpressionSyntax;
-                if (parensExpr != null)
+                value = null;
+                return false;
+            }
+
+            return invocation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out value);
+        }
+
+        internal static bool TryGetMatchingParameter(this InvocationExpressionSyntax invocation, ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IParameterSymbol parameter)
+        {
+            parameter = null;
+            if (invocation?.ArgumentList == null)
+            {
+                return false;
+            }
+
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            {
+                foreach (var reference in method.DeclaringSyntaxReferences)
                 {
-                    return TryFindInvokee(parensExpr.Expression, out invokee);
+                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
+                    if (methodDeclaration != null)
+                    {
+                        if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameterSyntax))
+                        {
+                            parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken) as IParameterSymbol;
+                            return parameter != null;
+                        }
+                    }
                 }
-
-                if (memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
-                    !(memberAccess.Expression is MemberBindingExpressionSyntax) &&
-                    !(memberAccess.Expression is ThisExpressionSyntax))
-                {
-                    invokee = memberAccess.Expression;
-                }
-                else
-                {
-                    invokee = memberAccess;
-                }
-
-                return true;
-            }
-
-            var parenthesizedExpressionSyntax = expression as ParenthesizedExpressionSyntax;
-            if (parenthesizedExpressionSyntax != null)
-            {
-                return TryFindInvokee(parenthesizedExpressionSyntax.Expression, out invokee);
-            }
-
-            var castExpression = expression as CastExpressionSyntax;
-            if (castExpression != null)
-            {
-                return TryFindInvokee(castExpression.Expression, out invokee);
-            }
-
-            if (expression.IsKind(SyntaxKind.AsExpression))
-            {
-                return TryFindInvokee(((BinaryExpressionSyntax)expression).Left, out invokee);
-            }
-
-            if (expression is MemberBindingExpressionSyntax)
-            {
-                var conditionalAccess = expression.Parent.Parent as ConditionalAccessExpressionSyntax;
-                if (conditionalAccess != null)
-                {
-                    return TryFindInvokee(conditionalAccess.Expression, out invokee);
-                }
-            }
-
-            if (expression is IdentifierNameSyntax)
-            {
-                invokee = expression;
-                return true;
             }
 
             return false;

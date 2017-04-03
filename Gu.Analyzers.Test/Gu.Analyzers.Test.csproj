@@ -57,22 +57,28 @@
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
+    <Compile Include="GU0030UseUsingTests\Diagnostics.AsyncAwait.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Assigned.cs" />
+    <Compile Include="GU0030UseUsingTests\HappyPath.Assigns.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Cached.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0030UseUsingTests\HappyPath.Returns.cs" />
+    <Compile Include="GU0030UseUsingTests\HappyPath.Rx.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFix.InjectedCreated.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFix.Rx.cs" />
     <Compile Include="GU0031DisposeMemberTests\CodeFixAll.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.Injected.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0031DisposeMemberTests\HappyPathRx.cs" />
+    <Compile Include="GU0031DisposeMemberTests\CodeFix.RefOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFix.RefOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.RefAndOut.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Rx.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Recursion.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Returned.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Using.cs" />
     <Compile Include="GU0034ReturntypeShouldIndicateIDisposableTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.Recursion.cs" />
@@ -82,22 +88,25 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="HappyPathWithAll.cs" />
-    <Compile Include="Helpers\AssignedValueWalkerTests.cs" />
-    <Compile Include="Helpers\AssignedValueWalkerTests.Local.cs" />
-    <Compile Include="Helpers\ConstructorDeclarationSyntaxExtTests.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.SideEffect.cs" />
+    <Compile Include="Helpers\AssignmentTests.Symbol.cs" />
+    <Compile Include="Helpers\AssignmentTests.With.cs" />
+    <Compile Include="Helpers\ConstructorsWalkerTests.cs" />
+    <Compile Include="Helpers\AsyncAwaitTests.cs" />
+    <Compile Include="Helpers\ConstructorTests.IsRunBefore.cs" />
+    <Compile Include="Helpers\MemberPathTests.TryFindRootMember.cs" />
+    <Compile Include="Helpers\RecursionLoopTests.cs" />
+    <Compile Include="Helpers\ReturnValueWalkerTests.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Constructors.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Indexer.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Local.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Property.cs" />
+    <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.RefAndOut.cs" />
+    <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Indexer.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.MethodReturn.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Nested.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Awaited.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.ConstructorInjected.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Field.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Property.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.Recursion.cs" />
     <Compile Include="ReproBox.cs" />
-    <Compile Include="Helpers\ValueWithSourceTests\ValueWithSourceTests.SyntaxError.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />
     <Compile Include="Verifiers\NestedCodeFixVerifier.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\CodeFix.cs" />
@@ -164,6 +173,7 @@
     <Compile Include="Verifiers\Helpers\MetadataReferences.cs" />
     <Compile Include="Verifiers\Helpers\TestDiagnosticProvider.cs" />
     <Compile Include="Verifiers\Helpers\TestXmlReferenceResolver.cs" />
+    <Compile Include="Verifiers\NestedDiagnosticVerifier.cs" />
     <Compile Include="Verifiers\NestedHappyPathVerifier.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -198,7 +208,6 @@
   <ItemGroup>
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
-  <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
       <Paket>True</Paket>
@@ -608,4 +617,5 @@
       </ItemGroup>
     </When>
   </Choose>
+  <Import Project="..\.paket\paket.targets" />
 </Project>

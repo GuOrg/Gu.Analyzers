@@ -13,7 +13,7 @@
         public const string DiagnosticId = "GU0030";
         private const string Title = "Use using.";
         private const string MessageFormat = "Use using.";
-        private const string Description = "Use using.";
+        private const string Description = "Use using for created `IDisposable` that is not assigned to a field or property.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
@@ -35,10 +35,10 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.VariableDeclaration);
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext context)
+        private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -46,21 +46,18 @@
             }
 
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
-            VariableDeclaratorSyntax declarator;
-            if (!variableDeclaration.Variables.TryGetSingle(out declarator))
+            foreach (var declarator in variableDeclaration.Variables)
             {
-                return;
-            }
+                var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
+                if (symbol == null ||
+                    !Disposable.IsPotentiallyAssignableTo(symbol.Type))
+                {
+                    return;
+                }
 
-            var symbol = context.SemanticModel.GetDeclaredSymbol(declarator, context.CancellationToken) as ILocalSymbol;
-            if (symbol == null)
-            {
-                return;
-            }
-
-            if (Disposable.IsPotentiallyAssignableTo(symbol.Type) && declarator.Initializer != null)
-            {
-                if (Disposable.IsPotentiallyCreatedAndNotCachedOrInjectedOrMember(declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                var value = declarator.Initializer?.Value;
+                if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.Yes, Result.Maybe))
                 {
                     if (variableDeclaration.Parent is UsingStatementSyntax ||
                         variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -83,7 +80,7 @@
                         return;
                     }
 
-                    if (IsDisposedAfter(symbol, declarator.Initializer.Value, context.SemanticModel, context.CancellationToken))
+                    if (IsDisposedAfter(symbol, value, context.SemanticModel, context.CancellationToken))
                     {
                         return;
                     }
@@ -106,37 +103,40 @@
                 return false;
             }
 
-            var block = variable.FirstAncestorOrSelf<BlockSyntax>();
-            ExpressionSyntax returnValue = null;
-            if (block?.TryGetReturnExpression(out returnValue) == true)
+            using (var pooled = ReturnValueWalker.Create(variable.FirstAncestorOrSelf<BlockSyntax>(), false, semanticModel, cancellationToken))
             {
-                var returned = semanticModel.GetSymbolSafe(returnValue, cancellationToken);
-                if (symbol.Equals(returned))
+                foreach (var value in pooled.Item)
                 {
-                    return true;
-                }
-
-                var objectCreation = returnValue as ObjectCreationExpressionSyntax;
-                if (objectCreation?.ArgumentList != null)
-                {
-                    foreach (var argument in objectCreation.ArgumentList.Arguments)
+                    var returnedSymbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                    if (SymbolComparer.Equals(symbol, returnedSymbol))
                     {
-                        var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
-                        if (symbol.Equals(arg))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
-                }
 
-                if (objectCreation?.Initializer != null)
-                {
-                    foreach (var argument in objectCreation.Initializer.Expressions)
+                    if (value is ObjectCreationExpressionSyntax objectCreation)
                     {
-                        var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
-                        if (symbol.Equals(arg))
+                        if (objectCreation.ArgumentList != null)
                         {
-                            return true;
+                            foreach (var argument in objectCreation.ArgumentList.Arguments)
+                            {
+                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                                if (SymbolComparer.Equals(symbol, arg))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        if (objectCreation.Initializer != null)
+                        {
+                            foreach (var argument in objectCreation.Initializer.Expressions)
+                            {
+                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
+                                if (SymbolComparer.Equals(symbol, arg))
+                                {
+                                    return true;
+                                }
+                            }
                         }
                     }
                 }

@@ -83,19 +83,20 @@
             }
 
             var invocation = context.Node as InvocationExpressionSyntax;
-            if (invocation == null)
+            if (invocation == null ||
+                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() != null)
             {
                 return;
             }
 
             var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-            if (call != KnownSymbol.IDisposable.Dispose)
+            if (call != KnownSymbol.IDisposable.Dispose ||
+                call?.Parameters.Length != 0)
             {
                 return;
             }
 
-            var statement = invocation.FirstAncestor<ExpressionStatementSyntax>();
-            if (Disposable.IsPotentiallyCachedOrInjected(statement, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
             }

@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFix : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
     {
         internal class InjectedCreated : NestedCodeFixVerifier<CodeFix>
         {
@@ -121,7 +121,7 @@ public sealed class Foo : IDisposable
             }
 
             [Test]
-            public async Task FieldAssignedWExtensionMethodFactoryAssigningInCtor()
+            public async Task FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 using System;
@@ -141,7 +141,7 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -163,7 +163,7 @@ public sealed class Foo : IDisposable
 {
     private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -178,7 +178,7 @@ public sealed class Foo : IDisposable
             }
 
             [Test]
-            public async Task FieldAssignedWGenericExtensionMethodFactoryAssigningInCtor()
+            public async Task FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 using System;
@@ -198,7 +198,7 @@ public sealed class Foo : IDisposable
 {
     ↓private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -220,7 +220,7 @@ public sealed class Foo : IDisposable
 {
     private readonly IDisposable disposable;
 
-    private Foo(object value)
+    public Foo(object value)
     {
         this.disposable = value.AsDisposable();
     }
@@ -238,7 +238,7 @@ public sealed class Foo : IDisposable
             public async Task FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
             {
                 var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
@@ -263,14 +263,14 @@ namespace RoslynSandBox
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
 
     public class Foo : IDisposable
     {
-        ↓private readonly IEnumerator<int> current;
+        private readonly IEnumerator<int> current;
 
         public Foo(List<int> list)
         {

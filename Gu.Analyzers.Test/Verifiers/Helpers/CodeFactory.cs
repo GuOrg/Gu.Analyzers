@@ -98,6 +98,7 @@
                 .AddMetadataReference(projectId, MetadataReferences.MsCorlib)
                 .AddMetadataReference(projectId, MetadataReferences.System)
                 .AddMetadataReference(projectId, MetadataReferences.SystemCore)
+                .AddMetadataReference(projectId, MetadataReferences.SystemNet)
                 .AddMetadataReference(projectId, MetadataReferences.SystemData)
                 .AddMetadataReference(projectId, MetadataReferences.PresentationCore)
                 .AddMetadataReference(projectId, MetadataReferences.PresentationFramework)
@@ -107,7 +108,8 @@
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfaces)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveLinq)
                 .AddMetadataReference(projectId, MetadataReferences.CSharpSymbols)
-                .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis);
+                .AddMetadataReference(projectId, MetadataReferences.CodeAnalysis)
+                .AddMetadataReference(projectId, MetadataReferences.NUnit);
 
             solution.Workspace.Options =
                     solution.Workspace.Options

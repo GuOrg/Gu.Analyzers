@@ -42,6 +42,40 @@ public class Foo
         }
 
         [Test]
+        public async Task NotDisposingVariableOfTypeObject()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        object stream = File.OpenRead(string.Empty);
+        ↓stream = File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public class Foo
+{
+    public void Meh()
+    {
+        object stream = File.OpenRead(string.Empty);
+        (stream as IDisposable)?.Dispose();
+        stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AssigningParameterTwice()
         {
             var testCode = @"
@@ -224,7 +258,7 @@ public class Foo
     public Stream Stream
     {
         get { return this.stream; }
-        set { this.stream = value; }
+        private set { this.stream = value; }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -242,14 +276,14 @@ public class Foo
 
     public Foo()
     {
-        this.Stream?.Dispose();
+        this.stream?.Dispose();
         this.Stream = File.OpenRead(string.Empty);
     }
 
     public Stream Stream
     {
         get { return this.stream; }
-        set { this.stream = value; }
+        private set { this.stream = value; }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
@@ -291,6 +325,169 @@ public class Foo
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnMethodStatementBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh()
+    {
+        return ↓this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh()
+    {
+        this.stream?.Dispose();
+        return this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnMethodExpressionBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh() => ↓this.stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+////            var fixedCode = @"
+////using System;
+////using System.IO;
+
+////public class Foo
+////{
+////    private Stream stream;
+
+////    public IDisposable Meh()
+////    {
+////        this.stream?.Dispose();
+////        return this.stream = File.OpenRead(string.Empty);
+////    }
+////}";
+            // Not implementing the fix for now, not a common case.
+            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnStatementInPropertyStamementBody()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh
+    {
+        get
+        {
+            return ↓this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public IDisposable Meh
+    {
+        get
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public IDisposable Meh => ↓this.stream = File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+////            var fixedCode = @"
+////namespace RoslynSandbox
+////{
+////    using System;
+////    using System.IO;
+
+////    public class Foo
+////    {
+////        private Stream stream;
+
+////        public IDisposable Meh
+////        {
+////            get
+////            {
+////                this.stream?.Dispose();
+////                return this.stream = File.OpenRead(string.Empty);
+////            }
+////        }
+////    }
+////}";
+            // Not implementing the fix for now, not a common case.
+            await this.VerifyCSharpFixAsync(testCode, testCode).ConfigureAwait(false);
         }
     }
 }

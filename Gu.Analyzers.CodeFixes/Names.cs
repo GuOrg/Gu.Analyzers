@@ -9,14 +9,6 @@ namespace Gu.Analyzers
 
     internal static class Names
     {
-        public enum Result
-        {
-            Unknown,
-            Yes,
-            No,
-            Mixed
-        }
-
         internal static bool UsesUnderscoreNames(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var pooled = Walker.Create(node, semanticModel, cancellationToken))
@@ -81,9 +73,9 @@ namespace Gu.Analyzers
                                 case Result.Yes:
                                     break;
                                 case Result.No:
-                                    this.UsesUnderScore = Result.Mixed;
+                                    this.UsesUnderScore = Result.Maybe;
                                     break;
-                                case Result.Mixed:
+                                case Result.Maybe:
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
@@ -97,11 +89,11 @@ namespace Gu.Analyzers
                                     this.UsesUnderScore = Result.No;
                                     break;
                                 case Result.Yes:
-                                    this.UsesUnderScore = Result.Mixed;
+                                    this.UsesUnderScore = Result.Maybe;
                                     break;
                                 case Result.No:
                                     break;
-                                case Result.Mixed:
+                                case Result.Maybe:
                                     break;
                                 default:
                                     throw new ArgumentOutOfRangeException();
@@ -123,9 +115,9 @@ namespace Gu.Analyzers
                     case Result.Yes:
                         break;
                     case Result.No:
-                        this.UsesThis = Result.Mixed;
+                        this.UsesThis = Result.Maybe;
                         break;
-                    case Result.Mixed:
+                    case Result.Maybe:
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -175,9 +167,9 @@ namespace Gu.Analyzers
                         case Result.Yes:
                             break;
                         case Result.No:
-                            this.UsesThis = Result.Mixed;
+                            this.UsesThis = Result.Maybe;
                             break;
-                        case Result.Mixed:
+                        case Result.Maybe:
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -194,11 +186,11 @@ namespace Gu.Analyzers
                                 this.UsesThis = Result.No;
                                 break;
                             case Result.Yes:
-                                this.UsesThis = Result.Mixed;
+                                this.UsesThis = Result.Maybe;
                                 break;
                             case Result.No:
                                 break;
-                            case Result.Mixed:
+                            case Result.Maybe:
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();

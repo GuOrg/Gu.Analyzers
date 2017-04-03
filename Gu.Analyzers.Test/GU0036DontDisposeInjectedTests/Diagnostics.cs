@@ -6,11 +6,52 @@
 
     internal class Diagnostics : DiagnosticVerifier<GU0036DontDisposeInjected>
     {
+        [TestCase("stream ?? File.OpenRead(string.Empty)")]
+        [TestCase("Stream ?? File.OpenRead(string.Empty)")]
+        [TestCase("File.OpenRead(string.Empty) ?? stream")]
+        [TestCase("File.OpenRead(string.Empty) ?? Stream")]
+        [TestCase("true ? stream : File.OpenRead(string.Empty)")]
+        [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
+        [TestCase("true ? File.OpenRead(string.Empty) : stream")]
+        [TestCase("true ? File.OpenRead(string.Empty) : Stream")]
+        [TestCase("(object) stream")]
+        [TestCase("(object) Stream")]
+        [TestCase("stream as object")]
+        [TestCase("Stream as object")]
+        public async Task InjectedAndCreatedField(string code)
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private static readonly Stream Stream = File.OpenRead(string.Empty);
+    private readonly object stream;
+
+    public Foo(Stream stream)
+    {
+        this.stream = stream ?? File.OpenRead(string.Empty);
+    }
+
+
+    public void Dispose()
+    {
+        ↓(this.stream as IDisposable)?.Dispose();
+    }
+}";
+            testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
         [TestCase("this.disposable.Dispose();")]
         [TestCase("this.disposable?.Dispose();")]
         [TestCase("disposable.Dispose();")]
         [TestCase("disposable?.Dispose();")]
-        public async Task DisposingField(string disposeCall)
+        public async Task DisposingFieldAssignedWithInjected(string disposeCall)
         {
             var testCode = @"
     using System;
@@ -19,9 +60,9 @@
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable arg)
         {
-            this.disposable = disposable;
+            this.disposable = arg;
         }
 
         public void Dispose()
@@ -70,11 +111,35 @@
                       .ConfigureAwait(false);
         }
 
+        [TestCase("Disposable.Dispose();")]
+        [TestCase("Disposable?.Dispose();")]
+        public async Task DisposingStaticField(string disposeCall)
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private static readonly IDisposable Disposable;
+
+        public void Dispose()
+        {
+            ↓Disposable.Dispose();
+        }
+    }";
+            testCode = testCode.AssertReplace("Disposable.Dispose();", disposeCall);
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
         [Test]
         public async Task DisposingPublicFieldOutsideOfLock()
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 
@@ -121,7 +186,7 @@ namespace RoslynSandBox
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public async Task DisposingProperty(string disposeCall)
+        public async Task DisposingPropertyAssignedWithInjected(string disposeCall)
         {
             var testCode = @"
     using System;
@@ -146,6 +211,55 @@ namespace RoslynSandBox
                    .WithLocationIndicated(ref testCode)
                    .WithMessage("Don't dispose injected.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("public abstract Stream Stream { get; }")]
+        [TestCase("public abstract Stream Stream { get; set; }")]
+        [TestCase("public virtual Stream Stream { get; }")]
+        [TestCase("public virtual Stream Stream { get; set; }")]
+        public async Task DisposingAbstractOrVirtualProperty(string property)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public abstract class FooBase : IDisposable
+    {
+        private bool disposed;
+
+        public abstract Stream Stream { get; }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                ↓this.Stream?.Dispose();
+            }
+        }
+    }
+}";
+
+            testCode = testCode.AssertReplace("public abstract Stream Stream { get; }", property);
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
                       .ConfigureAwait(false);
         }
 
@@ -243,6 +357,52 @@ public sealed class Bar : IDisposable
 }";
 
             testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
+
+            var expected = this.CSharpDiagnostic()
+                   .WithLocationIndicated(ref testCode)
+                   .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("this.foo.Disposable.Dispose()")]
+        [TestCase("this.foo?.Disposable.Dispose()")]
+        [TestCase("this.foo?.Disposable?.Dispose()")]
+        [TestCase("this.foo.Disposable?.Dispose()")]
+        public async Task DisposingNestedField(string disposeCall)
+        {
+            var fooCode = @"
+using System;
+
+public sealed class Foo
+{
+    public Foo(IDisposable disposable)
+    {
+        this.Disposable = disposable;
+    }
+
+    public IDisposable Disposable { get; }
+}";
+
+            var testCode = @"
+using System;
+
+public sealed class Bar : IDisposable
+{
+    private readonly Foo foo;
+
+    public Bar(Foo arg)
+    {
+        this.foo = arg;
+    }
+
+    public void Dispose()
+    {
+        ↓this.foo.Disposable.Dispose();
+    }
+}";
+
+            testCode = testCode.AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
 
             var expected = this.CSharpDiagnostic()
                    .WithLocationIndicated(ref testCode)
@@ -495,7 +655,7 @@ namespace Gu.Reactive
         public async Task IgnoreLambdaUsageOnInjected(string disposeCode)
         {
             var testCode = @"
-namespace RoslynSandBox
+namespace RoslynSandbox
 {
     using System;
 

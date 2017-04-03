@@ -1103,5 +1103,99 @@ public sealed class Foo<T> : IDisposable
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task WhenNotCallingBaseDisposeWithBaseCode()
+        {
+            var fooBaseCode = @"
+using System;
+
+public abstract class FooBase : IDisposable
+{
+    private readonly IDisposable disposable = new Disposable();
+    private bool disposed;
+
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            var testCode = @"
+public class Foo : FooBase
+{
+    ↓protected override void Dispose(bool disposing)
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooBaseCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+public class Foo : FooBase
+{
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenNotCallingBaseDisposeWithoutBaseCode()
+        {
+            var testCode = @"
+using System.IO;
+
+public class Foo : StreamReader
+{
+    public Foo(Stream stream)
+        : base(stream)
+    {
+    }
+
+    ↓protected override void Dispose(bool disposing)
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo : StreamReader
+{
+    public Foo(Stream stream)
+        : base(stream)
+    {
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
+        }
     }
 }

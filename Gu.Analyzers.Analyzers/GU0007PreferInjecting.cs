@@ -154,8 +154,7 @@
                     return Injectable.No;
                 }
 
-                ParameterSyntax parameter;
-                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out parameter) == false)
+                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out ParameterSyntax parameter) == false)
                 {
                     return Injectable.No;
                 }

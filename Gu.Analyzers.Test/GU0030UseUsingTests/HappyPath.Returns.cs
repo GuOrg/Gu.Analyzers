@@ -39,7 +39,7 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             }
 
             [Test]
-            public async Task Local()
+            public async Task LocalFileOpenRead()
             {
                 var testCode = @"
     using System.IO;
@@ -52,6 +52,78 @@ namespace Gu.Analyzers.Test.GU0030UseUsingTests
             return stream;
         }
     }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task LocalFileOpenReadAfterAccessingLength()
+            {
+                var testCode = @"
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            var length = stream.Length;
+            return stream;
+        }
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task LocalInIfAndEnd()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (true)
+            {
+                return stream;
+            }
+
+            return stream;
+        }
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task LocalInIf()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Bar(string text)
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (text == null)
+            {
+                return stream;
+            }
+
+            var length = stream.Length;
+            return stream;
+        }
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
