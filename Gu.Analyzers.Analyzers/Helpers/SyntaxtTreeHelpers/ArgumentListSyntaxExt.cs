@@ -26,7 +26,8 @@ namespace Gu.Analyzers
                 }
             }
 
-            if (arguments.Arguments.Count <= parameter.Ordinal)
+            if (arguments.Arguments.Count <= parameter.Ordinal ||
+                parameter.Ordinal == -1)
             {
                 return false;
             }

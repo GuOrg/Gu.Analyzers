@@ -124,9 +124,8 @@
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            var isCreation = Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken);
-            if (isCreation == Result.Yes ||
-                isCreation == Result.Maybe)
+            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.Yes, Result.Maybe))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnValue.GetLocation()));
             }
