@@ -7,7 +7,8 @@
 4.b PM> `.paket/paket.exe update group GROUPNAME` update packages.
 5. PM> `.paket/paket.exe install` install packages.
 6. PM> `.paket/paket.exe install -f --createnewbindingfiles` install packages and create app.configs with redirects.
-6. PM> `.paket/paket.exe outdated` Lists all dependencies that have newer versions available.
+7. PM> `.paket/paket.exe outdated` Lists all dependencies that have newer versions available.
+8. PM> `.paket/paket.exe remove nuget Gu.Analyzers group Analyzers`
 
 ## Create packages
 
