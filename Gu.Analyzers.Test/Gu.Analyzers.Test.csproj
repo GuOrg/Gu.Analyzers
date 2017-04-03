@@ -87,6 +87,8 @@
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Using.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
+    <Compile Include="GU0051XmlSerializerNotCached\Diagnostics.cs" />
+    <Compile Include="GU0051XmlSerializerNotCached\HappyPath.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.SideEffect.cs" />
     <Compile Include="Helpers\AssignmentTests.Symbol.cs" />
