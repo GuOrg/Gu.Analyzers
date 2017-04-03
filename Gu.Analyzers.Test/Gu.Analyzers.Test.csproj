@@ -85,8 +85,11 @@
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Rx.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Using.cs" />
+    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\Diagnostics.cs" />
+    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
+    <Compile Include="GU0038DontReturnInjectedAndCreatedTests\HappyPath.Recursion.cs" />
     <Compile Include="HappyPathWithAll.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.SideEffect.cs" />
     <Compile Include="Helpers\AssignmentTests.Symbol.cs" />
@@ -113,8 +116,8 @@
     <Compile Include="GU0050IgnoreEventsWhenSerializingTests\HappyPath.cs" />
     <Compile Include="GU0022UseGetOnlyTests\CodeFix.cs" />
     <Compile Include="GU0022UseGetOnlyTests\HappyPath.cs" />
-    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\Diagnostics.cs" />
-    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.cs" />
+    <Compile Include="GU0038DontReturnInjectedAndCreatedTests\Diagnostics.cs" />
+    <Compile Include="GU0038DontReturnInjectedAndCreatedTests\HappyPath.cs" />
     <Compile Include="GU0035ImplementIDisposableTests\HappyPath.WhenInjecting.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\Diagnostics.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.cs" />
