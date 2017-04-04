@@ -1,5 +1,3 @@
-using System;
-
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;

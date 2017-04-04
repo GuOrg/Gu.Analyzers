@@ -7,6 +7,28 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCached
     internal class HappyPath : HappyPathVerifier<Analyzers.GU0051XmlSerializerNotCached>
     {
         [Test]
+        public async Task NoCreationsOfTheSerializer()
+        {
+            var testCode = @"
+using System;
+using System.Collections.Generic;
+using System.Xml.Serialization;
+
+public class Foo
+{
+    public Foo(int a, int b, int c, int d)
+    {
+        for(int i = 0; i < 100; ++i)
+        {
+            
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task CachedXmlSerializer()
         {
             var testCode = @"
