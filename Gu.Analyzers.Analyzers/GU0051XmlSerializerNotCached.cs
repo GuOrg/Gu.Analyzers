@@ -46,6 +46,13 @@ namespace Gu.Analyzers
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
             if (objectCreation.IsSameType(KnownSymbol.XmlSerializer, context))
             {
+                var declaration = objectCreation.FirstAncestor<VariableDeclarationSyntax>();
+                if (declaration != null)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, declaration.GetLocation()));
+                    return;
+                }
+
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
         }
