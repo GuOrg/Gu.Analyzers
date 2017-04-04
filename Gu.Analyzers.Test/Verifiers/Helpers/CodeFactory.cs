@@ -103,6 +103,7 @@
                 .AddMetadataReference(projectId, MetadataReferences.PresentationCore)
                 .AddMetadataReference(projectId, MetadataReferences.PresentationFramework)
                 .AddMetadataReference(projectId, MetadataReferences.WindowsBase)
+                .AddMetadataReference(projectId, MetadataReferences.SystemXml)
                 .AddMetadataReference(projectId, MetadataReferences.SystemXaml)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactive)
                 .AddMetadataReference(projectId, MetadataReferences.SystemReactiveInterfaces)

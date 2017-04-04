@@ -32,6 +32,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
+        internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();

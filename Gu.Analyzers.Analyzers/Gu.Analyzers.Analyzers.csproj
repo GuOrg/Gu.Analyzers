@@ -77,6 +77,7 @@
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />
     <Compile Include="Helpers\Collection\ListExt.cs" />
+    <Compile Include="Helpers\KnownSymbols\XmlSerializerType.cs" />
     <Compile Include="Helpers\Pooled\SetExt.cs" />
     <Compile Include="Helpers\Property.cs" />
     <Compile Include="Helpers\RecursionLoop.cs" />

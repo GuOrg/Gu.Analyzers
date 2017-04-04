@@ -11,21 +11,12 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCached
         {
             var testCode = @"
 using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 
-[Serializable()]
-public class XMLObj
-{
-    [XmlElement(""block"")]
-    public List<XMLnode> nodes{ get; set; }
-
-    public XMLObj() { }
-}
-
-[Serializable]
 public class Foo
 {
-    private static XmlSerializer serializer = new XmlSerializer(typeof(XMLObj), new XmlRootAttribute(""rootNode""));
+    private static XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
 
     public Foo(int a, int b, int c, int d)
     {

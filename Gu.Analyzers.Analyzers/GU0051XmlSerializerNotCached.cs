@@ -1,3 +1,5 @@
+using System;
+
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
@@ -33,28 +35,20 @@ namespace Gu.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(this.HandleObjectCreation, SyntaxKind.ObjectCreationExpression);
         }
 
-        private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
+        private void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            var variableDeclaration = (VariableDeclarationSyntax)context.Node;
-            foreach (var declarator in variableDeclaration.Variables)
+            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
+            if (objectCreation.IsSameType(KnownSymbol.XmlSerializer, context))
             {
-                var local = context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) as ILocalSymbol;
-                if (local == null ||
-                    !Disposable.IsPotentiallyAssignableTo(local.Type))
-                {
-                    return;
-                }
-
-                var value = declarator.Initializer?.Value;
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
         }
     }
