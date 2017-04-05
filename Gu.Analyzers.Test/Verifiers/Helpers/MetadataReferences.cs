@@ -25,6 +25,7 @@ namespace Gu.Analyzers.Test
         internal static readonly MetadataReference SystemReactive = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.SerialDisposable).Assembly.Location);
         internal static readonly MetadataReference SystemReactiveInterfaces = MetadataReference.CreateFromFile(typeof(System.Reactive.Disposables.ICancelable).Assembly.Location);
         internal static readonly MetadataReference SystemReactiveLinq = MetadataReference.CreateFromFile(typeof(System.Reactive.Linq.Observable).Assembly.Location);
+        internal static readonly MetadataReference SystemXml = MetadataReference.CreateFromFile(typeof(System.Xml.Serialization.XmlSerializer).Assembly.Location);
         internal static readonly MetadataReference PresentationCore = MetadataReference.CreateFromFile(typeof(System.Windows.Media.Brush).Assembly.Location);
         internal static readonly MetadataReference PresentationFramework = MetadataReference.CreateFromFile(typeof(System.Windows.Controls.Control).Assembly.Location);
         internal static readonly MetadataReference WindowsBase = MetadataReference.CreateFromFile(typeof(System.Windows.Media.Matrix).Assembly.Location);
@@ -44,6 +45,7 @@ namespace Gu.Analyzers.Test
                         SystemReactive,
                         SystemReactiveInterfaces,
                         SystemReactiveLinq,
+                        SystemXml,
                         PresentationCore,
                         PresentationFramework,
                         WindowsBase,

@@ -11,6 +11,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly QualifiedType Func = Create("System.Func");
+        internal static readonly QualifiedType Type = Create("System.Type");
         internal static readonly QualifiedType SerializableAttribute = Create("System.SerializableAttribute");
         internal static readonly QualifiedType NonSerializedAttribute = Create("System.NonSerializedAttribute");
         internal static readonly DisposableType IDisposable = new DisposableType();
@@ -32,6 +33,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
+        internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
