@@ -11,6 +11,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly QualifiedType Func = Create("System.Func");
+        internal static readonly QualifiedType Type = Create("System.Type");
         internal static readonly QualifiedType SerializableAttribute = Create("System.SerializableAttribute");
         internal static readonly QualifiedType NonSerializedAttribute = Create("System.NonSerializedAttribute");
         internal static readonly DisposableType IDisposable = new DisposableType();

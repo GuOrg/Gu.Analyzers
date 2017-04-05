@@ -36,6 +36,24 @@ namespace Gu.Analyzers
             context.RegisterSyntaxNodeAction(this.HandleObjectCreation, SyntaxKind.ObjectCreationExpression);
         }
 
+        private bool IsLeakyConstructor(SyntaxNodeAnalysisContext context)
+        {
+            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
+            var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken);
+            var parameters = ctor.Parameters;
+            if (parameters.Length == 1 && parameters[0].Type == KnownSymbol.Type)
+            {
+                return false;
+            }
+
+            if (parameters.Length == 2 && parameters[0].Type == KnownSymbol.Type && parameters[1].Type == KnownSymbol.String)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         private void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
@@ -46,6 +64,11 @@ namespace Gu.Analyzers
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
             if (objectCreation.IsSameType(KnownSymbol.XmlSerializer, context))
             {
+                if (!this.IsLeakyConstructor(context))
+                {
+                    return;
+                }
+
                 var declaration = objectCreation.FirstAncestor<VariableDeclarationSyntax>();
                 if (declaration != null)
                 {
