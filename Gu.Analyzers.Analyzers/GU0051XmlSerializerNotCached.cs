@@ -69,13 +69,36 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                var fieldDeclaration = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
-                if (fieldDeclaration != null)
+                var assignment = objectCreation.FirstAncestor<AssignmentExpressionSyntax>();
+                if (assignment != null)
                 {
-                    var fieldDeclarationSymbol = context.SemanticModel.SemanticModelFor(fieldDeclaration)?.GetDeclaredSymbol(fieldDeclaration, context.CancellationToken) as IFieldSymbol;
-                    if (fieldDeclarationSymbol != null &&
-                       fieldDeclarationSymbol.IsReadOnly &&
-                       fieldDeclarationSymbol.IsStatic)
+                    var assignmentSymbol = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
+                    if (assignmentSymbol != null &&
+                       assignmentSymbol.CanBeReferencedByName &&
+                       assignmentSymbol.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference assignedToDeclaration))
+                    {
+                        var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
+                        var fieldSymbol = context.SemanticModel.SemanticModelFor(assignedToDeclarator)
+                                                 ?.GetDeclaredSymbol(assignedToDeclarator, context.CancellationToken) as IFieldSymbol;
+                        if (fieldSymbol != null &&
+                           fieldSymbol.IsReadOnly &&
+                           fieldSymbol.IsStatic)
+                        {
+                            return;
+                        }
+                    }
+
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
+                    return;
+                }
+
+                var declarator = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
+                if (declarator != null)
+                {
+                    var fieldSymbol = context.SemanticModel.SemanticModelFor(declarator)?.GetDeclaredSymbol(declarator, context.CancellationToken) as IFieldSymbol;
+                    if (fieldSymbol != null &&
+                       fieldSymbol.IsReadOnly &&
+                       fieldSymbol.IsStatic)
                     {
                         return;
                     }
