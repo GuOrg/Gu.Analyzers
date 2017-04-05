@@ -58,7 +58,7 @@ public class Foo
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public async Task LanguageConstructs(string code)
+        public async Task PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
 using System;
