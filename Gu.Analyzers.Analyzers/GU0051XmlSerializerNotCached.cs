@@ -69,10 +69,22 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                var declaration = objectCreation.FirstAncestor<VariableDeclarationSyntax>();
-                if (declaration != null)
+                var fieldDeclaration = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
+                if (fieldDeclaration != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, declaration.GetLocation()));
+                    var fieldDeclarationSymbol = context.SemanticModel.SemanticModelFor(fieldDeclaration)?.GetDeclaredSymbol(fieldDeclaration, context.CancellationToken) as IFieldSymbol;
+                    if (fieldDeclarationSymbol != null &&
+                       fieldDeclarationSymbol.IsReadOnly &&
+                       fieldDeclarationSymbol.IsStatic)
+                    {
+                        return;
+                    }
+                }
+
+                var variableDeclaration = objectCreation.FirstAncestor<VariableDeclarationSyntax>();
+                if (variableDeclaration != null)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
                     return;
                 }
 
