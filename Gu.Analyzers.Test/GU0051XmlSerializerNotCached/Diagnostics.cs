@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal partial class Diagnostics : DiagnosticVerifier<Analyzers.GU0051XmlSerializerNotCached>
+    internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0051XmlSerializerNotCached>
     {
         [Test]
         public async Task TrivialConstructionUnsaved()

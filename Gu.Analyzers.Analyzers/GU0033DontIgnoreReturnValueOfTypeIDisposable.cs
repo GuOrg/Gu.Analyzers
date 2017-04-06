@@ -118,7 +118,7 @@
                     return false;
                 }
 
-                if (argument.Parent.Parent is ObjectCreationExpressionSyntax objectcreation)
+                if (argument.Parent.Parent is ObjectCreationExpressionSyntax)
                 {
                     if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
                         member != null)
@@ -126,9 +126,7 @@
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                         if (initializer != null)
                         {
-                            if (
-                                semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is
-                                    IMethodSymbol chainedCtor &&
+                            if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
                                 if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, false, out IMethodSymbol disposeMethod))
