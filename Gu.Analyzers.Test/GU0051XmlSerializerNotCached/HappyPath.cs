@@ -91,7 +91,7 @@ using System.Xml.Serialization;
 
 public class Foo
 {
-    private static XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+    private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
 
     public Foo(int a, int b, int c, int d)
     {
