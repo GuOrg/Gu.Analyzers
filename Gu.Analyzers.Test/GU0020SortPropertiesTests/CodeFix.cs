@@ -631,5 +631,67 @@ public class Foo
     }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task NestedClass()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public Foo()
+        {
+        }
+
+        public int Bar
+        {
+            get { return this.Bar; }
+            set { this.Bar = value; }
+        }
+
+        public class Nested
+        {
+            public int Value1 { get; set; }
+            
+            public int Value2 { get; private set; }
+        }
+    }
+}";
+            var expected1 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 18, 13)
+                                .WithMessage("Move property.");
+            var expected2 = this.CSharpDiagnostic()
+                                .WithLocation("Foo.cs", 20, 13)
+                                .WithMessage("Move property.");
+
+            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public Foo()
+        {
+        }
+
+        public int Bar
+        {
+            get { return this.Bar; }
+            set { this.Bar = value; }
+        }
+
+        public class Nested
+        {
+            
+            public int Value2 { get; private set; }
+
+            public int Value1 { get; set; }
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
     }
 }
