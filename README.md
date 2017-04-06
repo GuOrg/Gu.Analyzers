@@ -61,7 +61,7 @@
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0030.md">GU0030</a></td>
-  <td>Use using.</td>
+  <td>Dispose created.</td>
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0031.md">GU0031</a></td>

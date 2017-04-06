@@ -1,10 +1,10 @@
-﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
+﻿namespace Gu.Analyzers.Test.GU0030DisposeCreatedTests
 {
     using System.Threading.Tasks;
 
     using NUnit.Framework;
 
-    internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
+    internal partial class Diagnostics : DiagnosticVerifier<GU0030DisposeCreated>
     {
         private static readonly string DisposableCode = @"
 using System;
@@ -42,7 +42,7 @@ namespace RoslynSandbox
             testCode = testCode.AssertReplace("new Disposable()", code);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
         }
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -88,7 +88,7 @@ namespace RoslynSandbox
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -109,7 +109,7 @@ namespace RoslynSandbox
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -127,7 +127,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(new[] { testCode, DisposableCode }, expected).ConfigureAwait(false);
         }
 
@@ -152,7 +152,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -178,7 +178,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -200,7 +200,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -225,7 +225,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -254,7 +254,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
 
@@ -276,7 +276,7 @@ namespace RoslynSandbox
     }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use using.");
+                               .WithMessage("Dispose created.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
         }
     }

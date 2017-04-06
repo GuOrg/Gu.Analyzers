@@ -1,9 +1,10 @@
-﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
+﻿namespace Gu.Analyzers.Test.GU0030DisposeCreatedTests
 {
     using System.Threading.Tasks;
+
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<GU0030UseUsing>
+    internal partial class HappyPath : HappyPathVerifier<GU0030DisposeCreated>
     {
         private static readonly string DisposableCode = @"
 using System;

@@ -8,11 +8,11 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0030UseUsing : DiagnosticAnalyzer
+    internal class GU0030DisposeCreated : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0030";
-        private const string Title = "Use using.";
-        private const string MessageFormat = "Use using.";
+        private const string Title = "Dispose created.";
+        private const string MessageFormat = "Dispose created.";
         private const string Description = "Use using for created `IDisposable` that is not assigned to a field or property.";
         private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 

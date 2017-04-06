@@ -1,9 +1,10 @@
-﻿namespace Gu.Analyzers.Test.GU0030UseUsingTests
+﻿namespace Gu.Analyzers.Test.GU0030DisposeCreatedTests
 {
     using System.Threading.Tasks;
+
     using NUnit.Framework;
 
-    internal partial class Diagnostics : DiagnosticVerifier<GU0030UseUsing>
+    internal partial class Diagnostics : DiagnosticVerifier<GU0030DisposeCreated>
     {
         internal class AsyncAwait : NestedDiagnosticVerifier<Diagnostics>
         {
@@ -23,7 +24,7 @@ internal static class Foo
 }";
                 var expected = this.CSharpDiagnostic()
                        .WithLocationIndicated(ref testCode)
-                       .WithMessage("Use using.");
+                       .WithMessage("Dispose created.");
                 await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
             }
 
@@ -43,7 +44,7 @@ internal static class Foo
 }";
                 var expected = this.CSharpDiagnostic()
                        .WithLocationIndicated(ref testCode)
-                       .WithMessage("Use using.");
+                       .WithMessage("Dispose created.");
                 await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
             }
 
@@ -68,7 +69,7 @@ internal static class Foo
 }";
                 var expected = this.CSharpDiagnostic()
                        .WithLocationIndicated(ref testCode)
-                       .WithMessage("Use using.");
+                       .WithMessage("Dispose created.");
                 await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
             }
 
@@ -93,7 +94,7 @@ internal static class Foo
 }";
                 var expected = this.CSharpDiagnostic()
                        .WithLocationIndicated(ref testCode)
-                       .WithMessage("Use using.");
+                       .WithMessage("Dispose created.");
                 await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
             }
 
@@ -126,7 +127,7 @@ internal static class Foo
 }";
                 var expected = this.CSharpDiagnostic()
                        .WithLocationIndicated(ref testCode)
-                       .WithMessage("Use using.");
+                       .WithMessage("Dispose created.");
                 await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
             }
         }

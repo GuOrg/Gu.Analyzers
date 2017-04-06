@@ -53,7 +53,7 @@
     <Compile Include="GU0011DontIgnoreReturnValue.cs" />
     <Compile Include="GU0020SortProperties.cs" />
     <Compile Include="GU0021CalculatedPropertyAllocates.cs" />
-    <Compile Include="GU0030UseUsing.cs" />
+    <Compile Include="GU0030DisposeCreated.cs" />
     <Compile Include="GU0031DisposeMember.cs" />
     <Compile Include="GU0036DontDisposeInjected.cs" />
     <Compile Include="GU0032DisposeBeforeReassigning.cs" />
