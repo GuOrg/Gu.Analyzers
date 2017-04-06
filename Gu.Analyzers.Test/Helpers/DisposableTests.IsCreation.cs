@@ -16,10 +16,10 @@
             [TestCase("(object) new Disposable()", Result.Yes)]
             [TestCase("typeof(IDisposable)", Result.No)]
             [TestCase("(IDisposable)null", Result.No)]
-            [TestCase("File.OpenRead(string.Empty) ?? null", Result.Maybe)]
-            [TestCase("null ?? File.OpenRead(string.Empty)", Result.Maybe)]
-            [TestCase("true ? null : File.OpenRead(string.Empty)", Result.Maybe)]
-            [TestCase("true ? File.OpenRead(string.Empty) : null", Result.Maybe)]
+            [TestCase("File.OpenRead(string.Empty) ?? null", Result.Yes)]
+            [TestCase("null ?? File.OpenRead(string.Empty)", Result.Yes)]
+            [TestCase("true ? null : File.OpenRead(string.Empty)", Result.Yes)]
+            [TestCase("true ? File.OpenRead(string.Empty) : null", Result.Yes)]
             public void LanguageConstructs(string code, Result expected)
             {
                 var testCode = @"
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             [TestCase("CreateDisposableExpressionBodyReturnTypeObject()", Result.Yes)]
             [TestCase("CreateDisposableInIf(true)", Result.Yes)]
             [TestCase("CreateDisposableInElse(true)", Result.Yes)]
-            [TestCase("ReturningLocal()", Result.Maybe)]
+            [TestCase("ReturningLocal()", Result.Yes)]
             public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
             {
                 var testCode = @"
@@ -323,7 +323,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("File.OpenRead(string.Empty)", Result.Maybe)]
+            [TestCase("File.OpenRead(string.Empty)", Result.Yes)]
             [TestCase("this.ints.GetEnumerator()", Result.Yes)]
             [TestCase("((IList)this.ints).GetEnumerator()", Result.No)]
             [TestCase("this.disposables.First()", Result.No)]
