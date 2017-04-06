@@ -83,6 +83,48 @@
         }
 
         [Test]
+        public async Task WhenNotInjectingChainedNameCollision()
+        {
+            var fooCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(int value, Bar bar)
+        {
+            this.bar = bar;
+        }
+    }";
+            var barCode = @"
+    public class Bar
+    {
+    }";
+
+            var testCode = @"
+    public class Meh : Foo
+    {
+        public Meh(int bar)
+           : base(bar, ↓new Bar())
+        {
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Prefer injecting.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, testCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public class Meh : Foo
+    {
+        public Meh(int bar, Bar bar_)
+           : base(bar, bar_)
+        {
+        }
+    }";
+            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, testCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenNotInjectingChainedGeneric()
         {
             var fooCode = @"

@@ -98,9 +98,28 @@
         private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ExpressionSyntax objectCreation, ParameterSyntax parameterSyntax)
         {
             var ctor = objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            parameterSyntax = UniqueName(ctor.ParameterList, parameterSyntax);
             var updated = ctor.ReplaceNode(objectCreation, SyntaxFactory.IdentifierName(parameterSyntax.Identifier));
             updated = updated.WithParameterList(ctor.ParameterList.AddParameters(parameterSyntax));
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(ctor, updated)));
+        }
+
+        private static ParameterSyntax UniqueName(ParameterListSyntax parameterList, ParameterSyntax parameter)
+        {
+            if (parameterList != null)
+            {
+                foreach (var p in parameterList.Parameters)
+                {
+                    if (p.Identifier.ValueText == parameter.Identifier.ValueText)
+                    {
+                        return UniqueName(
+                            parameterList,
+                            parameter.WithIdentifier(SyntaxFactory.Identifier(parameter.Identifier.ValueText + "_")));
+                    }
+                }
+            }
+
+            return parameter;
         }
 
         private static string ParameterName(ITypeSymbol type)
