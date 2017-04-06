@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFix : CodeFixVerifier<GU0031DisposeMember, DisposeMemberCodeFixProvider>
     {
         internal class Rx : NestedCodeFixVerifier<CodeFix>
         {
@@ -51,6 +51,56 @@ public sealed class Foo : IDisposable
     public void Dispose()
     {
         this.disposable.Dispose();
+    }
+}";
+                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task ObservableSubscribe()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓private readonly IDisposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.disposable = observable.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Dispose member.");
+                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.disposable = observable.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);

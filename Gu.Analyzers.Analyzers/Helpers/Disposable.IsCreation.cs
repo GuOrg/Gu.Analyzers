@@ -313,10 +313,15 @@ namespace Gu.Analyzers
                             : Result.No;
                     }
 
-                    return !IsAssignableTo(method.ReturnType) ||
-                           method.IsGenericMethod
-                               ? Result.No
-                               : Result.Maybe;
+                    if (method.ContainingType == KnownSymbol.File &&
+                        IsAssignableTo(method.ReturnType))
+                    {
+                        return Result.Yes;
+                    }
+
+                    return IsAssignableTo(method.ReturnType)
+                               ? Result.Maybe
+                               : Result.No;
                 }
 
                 return Result.Unknown;
