@@ -125,6 +125,48 @@
         }
 
         [Test]
+        public async Task WhenNotInjectingChainedGenericParameterName()
+        {
+            var fooCode = @"
+    public sealed class Foo
+    {
+        private readonly IsModuleReady<FooModule> isFooReady;
+
+        public Foo()
+        {
+            this.isFooReady = ↓new IsModuleReady<FooModule>();
+        }
+    }";
+
+            var moduleCode = @"
+    public class IsModuleReady<TModule>
+        where TModule : Module
+    {
+    }
+
+    public abstract class Module { }
+
+    public class FooModule : Module { }";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref fooCode)
+                               .WithMessage("Prefer injecting.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, moduleCode }, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+    public sealed class Foo
+    {
+        private readonly IsModuleReady<FooModule> isFooReady;
+
+        public Foo(IsModuleReady<FooModule> isFooModuleReady)
+        {
+            this.isFooReady = isFooModuleReady;
+        }
+    }";
+            await this.VerifyCSharpFixAsync(new[] { fooCode, moduleCode }, new[] { fixedCode, moduleCode }).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task WhenNotInjectingChainedNewWithInjectedArgument()
         {
             var fooCode = @"

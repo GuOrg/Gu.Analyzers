@@ -34,8 +34,7 @@
                 }
 
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
-                var objectCreation = node as ObjectCreationExpressionSyntax;
-                if (objectCreation != null)
+                if (node is ObjectCreationExpressionSyntax objectCreation)
                 {
                     var type = (ITypeSymbol)semanticModel.GetSymbolSafe(objectCreation, context.CancellationToken)?.ContainingSymbol;
                     if (type == null)
@@ -43,7 +42,7 @@
                         continue;
                     }
 
-                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
+                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
                                                        .WithType(objectCreation.Type);
                     switch (GU0007PreferInjecting.CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
                     {
@@ -74,7 +73,7 @@
                 if (memberAccess != null)
                 {
                     var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(memberAccess, context.CancellationToken));
-                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(Parametername(type)))
+                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
                                                        .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
                     switch (GU0007PreferInjecting.IsInjectable(memberAccess, memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
                     {
@@ -104,15 +103,27 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(ctor, updated)));
         }
 
-        private static string Parametername(ITypeSymbol type)
+        private static string ParameterName(ITypeSymbol type)
         {
-            var typeName = type.Name;
-            if (char.IsUpper(typeName[0]))
+            if (type is INamedTypeSymbol namedType &&
+                namedType.IsGenericType)
             {
-                return new string(char.ToLower(typeName[0]), 1) + typeName.Substring(1);
+                var definition = namedType.OriginalDefinition;
+                if (definition?.TypeParameters.Length == 1)
+                {
+                    var parameter = definition.TypeParameters[0];
+                    foreach (var constraintType in parameter.ConstraintTypes)
+                    {
+                        if (type.Name.Contains(constraintType.Name))
+                        {
+                            return type.Name.Replace(constraintType.Name, namedType.TypeArguments[0].Name)
+                                       .FirstCharLower();
+                        }
+                    }
+                }
             }
 
-            return typeName;
+            return type.Name.FirstCharLower();
         }
     }
 }
