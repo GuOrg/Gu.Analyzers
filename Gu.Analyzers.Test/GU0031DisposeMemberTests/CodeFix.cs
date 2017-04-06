@@ -936,7 +936,7 @@ public class Foo : IDisposable
         }
 
         [Test]
-        public async Task DisposeMemberWhenOverriddenDisposeMethod()
+        public async Task DisposeFirstMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
 using System;
@@ -1019,6 +1019,105 @@ public class Foo : BaseClass
         if (disposing)
         {
             this.stream?.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposeSecondMemberWhenOverriddenDisposeMethod()
+        {
+            var baseCode = @"
+using System;
+
+public class BaseClass : IDisposable
+{
+    private bool disposed;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+        }
+    }
+
+    protected void ThrowIfDisposed()
+    {
+        if (this.disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            var testCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
+
+    private bool disposed;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.stream1.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+using System.IO;
+
+public class Foo : BaseClass
+{
+    private readonly Stream stream1 = File.OpenRead(string.Empty);
+    private readonly Stream stream2 = File.OpenRead(string.Empty);
+
+    private bool disposed;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.stream1.Dispose();
+            this.stream2?.Dispose();
         }
 
         base.Dispose(disposing);
