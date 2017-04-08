@@ -2,7 +2,7 @@
 version 0.1.11.17-dev
 title Gu.Analyzers
 id Gu.Analyzers
-authors Johan Larsson
+authors Johan Larsson, milleniumbug
 owners Johan Larsson
 copyright Copyright Johan Larsson 2016
 developmentDependency true
