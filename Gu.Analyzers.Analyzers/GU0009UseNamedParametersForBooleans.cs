@@ -41,7 +41,7 @@
 
         private static bool IsLiteralBool(ArgumentSyntax argument)
         {
-            var kind = argument.Expression.Kind();
+            var kind = argument.Expression?.Kind();
             return kind == SyntaxKind.TrueLiteralExpression ||
                    kind == SyntaxKind.FalseLiteralExpression;
         }
