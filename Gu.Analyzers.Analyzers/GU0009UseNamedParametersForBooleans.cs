@@ -36,17 +36,35 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleArguments, SyntaxKind.ArgumentList);
+            context.RegisterSyntaxNodeAction(HandleArgument, SyntaxKind.Argument);
         }
 
-        private static void HandleArguments(SyntaxNodeAnalysisContext context)
+        private static bool IsLiteralBool(ArgumentSyntax argument)
+        {
+            var kind = argument.Expression.Kind();
+            return kind == SyntaxKind.TrueLiteralExpression ||
+                   kind == SyntaxKind.FalseLiteralExpression;
+        }
+
+        private static void HandleArgument(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            var argumentListSyntax = (ArgumentListSyntax)context.Node;
+            var argumentSyntax = (ArgumentSyntax)context.Node;
+            if (!IsLiteralBool(argumentSyntax))
+            {
+                return;
+            }
+
+            if (argumentSyntax.NameColon != null)
+            {
+                return;
+            }
+
+            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
         }
     }
 }
