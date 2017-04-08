@@ -40,6 +40,10 @@
   <td>Avoid relay properties.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0009.md">GU0009</a></td>
+  <td>Name the boolean parameter.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
   <td>Assigning same value.</td>
 </tr>
