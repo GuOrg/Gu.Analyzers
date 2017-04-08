@@ -86,13 +86,33 @@
             }
 
             var methodSymbol = context.SemanticModel.GetSymbolSafe(argumentSyntax.FirstAncestor<ArgumentListSyntax>().Parent, context.CancellationToken) as IMethodSymbol;
-            if (methodSymbol != null && !ReferenceEquals(methodSymbol.OriginalDefinition, methodSymbol))
+            if (methodSymbol == null)
+            {
+                return;
+            }
+
+            if (!ReferenceEquals(methodSymbol.OriginalDefinition, methodSymbol))
             {
                 var methodGenericSymbol = methodSymbol.OriginalDefinition;
                 var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
                 if (parameterIndexOpt is int parameterIndex &&
                     methodGenericSymbol.Parameters[parameterIndex]
                                        .Type is ITypeParameterSymbol)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
+                if (parameterIndexOpt == null)
+                {
+                    return;
+                }
+
+                var parameterIndex = System.Math.Min(parameterIndexOpt.Value, methodSymbol.Parameters.Length - 1);
+                var parameter = methodSymbol.Parameters[parameterIndex];
+                if (parameter.IsParams)
                 {
                     return;
                 }
