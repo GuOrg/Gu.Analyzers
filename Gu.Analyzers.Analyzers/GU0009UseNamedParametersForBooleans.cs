@@ -46,6 +46,14 @@
                    kind == SyntaxKind.FalseLiteralExpression;
         }
 
+        private static bool IsDisposePattern(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Name == "Dispose" &&
+                   methodSymbol.Parameters.Length == 1 &&
+                   methodSymbol.Parameters[0]
+                               .Type == KnownSymbol.Boolean;
+        }
+
         private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
         {
             if (argument.NameColon == null)
@@ -87,6 +95,11 @@
 
             var methodSymbol = context.SemanticModel.GetSymbolSafe(argumentSyntax.FirstAncestor<ArgumentListSyntax>().Parent, context.CancellationToken) as IMethodSymbol;
             if (methodSymbol == null)
+            {
+                return;
+            }
+
+            if (IsDisposePattern(methodSymbol))
             {
                 return;
             }

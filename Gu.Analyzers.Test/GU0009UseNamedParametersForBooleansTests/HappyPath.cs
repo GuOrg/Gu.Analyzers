@@ -134,5 +134,41 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DontWarnOnDisposePattern()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public abstract class FooBase : IDisposable
+{
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed = false;
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+
+        if (disposing)
+        {
+            this.stream.Dispose();
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
