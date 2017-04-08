@@ -111,5 +111,28 @@ public class Foo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task BooleanParamsArray()
+        {
+            var testCode = @"
+using System;
+using System.Collections.Generic;
+
+public class Foo
+{
+    public void Floof(params bool[] useFluffyBuns)
+    {
+        
+    }
+
+    public void Another()
+    {
+        Floof(true, true, true, false, true, false);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
