@@ -46,6 +46,27 @@
                    kind == SyntaxKind.FalseLiteralExpression;
         }
 
+        private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
+        {
+            if (argument.NameColon == null)
+            {
+                var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
+                                    .Arguments.IndexOf(argument);
+                return index;
+            }
+
+            for (int i = 0; i < method.Parameters.Length; ++i)
+            {
+                var candidate = method.Parameters[i];
+                if (candidate.Name == argument.NameColon.Name.Identifier.ValueText)
+                {
+                    return i;
+                }
+            }
+
+            return null;
+        }
+
         private static void HandleArgument(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
@@ -62,6 +83,19 @@
             if (argumentSyntax.NameColon != null)
             {
                 return;
+            }
+
+            var methodSymbol = context.SemanticModel.GetSymbolSafe(argumentSyntax.FirstAncestor<ArgumentListSyntax>().Parent, context.CancellationToken) as IMethodSymbol;
+            if (methodSymbol != null && !ReferenceEquals(methodSymbol.OriginalDefinition, methodSymbol))
+            {
+                var methodGenericSymbol = methodSymbol.OriginalDefinition;
+                var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
+                if (parameterIndexOpt is int parameterIndex &&
+                    methodGenericSymbol.Parameters[parameterIndex]
+                                       .Type is ITypeParameterSymbol)
+                {
+                    return;
+                }
             }
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
