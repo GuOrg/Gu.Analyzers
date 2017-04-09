@@ -105,6 +105,7 @@
             {
                 var methodGenericSymbol = methodSymbol.OriginalDefinition;
                 var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
+                //// ReSharper disable once IsExpressionAlwaysTrue R# dumbs analysis here.
                 if (parameterIndexOpt is int parameterIndex &&
                     methodGenericSymbol.Parameters[parameterIndex]
                                        .Type is ITypeParameterSymbol)
