@@ -76,10 +76,12 @@
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\FileType.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableOfTType.cs" />
+    <Compile Include="Helpers\KnownSymbols\NUnitAssertType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />
     <Compile Include="Helpers\Collection\ListExt.cs" />
     <Compile Include="Helpers\KnownSymbols\XmlSerializerType.cs" />
+    <Compile Include="Helpers\KnownSymbols\XunitAssertType.cs" />
     <Compile Include="Helpers\Pooled\SetExt.cs" />
     <Compile Include="Helpers\Property.cs" />
     <Compile Include="Helpers\RecursionLoop.cs" />

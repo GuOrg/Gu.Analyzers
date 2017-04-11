@@ -170,5 +170,23 @@ public abstract class FooBase : IDisposable
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DontWarnOnAssertAreEqual()
+        {
+            var testCode = @"
+using NUnit.Framework;
+
+public class FooTests
+{
+    [Test]
+    public void Bar()
+    {
+        Assert.AreEqual(true, true);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

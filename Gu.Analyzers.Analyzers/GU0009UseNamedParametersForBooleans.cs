@@ -36,42 +36,6 @@
             context.RegisterSyntaxNodeAction(HandleArgument, SyntaxKind.Argument);
         }
 
-        private static bool IsLiteralBool(ArgumentSyntax argument)
-        {
-            var kind = argument.Expression?.Kind();
-            return kind == SyntaxKind.TrueLiteralExpression ||
-                   kind == SyntaxKind.FalseLiteralExpression;
-        }
-
-        private static bool IsDisposePattern(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol.Name == "Dispose" &&
-                   methodSymbol.Parameters.Length == 1 &&
-                   methodSymbol.Parameters[0]
-                               .Type == KnownSymbol.Boolean;
-        }
-
-        private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
-        {
-            if (argument.NameColon == null)
-            {
-                var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
-                                    .Arguments.IndexOf(argument);
-                return index;
-            }
-
-            for (int i = 0; i < method.Parameters.Length; ++i)
-            {
-                var candidate = method.Parameters[i];
-                if (candidate.Name == argument.NameColon.Name.Identifier.ValueText)
-                {
-                    return i;
-                }
-            }
-
-            return null;
-        }
-
         private static void HandleArgument(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
@@ -96,7 +60,7 @@
                 return;
             }
 
-            if (IsDisposePattern(methodSymbol))
+            if (IsIgnored(methodSymbol))
             {
                 return;
             }
@@ -130,6 +94,49 @@
             }
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
+        }
+
+        private static bool IsLiteralBool(ArgumentSyntax argument)
+        {
+            var kind = argument.Expression?.Kind();
+            return kind == SyntaxKind.TrueLiteralExpression ||
+                   kind == SyntaxKind.FalseLiteralExpression;
+        }
+
+        private static bool IsIgnored(IMethodSymbol methodSymbol)
+        {
+            return IsDisposePattern(methodSymbol) ||
+                   methodSymbol == KnownSymbol.NUnitAssert.AreEqual ||
+                   methodSymbol == KnownSymbol.XunitAssert.Equal;
+        }
+
+        private static bool IsDisposePattern(IMethodSymbol methodSymbol)
+        {
+            return methodSymbol.Name == "Dispose" &&
+                   methodSymbol.Parameters.Length == 1 &&
+                   methodSymbol.Parameters[0]
+                               .Type == KnownSymbol.Boolean;
+        }
+
+        private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
+        {
+            if (argument.NameColon == null)
+            {
+                var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
+                                    .Arguments.IndexOf(argument);
+                return index;
+            }
+
+            for (int i = 0; i < method.Parameters.Length; ++i)
+            {
+                var candidate = method.Parameters[i];
+                if (candidate.Name == argument.NameColon.Name.Identifier.ValueText)
+                {
+                    return i;
+                }
+            }
+
+            return null;
         }
     }
 }
