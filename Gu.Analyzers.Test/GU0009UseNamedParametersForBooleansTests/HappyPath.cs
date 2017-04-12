@@ -188,5 +188,27 @@ public class FooTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DontWarnOnConfigureAwait()
+        {
+            var testCode = @"
+using System.Threading.Tasks;
+
+public class FooTests
+{
+    public void Bar()
+    {
+        Task<int> a = null;
+        Task b = null;
+        a.ConfigureAwait(false);
+        a.ConfigureAwait(true);
+        b.ConfigureAwait(false);
+        b.ConfigureAwait(true);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

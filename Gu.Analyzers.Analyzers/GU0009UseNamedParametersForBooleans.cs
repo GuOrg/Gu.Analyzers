@@ -106,8 +106,19 @@
         private static bool IsIgnored(IMethodSymbol methodSymbol)
         {
             return IsDisposePattern(methodSymbol) ||
+                   IsConfigureAwait(methodSymbol) ||
                    methodSymbol == KnownSymbol.NUnitAssert.AreEqual ||
                    methodSymbol == KnownSymbol.XunitAssert.Equal;
+        }
+
+        private static bool IsConfigureAwait(IMethodSymbol methodSymbol)
+        {
+            return (methodSymbol.ReceiverType == KnownSymbol.Task ||
+                    methodSymbol.ReceiverType == KnownSymbol.TaskOfT) &&
+                   methodSymbol.Name == "ConfigureAwait" &&
+                   methodSymbol.Parameters.Length == 1 &&
+                   methodSymbol.Parameters[0]
+                               .Type == KnownSymbol.Boolean;
         }
 
         private static bool IsDisposePattern(IMethodSymbol methodSymbol)
