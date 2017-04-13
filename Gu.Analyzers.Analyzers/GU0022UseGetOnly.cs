@@ -94,8 +94,7 @@
 
         private static bool IsAssigningMember(ExpressionSyntax assignedValue)
         {
-            var assignment = assignedValue.Parent as AssignmentExpressionSyntax;
-            if (assignment != null)
+            if (assignedValue.Parent is AssignmentExpressionSyntax assignment)
             {
                 if (assignment.Left is IdentifierNameSyntax ||
                     (assignment.Left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||

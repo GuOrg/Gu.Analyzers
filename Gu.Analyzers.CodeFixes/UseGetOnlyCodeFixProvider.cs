@@ -56,8 +56,7 @@
                                          IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
 
                         var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                        ConstructorDeclarationSyntax ctor;
-                        if (TryGetConstructor(property, out ctor))
+                        if (TryGetConstructor(property, out ConstructorDeclarationSyntax ctor))
                         {
                             context.RegisterCodeFix(
                                 CodeAction.Create(
@@ -91,8 +90,7 @@
 
         private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
         {
-            var arrow = node as ArrowExpressionClauseSyntax;
-            if (arrow != null)
+            if (node is ArrowExpressionClauseSyntax arrow)
             {
                 return arrow.Expression as ObjectCreationExpressionSyntax;
             }
@@ -201,8 +199,7 @@
                 return false;
             }
 
-            var memberAccess = expression as MemberAccessExpressionSyntax;
-            if (memberAccess != null)
+            if (expression is MemberAccessExpressionSyntax memberAccess)
             {
                 return IsMutable(semanticModel, cancellationToken, memberAccess.Expression);
             }
@@ -215,8 +212,7 @@
             result = null;
             foreach (var member in ((TypeDeclarationSyntax)property.Parent).Members)
             {
-                var ctor = member as ConstructorDeclarationSyntax;
-                if (ctor != null)
+                if (member is ConstructorDeclarationSyntax ctor)
                 {
                     if (ctor.Body == null || result != null)
                     {

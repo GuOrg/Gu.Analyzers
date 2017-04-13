@@ -80,8 +80,7 @@
                 return;
             }
 
-            StatementSyntax single;
-            if (!getter.Body.Statements.TryGetSingle(out single))
+            if (!getter.Body.Statements.TryGetSingle(out StatementSyntax single))
             {
                 return;
             }

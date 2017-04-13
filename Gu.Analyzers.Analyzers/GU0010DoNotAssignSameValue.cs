@@ -69,9 +69,7 @@
 
         private static bool AreSame(ExpressionSyntax left, ExpressionSyntax right)
         {
-            IdentifierNameSyntax leftName;
-            IdentifierNameSyntax rightName;
-            if (TryGetIdentifierName(left, out leftName) ^ TryGetIdentifierName(right, out rightName))
+            if (TryGetIdentifierName(left, out IdentifierNameSyntax leftName) ^ TryGetIdentifierName(right, out IdentifierNameSyntax rightName))
             {
                 return false;
             }

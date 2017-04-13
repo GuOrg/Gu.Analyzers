@@ -6,9 +6,8 @@ namespace Gu.Analyzers
     {
         internal static bool IsAutoProperty(this PropertyDeclarationSyntax property)
         {
-            AccessorDeclarationSyntax getter;
             AccessorDeclarationSyntax setter = null;
-            if (property.TryGetGetAccessorDeclaration(out getter) ||
+            if (property.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) ||
                 property.TryGetSetAccessorDeclaration(out setter))
             {
                 return getter?.Body == null && setter?.Body == null;

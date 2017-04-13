@@ -97,8 +97,7 @@
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
-                IdentifierNameSyntax left;
-                if (TryGetIdentifier(node.Left, out left))
+                if (TryGetIdentifier(node.Left, out IdentifierNameSyntax left))
                 {
                     this.readOnlies.Remove(left.Identifier.ValueText).IgnoreReturnValue();
                 }
@@ -109,8 +108,7 @@
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
                 var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                ConstructorDeclarationSyntax declaration;
-                if (ctor.TryGetSingleDeclaration(this.cancellationToken, out declaration))
+                if (ctor.TryGetSingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
                 {
                     this.Visit(declaration);
                 }
@@ -125,12 +123,10 @@
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
-                    var fieldDeclaration = member as FieldDeclarationSyntax;
-                    if (fieldDeclaration != null)
+                    if (member is FieldDeclarationSyntax fieldDeclaration)
                     {
                         var declaration = fieldDeclaration.Declaration;
-                        VariableDeclaratorSyntax variable;
-                        if (declaration.Variables.TryGetSingle(out variable))
+                        if (declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax variable))
                         {
                             var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
                             if (field.IsReadOnly && field.IsStatic == isStatic && variable.Initializer == null)
@@ -143,11 +139,10 @@
                     }
 
                     var propertyDeclaration = member as PropertyDeclarationSyntax;
-                    AccessorDeclarationSyntax getter;
                     if (propertyDeclaration != null &&
-                        propertyDeclaration.ExpressionBody == null &&
-                        propertyDeclaration.TryGetGetAccessorDeclaration(out getter) &&
-                        getter.Body == null)
+    propertyDeclaration.ExpressionBody == null &&
+    propertyDeclaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
+    getter.Body == null)
                     {
                         var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
                         if (property.IsReadOnly &&

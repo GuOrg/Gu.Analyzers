@@ -154,8 +154,7 @@
 
                     if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
                     {
-                        var block = ifStatement.Statement as BlockSyntax;
-                        if (block != null)
+                        if (ifStatement.Statement is BlockSyntax block)
                         {
                             var statements = block.Statements.Add(fix.DisposeStatement);
                             var newBlock = block.WithStatements(statements);

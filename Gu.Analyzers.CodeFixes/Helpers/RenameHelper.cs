@@ -55,8 +55,7 @@ namespace Gu.Analyzers
 
             var containingSymbol = symbol.ContainingSymbol;
 
-            var containingNamespaceOrTypeSymbol = containingSymbol as INamespaceOrTypeSymbol;
-            if (containingNamespaceOrTypeSymbol != null)
+            if (containingSymbol is INamespaceOrTypeSymbol containingNamespaceOrTypeSymbol)
             {
                 if (containingNamespaceOrTypeSymbol.Kind == SymbolKind.Namespace)
                 {

@@ -132,8 +132,7 @@ namespace Gu.Analyzers
                     return before != this.values.Count;
                 }
 
-                var binaryExpression = assignedValue as BinaryExpressionSyntax;
-                if (binaryExpression != null)
+                if (assignedValue is BinaryExpressionSyntax binaryExpression)
                 {
                     switch (binaryExpression.Kind())
                     {
@@ -148,22 +147,19 @@ namespace Gu.Analyzers
                     }
                 }
 
-                var cast = assignedValue as CastExpressionSyntax;
-                if (cast != null)
+                if (assignedValue is CastExpressionSyntax cast)
                 {
                     return this.AddRecursiveValues(cast.Expression);
                 }
 
-                var conditional = assignedValue as ConditionalExpressionSyntax;
-                if (conditional != null)
+                if (assignedValue is ConditionalExpressionSyntax conditional)
                 {
                     var whenTrue = this.AddRecursiveValues(conditional.WhenTrue);
                     var whenFalse = this.AddRecursiveValues(conditional.WhenFalse);
                     return whenTrue || whenFalse;
                 }
 
-                var @await = assignedValue as AwaitExpressionSyntax;
-                if (@await != null)
+                if (assignedValue is AwaitExpressionSyntax @await)
                 {
                     using (var pooled = ReturnValueWalker.Create(@await, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
@@ -200,8 +196,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                var property = symbol as IPropertySymbol;
-                if (property != null)
+                if (symbol is IPropertySymbol property)
                 {
                     if (property.DeclaringSyntaxReferences.Length == 0)
                     {
@@ -215,8 +210,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                var method = symbol as IMethodSymbol;
-                if (method != null)
+                if (symbol is IMethodSymbol method)
                 {
                     if (method.DeclaringSyntaxReferences.Length == 0)
                     {

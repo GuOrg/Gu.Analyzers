@@ -160,8 +160,7 @@
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
             TypeDeclarationSyntax updated = typeDeclaration;
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("Dispose", out existsingMethod))
+            if (!type.TryGetMethod("Dispose", out IMethodSymbol _))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
@@ -179,10 +178,9 @@
                         SyntaxFactory.ParseStatement("base.Dispose(disposing);")
                     });
 
-                SyntaxNode method;
                 if (updated.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
-                                       out method))
+                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
+                       out SyntaxNode method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
                 }
@@ -201,8 +199,7 @@
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
             TypeDeclarationSyntax updated = typeDeclaration;
 
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("Dispose", out existsingMethod))
+            if (!type.TryGetMethod("Dispose", out IMethodSymbol _))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
@@ -212,10 +209,9 @@
                     accessibility: Accessibility.Public,
                     statements: new[] { SyntaxFactory.ParseStatement(usesUnderscoreNames ? "Dispose(true);" : "this.Dispose(true);") });
 
-                MemberDeclarationSyntax method;
                 if (updated.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
-                                       out method))
+                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                       out MemberDeclarationSyntax method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
                 }
@@ -272,8 +268,7 @@
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
             TypeDeclarationSyntax updated = typeDeclaration;
 
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("Dispose", out existsingMethod))
+            if (!type.TryGetMethod("Dispose", out IMethodSymbol _))
             {
                 var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
                 updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
@@ -287,10 +282,9 @@
                         syntaxGenerator.SetDisposedTrue(usesUnderscoreNames)
                     });
 
-                MemberDeclarationSyntax method;
                 if (updated.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
-                                       out method))
+                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
+                       out MemberDeclarationSyntax method))
                 {
                     updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
                 }
@@ -330,8 +324,7 @@
 
             public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
-                SyntaxToken modifier;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -346,8 +339,7 @@
 
             public override SyntaxNode VisitEventDeclaration(EventDeclarationSyntax node)
             {
-                SyntaxToken modifier;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -362,8 +354,7 @@
 
             public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
             {
-                SyntaxToken modifier;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -378,8 +369,7 @@
 
             public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
             {
-                SyntaxToken modifier;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -403,8 +393,7 @@
 
             public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
             {
-                SyntaxToken modifier;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }

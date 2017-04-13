@@ -111,8 +111,7 @@
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
-                var right = node.Right as IdentifierNameSyntax;
-                if (right != null)
+                if (node.Right is IdentifierNameSyntax right)
                 {
                     var rightSymbol = this.semanticModel.GetSymbolSafe(right, this.cancellationToken);
                     if (rightSymbol is IParameterSymbol)

@@ -78,11 +78,10 @@ namespace Gu.Analyzers
                        assignmentSymbol.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference assignedToDeclaration))
                     {
                         var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
-                        var fieldSymbol = context.SemanticModel.SemanticModelFor(assignedToDeclarator)
-                                                 ?.GetDeclaredSymbol(assignedToDeclarator, context.CancellationToken) as IFieldSymbol;
-                        if (fieldSymbol != null &&
-                           fieldSymbol.IsReadOnly &&
-                           fieldSymbol.IsStatic)
+                        if (context.SemanticModel.SemanticModelFor(assignedToDeclarator)
+                         ?.GetDeclaredSymbol(assignedToDeclarator, context.CancellationToken) is IFieldSymbol fieldSymbol &&
+   fieldSymbol.IsReadOnly &&
+   fieldSymbol.IsStatic)
                         {
                             return;
                         }
@@ -95,10 +94,9 @@ namespace Gu.Analyzers
                 var declarator = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
                 if (declarator != null)
                 {
-                    var fieldSymbol = context.SemanticModel.SemanticModelFor(declarator)?.GetDeclaredSymbol(declarator, context.CancellationToken) as IFieldSymbol;
-                    if (fieldSymbol != null &&
-                       fieldSymbol.IsReadOnly &&
-                       fieldSymbol.IsStatic)
+                    if (context.SemanticModel.SemanticModelFor(declarator)?.GetDeclaredSymbol(declarator, context.CancellationToken) is IFieldSymbol fieldSymbol &&
+   fieldSymbol.IsReadOnly &&
+   fieldSymbol.IsStatic)
                     {
                         return;
                     }

@@ -166,8 +166,7 @@
 
         private static bool IsIgnored(ISymbol symbol)
         {
-            var method = symbol as IMethodSymbol;
-            if (method != null)
+            if (symbol is IMethodSymbol method)
             {
                 return method == KnownSymbol.IEnumerable.GetEnumerator;
             }

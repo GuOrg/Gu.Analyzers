@@ -94,8 +94,7 @@
                 }
                 else
                 {
-                    IMethodSymbol ctor;
-                    if (TryGetDefault(type, out ctor))
+                    if (TryGetDefault(type, out IMethodSymbol ctor))
                     {
                         foreach (var reference in ctor.DeclaringSyntaxReferences)
                         {
@@ -133,8 +132,7 @@
             {
                 var baseType = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken)
                                             .ContainingType.BaseType;
-                IMethodSymbol defaultCtor;
-                if (TryGetDefault(baseType, out defaultCtor))
+                if (TryGetDefault(baseType, out IMethodSymbol defaultCtor))
                 {
                     foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
                     {
@@ -154,8 +152,7 @@
                 return false;
             }
 
-            ConstructorInitializerSyntax initializer;
-            if (TryGetInitializer(other, cancellationToken, out initializer))
+            if (TryGetInitializer(other, cancellationToken, out ConstructorInitializerSyntax initializer))
             {
                 if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
                    !initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))

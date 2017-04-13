@@ -82,9 +82,8 @@
                 return;
             }
 
-            AccessorDeclarationSyntax setter;
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter) &&
-                setter.Body != null)
+            if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
+    setter.Body != null)
             {
                 // Handle the backing field
                 return;

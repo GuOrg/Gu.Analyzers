@@ -59,11 +59,8 @@
             {
                 var symbols = context.SemanticModel.LookupSymbols(objectCreationExpressionSyntax.SpanStart);
                 var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(objectCreationExpressionSyntax, context.CancellationToken);
-                int parameterIndex;
-                ArgumentSyntax argument;
-                int argumentIndex;
-                if (TryGetIndexOfParameter(ctor, "paramName", out parameterIndex) &&
-                    TryGetIndexOfNameArgument(symbols, objectCreationExpressionSyntax.ArgumentList, out argument, out argumentIndex) &&
+                if (TryGetIndexOfParameter(ctor, "paramName", out int parameterIndex) &&
+                    TryGetIndexOfNameArgument(symbols, objectCreationExpressionSyntax.ArgumentList, out ArgumentSyntax argument, out int argumentIndex) &&
                     argumentIndex != parameterIndex)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
@@ -97,11 +94,9 @@
             for (var i = 0; i < arguments.Arguments.Count; i++)
             {
                 argument = arguments.Arguments[i];
-                var literal = argument.Expression as LiteralExpressionSyntax;
-                if (literal != null)
+                if (argument.Expression is LiteralExpressionSyntax literal)
                 {
-                    ISymbol _;
-                    if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out _))
+                    if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out ISymbol _))
                     {
                         index = i;
                         return true;
@@ -117,8 +112,7 @@
                         continue;
                     }
 
-                    ISymbol _;
-                    if (symbols.TryGetSingle(x => x.Name == identifierName.Identifier.ValueText, out _))
+                    if (symbols.TryGetSingle(x => x.Name == identifierName.Identifier.ValueText, out ISymbol _))
                     {
                         index = i;
                         return true;

@@ -17,8 +17,7 @@ namespace Gu.Analyzers
                                         ? "_disposed"
                                         : "disposed";
 
-            IFieldSymbol existsingField;
-            if (!type.TryGetField(disposedFieldName, out existsingField))
+            if (!type.TryGetField(disposedFieldName, out IFieldSymbol _))
             {
                 var disposedField = syntaxGenerator.FieldDeclaration(
                     disposedFieldName,
@@ -26,8 +25,7 @@ namespace Gu.Analyzers
                     type: SyntaxFactory.ParseTypeName("bool"));
 
                 var members = typeDeclaration.Members;
-                MemberDeclarationSyntax field;
-                if (members.TryGetLast(x => x is FieldDeclarationSyntax, out field))
+                if (members.TryGetLast(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
                 {
                     return typeDeclaration.InsertNodesAfter(field, new[] { disposedField });
                 }
@@ -45,8 +43,7 @@ namespace Gu.Analyzers
 
         internal static TypeDeclarationSyntax WithThrowIfDisposed(this TypeDeclarationSyntax typeDeclaration, ITypeSymbol type, SyntaxGenerator syntaxGenerator, bool usesUnderscoreNames)
         {
-            IMethodSymbol existsingMethod;
-            if (!type.TryGetMethod("ThrowIfDisposed", out existsingMethod))
+            if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
             {
                 var ifDisposedThrow = syntaxGenerator.IfStatement(
                     SyntaxFactory.ParseExpression(usesUnderscoreNames ? "_disposed" : "this.disposed"),
@@ -56,10 +53,9 @@ namespace Gu.Analyzers
                     accessibility: type.IsSealed ? Accessibility.Private : Accessibility.Protected,
                     statements: new[] { ifDisposedThrow });
 
-                MemberDeclarationSyntax method;
                 if (typeDeclaration.Members.TryGetLast(
-                                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
-                                       out method))
+                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.ProtectedKeyword) == true,
+                       out MemberDeclarationSyntax method))
                 {
                     return typeDeclaration.InsertNodesAfter(method, new[] { throwIfDisposedMethod });
                 }

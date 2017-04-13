@@ -66,8 +66,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var invocation = expression as InvocationExpressionSyntax;
-            if (invocation != null)
+            if (expression is InvocationExpressionSyntax invocation)
             {
                 if (invocation.Parent != null &&
                     invocation.Parent.IsKind(SyntaxKind.ConditionalAccessExpression) &&
@@ -113,8 +112,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var memberAccess = expression as MemberAccessExpressionSyntax;
-            if (memberAccess != null)
+            if (expression is MemberAccessExpressionSyntax memberAccess)
             {
                 if (memberAccess.Expression is ThisExpressionSyntax ||
                     memberAccess.Expression is BaseExpressionSyntax)
@@ -126,8 +124,7 @@ namespace Gu.Analyzers
                 return TryPeel(memberAccess.Expression, out member);
             }
 
-            var memberBinding = expression as MemberBindingExpressionSyntax;
-            if (memberBinding != null)
+            if (expression is MemberBindingExpressionSyntax)
             {
                 return TryPeel((expression.Parent?.Parent as ConditionalAccessExpressionSyntax)?.Expression, out member);
             }

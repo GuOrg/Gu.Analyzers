@@ -118,11 +118,8 @@
 
         private static bool HasSerializableAttribute(INamedTypeSymbol type)
         {
-            AttributeData serializableAttribute;
             return type.GetAttributes()
-                       .TryGetFirst(
-                           x => x.AttributeClass == KnownSymbol.SerializableAttribute,
-                           out serializableAttribute);
+                       .TryGetFirst(x => x.AttributeClass == KnownSymbol.SerializableAttribute, out AttributeData _);
         }
     }
 }

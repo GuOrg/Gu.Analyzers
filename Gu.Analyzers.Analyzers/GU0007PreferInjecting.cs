@@ -163,8 +163,7 @@
                 return Injectable.Safe;
             }
 
-            var memberAccess = expression as MemberAccessExpressionSyntax;
-            if (memberAccess != null)
+            if (expression is MemberAccessExpressionSyntax memberAccess)
             {
                 if (memberAccess.Parent is MemberAccessExpressionSyntax ||
                     memberAccess.Expression is MemberAccessExpressionSyntax)
@@ -176,8 +175,7 @@
                 return IsInjectable(memberAccess.Expression, ctor, @checked);
             }
 
-            var nestedObjectCreation = expression as ObjectCreationExpressionSyntax;
-            if (nestedObjectCreation != null)
+            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
             {
                 if (CanInject(nestedObjectCreation, ctor) == Injectable.No)
                 {

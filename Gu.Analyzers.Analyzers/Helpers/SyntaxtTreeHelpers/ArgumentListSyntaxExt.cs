@@ -45,15 +45,13 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            ArgumentSyntax argument;
-            if (TryGetMatchingArgument(arguments, parameter, out argument))
+            if (TryGetMatchingArgument(arguments, parameter, out ArgumentSyntax argument))
             {
                 value = argument.Expression;
                 return value != null;
             }
 
-            SyntaxNode declaration;
-            if (parameter.HasExplicitDefaultValue && parameter.TryGetSingleDeclaration(cancellationToken, out declaration))
+            if (parameter.HasExplicitDefaultValue && parameter.TryGetSingleDeclaration(cancellationToken, out SyntaxNode declaration))
             {
                 value = (declaration as ParameterSyntax)?.Default.Value;
             }

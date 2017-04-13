@@ -91,8 +91,7 @@
                     return;
                 }
 
-                List<MemberDeclarationSyntax> members;
-                if (!this.sorted.Item.TryGetValue(type, out members))
+                if (!this.sorted.Item.TryGetValue(type, out List<MemberDeclarationSyntax> members))
                 {
                     members = new List<MemberDeclarationSyntax>(type.Members);
                     this.sorted.Item[type] = members;
@@ -169,8 +168,7 @@
                     return false;
                 }
 
-                List<MemberDeclarationSyntax> sortedMembers;
-                if (this.sorted.Item.TryGetValue(type, out sortedMembers))
+                if (this.sorted.Item.TryGetValue(type, out List<MemberDeclarationSyntax> sortedMembers))
                 {
                     var index = type.Members.IndexOf(member);
                     if (index == -1)
@@ -229,15 +227,13 @@
 
             public override SyntaxNode Visit(SyntaxNode node)
             {
-                var type = node as TypeDeclarationSyntax;
-                if (type != null)
+                if (node is TypeDeclarationSyntax type)
                 {
                     this.sorted.Sort(type, this.semanticModel, this.cancellationToken);
                     return base.Visit(node);
                 }
 
-                MemberDeclarationSyntax sortedNode;
-                if (this.sorted.TryGetSorted(node, out sortedNode))
+                if (this.sorted.TryGetSorted(node, out MemberDeclarationSyntax sortedNode))
                 {
                     return base.Visit(sortedNode);
                 }

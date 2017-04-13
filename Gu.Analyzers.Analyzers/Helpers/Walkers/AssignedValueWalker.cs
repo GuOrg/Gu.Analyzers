@@ -75,8 +75,7 @@
             else
             {
                 var ctor = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                IMethodSymbol baseCtor;
-                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out baseCtor))
+                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out IMethodSymbol baseCtor))
                 {
                     this.HandleInvoke(baseCtor, null);
                 }
@@ -152,11 +151,9 @@
                         foreach (var reference in method.DeclaringSyntaxReferences)
                         {
                             var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                            ParameterSyntax parameterSyntax;
-                            if (methodDeclaration.TryGetMatchingParameter(node, out parameterSyntax))
+                            if (methodDeclaration.TryGetMatchingParameter(node, out ParameterSyntax parameterSyntax))
                             {
-                                var parameter = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken) as IParameterSymbol;
-                                if (parameter != null)
+                                if (this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken) is IParameterSymbol parameter)
                                 {
                                     if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
                                     {
@@ -265,12 +262,10 @@
                 {
                     for (var i = before; i < this.values.Count; i++)
                     {
-                        var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
-                        if (parameter != null &&
-                            parameter.RefKind != RefKind.Out)
+                        if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
+    parameter.RefKind != RefKind.Out)
                         {
-                            ExpressionSyntax arg;
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out arg))
+                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out ExpressionSyntax arg))
                             {
                                 this.values[i] = arg;
                             }
@@ -412,8 +407,7 @@
                 foreach (var reference in property.DeclaringSyntaxReferences)
                 {
                     var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    AccessorDeclarationSyntax setter;
-                    if (declaration.TryGetSetAccessorDeclaration(out setter))
+                    if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
                     {
                         this.Visit(setter);
                     }

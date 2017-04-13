@@ -134,23 +134,22 @@
 
             public int Compare(IPropertySymbol x, IPropertySymbol y)
             {
-                int result;
-                if (TryCompare(x, y, p => !p.IsIndexer, out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Public), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Friend), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndFriend), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Internal), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Protected), out result) ||
-                    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Private), out result) ||
-                    TryCompare(x, y, p => p.IsStatic, out result) ||
-                    TryCompare(x, y, IsGetOnly, out result) ||
-                    TryCompare(x, y, IsCalculated, out result) ||
-                    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Private), out result) ||
-                    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Protected), out result) ||
-                    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
-                    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Friend), out result) ||
-                    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Internal), out result))
+                if (TryCompare(x, y, p => !p.IsIndexer, out int result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Public), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Friend), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndFriend), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Internal), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Protected), out result) ||
+    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Private), out result) ||
+    TryCompare(x, y, p => p.IsStatic, out result) ||
+    TryCompare(x, y, IsGetOnly, out result) ||
+    TryCompare(x, y, IsCalculated, out result) ||
+    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Private), out result) ||
+    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Protected), out result) ||
+    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
+    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Friend), out result) ||
+    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Internal), out result))
                 {
                     return result;
                 }
@@ -160,8 +159,7 @@
 
             private static bool IsDeclaredAccessibility(IPropertySymbol property, Accessibility accessibility)
             {
-                IPropertySymbol interfaceProperty;
-                if (property.ExplicitInterfaceImplementations.TryGetSingle(out interfaceProperty))
+                if (property.ExplicitInterfaceImplementations.TryGetSingle(out IPropertySymbol interfaceProperty))
                 {
                     return interfaceProperty.DeclaredAccessibility == accessibility;
                 }
@@ -171,8 +169,7 @@
 
             private static bool IsSetMethodDeclaredAccessibility(IPropertySymbol property, Accessibility accessibility)
             {
-                IPropertySymbol interfaceProperty;
-                if (property.ExplicitInterfaceImplementations.TryGetSingle(out interfaceProperty))
+                if (property.ExplicitInterfaceImplementations.TryGetSingle(out IPropertySymbol interfaceProperty))
                 {
                     return interfaceProperty.DeclaredAccessibility == accessibility;
                 }
@@ -205,27 +202,23 @@
 
             private static bool IsGetOnly(IPropertySymbol property)
             {
-                BasePropertyDeclarationSyntax declaration;
-                if (!TryGetDeclaration(property, out declaration))
+                if (!TryGetDeclaration(property, out BasePropertyDeclarationSyntax declaration))
                 {
                     return false;
                 }
 
-                AccessorDeclarationSyntax getter;
-                if (!TryGetGetter(declaration, out getter) ||
-                    getter.Body != null)
+                if (!TryGetGetter(declaration, out AccessorDeclarationSyntax getter) ||
+    getter.Body != null)
                 {
                     return false;
                 }
 
-                AccessorDeclarationSyntax _;
-                return !TryGetSetter(declaration, out _);
+                return !TryGetSetter(declaration, out AccessorDeclarationSyntax _);
             }
 
             private static bool IsCalculated(IPropertySymbol property)
             {
-                BasePropertyDeclarationSyntax declaration;
-                if (!TryGetDeclaration(property, out declaration))
+                if (!TryGetDeclaration(property, out BasePropertyDeclarationSyntax declaration))
                 {
                     return false;
                 }
@@ -235,14 +228,12 @@
                     return false;
                 }
 
-                AccessorDeclarationSyntax _;
-                if (TryGetSetter(declaration, out _))
+                if (TryGetSetter(declaration, out AccessorDeclarationSyntax _))
                 {
                     return false;
                 }
 
-                AccessorDeclarationSyntax getter;
-                if (TryGetGetter(declaration, out getter) && getter.Body != null)
+                if (TryGetGetter(declaration, out AccessorDeclarationSyntax getter) && getter.Body != null)
                 {
                     return true;
                 }

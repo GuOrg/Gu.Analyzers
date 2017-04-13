@@ -325,8 +325,7 @@
                 return false;
             }
 
-            var expressionBody = lambda.Body as ExpressionSyntax;
-            if (expressionBody != null)
+            if (lambda.Body is ExpressionSyntax expressionBody)
             {
                 this.AddReturnValue(expressionBody);
             }

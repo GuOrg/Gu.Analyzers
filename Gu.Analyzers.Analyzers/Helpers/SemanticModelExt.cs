@@ -25,8 +25,7 @@
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
-            var awaitExpression = node as AwaitExpressionSyntax;
-            if (awaitExpression != null)
+            if (node is AwaitExpressionSyntax awaitExpression)
             {
                 return GetSymbolSafe(semanticModel, awaitExpression, cancellationToken);
             }
@@ -139,8 +138,7 @@
 
             foreach (var metadataReference in semanticModel.Compilation.References)
             {
-                var compilationReference = metadataReference as CompilationReference;
-                if (compilationReference != null)
+                if (metadataReference is CompilationReference compilationReference)
                 {
                     if (compilationReference.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
                     {

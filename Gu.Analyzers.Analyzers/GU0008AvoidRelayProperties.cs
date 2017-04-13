@@ -67,16 +67,14 @@
                 return IsRelayReturn(property.ExpressionBody.Expression, semanticModel, cancellationToken);
             }
 
-            AccessorDeclarationSyntax getter;
-            if (property.TryGetGetAccessorDeclaration(out getter))
+            if (property.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter))
             {
                 if (getter.Body == null)
                 {
                     return false;
                 }
 
-                StatementSyntax statement;
-                if (getter.Body.Statements.TryGetSingle(out statement))
+                if (getter.Body.Statements.TryGetSingle(out StatementSyntax statement))
                 {
                     return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression, semanticModel, cancellationToken);
                 }
@@ -117,8 +115,7 @@
 
         private static bool IsInjected(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var field = member as IFieldSymbol;
-            if (field != null)
+            if (member is IFieldSymbol field)
             {
                 using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
                 {
@@ -137,8 +134,7 @@
                 }
             }
 
-            var property = member as IPropertySymbol;
-            if (property != null)
+            if (member is IPropertySymbol property)
             {
                 using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
                 {

@@ -42,8 +42,7 @@
                     continue;
                 }
 
-                SyntaxNode root;
-                if (tree.TryGetRoot(out root))
+                if (tree.TryGetRoot(out SyntaxNode root))
                 {
                     pooled.Item.Visit(root);
                 }

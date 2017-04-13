@@ -23,8 +23,7 @@
                     var identifierName = invocation.Expression as IdentifierNameSyntax;
                     if (identifierName == null)
                     {
-                        var memberAccess = invocation.Expression as MemberAccessExpressionSyntax;
-                        if (memberAccess != null)
+                        if (invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                         {
                             identifierName = memberAccess.Name as IdentifierNameSyntax;
                         }
@@ -65,8 +64,7 @@
             {
                 foreach (var reference in method.DeclaringSyntaxReferences)
                 {
-                    var methodDeclaration = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
-                    if (methodDeclaration != null)
+                    if (reference.GetSyntax(cancellationToken) is MethodDeclarationSyntax methodDeclaration)
                     {
                         if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameterSyntax))
                         {

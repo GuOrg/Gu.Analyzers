@@ -69,8 +69,7 @@
                     }
                 }
 
-                var memberAccess = node as MemberAccessExpressionSyntax;
-                if (memberAccess != null)
+                if (node is MemberAccessExpressionSyntax memberAccess)
                 {
                     var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(memberAccess, context.CancellationToken));
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))

@@ -88,8 +88,7 @@
             if (pooled.Item.nonPrivateCtors.Count == 0 &&
                 pooled.Item.Default == null)
             {
-                IMethodSymbol @default;
-                if (Constructor.TryGetDefault(pooled.Item.type, out @default))
+                if (Constructor.TryGetDefault(pooled.Item.type, out IMethodSymbol @default))
                 {
                     foreach (var reference in @default.DeclaringSyntaxReferences)
                     {

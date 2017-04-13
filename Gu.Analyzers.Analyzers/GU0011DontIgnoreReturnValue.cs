@@ -113,8 +113,7 @@
                     return true;
                 }
 
-                MethodDeclarationSyntax declaration;
-                if (method.TryGetSingleDeclaration(cancellationToken, out declaration))
+                if (method.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
                 {
                     using (var pooled = ReturnValueWalker.Create(declaration, Search.Recursive, semanticModel, cancellationToken))
                     {
