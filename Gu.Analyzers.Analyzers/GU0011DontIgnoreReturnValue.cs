@@ -116,7 +116,7 @@
                 MethodDeclarationSyntax declaration;
                 if (method.TryGetSingleDeclaration(cancellationToken, out declaration))
                 {
-                    using (var pooled = ReturnValueWalker.Create(declaration, true, semanticModel, cancellationToken))
+                    using (var pooled = ReturnValueWalker.Create(declaration, SearchMode.Recursive, semanticModel, cancellationToken))
                     {
                         if (method.IsExtensionMethod)
                         {

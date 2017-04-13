@@ -104,7 +104,7 @@
             {
                 if (argument.Parent.Parent is InvocationExpressionSyntax invocation)
                 {
-                    using (var returnWalker = ReturnValueWalker.Create(invocation, true, semanticModel, cancellationToken))
+                    using (var returnWalker = ReturnValueWalker.Create(invocation, SearchMode.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var returnValue in returnWalker.Item)
                         {

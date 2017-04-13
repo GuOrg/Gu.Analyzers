@@ -115,7 +115,7 @@ namespace Gu.Analyzers
                 foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(cancellationToken);
-                    using (var pooled = ReturnValueWalker.Create(node, false, semanticModel, cancellationToken))
+                    using (var pooled = ReturnValueWalker.Create(node, SearchMode.TopLevel, semanticModel, cancellationToken))
                     {
                         if (pooled.Item.Count == 0)
                         {

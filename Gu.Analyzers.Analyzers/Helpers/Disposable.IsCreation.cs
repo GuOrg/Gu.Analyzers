@@ -137,7 +137,7 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            using (var pooled = ReturnValueWalker.Create(candidate, true, semanticModel, cancellationToken))
+            using (var pooled = ReturnValueWalker.Create(candidate, SearchMode.Recursive, semanticModel, cancellationToken))
             {
                 if (pooled.Item.Count == 0)
                 {

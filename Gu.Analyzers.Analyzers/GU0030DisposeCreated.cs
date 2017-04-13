@@ -97,7 +97,7 @@
 
         private static bool IsReturned(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = ReturnValueWalker.Create(block, false, semanticModel, cancellationToken))
+            using (var pooled = ReturnValueWalker.Create(block, SearchMode.TopLevel, semanticModel, cancellationToken))
             {
                 foreach (var value in pooled.Item)
                 {

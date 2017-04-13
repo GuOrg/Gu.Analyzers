@@ -15,7 +15,6 @@
             {
                 x.values.Clear();
                 x.recursionLoop.Clear();
-                x.isRecursive = false;
                 x.awaits = false;
                 x.semanticModel = null;
                 x.cancellationToken = CancellationToken.None;
@@ -24,7 +23,7 @@
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly RecursionLoop recursionLoop = new RecursionLoop();
 
-        private bool isRecursive;
+        private SearchMode searchMode;
         private bool awaits;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -67,7 +66,7 @@
 
         internal static bool TrygetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
-            using (var pooled = Create(body, false, semanticModel, cancellationToken))
+            using (var pooled = Create(body, SearchMode.TopLevel, semanticModel, cancellationToken))
             {
                 if (pooled.Item.values.Count != 1)
                 {
@@ -80,7 +79,7 @@
             }
         }
 
-        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             if (node == null)
@@ -88,7 +87,7 @@
                 return pooled;
             }
 
-            pooled.Item.isRecursive = recursive;
+            pooled.Item.searchMode = searchMode;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.Run(node);
@@ -98,7 +97,7 @@
         private Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
         {
             var pooled = Pool.GetOrCreate();
-            pooled.Item.isRecursive = this.isRecursive;
+            pooled.Item.searchMode = this.searchMode;
             pooled.Item.awaits = this.awaits;
             pooled.Item.semanticModel = this.semanticModel;
             pooled.Item.cancellationToken = this.cancellationToken;
@@ -137,14 +136,14 @@
                     return;
                 }
 
-                if (this.isRecursive &&
+                if (this.searchMode == SearchMode.Recursive &&
                     value is AwaitExpressionSyntax @await)
                 {
                     value = @await.Expression;
                 }
             }
 
-            if (this.isRecursive)
+            if (this.searchMode == SearchMode.Recursive)
             {
                 if (value is InvocationExpressionSyntax invocation)
                 {
@@ -234,7 +233,7 @@
             for (var i = this.values.Count - 1; i >= 0; i--)
             {
                 var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.isRecursive &&
+                if (this.searchMode == SearchMode.Recursive &&
                     SymbolComparer.Equals(symbol, method))
                 {
                     this.values.RemoveAt(i);
@@ -278,7 +277,7 @@
             for (var i = this.values.Count - 1; i >= 0; i--)
             {
                 var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.isRecursive &&
+                if (this.searchMode == SearchMode.Recursive &&
                     SymbolComparer.Equals(symbol, property))
                 {
                     this.values.RemoveAt(i);

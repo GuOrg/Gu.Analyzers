@@ -134,7 +134,7 @@ namespace Gu.Analyzers
             if (symbol is IPropertySymbol property &&
                 !property.IsAutoProperty(cancellationToken))
             {
-                using (var returnValues = ReturnValueWalker.Create(value, false, semanticModel, cancellationToken))
+                using (var returnValues = ReturnValueWalker.Create(value, SearchMode.TopLevel, semanticModel, cancellationToken))
                 {
                     using (var recursive = RecursiveValues.Create(returnValues.Item, semanticModel, cancellationToken))
                     {
