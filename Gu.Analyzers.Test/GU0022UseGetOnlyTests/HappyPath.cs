@@ -5,25 +5,32 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 
     internal class HappyPath : HappyPathVerifier<GU0022UseGetOnly>
     {
-        public static readonly UpdateItem[] UpdateSource =
+        public static readonly TestCase[] TestCases =
         {
-            new UpdateItem("int", "A++;"),
-            new UpdateItem("int", "A--;"),
-            new UpdateItem("int", "A+=a;"),
-            new UpdateItem("int", "A-=a;"),
-            new UpdateItem("int", "A*=a;"),
-            new UpdateItem("int", "A/=a;"),
-            new UpdateItem("int", "A%=a;"),
-            new UpdateItem("int", "A = a;"),
-            new UpdateItem("bool", "A|=a;"),
+            new TestCase("int", "A++;"),
+            new TestCase("int", "A--;"),
+            new TestCase("int", "A+=a;"),
+            new TestCase("int", "A-=a;"),
+            new TestCase("int", "A*=a;"),
+            new TestCase("int", "A/=a;"),
+            new TestCase("int", "A%=a;"),
+            new TestCase("int", "A = a;"),
+            new TestCase("bool", "A|=a;"),
         };
 
         [Test]
-        public async Task MiscProperties()
+        public async Task DifferentProperties()
         {
-            var testCode = @"
-    public class Foo
+            var interfaceCode = @"
+    public interface IFoo
     {
+        int D { get; set; }
+    }";
+            var testCode = @"
+    public class Foo : IFoo
+    {
+        // private int f;
+        
         public Foo(int a, int b, int c, int d)
         {
             this.A = a;
@@ -40,14 +47,26 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 
         public int D { get; set; }
 
+        int IFoo.D
+        {
+            get { return this.D; }
+            set { this.D = value; }
+        }
+
         public int E => A;
+
+        // public int F
+        // {
+        //     get => this.f;
+        //     set => this.f = value;
+        // }
     }";
-            await this.VerifyHappyPathAsync(testCode)
+            await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
 
-        [TestCaseSource(nameof(UpdateSource))]
-        public async Task UpdatedInMethodThis(UpdateItem data)
+        [TestCaseSource(nameof(TestCases))]
+        public async Task UpdatedInMethodThis(TestCase data)
         {
             var testCode = @"
 public class Foo
@@ -65,8 +84,8 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
-        [TestCaseSource(nameof(UpdateSource))]
-        public async Task UpdatedInMethodUnderscoreNames(UpdateItem data)
+        [TestCaseSource(nameof(TestCases))]
+        public async Task UpdatedInMethodUnderscoreNames(TestCase data)
         {
             var testCode = @"
 public class Foo
@@ -105,8 +124,8 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
-        [TestCaseSource(nameof(UpdateSource))]
-        public async Task UpdatingOtherInstanceInCtor(UpdateItem data)
+        [TestCaseSource(nameof(TestCases))]
+        public async Task UpdatingOtherInstanceInCtor(TestCase data)
         {
             var testCode = @"
     public class Foo
@@ -124,9 +143,9 @@ public class Foo
                       .ConfigureAwait(false);
         }
 
-        internal class UpdateItem
+        internal class TestCase
         {
-            public UpdateItem(string type, string update)
+            public TestCase(string type, string update)
             {
                 this.Type = type;
                 this.Update = update;
