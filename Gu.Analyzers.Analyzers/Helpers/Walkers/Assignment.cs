@@ -14,7 +14,6 @@
                 {
                     x.assignments.Clear();
                     x.Clear();
-                    x.IsRecursive = false;
                     x.SemanticModel = null;
                     x.CancellationToken = CancellationToken.None;
                 });
@@ -36,22 +35,22 @@
             this.assignments.Add(node);
         }
 
-        internal static Pool<Assignment>.Pooled Create(SyntaxNode node, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<Assignment>.Pooled Create(SyntaxNode node, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Cache.GetOrCreate();
             pooled.Item.SemanticModel = semanticModel;
             pooled.Item.CancellationToken = cancellationToken;
-            pooled.Item.IsRecursive = recursive;
+            pooled.Item.SearchMode = searchMode;
             pooled.Item.Visit(node);
             return pooled;
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return FirstForSymbol(symbol, scope, recursive, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
+            return FirstForSymbol(symbol, scope, searchMode, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -60,7 +59,7 @@
                 return false;
             }
 
-            using (var pooledAssignments = Create(scope, recursive, semanticModel, cancellationToken))
+            using (var pooledAssignments = Create(scope, searchMode, semanticModel, cancellationToken))
             {
                 foreach (var candidate in pooledAssignments.Item.Assignments)
                 {
@@ -76,7 +75,7 @@
             return false;
         }
 
-        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -85,7 +84,7 @@
                 return false;
             }
 
-            using (var pooledAssignments = Create(scope, recursive, semanticModel, cancellationToken))
+            using (var pooledAssignments = Create(scope, searchMode, semanticModel, cancellationToken))
             {
                 foreach (var candidate in pooledAssignments.Item.Assignments)
                 {

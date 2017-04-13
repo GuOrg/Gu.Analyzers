@@ -146,7 +146,7 @@ namespace Gu.Analyzers
 
             private DisposeWalker()
             {
-                this.IsRecursive = true;
+                this.SearchMode = SearchMode.Recursive;
             }
 
             public int Count => this.invocations.Count;
@@ -181,7 +181,7 @@ namespace Gu.Analyzers
                     return Create(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, SearchMode.Recursive, out IMethodSymbol disposeMethod))
+                if (TryGetDisposeMethod(type, Analyzers.SearchMode.Recursive, out IMethodSymbol disposeMethod))
                 {
                     return Create(disposeMethod, semanticModel, cancellationToken);
                 }

@@ -26,7 +26,7 @@ namespace Gu.Analyzers
             {
                 using (var pooledSet = SetPool<ISymbol>.Create())
                 {
-                    using (var pooledAssigned = Assignment.Create(setter, true, semanticModel, cancellationToken))
+                    using (var pooledAssigned = Assignment.Create(setter, SearchMode.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var assigned in pooledAssigned.Item.Assignments)
                         {
