@@ -94,7 +94,7 @@
         {
             var containingType = context.ContainingSymbol.ContainingType;
             if (!Disposable.IsAssignableTo(containingType) ||
-                !Disposable.TryGetDisposeMethod(containingType, SearchMode.TopLevel, out IMethodSymbol _))
+                !Disposable.TryGetDisposeMethod(containingType, Search.TopLevel, out IMethodSymbol _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

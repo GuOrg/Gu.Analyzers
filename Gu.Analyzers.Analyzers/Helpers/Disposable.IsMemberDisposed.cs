@@ -115,7 +115,7 @@ namespace Gu.Analyzers
                 foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(cancellationToken);
-                    using (var pooled = ReturnValueWalker.Create(node, SearchMode.TopLevel, semanticModel, cancellationToken))
+                    using (var pooled = ReturnValueWalker.Create(node, Search.TopLevel, semanticModel, cancellationToken))
                     {
                         if (pooled.Item.Count == 0)
                         {
@@ -146,7 +146,7 @@ namespace Gu.Analyzers
 
             private DisposeWalker()
             {
-                this.SearchMode = SearchMode.Recursive;
+                this.Search = Search.Recursive;
             }
 
             public int Count => this.invocations.Count;
@@ -181,7 +181,7 @@ namespace Gu.Analyzers
                     return Create(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, Analyzers.SearchMode.Recursive, out IMethodSymbol disposeMethod))
+                if (TryGetDisposeMethod(type, Analyzers.Search.Recursive, out IMethodSymbol disposeMethod))
                 {
                     return Create(disposeMethod, semanticModel, cancellationToken);
                 }

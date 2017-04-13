@@ -1,6 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
-    internal enum SearchMode
+    internal enum Search
     {
         TopLevel,
         Recursive

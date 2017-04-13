@@ -104,7 +104,7 @@
             {
                 if (argument.Parent.Parent is InvocationExpressionSyntax invocation)
                 {
-                    using (var returnWalker = ReturnValueWalker.Create(invocation, SearchMode.Recursive, semanticModel, cancellationToken))
+                    using (var returnWalker = ReturnValueWalker.Create(invocation, Search.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var returnValue in returnWalker.Item)
                         {
@@ -129,7 +129,7 @@
                             if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
-                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, SearchMode.TopLevel, out IMethodSymbol disposeMethod))
+                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out IMethodSymbol disposeMethod))
                                 {
                                     return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
                                 }

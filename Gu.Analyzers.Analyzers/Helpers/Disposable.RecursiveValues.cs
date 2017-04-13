@@ -165,7 +165,7 @@ namespace Gu.Analyzers
                 var @await = assignedValue as AwaitExpressionSyntax;
                 if (@await != null)
                 {
-                    using (var pooled = ReturnValueWalker.Create(@await, SearchMode.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var pooled = ReturnValueWalker.Create(@await, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
                         return this.AddManyRecursively(pooled.Item);
                     }
@@ -209,7 +209,7 @@ namespace Gu.Analyzers
                         return true;
                     }
 
-                    using (var returnValues = ReturnValueWalker.Create(assignedValue, SearchMode.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var returnValues = ReturnValueWalker.Create(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
                         return this.AddManyRecursively(returnValues.Item);
                     }
@@ -224,7 +224,7 @@ namespace Gu.Analyzers
                         return true;
                     }
 
-                    using (var pooled = ReturnValueWalker.Create(assignedValue, SearchMode.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var pooled = ReturnValueWalker.Create(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
                         return this.AddManyRecursively(pooled.Item);
                     }

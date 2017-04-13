@@ -26,7 +26,7 @@ namespace Gu.Analyzers
             {
                 using (var pooledSet = SetPool<ISymbol>.Create())
                 {
-                    using (var pooledAssigned = Assignment.Create(setter, SearchMode.Recursive, semanticModel, cancellationToken))
+                    using (var pooledAssigned = Assignment.Create(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var assigned in pooledAssigned.Item.Assignments)
                         {
@@ -137,7 +137,7 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
-            using (var pooled = ReturnValueWalker.Create(candidate, SearchMode.Recursive, semanticModel, cancellationToken))
+            using (var pooled = ReturnValueWalker.Create(candidate, Search.Recursive, semanticModel, cancellationToken))
             {
                 if (pooled.Item.Count == 0)
                 {

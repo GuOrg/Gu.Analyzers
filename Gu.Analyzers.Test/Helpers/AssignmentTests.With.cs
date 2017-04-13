@@ -11,9 +11,9 @@
     {
         internal class With
         {
-            [TestCase(SearchMode.Recursive)]
-            [TestCase(SearchMode.TopLevel)]
-            public void FieldCtorArg(SearchMode searchMode)
+            [TestCase(Search.Recursive)]
+            [TestCase(Search.TopLevel)]
+            public void FieldCtorArg(Search search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -35,13 +35,13 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var arg = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, Assignment.FirstWith(arg, ctor, searchMode, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstWith(arg, ctor, search, semanticModel, CancellationToken.None, out result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
-            [TestCase(SearchMode.Recursive)]
-            [TestCase(SearchMode.TopLevel)]
-            public void FieldCtorArgInNested(SearchMode search)
+            [TestCase(Search.Recursive)]
+            [TestCase(Search.TopLevel)]
+            public void FieldCtorArgInNested(Search search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -70,9 +70,9 @@ namespace RoslynSandbox
             }
 
             [Explicit]
-            [TestCase(SearchMode.Recursive)]
-            [TestCase(SearchMode.TopLevel)]
-            public void ChainedCtorArg(SearchMode search)
+            [TestCase(Search.Recursive)]
+            [TestCase(Search.TopLevel)]
+            public void ChainedCtorArg(Search search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -99,20 +99,20 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
-                if (search == SearchMode.Recursive)
+                if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, SearchMode.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = chainedArg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, Assignment.FirstWith(symbol, ctor, SearchMode.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, Assignment.FirstWith(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
 
-            [TestCase(SearchMode.Recursive)]
-            [TestCase(SearchMode.TopLevel)]
-            public void FieldWithCtorArgViaProperty(SearchMode search)
+            [TestCase(Search.Recursive)]
+            [TestCase(Search.TopLevel)]
+            public void FieldWithCtorArgViaProperty(Search search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -140,14 +140,14 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
-                if (search == SearchMode.Recursive)
+                if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, SearchMode.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.Number = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, Assignment.FirstForSymbol(symbol, ctor, SearchMode.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, Assignment.FirstForSymbol(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

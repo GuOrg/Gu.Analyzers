@@ -81,7 +81,7 @@
                 return default(Fix);
             }
 
-            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, SearchMode.TopLevel, out IMethodSymbol disposeMethodSymbol))
+            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out IMethodSymbol disposeMethodSymbol))
             {
                 if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
                     disposeMethodSymbol.Parameters.Length == 0 &&

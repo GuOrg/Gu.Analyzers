@@ -23,7 +23,7 @@
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly RecursionLoop recursionLoop = new RecursionLoop();
 
-        private SearchMode searchMode;
+        private Search search;
         private bool awaits;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -66,7 +66,7 @@
 
         internal static bool TrygetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
-            using (var pooled = Create(body, SearchMode.TopLevel, semanticModel, cancellationToken))
+            using (var pooled = Create(body, Search.TopLevel, semanticModel, cancellationToken))
             {
                 if (pooled.Item.values.Count != 1)
                 {
@@ -79,7 +79,7 @@
             }
         }
 
-        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, SearchMode searchMode, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var pooled = Pool.GetOrCreate();
             if (node == null)
@@ -87,7 +87,7 @@
                 return pooled;
             }
 
-            pooled.Item.searchMode = searchMode;
+            pooled.Item.search = search;
             pooled.Item.semanticModel = semanticModel;
             pooled.Item.cancellationToken = cancellationToken;
             pooled.Item.Run(node);
@@ -97,7 +97,7 @@
         private Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
         {
             var pooled = Pool.GetOrCreate();
-            pooled.Item.searchMode = this.searchMode;
+            pooled.Item.search = this.search;
             pooled.Item.awaits = this.awaits;
             pooled.Item.semanticModel = this.semanticModel;
             pooled.Item.cancellationToken = this.cancellationToken;
@@ -136,14 +136,14 @@
                     return;
                 }
 
-                if (this.searchMode == SearchMode.Recursive &&
+                if (this.search == Search.Recursive &&
                     value is AwaitExpressionSyntax @await)
                 {
                     value = @await.Expression;
                 }
             }
 
-            if (this.searchMode == SearchMode.Recursive)
+            if (this.search == Search.Recursive)
             {
                 if (value is InvocationExpressionSyntax invocation)
                 {
@@ -233,7 +233,7 @@
             for (var i = this.values.Count - 1; i >= 0; i--)
             {
                 var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.searchMode == SearchMode.Recursive &&
+                if (this.search == Search.Recursive &&
                     SymbolComparer.Equals(symbol, method))
                 {
                     this.values.RemoveAt(i);
@@ -277,7 +277,7 @@
             for (var i = this.values.Count - 1; i >= 0; i--)
             {
                 var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.searchMode == SearchMode.Recursive &&
+                if (this.search == Search.Recursive &&
                     SymbolComparer.Equals(symbol, property))
                 {
                     this.values.RemoveAt(i);

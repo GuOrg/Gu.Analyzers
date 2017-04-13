@@ -14,7 +14,7 @@
     {
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-        protected SearchMode SearchMode { get; set; }
+        protected Search Search { get; set; }
 
         protected SemanticModel SemanticModel { get; set; }
 
@@ -39,7 +39,7 @@
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             base.VisitIdentifierName(node);
-            if (this.SearchMode == SearchMode.Recursive)
+            if (this.Search == Search.Recursive)
             {
                 if (this.TryGetPropertyGet(node, out IMethodSymbol getter))
                 {
@@ -54,7 +54,7 @@
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             base.VisitAssignmentExpression(node);
-            if (this.SearchMode == SearchMode.Recursive)
+            if (this.Search == Search.Recursive)
             {
                 if (this.TryGetPropertySet(node.Left, out IMethodSymbol setter) &&
                     this.visited.Add(node))
@@ -93,7 +93,7 @@
                 return;
             }
 
-            if (this.SearchMode == SearchMode.Recursive &&
+            if (this.Search == Search.Recursive &&
                 this.visited.Add(node))
             {
                 var method = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken);

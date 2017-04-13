@@ -66,7 +66,7 @@ namespace Gu.Analyzers
                    type.Is(KnownSymbol.IDisposable);
         }
 
-        internal static bool TryGetDisposeMethod(ITypeSymbol type, SearchMode searchMode, out IMethodSymbol disposeMethod)
+        internal static bool TryGetDisposeMethod(ITypeSymbol type, Search search, out IMethodSymbol disposeMethod)
         {
             disposeMethod = null;
             if (type == null)
@@ -79,10 +79,10 @@ namespace Gu.Analyzers
             {
                 case 0:
                     var baseType = type.BaseType;
-                    if (searchMode == SearchMode.Recursive &&
+                    if (search == Search.Recursive &&
                         IsAssignableTo(baseType))
                     {
-                        return TryGetDisposeMethod(baseType, SearchMode.Recursive, out disposeMethod);
+                        return TryGetDisposeMethod(baseType, Search.Recursive, out disposeMethod);
                     }
 
                     return false;

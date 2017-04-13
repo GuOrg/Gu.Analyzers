@@ -87,7 +87,7 @@
     <Compile Include="Helpers\RecursionLoop.cs" />
     <Compile Include="Helpers\Result.cs" />
     <Compile Include="Helpers\ResultExt.cs" />
-    <Compile Include="Helpers\SearchMode.cs" />
+    <Compile Include="Helpers\Search.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\ArgumentListSyntaxExt.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\Constructor.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpers\PropertyDeclarationSyntaxExt.cs" />
