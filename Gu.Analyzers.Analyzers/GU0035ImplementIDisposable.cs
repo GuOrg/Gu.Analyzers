@@ -77,9 +77,8 @@
                 return;
             }
 
-            AccessorDeclarationSyntax setter;
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter) &&
-                setter.Body != null)
+            if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
+    setter.Body != null)
             {
                 // Handle the backing field
                 return;
@@ -94,9 +93,8 @@
         private static void CheckThatIDisposalbeIsImplemented(SyntaxNodeAnalysisContext context)
         {
             var containingType = context.ContainingSymbol.ContainingType;
-
-            IMethodSymbol disposeMethod;
-            if (!Disposable.IsAssignableTo(containingType) || !Disposable.TryGetDisposeMethod(containingType, false, out disposeMethod))
+            if (!Disposable.IsAssignableTo(containingType) ||
+                !Disposable.TryGetDisposeMethod(containingType, SearchMode.TopLevel, out IMethodSymbol _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

@@ -181,7 +181,7 @@ namespace Gu.Analyzers
                     return Create(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, true, out IMethodSymbol disposeMethod))
+                if (TryGetDisposeMethod(type, SearchMode.Recursive, out IMethodSymbol disposeMethod))
                 {
                     return Create(disposeMethod, semanticModel, cancellationToken);
                 }
