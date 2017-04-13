@@ -9,7 +9,7 @@
 
     internal static class Constructor
     {
-        internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, bool recursive, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var created = semanticModel.GetSymbolSafe(creation, cancellationToken) as IMethodSymbol;
             var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
@@ -18,7 +18,8 @@
                 return true;
             }
 
-            return recursive && IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
+            return search == Search.Recursive &&
+                   IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
         }
 
         internal static bool IsRunBefore(this ConstructorDeclarationSyntax ctor, ConstructorDeclarationSyntax otherDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)

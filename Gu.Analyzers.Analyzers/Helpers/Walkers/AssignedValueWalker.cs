@@ -336,7 +336,7 @@
                         foreach (var creation in pooled.Item.ObjectCreations)
                         {
                             if (contextCtor == null ||
-                                creation.Creates(contextCtor, true, this.semanticModel, this.cancellationToken))
+                                creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
                             {
                                 if (this.visitedLocations.Add(creation))
                                 {
