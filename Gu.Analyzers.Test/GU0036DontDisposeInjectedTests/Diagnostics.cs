@@ -481,6 +481,72 @@ public class Foo
         }
 
         [Test]
+        public async Task DisposingInjectedPropertyInBaseClass()
+        {
+            var fooBaseCode = @"
+    using System;
+
+    public class FooBase : IDisposable
+    {
+        private bool disposed = false;
+
+        public FooBase()
+            : this(null)
+        {
+        }
+
+        public FooBase(object bar)
+        {
+            this.Bar = bar;
+        }
+
+        public object Bar { get; }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }";
+
+            var fooImplCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo : FooBase
+    {
+        public Foo(Stream stream)
+            : base(stream)
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ↓(this.Bar as IDisposable)?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref fooImplCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { fooBaseCode, fooImplCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task InjectedViaMethod()
         {
             var testCode = @"

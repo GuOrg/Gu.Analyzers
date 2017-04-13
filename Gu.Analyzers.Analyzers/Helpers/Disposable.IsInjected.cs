@@ -89,12 +89,13 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (IsInjectedCore(semanticModel.GetSymbolSafe(member, cancellationToken)).IsEither(Result.Yes, Result.Maybe))
+            var symbol = semanticModel.GetSymbolSafe(member, cancellationToken);
+            if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
             {
                 return true;
             }
 
-            using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
+            using (var sources = AssignedValueWalker.Create(symbol, disposeCall, semanticModel, cancellationToken))
             {
                 using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
                 {
