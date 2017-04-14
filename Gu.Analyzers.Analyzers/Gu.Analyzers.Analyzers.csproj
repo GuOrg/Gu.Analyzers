@@ -73,6 +73,7 @@
     <Compile Include="Helpers\Disposable.IsMemberDisposed.cs" />
     <Compile Include="Helpers\Disposable.IsInjected.cs" />
     <Compile Include="Helpers\Disposable.RecursiveValues.cs" />
+    <Compile Include="Helpers\KnownSymbols\DependencyObjectType.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\FileType.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableOfTType.cs" />

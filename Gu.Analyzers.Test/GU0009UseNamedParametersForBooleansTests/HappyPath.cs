@@ -234,5 +234,54 @@ namespace Gu.Wpf.NumericInput.Demo
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [TestCase("textBox.SetBar(true)")]
+        [TestCase("Foo.SetBar(textBox, true)")]
+        public async Task DontWarnOnAttachedPropertySetter(string method)
+        {
+            var apCode = @"
+namespace Gu.Wpf.NumericInput.Demo
+{
+    using System.Windows;
+    using System.Windows.Controls;
+
+    public static class Foo
+    {
+        public static readonly DependencyProperty BarProperty = DependencyProperty.RegisterAttached(
+            ""Bar"",
+            typeof(bool),
+            typeof(Foo),
+            new PropertyMetadata(default(bool)));
+
+        public static void SetBar(this DependencyObject element, bool value)
+        {
+            element.SetValue(BarProperty, value);
+        }
+
+        public static bool GetBar(DependencyObject element)
+        {
+            return (bool)element.GetValue(BarProperty);
+        }
+    }
+}";
+            var testCode = @"
+namespace Gu.Wpf.NumericInput.Demo
+{
+    using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
+
+    public class Baz
+    {
+        public void Meh()
+        {
+            var textBox = new TextBox();
+            textBox.SetBar(true);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("textBox.SetBar(true)", method);
+            await this.VerifyHappyPathAsync(apCode, testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

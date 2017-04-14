@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -108,6 +109,7 @@
         {
             return IsDisposePattern(methodSymbol) ||
                    IsConfigureAwait(methodSymbol) ||
+                   IsAttachedSetMethod(methodSymbol) ||
                    methodSymbol == KnownSymbol.NUnitAssert.AreEqual ||
                    methodSymbol == KnownSymbol.XunitAssert.Equal;
         }
@@ -128,6 +130,29 @@
                    methodSymbol.Parameters.Length == 1 &&
                    methodSymbol.Parameters[0]
                                .Type == KnownSymbol.Boolean;
+        }
+
+        private static bool IsAttachedSetMethod(IMethodSymbol method)
+        {
+            if (method == null ||
+                !method.ReturnsVoid ||
+                method.AssociatedSymbol != null)
+            {
+                return false;
+            }
+
+            if (method.IsStatic)
+            {
+                return method.Parameters.Length == 2 &&
+                       method.Parameters[0].Type.Is(KnownSymbol.DependencyObject) &&
+                       method.Name.StartsWith("Set");
+            }
+
+            return method.IsExtensionMethod &&
+                   method.ReceiverType.Is(KnownSymbol.DependencyObject) &&
+                   method.Parameters.Length == 1 &&
+                   method.Name.StartsWith("Set");
+
         }
 
         private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)

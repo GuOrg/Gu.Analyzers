@@ -41,6 +41,8 @@ namespace Gu.Analyzers
 
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
+        internal static readonly DependencyObjectType DependencyObject = new DependencyObjectType();
+        internal static readonly QualifiedType DependencyPropertyChangedEventArgs = Create("System.Windows.DependencyPropertyChangedEventArgs");
 
         internal static readonly NUnitAssertType NUnitAssert = new NUnitAssertType();
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
