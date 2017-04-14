@@ -87,7 +87,8 @@
 
                 var parameterIndex = System.Math.Min(parameterIndexOpt.Value, methodSymbol.Parameters.Length - 1);
                 var parameter = methodSymbol.Parameters[parameterIndex];
-                if (parameter.IsParams)
+                if (parameter.IsParams ||
+                    parameter.Type != KnownSymbol.Boolean)
                 {
                     return;
                 }

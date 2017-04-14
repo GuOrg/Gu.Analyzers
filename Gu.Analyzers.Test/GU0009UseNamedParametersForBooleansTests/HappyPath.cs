@@ -210,5 +210,29 @@ public class FooTests
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [TestCase("SetValue")]
+        [TestCase("SetCurrentValue")]
+        public async Task DontWarnOn(string method)
+        {
+            var testCode = @"
+namespace Gu.Wpf.NumericInput.Demo
+{
+    using System.Windows.Controls;
+    using System.Windows.Controls.Primitives;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            var textBox = new TextBox();
+            textBox.SetValue(TextBoxBase.IsReadOnlyProperty, true);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("SetValue", method);
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
