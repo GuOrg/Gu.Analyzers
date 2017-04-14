@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0009UseNamedParametersForBooleans>
+    internal class Diagnostics : DiagnosticVerifier<GU0009UseNamedParametersForBooleans>
     {
         [Test]
         public async Task UnnamedBooleanParameters()

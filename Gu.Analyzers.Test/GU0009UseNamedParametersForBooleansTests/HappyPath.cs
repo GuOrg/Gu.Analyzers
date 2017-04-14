@@ -4,7 +4,7 @@
 
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<Analyzers.GU0009UseNamedParametersForBooleans>
+    internal class HappyPath : HappyPathVerifier<GU0009UseNamedParametersForBooleans>
     {
         [Test]
         public async Task UsesNamedParameter()
