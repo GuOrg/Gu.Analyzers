@@ -151,7 +151,6 @@
                    method.ReceiverType.Is(KnownSymbol.DependencyObject) &&
                    method.Parameters.Length == 1 &&
                    method.Name.StartsWith("Set");
-
         }
 
         private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
