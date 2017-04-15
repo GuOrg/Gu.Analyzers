@@ -66,11 +66,13 @@
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            if (node.Initializer != null &&
-                this.visitedLocations.Add(node.Initializer))
+            if (node.Initializer != null)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
-                this.HandleInvoke(ctor, node.Initializer.ArgumentList);
+                if (this.visitedLocations.Add(node.Initializer))
+                {
+                    var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
+                    this.HandleInvoke(ctor, node.Initializer.ArgumentList);
+                }
             }
             else
             {

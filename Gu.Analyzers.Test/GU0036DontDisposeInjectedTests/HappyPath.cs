@@ -213,6 +213,71 @@ public class Disposable : IDisposable
         }
 
         [Test]
+        public async Task DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
+        {
+            var fooBaseCode = @"
+    using System;
+
+    public class FooBase : IDisposable
+    {
+        private static IDisposable Empty = new Disposable();
+
+        private readonly object bar;
+        private bool disposed = false;
+
+        public FooBase(string text)
+        {
+            this.bar = Empty;
+        }
+
+        public FooBase(object bar)
+        {
+            this.bar = bar;
+        }
+
+        public object Bar => this.bar;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }";
+
+            var fooImplCode = @"
+    using System;
+    using System.IO;
+
+    public class Foo : FooBase
+    {
+        public Foo(string fileName)
+            : base(File.OpenRead(fileName))
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                (this.Bar as IDisposable)?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }";
+            await this.VerifyHappyPathAsync(DisposableCode, fooBaseCode, fooImplCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
