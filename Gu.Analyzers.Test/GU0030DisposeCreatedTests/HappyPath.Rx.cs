@@ -148,7 +148,7 @@ public sealed class Foo : IDisposable
             }
 
             [Test]
-            public async Task DisposableCreate()
+            public async Task DisposableCreateClosure()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -167,6 +167,37 @@ namespace RoslynSandbox
                     {
                         var stream = File.OpenRead(string.Empty);
                         return Disposable.Create(() => stream.Dispose());
+                    });
+        }
+    }
+}";
+
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task DisposableCreateClosureStatementBody()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    public sealed class Foo
+    {
+        public IObservable<object> Create()
+        {
+            return Observable.Create<object>(
+                o =>
+                    {
+                        var stream = File.OpenRead(string.Empty);
+                        return Disposable.Create(() =>
+                            {
+                                stream.Dispose();
+                            });
                     });
         }
     }
