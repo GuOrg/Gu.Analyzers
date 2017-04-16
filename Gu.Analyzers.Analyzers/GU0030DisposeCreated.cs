@@ -233,14 +233,14 @@
             }
 
             var block = node.FirstAncestor<BlockSyntax>();
-            var otherblock = other.FirstAncestor<BlockSyntax>();
+            var otherBlock = other.FirstAncestor<BlockSyntax>();
 
-            if (block == null || otherblock == null)
+            if (block == null || otherBlock == null)
             {
                 return false;
             }
 
-            return ReferenceEquals(block, otherblock);
+            return ReferenceEquals(block, otherBlock);
         }
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+    [Obsolete("Rewrite as Execution walker and add recursive.")]
     internal sealed class InvocationWalker : CSharpSyntaxWalker, IReadOnlyList<InvocationExpressionSyntax>
     {
         private static readonly Pool<InvocationWalker> Pool = new Pool<InvocationWalker>(
