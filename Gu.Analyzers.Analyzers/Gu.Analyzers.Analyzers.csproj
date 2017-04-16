@@ -78,6 +78,7 @@
     <Compile Include="Helpers\KnownSymbols\FileType.cs" />
     <Compile Include="Helpers\KnownSymbols\IEnumerableOfTType.cs" />
     <Compile Include="Helpers\KnownSymbols\NUnitAssertType.cs" />
+    <Compile Include="Helpers\KnownSymbols\RxDisposableType.cs" />
     <Compile Include="Helpers\KnownSymbols\SingleAssignmentDisposableType.cs" />
     <Compile Include="Helpers\Comparers\SymbolComparer.cs" />
     <Compile Include="Helpers\Collection\ListExt.cs" />

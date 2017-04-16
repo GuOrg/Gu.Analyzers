@@ -133,6 +133,26 @@
                             }
                         }
                     }
+
+                    if (value is InvocationExpressionSyntax invocation)
+                    {
+                        if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
+                            invocation.ArgumentList != null &&
+                            invocation.ArgumentList.Arguments.TryGetSingle(out ArgumentSyntax argument))
+                        {
+                            var body = (argument.Expression as ParenthesizedLambdaExpressionSyntax)?.Body;
+                            using (var pooledInvocations = InvocationWalker.Create(body))
+                            {
+                                foreach (var candidate in pooledInvocations.Item.Invocations)
+                                {
+                                    if (Disposable.IsDisposing(candidate, symbol, semanticModel, cancellationToken))
+                                    {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
@@ -190,26 +210,9 @@
                         continue;
                     }
 
-                    var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-                    if (invokedSymbol?.Name != "Dispose")
+                    if (Disposable.IsDisposing(invocation, symbol, semanticModel, cancellationToken))
                     {
-                        continue;
-                    }
-
-                    var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
-                    if (statement != null)
-                    {
-                        using (var pooledNames = IdentifierNameWalker.Create(statement))
-                        {
-                            foreach (var identifierName in pooledNames.Item.IdentifierNames)
-                            {
-                                var otherSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
-                                if (symbol.Equals(otherSymbol))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
+                        return true;
                     }
                 }
             }

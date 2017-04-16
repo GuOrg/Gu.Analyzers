@@ -37,6 +37,7 @@ namespace Gu.Analyzers
         internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
+        internal static readonly RxDisposableType RxDisposable = new RxDisposableType();
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
 
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();

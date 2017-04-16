@@ -44,20 +44,9 @@ namespace Gu.Analyzers
                 {
                     foreach (var invocation in pooled.Item)
                     {
-                        var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
-                        if (method == null ||
-                            method.Parameters.Length != 0 ||
-                            method != KnownSymbol.IDisposable.Dispose)
+                        if (IsDisposing(invocation, member, semanticModel, cancellationToken))
                         {
-                            continue;
-                        }
-
-                        if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out ExpressionSyntax disposed))
-                        {
-                            if (SymbolComparer.Equals(member, semanticModel.GetSymbolSafe(disposed, cancellationToken)))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
@@ -90,6 +79,27 @@ namespace Gu.Analyzers
                             return true;
                         }
                     }
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
+            if (method == null ||
+                method.Parameters.Length != 0 ||
+                method != KnownSymbol.IDisposable.Dispose)
+            {
+                return false;
+            }
+
+            if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out ExpressionSyntax disposed))
+            {
+                if (SymbolComparer.Equals(member, semanticModel.GetSymbolSafe(disposed, cancellationToken)))
+                {
+                    return true;
                 }
             }
 
