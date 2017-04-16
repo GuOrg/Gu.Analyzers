@@ -17,6 +17,55 @@ public class Disposable : IDisposable
 }";
 
         [Test]
+        public async Task DisposingArrayItem()
+        {
+            var testCode = @"
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable[] disposables;
+
+        public void Bar()
+        {
+            var disposable = disposables[0];
+            disposable.Dispose();
+        }
+
+        public void Dispose()
+        {
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingDictionaryItem()
+        {
+            var testCode = @"
+    using System;
+    using System.Collections.Generic;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
+
+        public void Bar()
+        {
+            var disposable = map[0];
+            disposable.Dispose();
+        }
+
+        public void Dispose()
+        {
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposingWithBaseClass()
         {
             var fooBaseCode = @"
