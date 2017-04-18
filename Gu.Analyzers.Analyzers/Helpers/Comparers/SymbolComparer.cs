@@ -25,6 +25,18 @@
                 return false;
             }
 
+            if (x.Equals(y))
+            {
+                return true;
+            }
+
+            if (x is INamedTypeSymbol xNamed &&
+                y is INamedTypeSymbol yNamed &&
+                AreEquivalent(xNamed, yNamed))
+            {
+                return true;
+            }
+
             return x.Equals(y) ||
                    DefinitionEquals(x, y) ||
                    DefinitionEquals(y, x) ||
@@ -39,6 +51,37 @@
         public int GetHashCode(ISymbol obj)
         {
             return obj?.MetadataName.GetHashCode() ?? 0;
+        }
+
+        private static bool AreEquivalent(INamedTypeSymbol first, INamedTypeSymbol other)
+        {
+            if (ReferenceEquals(first, other))
+            {
+                return true;
+            }
+
+            if (first == null ||
+                other == null)
+            {
+                return false;
+            }
+
+            if (first.MetadataName != other.MetadataName ||
+                first.ContainingModule.MetadataName != other.ContainingModule.MetadataName ||
+                first.Arity != other.Arity)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < first.Arity; i++)
+            {
+                if (!Equals(first.TypeArguments[i], other.TypeArguments[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static bool DefinitionEquals(ISymbol x, ISymbol y)
