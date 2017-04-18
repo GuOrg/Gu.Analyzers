@@ -221,6 +221,100 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task MethodReturningFieldAsObject()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly IDisposable disposable = new Disposable();
+
+        private object Meh()
+        {
+            return this.disposable;
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodReturningFieldIndexerAsObject()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly IDisposable[] disposable = { new Disposable() };
+
+        private object Meh()
+        {
+            return this.disposable[0];
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task MethodReturningFieldDisposableListIndexerAsObject()
+        {
+            var disposableListCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class DisposableList<T> : IReadOnlyList<T>, IDisposable
+    {
+        private readonly List<T> inner = new List<T>();
+
+        public int Count => this.inner.Count;
+
+        public T this[int index] => this.inner[index];
+
+        public IEnumerator<T> GetEnumerator() => this.inner.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.inner).GetEnumerator();
+
+        public void Add(T item) => this.inner.Add(item);
+
+        public void Dispose()
+        {
+            this.inner.Clear();
+        }
+    }
+}";
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly DisposableList<IDisposable> disposable = new DisposableList<IDisposable> { new Disposable() };
+
+        private object Meh()
+        {
+            return this.disposable[0];
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(DisposableCode, disposableListCode, testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task MethodReturningFuncObject()
         {
             var testCode = @"
