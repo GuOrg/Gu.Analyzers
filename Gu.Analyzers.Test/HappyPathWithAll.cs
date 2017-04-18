@@ -41,6 +41,29 @@ public class Disposable : IDisposable
     }
 }";
 
+            var fooListCode = @"
+using System.Collections;
+using System.Collections.Generic;
+
+internal class FooList<T> : IReadOnlyList<T>
+{
+    private readonly List<T> inner = new List<T>();
+
+    public int Count => this.inner.Count;
+
+    public T this[int index] => this.inner[index];
+
+    public IEnumerator<T> GetEnumerator()
+    {
+        return this.inner.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable)this.inner).GetEnumerator();
+    }
+}";
+
             var fooCode = @"
 using System;
 using System.ComponentModel;
@@ -245,7 +268,8 @@ namespace RoslynSandbox
      }
 }";
 
-            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { disposableCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode, reactiveCode }, AllAnalyzers).ConfigureAwait(false);
+            var sources = new[] { disposableCode, fooListCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode, reactiveCode };
+            await DiagnosticVerifier.VerifyHappyPathAsync(sources, AllAnalyzers).ConfigureAwait(false);
         }
 
         [Test]
