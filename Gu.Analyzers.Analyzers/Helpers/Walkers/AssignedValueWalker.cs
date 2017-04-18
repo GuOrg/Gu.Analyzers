@@ -130,7 +130,36 @@
             {
                 base.VisitInvocationExpression(node);
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (this.Context is ElementAccessExpressionSyntax &&
+                    SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe((node.Expression as MemberAccessExpressionSyntax)?.Expression, this.cancellationToken)))
+                {
+                    if (method.Name == "Add")
+                    {
+                        if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
+                            node.ArgumentList?.Arguments.Count == 2)
+                        {
+                            this.values.Add(node.ArgumentList.Arguments[1].Expression);
+                        }
+                        else if (node.ArgumentList?.Arguments.Count == 1)
+                        {
+                            this.values.Add(node.ArgumentList.Arguments[0].Expression);
+                        }
+                    }
+                }
+
                 this.HandleInvoke(method, node.ArgumentList);
+            }
+        }
+
+        public override void VisitElementAccessExpression(ElementAccessExpressionSyntax node)
+        {
+            if (node.Parent is AssignmentExpressionSyntax assignment &&
+                this.visitedLocations.Add(node) &&
+                this.Context is ElementAccessExpressionSyntax &&
+                SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
+            {
+                this.values.Add(assignment.Right);
+                base.VisitElementAccessExpression(node);
             }
         }
 
@@ -188,6 +217,11 @@
 
         internal static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (value is ElementAccessExpressionSyntax elementAccess)
+            {
+                return Create(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
+            }
+
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
             if (symbol is IFieldSymbol ||
                 symbol is IPropertySymbol ||
@@ -417,8 +451,7 @@
 
                 for (var i = before; i < this.values.Count; i++)
                 {
-                    var parameter =
-                        this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
+                    var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
                     if (Equals(parameter?.ContainingSymbol, property.SetMethod))
                     {
                         this.values[i] = value;

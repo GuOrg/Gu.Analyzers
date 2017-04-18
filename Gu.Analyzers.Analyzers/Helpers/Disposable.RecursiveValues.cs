@@ -167,6 +167,14 @@ namespace Gu.Analyzers
                     }
                 }
 
+                if (assignedValue is ElementAccessExpressionSyntax elementAccess)
+                {
+                    using (var pooled = AssignedValueWalker.Create(elementAccess, this.semanticModel, this.cancellationToken))
+                    {
+                        return this.AddManyRecursively(pooled.Item);
+                    }
+                }
+
                 var symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
                 if (symbol == null)
                 {
