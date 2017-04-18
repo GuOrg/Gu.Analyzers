@@ -741,5 +741,123 @@ namespace RoslynSandbox
             await this.VerifyCSharpDiagnosticAsync(testCode, expected)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DisposingArrayItemAssignedWithInjected()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable[] disposables = new IDisposable[1];
+
+        public Foo(IDisposable disposable)
+        {
+            this.disposables[0] = disposable;
+        }
+
+        public void Bar()
+        {
+            var disposable = this.disposables[0];
+            ↓disposable.Dispose();
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingStaticArrayItem()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        private static readonly IDisposable[] Disposables = new IDisposable[1];
+
+        public void Bar()
+        {
+            var disposable = Disposables[0];
+            ↓disposable.Dispose();
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingDictionaryItem()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    using System.Collections.Generic;
+
+    public sealed class Foo
+    {
+        private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
+
+        public Foo(IDisposable bar)
+        {
+            this.map[1] = bar;
+        }
+
+        public void Bar()
+        {
+            var disposable = map[0];
+            ↓disposable.Dispose();
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task DisposingStaticDictionaryItem()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    using System.Collections.Generic;
+
+    public sealed class Foo
+    {
+        private static readonly Dictionary<int, IDisposable> Map = new Dictionary<int, IDisposable>();
+
+        public void Bar()
+        {
+            var disposable = Map[0];
+            ↓disposable.Dispose();
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't dispose injected.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+        }
     }
 }

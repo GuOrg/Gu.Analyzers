@@ -8,9 +8,9 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
     {
         internal class Indexer
         {
-            [TestCase("var temp1 = ints[0];", "new int[] { 1, 2 }")]
-            [TestCase("var temp2 = ints[0];", "new int[] { 1, 2 }, 3")]
-            public void ArrayIndexer(string code, string expected)
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+            public void InitializedArrayIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -34,9 +34,35 @@ internal class Foo
                 }
             }
 
-            [TestCase("var temp1 = ints[0];", "new List<int> { 1, 2 }")]
-            [TestCase("var temp2 = ints[0];", "new List<int> { 1, 2 }, 3")]
-            public void ListOfIntIndexerAfterSetItem(string code, string expected)
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+            public void InitializedTypedArrayIndexer(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo()
+    {
+        int[] ints = { 1, 2 };
+        var temp1 = ints[0];
+        ints[0] = 3;
+        var temp2 = ints[0];
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.EqualsValueClause(code)
+                                      .Value;
+                using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", pooled.Item);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+            public void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -65,9 +91,9 @@ namespace RoslynSandbox
                 }
             }
 
-            [TestCase("var temp1 = ints[0];", "new List<int> { 1, 2 }")]
-            [TestCase("var temp2 = ints[0];", "new List<int> { 1, 2 }, 3")]
-            public void ListOfIntIndexerAfterAddItem(string code, string expected)
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+            public void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -96,9 +122,9 @@ namespace RoslynSandbox
                 }
             }
 
-            [TestCase("var temp1 = ints[0];", "new Dictionary<int, int> { [0] = 1 }")]
-            [TestCase("var temp2 = ints[0];", "new Dictionary<int, int> { [0] = 1 }, 2")]
-            public void DictionaryIndexer(string code, string expected)
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+            public void InitializedElementStyleDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -109,9 +135,13 @@ namespace RoslynSandbox
     {
         internal Foo()
         {
-            var ints = new Dictionary<int, int> { [0] = 1 };
+            var ints = new Dictionary<int, int> 
+            { 
+                [1] = 1,
+                [2] = 2,
+            };
             var temp1 = ints[0];
-            ints[0] = 2;
+            ints[3] = 3;
             var temp2 = ints[0];
         }
     }
@@ -127,8 +157,8 @@ namespace RoslynSandbox
                 }
             }
 
-            [TestCase("var temp1 = ints[0];", "new Dictionary<int, int> { { 1, 1 }, }")]
-            [TestCase("var temp2 = ints[0];", "new Dictionary<int, int> { { 1, 1 }, }, 2")]
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
             public void InitializedDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -140,9 +170,13 @@ namespace RoslynSandbox
     {
         internal Foo()
         {
-            var ints = new Dictionary<int, int> { { 1, 1 }, };
+            var ints = new Dictionary<int, int> 
+            {
+                { 1, 1 }, 
+                { 2, 2 }, 
+            };
             var temp1 = ints[0];
-            ints[0] = 2;
+            ints[3] = 3;
             var temp2 = ints[0];
         }
     }
@@ -158,8 +192,8 @@ namespace RoslynSandbox
                 }
             }
 
-            [TestCase("var temp1 = ints[0];", "new Dictionary<int, int> { { 1, 1 }, }")]
-            [TestCase("var temp2 = ints[0];", "new Dictionary<int, int> { { 1, 1 }, }, 2")]
+            [TestCase("var temp1 = ints[0];", "1, 2")]
+            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
             public void InitializedDictionaryAfterAdd(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -171,9 +205,13 @@ namespace RoslynSandbox
     {
         internal Foo()
         {
-            var ints = new Dictionary<int, int> { { 1, 1 }, };
+            var ints = new Dictionary<int, int> 
+            {
+                { 1, 1 }, 
+                { 2, 2 }, 
+            };
             var temp1 = ints[0];
-            ints.Add(1, 2);
+            ints.Add(3, 3);
             var temp2 = ints[0];
         }
     }

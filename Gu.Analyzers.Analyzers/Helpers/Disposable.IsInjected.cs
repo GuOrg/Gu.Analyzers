@@ -164,10 +164,32 @@ namespace Gu.Analyzers
             values.Reset();
             while (values.MoveNext())
             {
-                var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
-                if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+                if (values.Current is ElementAccessExpressionSyntax elementAccess)
                 {
-                    return Result.Yes;
+                    var symbol = semanticModel.GetSymbolSafe((elementAccess.Expression as MemberAccessExpressionSyntax)?.Expression, cancellationToken) ??
+                                 semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken);
+                    if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+                    {
+                        return Result.Yes;
+                    }
+
+                    using (var sources = AssignedValueWalker.Create(values.Current, semanticModel, cancellationToken))
+                    {
+                        using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                        {
+                            return IsInjectedCore(recursive, semanticModel, cancellationToken);
+                        }
+                    }
+
+                    return Result.Unknown;
+                }
+                else
+                {
+                    var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
+                    if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+                    {
+                        return Result.Yes;
+                    }
                 }
             }
 

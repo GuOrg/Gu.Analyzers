@@ -429,6 +429,70 @@
                 return;
             }
 
+            if (this.Context is ElementAccessExpressionSyntax)
+            {
+                switch (value)
+                {
+                    case ArrayCreationExpressionSyntax arrayCreation:
+                        {
+                            if (arrayCreation.Initializer == null)
+                            {
+                                return;
+                            }
+
+                            foreach (var item in arrayCreation.Initializer.Expressions)
+                            {
+                                this.values.Add(item);
+                            }
+                        }
+
+                        break;
+
+                    case ObjectCreationExpressionSyntax objectCreation:
+                        {
+                            if (objectCreation.Initializer == null)
+                            {
+                                return;
+                            }
+
+                            foreach (var item in objectCreation.Initializer.Expressions)
+                            {
+                                if (item is InitializerExpressionSyntax kvp)
+                                {
+                                    if (kvp.Expressions.Count == 2)
+                                    {
+                                        this.values.Add(kvp.Expressions[1]);
+                                    }
+                                }
+                                else if (item is AssignmentExpressionSyntax assignment)
+                                {
+                                    this.values.Add(assignment.Right);
+                                }
+                                else
+                                {
+                                    this.values.Add(item);
+                                }
+                            }
+                        }
+
+                        break;
+
+                    case InitializerExpressionSyntax initializer:
+                        {
+                            foreach (var item in initializer.Expressions)
+                            {
+                                this.values.Add(item);
+                            }
+                        }
+
+                        break;
+                    default:
+                        return;
+                }
+
+                return;
+            }
+
             var property = assignedSymbol as IPropertySymbol;
             if (!SymbolComparer.Equals(this.CurrentSymbol, property) &&
                 (this.CurrentSymbol is IFieldSymbol || this.CurrentSymbol is IPropertySymbol) &&
