@@ -73,6 +73,12 @@ NUGET
     StyleCop.Analyzers (1.0.1)
     System.Runtime (4.3) - framework: net452
 
+GROUP Build
+FRAMEWORK: NET45
+NUGET
+  remote: http://www.nuget.org/api/v2
+    Microsoft.VSSDK.BuildTools (15.0.26201)
+
 GROUP Test
 FRAMEWORK: NET452
 NUGET
