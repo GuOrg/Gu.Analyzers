@@ -86,6 +86,7 @@
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Rx.cs" />
     <Compile Include="GU0036DontDisposeInjectedTests\HappyPath.Using.cs" />
+    <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\Diagnostics.Collections.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="GU0009UseNamedParametersForBooleansTests\Diagnostics.cs" />

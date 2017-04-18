@@ -3,8 +3,18 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0037DontMixInjectedAndCreatedForMember>
+    internal partial class Diagnostics : DiagnosticVerifier<GU0037DontMixInjectedAndCreatedForMember>
     {
+        private static readonly string DisposableCode = @"
+using System;
+
+public class Disposable : IDisposable
+{
+    public void Dispose()
+    {
+    }
+}";
+
         [TestCase("arg ?? File.OpenRead(string.Empty)")]
         [TestCase("arg ?? File.OpenRead(string.Empty)")]
         [TestCase("File.OpenRead(string.Empty) ?? arg")]
