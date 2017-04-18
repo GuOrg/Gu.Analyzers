@@ -166,8 +166,7 @@ namespace Gu.Analyzers
             {
                 if (values.Current is ElementAccessExpressionSyntax elementAccess)
                 {
-                    var symbol = semanticModel.GetSymbolSafe((elementAccess.Expression as MemberAccessExpressionSyntax)?.Expression, cancellationToken) ??
-                                 semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken);
+                    var symbol = semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken);
                     if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
                     {
                         return Result.Yes;
@@ -180,8 +179,6 @@ namespace Gu.Analyzers
                             return IsInjectedCore(recursive, semanticModel, cancellationToken);
                         }
                     }
-
-                    return Result.Unknown;
                 }
                 else
                 {
