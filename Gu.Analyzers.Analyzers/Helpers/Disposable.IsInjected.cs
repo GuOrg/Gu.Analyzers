@@ -20,7 +20,7 @@ namespace Gu.Analyzers
                 using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken) == Result.No;
+                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                 }
             }
         }
@@ -38,7 +38,7 @@ namespace Gu.Analyzers
                 using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken) == Result.No;
+                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                 }
             }
         }
@@ -161,36 +161,58 @@ namespace Gu.Analyzers
                 return Result.No;
             }
 
+            var result = Result.No;
             values.Reset();
             while (values.MoveNext())
             {
                 if (values.Current is ElementAccessExpressionSyntax elementAccess)
                 {
                     var symbol = semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken);
-                    if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+                    var isInjected = IsInjectedCore(symbol);
+                    if (isInjected == Result.Yes)
                     {
                         return Result.Yes;
+                    }
+
+                    if (isInjected == Result.Maybe)
+                    {
+                        result = Result.Maybe;
                     }
 
                     using (var sources = AssignedValueWalker.Create(values.Current, semanticModel, cancellationToken))
                     {
                         using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
                         {
-                            return IsInjectedCore(recursive, semanticModel, cancellationToken);
+                            isInjected = IsInjectedCore(recursive, semanticModel, cancellationToken);
+                            if (isInjected == Result.Yes)
+                            {
+                                return Result.Yes;
+                            }
+
+                            if (isInjected == Result.Maybe)
+                            {
+                                result = Result.Maybe;
+                            }
                         }
                     }
                 }
                 else
                 {
                     var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
-                    if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+                    var isInjected = IsInjectedCore(symbol);
+                    if (isInjected == Result.Yes)
                     {
                         return Result.Yes;
+                    }
+
+                    if (isInjected == Result.Maybe)
+                    {
+                        result = Result.Maybe;
                     }
                 }
             }
 
-            return Result.No;
+            return result;
         }
 
         private static Result IsInjectedCore(ISymbol symbol)

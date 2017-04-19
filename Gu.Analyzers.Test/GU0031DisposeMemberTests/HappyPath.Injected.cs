@@ -28,7 +28,26 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
             }
 
             [Test]
-            public async Task IgnoreInjectedAndCreated()
+            public async Task IgnoreAssignedWithCtorArgumentIndexer()
+            {
+                var testCode = @"
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable bar;
+        
+        public Foo(IDisposable[] bars)
+        {
+            this.bar = bars[0];
+        }
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoreInjectedAndCreatedField()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -45,6 +64,58 @@ namespace RoslynSandbox
         }
 
         public static Foo Create() => new Foo(new Disposable());
+    }
+}";
+                await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoreInjectedAndCreatedProperty()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        public Foo(IDisposable bar)
+        {
+            this.Bar = bar;
+        }
+
+        public IDisposable Bar { get; }
+
+        public static Foo Create() => new Foo(new Disposable());
+    }
+}";
+                await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable bar;
+
+        public Foo(IDisposable bar)
+        {
+            this.bar = bar;
+        }
+
+        public static Foo Create()
+        {
+            var disposables = new[] { new Disposable() };
+            return new Foo(disposables[0]);
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(DisposableCode, testCode)
