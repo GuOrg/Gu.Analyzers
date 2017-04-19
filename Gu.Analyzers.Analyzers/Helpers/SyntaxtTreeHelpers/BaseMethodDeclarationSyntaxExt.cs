@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class BaseMethodDeclarationSyntaxExt
@@ -17,8 +19,22 @@
             {
                 var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
                                     .Arguments.IndexOf(argument);
-                parameter = method.ParameterList.Parameters[index];
-                return true;
+                if (method.ParameterList.Parameters.TryGetAtIndex(index, out parameter))
+                {
+                    return true;
+                }
+
+                parameter = method.ParameterList.Parameters.Last();
+                foreach (var modifier in parameter.Modifiers)
+                {
+                    if (modifier.IsKind(SyntaxKind.ParamsKeyword))
+                    {
+                        return true;
+                    }
+                }
+
+                parameter = null;
+                return false;
             }
 
             foreach (var candidate in method.ParameterList.Parameters)

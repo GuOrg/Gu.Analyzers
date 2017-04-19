@@ -243,6 +243,41 @@ public class Meh
             }
 
             [Test]
+            public async Task ReturningNewAssigningAndDisposingParams()
+            {
+                var fooCode = @"
+using System;
+
+public class Foo : IDisposable
+{
+    private readonly IDisposable[] disposables;
+
+    public Foo(params IDisposable[] disposables)
+    {
+        this.disposables = disposables;
+    }
+
+    public void Dispose()
+    {
+        foreach (var disposable in this.disposables)
+        {
+            disposable.Dispose();
+        }
+    }
+}";
+                var testCode = @"
+public class Meh
+{
+    public Foo Bar()
+    {
+        return new Foo(new Disposable(), new Disposable());
+    }
+}";
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task ReturningCreateNewAssigningAndDisposing()
             {
                 var fooCode = @"
