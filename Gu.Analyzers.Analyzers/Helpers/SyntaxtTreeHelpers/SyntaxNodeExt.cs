@@ -38,9 +38,9 @@
                        : ancestor;
         }
 
-        internal static bool IsInExpressionTree(this SyntaxNode argumentListSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsInExpressionTree(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var lambda = argumentListSyntax.FirstAncestor<LambdaExpressionSyntax>();
+            var lambda = node.FirstAncestor<LambdaExpressionSyntax>();
             while (lambda != null)
             {
                 var lambdaType = semanticModel.GetTypeInfoSafe(lambda, cancellationToken).ConvertedType;
@@ -50,7 +50,7 @@
                     return true;
                 }
 
-                lambda = argumentListSyntax.FirstAncestor<LambdaExpressionSyntax>();
+                lambda = lambda.FirstAncestor<LambdaExpressionSyntax>();
             }
 
             return false;
