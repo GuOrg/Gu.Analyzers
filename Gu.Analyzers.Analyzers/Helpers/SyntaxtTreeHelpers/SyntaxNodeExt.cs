@@ -38,6 +38,24 @@
                        : ancestor;
         }
 
+        internal static bool IsInExpressionTree(this SyntaxNode argumentListSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var lambda = argumentListSyntax.FirstAncestor<LambdaExpressionSyntax>();
+            while (lambda != null)
+            {
+                var lambdaType = semanticModel.GetTypeInfoSafe(lambda, cancellationToken).ConvertedType;
+                if (lambdaType != null &&
+                    lambdaType.Is(KnownSymbol.Expression))
+                {
+                    return true;
+                }
+
+                lambda = argumentListSyntax.FirstAncestor<LambdaExpressionSyntax>();
+            }
+
+            return false;
+        }
+
         internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
         {
             var statement = node?.FirstAncestorOrSelf<StatementSyntax>();

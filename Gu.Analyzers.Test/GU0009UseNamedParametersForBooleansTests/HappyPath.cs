@@ -283,5 +283,32 @@ namespace Gu.Wpf.NumericInput.Demo
             await this.VerifyHappyPathAsync(apCode, testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DontWarnInExpressionTree()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Linq.Expressions;
+
+    internal class Foo
+    {
+        public void Bar()
+        {
+            Meh(() => Id(true)); // GU0009 should not warn here
+        }
+
+        internal static void Meh(Expression<Action> meh)
+        {
+        }
+
+        private static bool Id(bool self) => self;
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }

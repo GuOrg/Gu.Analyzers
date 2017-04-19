@@ -54,6 +54,11 @@
                 return;
             }
 
+            if (argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken))
+            {
+                return;
+            }
+
             var methodSymbol = context.SemanticModel.GetSymbolSafe(argumentSyntax.FirstAncestor<ArgumentListSyntax>().Parent, context.CancellationToken) as IMethodSymbol;
             if (methodSymbol == null)
             {

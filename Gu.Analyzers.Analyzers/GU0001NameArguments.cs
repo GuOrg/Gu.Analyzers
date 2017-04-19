@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -66,7 +65,7 @@
                 return;
             }
 
-            if (IsInExpressionTree(argumentListSyntax, context.SemanticModel, context.CancellationToken))
+            if (argumentListSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken))
             {
                 return;
             }
@@ -87,21 +86,6 @@
                     return;
                 }
             }
-        }
-
-        private static bool IsInExpressionTree(ArgumentListSyntax argumentListSyntax, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            foreach (var lamda in argumentListSyntax.Ancestors().OfType<LambdaExpressionSyntax>())
-            {
-                var lambdaType = semanticModel.GetTypeInfo(lamda, cancellationToken).ConvertedType;
-                if (lambdaType != null &&
-                    lambdaType.Is(KnownSymbol.Expression))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         private static bool HasAdjacentParametersOfSameType(ImmutableArray<IParameterSymbol> parameters)
