@@ -39,6 +39,7 @@ namespace Gu.Analyzers
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly RxDisposableType RxDisposable = new RxDisposableType();
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
+        internal static readonly QualifiedType CompositeDisposable = new QualifiedType("System.Reactive.Disposables.CompositeDisposable");
 
         internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();

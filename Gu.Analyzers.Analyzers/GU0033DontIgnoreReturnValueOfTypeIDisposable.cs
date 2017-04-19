@@ -145,7 +145,8 @@
                         return true;
                     }
 
-                    return ctor?.ContainingType != KnownSymbol.StreamReader;
+                    return ctor?.ContainingType != KnownSymbol.StreamReader &&
+                           ctor?.ContainingType != KnownSymbol.CompositeDisposable;
                 }
             }
 

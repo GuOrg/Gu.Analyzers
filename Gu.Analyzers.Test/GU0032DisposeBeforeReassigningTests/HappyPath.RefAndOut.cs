@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0032DisposeBeforeReassigningTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0032DisposeBeforeReassigning>
     {
-        internal class RefAndOut : NestedHappyPathVerifier<HappyPath>
+        internal class RefAndOut : NestedHappyPathVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposableTests.HappyPath>
         {
             [Test]
             public async Task AssigningVariableViaOutParameter()
