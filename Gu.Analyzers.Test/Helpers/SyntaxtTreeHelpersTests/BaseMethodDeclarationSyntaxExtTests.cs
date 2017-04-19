@@ -156,7 +156,6 @@ namespace RoslynSandbox
                         out ParameterSyntax parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
-
         }
     }
 }

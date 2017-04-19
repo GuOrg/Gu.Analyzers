@@ -27,6 +27,26 @@ public sealed class Foo
         }
 
         [Test]
+        public async Task ReturnFileOpenReadAsDynamic()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo
+{
+    public dynamic Meh()
+    {
+        return ↓File.OpenRead(string.Empty);
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Return type should indicate that the value should be disposed.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"

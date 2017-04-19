@@ -180,6 +180,56 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task MethodReturningDynamic()
+        {
+            var testCode = @"
+    public class Foo
+    {
+        public void Bar()
+        {
+            Meh();
+        }
+
+        private static dynamic Meh()
+        {
+            return new object();
+        }
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task GenericClassMethodReturningDynamicSubtract()
+        {
+            var testCode = @"
+    public class Foo<T>
+    {
+        private readonly T item1;
+        private readonly T item2;
+
+        private dynamic Meh() => (dynamic)item1 - (dynamic)item2; //Supersnyggt
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task GenericClassPropertyReturningDynamicSubtract()
+        {
+            var testCode = @"
+    public class Foo<T>
+    {
+        private readonly T item1;
+        private readonly T item2;
+
+        private dynamic Meh => (dynamic)item1 - (dynamic)item2; //Supersnyggt
+    }";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task MethodReturningThis()
         {
             var chunkCode = @"
