@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         internal class Injected : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task IgnorePassedInViaCtorThis()
+            public async Task IgnoreAssignedWithCtorArgument()
             {
                 var testCode = @"
     using System;
@@ -24,6 +24,30 @@ namespace Gu.Analyzers.Test.GU0031DisposeMemberTests
         }
     }";
                 await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task IgnoreInjectedAndCreated()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly IDisposable bar;
+
+        public Foo(IDisposable bar)
+        {
+            this.bar = bar;
+        }
+
+        public static Foo Create() => new Foo(new Disposable());
+    }
+}";
+                await this.VerifyHappyPathAsync(DisposableCode, testCode)
                           .ConfigureAwait(false);
             }
 
