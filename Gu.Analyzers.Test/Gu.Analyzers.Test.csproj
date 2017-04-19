@@ -111,6 +111,7 @@
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.RefAndOut.cs" />
     <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
+    <Compile Include="Helpers\SyntaxtTreeHelpersTests\BaseMethodDeclarationSyntaxExtTests.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="ReproBox.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />
