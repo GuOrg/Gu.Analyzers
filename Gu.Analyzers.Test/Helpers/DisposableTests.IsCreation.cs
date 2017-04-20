@@ -26,7 +26,52 @@
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.IO;
+    using System.Linq;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            var value = new Disposable();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("new Disposable()", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("new List<IDisposable>().Find(x => true)", Result.No)]
+            [TestCase("ImmutableList<IDisposable>.Empty.Find(x => true)", Result.No)]
+            [TestCase("new Queue<IDisposable>().Peek()", Result.No)]
+            [TestCase("ImmutableQueue<IDisposable>.Empty.Peek()", Result.No)]
+            [TestCase("new List<IDisposable>()[0]", Result.No)]
+            [TestCase("ImmutableList<IDisposable>.Empty[0]", Result.Unknown)]
+            public void Ignored(string code, Result expected)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.IO;
+    using System.Linq;
 
     public class Disposable : IDisposable
     {

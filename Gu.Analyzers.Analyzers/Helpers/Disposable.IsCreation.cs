@@ -291,6 +291,25 @@ namespace Gu.Analyzers
 
                     if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
                         method.ContainingType == KnownSymbol.Enumerable ||
+                        method.ContainingType == KnownSymbol.ListOfT ||
+                        method.ContainingType == KnownSymbol.StackOfT ||
+                        method.ContainingType == KnownSymbol.QueueOfT ||
+                        method.ContainingType == KnownSymbol.LinkedListOfT ||
+                        method.ContainingType == KnownSymbol.SortedSetOfT ||
+
+                        method.ContainingType == KnownSymbol.DictionaryOfTKeyTValue ||
+                        method.ContainingType == KnownSymbol.SortedListOfTKeyTValue ||
+                        method.ContainingType == KnownSymbol.SortedDictionaryOfTKeyTValue ||
+
+                        method.ContainingType == KnownSymbol.ImmutableHashSetOfT ||
+                        method.ContainingType == KnownSymbol.ImmutableListOfT ||
+                        method.ContainingType == KnownSymbol.ImmutableQueueOfT ||
+                        method.ContainingType == KnownSymbol.ImmutableSortedSetOfT ||
+                        method.ContainingType == KnownSymbol.ImmutableStackOfT ||
+
+                        method.ContainingType == KnownSymbol.ImmutableDictionaryOfTKeyTValue ||
+                        method.ContainingType == KnownSymbol.ImmutableSortedDictionaryOfTKeyTValue ||
+
                         method.ContainingType == KnownSymbol.ConditionalWeakTable ||
                         method == KnownSymbol.IEnumerable.GetEnumerator ||
                         method == KnownSymbol.Task.Run ||
