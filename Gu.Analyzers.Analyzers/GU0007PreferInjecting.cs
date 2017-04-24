@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Immutable;
-
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,7 +47,7 @@
             context.RegisterSyntaxNodeAction(HandleMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
         }
 
-        internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, ConstructorDeclarationSyntax ctor)
+        internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (objectCreation?.ArgumentList?.Arguments.Any() != true)
             {
@@ -57,7 +57,7 @@
             var injectable = Injectable.Safe;
             foreach (var argument in objectCreation.ArgumentList.Arguments)
             {
-                var temp = IsInjectable(argument.Expression, ctor);
+                var temp = IsInjectable(argument.Expression, semanticModel, cancellationToken);
                 switch (temp)
                 {
                     case Injectable.No:
@@ -75,7 +75,7 @@
             return injectable;
         }
 
-        internal static Injectable IsInjectable(ExpressionSyntax expression, ConstructorDeclarationSyntax ctor)
+        internal static Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var identifierName = expression as IdentifierNameSyntax;
             if (identifierName?.Identifier != null)
@@ -86,8 +86,12 @@
                     return Injectable.No;
                 }
 
-                // ReSharper disable once UnusedVariable
-                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out ParameterSyntax parameter) == false)
+                if (!TryGetSingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
+                {
+                    return Injectable.No;
+                }
+
+                if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
                 {
                     return Injectable.No;
                 }
@@ -97,19 +101,40 @@
 
             if (expression is MemberAccessExpressionSyntax memberAccess)
             {
-                if (memberAccess.Parent is MemberAccessExpressionSyntax ||
-                    memberAccess.Expression is MemberAccessExpressionSyntax)
+                if (memberAccess.Parent is AssignmentExpressionSyntax assignment)
                 {
-                    // only handling simple servicelocator
-                    return Injectable.No;
+                    if (assignment.Left == expression)
+                    {
+                        return Injectable.No;
+                    }
                 }
 
-                return IsInjectable(memberAccess.Expression, ctor);
+                if (MemberPath.TryFindRootMember(memberAccess, out ExpressionSyntax rootMember))
+                {
+                    var rootSymbol = semanticModel.GetSymbolSafe(rootMember, cancellationToken);
+                    if (rootSymbol == null)
+                    {
+                        return Injectable.No;
+                    }
+
+                    if (rootSymbol is IParameterSymbol &&
+                        memberAccess.FirstAncestor<ConstructorDeclarationSyntax>() != null)
+                    {
+                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                    }
+
+                    if (rootSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                    {
+                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                    }
+                }
+
+                return Injectable.No;
             }
 
             if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
             {
-                if (CanInject(nestedObjectCreation, ctor) == Injectable.No)
+                if (CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Injectable.No)
                 {
                     return Injectable.No;
                 }
@@ -122,6 +147,24 @@
 
         internal static ITypeSymbol MemberType(ISymbol symbol) => (symbol as IPropertySymbol)?.Type;
 
+        internal static bool TryGetSingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
+        {
+            ctor = null;
+            var classDeclaration = node.FirstAncestor<ClassDeclarationSyntax>();
+            if (classDeclaration == null)
+            {
+                return false;
+            }
+
+            if (classDeclaration.Members.TryGetSingle(x => x is ConstructorDeclarationSyntax, out MemberDeclarationSyntax single))
+            {
+                ctor = (ConstructorDeclarationSyntax)single;
+                return true;
+            }
+
+            return false;
+        }
+
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
@@ -130,7 +173,7 @@
             }
 
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+            if (objectCreation.FirstAncestor<ConstructorDeclarationSyntax>()?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
             {
                 return;
             }
@@ -141,7 +184,7 @@
                 return;
             }
 
-            if (CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()) == Injectable.Safe)
+            if (CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
@@ -156,21 +199,21 @@
 
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
             var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
+            if (symbol.IsStatic)
+            {
+                return;
+            }
+
             var memberType = MemberType(symbol);
-            if (memberType == null || !IsInjectionType(memberType))
+            if (memberType == null ||
+                !IsInjectionType(memberType))
             {
                 return;
             }
 
-            var ctor = memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+            if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) != Injectable.No)
             {
-                return;
-            }
-
-            if (IsInjectable(memberAccess, ctor) != Injectable.No)
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.Name.GetLocation()));
             }
         }
 

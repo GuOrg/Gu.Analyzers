@@ -55,7 +55,7 @@
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.cs" />
     <Compile Include="GU0008AvoidRelayPropertiesTests\CodeFix.cs" />
     <Compile Include="GU0008AvoidRelayPropertiesTests\HappyPath.cs" />
-    <Compile Include="GU0007PreferInjectingTests\CodeFix.cs" />
+    <Compile Include="GU0007PreferInjectingTests\CodeFix.Simple.cs" />
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />

@@ -44,7 +44,7 @@
             string batchNewSource = null,
             int? codeFixIndex = null,
             bool allowNewCompilerDiagnostics = false,
-            int numberOfIncrementalIterations = -1000,
+            int numberOfIncrementalIterations = 1,
             int numberOfFixAllIterations = 1,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -65,7 +65,7 @@
             string[] batchNewSource = null,
             int? codeFixIndex = null,
             bool allowNewCompilerDiagnostics = false,
-            int numberOfIncrementalIterations = -1000,
+            int numberOfIncrementalIterations = 1,
             int numberOfFixAllIterations = 1,
             CancellationToken cancellationToken = default(CancellationToken))
         {

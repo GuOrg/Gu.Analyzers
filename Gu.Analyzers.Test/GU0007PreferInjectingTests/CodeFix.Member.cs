@@ -36,14 +36,14 @@
 
         public Foo(ServiceLocator locator)
         {
-            this.bar = ↓locator.Bar;
+            this.bar = locator.↓Bar;
         }
     }";
 
                 var expected = this.CSharpDiagnostic()
                                    .WithLocationIndicated(ref fooCode)
                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] {BarCode, LocatorCode, fooCode }, expected)
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
                           .ConfigureAwait(false);
 
                 var fixedCode = @"

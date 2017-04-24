@@ -44,7 +44,7 @@
 
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
                                                        .WithType(objectCreation.Type);
-                    switch (GU0007PreferInjecting.CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
+                    switch (GU0007PreferInjecting.CanInject(objectCreation, semanticModel, context.CancellationToken))
                     {
                         case GU0007PreferInjecting.Injectable.No:
                             continue;
@@ -69,12 +69,12 @@
                     }
                 }
 
-                if (node is MemberAccessExpressionSyntax memberAccess)
+                if (node is IdentifierNameSyntax identifierName)
                 {
-                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(memberAccess, context.CancellationToken));
+                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(identifierName, context.CancellationToken));
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
                                                        .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
-                    switch (GU0007PreferInjecting.IsInjectable(memberAccess, memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()))
+                    switch (GU0007PreferInjecting.IsInjectable(identifierName, semanticModel, context.CancellationToken))
                     {
                         case GU0007PreferInjecting.Injectable.No:
                             continue;
@@ -83,7 +83,7 @@
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Inject UNSAFE",
-                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, memberAccess, parameterSyntax),
+                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, identifierName, parameterSyntax),
                                     nameof(InjectCodeFixProvider)),
                                 diagnostic);
                             break;
@@ -94,13 +94,31 @@
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ExpressionSyntax objectCreation, ParameterSyntax parameterSyntax)
+        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
         {
-            var ctor = objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            parameterSyntax = UniqueName(ctor.ParameterList, parameterSyntax);
-            var updated = ctor.ReplaceNode(objectCreation, SyntaxFactory.IdentifierName(parameterSyntax.Identifier));
-            updated = updated.WithParameterList(ctor.ParameterList.AddParameters(parameterSyntax));
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(ctor, updated)));
+            ExpressionSyntax OldNode(ExpressionSyntax e)
+            {
+                if (e is ObjectCreationExpressionSyntax)
+                {
+                    return e;
+                }
+
+                if (e.Parent is MemberAccessExpressionSyntax memberAccess)
+                {
+                    return OldNode(memberAccess);
+                }
+
+                return e;
+            }
+
+            if (GU0007PreferInjecting.TryGetSingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
+            {
+                parameterSyntax = UniqueName(ctor.ParameterList, parameterSyntax);
+                var oldNode = OldNode(expression);
+                return Task.FromResult(context.Document.WithSyntaxRoot(new InjectRewriter(oldNode, parameterSyntax).Visit(syntaxRoot)));
+            }
+
+            return Task.FromResult(context.Document);
         }
 
         private static ParameterSyntax UniqueName(ParameterListSyntax parameterList, ParameterSyntax parameter)
@@ -142,6 +160,58 @@
             }
 
             return type.Name.FirstCharLower();
+        }
+
+        private class InjectRewriter : CSharpSyntaxRewriter
+        {
+            private readonly ExpressionSyntax oldNode;
+            private readonly ParameterSyntax parameter;
+
+            public InjectRewriter(ExpressionSyntax oldNode, ParameterSyntax parameter)
+            {
+                this.oldNode = oldNode;
+                this.parameter = parameter;
+            }
+
+            public override SyntaxNode VisitParameterList(ParameterListSyntax node)
+            {
+                if (node.Parent is ConstructorDeclarationSyntax)
+                {
+                    return node.AddParameters(this.parameter);
+                }
+
+                return base.VisitParameterList(node);
+            }
+
+            public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+            {
+                if (node == this.oldNode)
+                {
+                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
+                }
+
+                return base.VisitObjectCreationExpression(node);
+            }
+
+            public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+            {
+                if (node == this.oldNode)
+                {
+                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
+                }
+
+                return base.VisitMemberAccessExpression(node);
+            }
+
+            public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                if (node == this.oldNode)
+                {
+                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
+                }
+
+                return base.VisitIdentifierName(node);
+            }
         }
     }
 }
