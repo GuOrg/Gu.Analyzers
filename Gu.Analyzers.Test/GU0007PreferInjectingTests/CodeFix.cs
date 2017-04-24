@@ -3,12 +3,14 @@
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0007PreferInjecting, InjectCodeFixProvider>
+    internal partial class CodeFix : CodeFixVerifier<GU0007PreferInjecting, InjectCodeFixProvider>
     {
-        [Test]
-        public async Task WhenNotInjectingFieldInitialization()
+        internal class Simple : NestedCodeFixVerifier<CodeFix>
         {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingFieldInitialization()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -18,16 +20,17 @@
             this.bar = ↓new Bar();
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref fooCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref fooCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -37,13 +40,14 @@
             this.bar = bar;
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode }, new[] { fixedCode, barCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode}, new[] {fixedCode, barCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenNotInjectingChained()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingChained()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -53,12 +57,12 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
     }";
 
-            var mehCode = @"
+                var mehCode = @"
     public class Meh : Foo
     {
         public Meh()
@@ -66,12 +70,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref mehCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, mehCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref mehCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, mehCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(Bar bar)
@@ -79,13 +84,14 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, mehCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, mehCode}, new[] {fooCode, barCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenNotInjectingChainedNameCollision()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingChainedNameCollision()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -95,12 +101,12 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
     }";
 
-            var testCode = @"
+                var testCode = @"
     public class Meh : Foo
     {
         public Meh(int bar)
@@ -108,12 +114,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, testCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, testCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(int bar, Bar bar_)
@@ -121,13 +128,14 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, testCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, testCode}, new[] {fooCode, barCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenNotInjectingChainedGeneric()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingChainedGeneric()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar<int> bar;
@@ -137,12 +145,12 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar<T>
     {
     }";
 
-            var mehCode = @"
+                var mehCode = @"
     public class Meh : Foo
     {
         public Meh()
@@ -150,12 +158,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref mehCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, mehCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref mehCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, mehCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(Bar<int> bar)
@@ -163,13 +172,14 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, mehCode }, new[] { fooCode, barCode, fixedCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, mehCode}, new[] {fooCode, barCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenNotInjectingChainedGenericParameterName()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingChainedGenericParameterName()
+            {
+                var fooCode = @"
     public sealed class Foo
     {
         private readonly IsModuleReady<FooModule> isFooReady;
@@ -180,7 +190,7 @@
         }
     }";
 
-            var moduleCode = @"
+                var moduleCode = @"
     public class IsModuleReady<TModule>
         where TModule : Module
     {
@@ -190,12 +200,13 @@
 
     public class FooModule : Module { }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref fooCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, moduleCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref fooCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, moduleCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public sealed class Foo
     {
         private readonly IsModuleReady<FooModule> isFooReady;
@@ -205,13 +216,14 @@
             this.isFooReady = isFooModuleReady;
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, moduleCode }, new[] { fixedCode, moduleCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, moduleCode}, new[] {fixedCode, moduleCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task WhenNotInjectingChainedNewWithInjectedArgument()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task WhenNotInjectingChainedNewWithInjectedArgument()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -221,7 +233,7 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
         private readonly Baz baz;
@@ -232,11 +244,11 @@
         }
     }";
 
-            var bazCode = @"
+                var bazCode = @"
     public class Baz
     {
     }";
-            var testCode = @"
+                var testCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz)
@@ -244,12 +256,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, bazCode, testCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, bazCode, testCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz, Bar bar)
@@ -257,13 +270,15 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, bazCode, testCode }, new[] { fooCode, barCode, bazCode, fixedCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, bazCode, testCode},
+                                                new[] {fooCode, barCode, bazCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task UnsafeWhenNotInjectingChainedPassingInPropertyOfInjected()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task UnsafeWhenNotInjectingChainedPassingInPropertyOfInjected()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -273,7 +288,7 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
         private readonly int value;
@@ -284,13 +299,13 @@
         }
     }";
 
-            var bazCode = @"
+                var bazCode = @"
     public class Baz
     {
         public int Value { get; } = 2;
     }";
 
-            var mehCode = @"
+                var mehCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz)
@@ -298,12 +313,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref mehCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, bazCode, mehCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref mehCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, bazCode, mehCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz, Bar bar)
@@ -311,13 +327,15 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, bazCode, mehCode }, new[] { fooCode, barCode, bazCode, fixedCode }).ConfigureAwait(false);
-        }
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, bazCode, mehCode},
+                                                new[] {fooCode, barCode, bazCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
 
-        [Test]
-        public async Task UnsafeWhenNotInjectingChainedPropertyOnInjected()
-        {
-            var fooCode = @"
+            [Test]
+            public async Task UnsafeWhenNotInjectingChainedPropertyOnInjected()
+            {
+                var fooCode = @"
     public class Foo
     {
         private readonly Bar bar;
@@ -327,12 +345,12 @@
             this.bar = bar;
         }
     }";
-            var barCode = @"
+                var barCode = @"
     public class Bar
     {
     }";
 
-            var bazCode = @"
+                var bazCode = @"
     public class Baz
     {
         public Baz(Bar bar)
@@ -343,7 +361,7 @@
         public Bar Bar { get; }
     }";
 
-            var mehCode = @"
+                var mehCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz)
@@ -351,12 +369,13 @@
         {
         }
     }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref mehCode)
-                               .WithMessage("Prefer injecting.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode, bazCode, mehCode }, expected).ConfigureAwait(false);
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref mehCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] {fooCode, barCode, bazCode, mehCode}, expected)
+                          .ConfigureAwait(false);
 
-            var fixedCode = @"
+                var fixedCode = @"
     public class Meh : Foo
     {
         public Meh(Baz baz, Bar bar)
@@ -364,7 +383,9 @@
         {
         }
     }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode, bazCode, mehCode }, new[] { fooCode, barCode, bazCode, fixedCode }).ConfigureAwait(false);
+                await this.VerifyCSharpFixAsync(new[] {fooCode, barCode, bazCode, mehCode}, new[] {fooCode, barCode, bazCode, fixedCode})
+                          .ConfigureAwait(false);
+            }
         }
     }
 }

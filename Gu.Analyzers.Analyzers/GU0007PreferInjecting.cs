@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
 
     using Microsoft.CodeAnalysis;
@@ -78,10 +77,47 @@
 
         internal static Injectable IsInjectable(ExpressionSyntax expression, ConstructorDeclarationSyntax ctor)
         {
-            using (var pooled = SetPool<ExpressionSyntax>.Create())
+            var identifierName = expression as IdentifierNameSyntax;
+            if (identifierName?.Identifier != null)
             {
-                return IsInjectable(expression, ctor, pooled.Item);
+                var identifier = identifierName.Identifier.ValueText;
+                if (identifier == null)
+                {
+                    return Injectable.No;
+                }
+
+                // ReSharper disable once UnusedVariable
+                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out ParameterSyntax parameter) == false)
+                {
+                    return Injectable.No;
+                }
+
+                return Injectable.Safe;
             }
+
+            if (expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                if (memberAccess.Parent is MemberAccessExpressionSyntax ||
+                    memberAccess.Expression is MemberAccessExpressionSyntax)
+                {
+                    // only handling simple servicelocator
+                    return Injectable.No;
+                }
+
+                return IsInjectable(memberAccess.Expression, ctor);
+            }
+
+            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
+            {
+                if (CanInject(nestedObjectCreation, ctor) == Injectable.No)
+                {
+                    return Injectable.No;
+                }
+
+                return Injectable.Safe;
+            }
+
+            return Injectable.No;
         }
 
         internal static ITypeSymbol MemberType(ISymbol symbol) => (symbol as IPropertySymbol)?.Type;
@@ -119,15 +155,15 @@
             }
 
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
-            var ctor = memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+            var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
+            var memberType = MemberType(symbol);
+            if (memberType == null || !IsInjectionType(memberType))
             {
                 return;
             }
 
-            var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
-            var memberType = MemberType(symbol);
-            if (memberType == null || !IsInjectionType(memberType))
+            var ctor = memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
             {
                 return;
             }
@@ -136,56 +172,6 @@
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.GetLocation()));
             }
-        }
-
-        private static Injectable IsInjectable(ExpressionSyntax expression, ConstructorDeclarationSyntax ctor, HashSet<ExpressionSyntax> @checked)
-        {
-            if (!@checked.Add(expression))
-            {
-                return Injectable.No;
-            }
-
-            var identifierName = expression as IdentifierNameSyntax;
-            if (identifierName?.Identifier != null)
-            {
-                var identifier = identifierName.Identifier.ValueText;
-                if (identifier == null)
-                {
-                    return Injectable.No;
-                }
-
-                // ReSharper disable once UnusedVariable
-                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out ParameterSyntax parameter) == false)
-                {
-                    return Injectable.No;
-                }
-
-                return Injectable.Safe;
-            }
-
-            if (expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                if (memberAccess.Parent is MemberAccessExpressionSyntax ||
-                    memberAccess.Expression is MemberAccessExpressionSyntax)
-                {
-                    // only handling simple servicelocator
-                    return Injectable.No;
-                }
-
-                return IsInjectable(memberAccess.Expression, ctor, @checked);
-            }
-
-            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
-            {
-                if (CanInject(nestedObjectCreation, ctor) == Injectable.No)
-                {
-                    return Injectable.No;
-                }
-
-                return Injectable.Safe;
-            }
-
-            return Injectable.No;
         }
 
         private static bool IsInjectionType(ITypeSymbol type)
