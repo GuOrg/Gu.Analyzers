@@ -77,6 +77,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Benchmarks\GU0001NameArguments.md" />
+    <None Include="Benchmarks\GU0002NamedArgumentPositionMatches.md" />
+    <None Include="Benchmarks\GU0003CtorParameterNamesShouldMatch.md" />
+    <None Include="Benchmarks\GU0004AssignAllReadOnlyMembers.md" />
+    <None Include="Benchmarks\GU0005ExceptionArgumentsPositions.md" />
+    <None Include="Benchmarks\GU0006UseNameof.md" />
+    <None Include="Benchmarks\GU0007PreferInjecting.md" />
+    <None Include="Benchmarks\GU0008AvoidRelayProperties.md" />
+    <None Include="Benchmarks\GU0009UseNamedParametersForBooleans.md" />
+    <None Include="Benchmarks\GU0010DoNotAssignSameValue.md" />
+    <None Include="Benchmarks\GU0011DontIgnoreReturnValue.md" />
+    <None Include="Benchmarks\GU0020SortProperties.md" />
+    <None Include="Benchmarks\GU0021CalculatedPropertyAllocates.md" />
+    <None Include="Benchmarks\GU0022UseGetOnly.md" />
+    <None Include="Benchmarks\GU0030DisposeCreated.md" />
+    <None Include="Benchmarks\GU0031DisposeMember.md" />
+    <None Include="Benchmarks\GU0032DisposeBeforeReassigning.md" />
+    <None Include="Benchmarks\GU0033DontIgnoreReturnValueOfTypeIDisposable.md" />
+    <None Include="Benchmarks\GU0034ReturntypeShouldIndicateIDisposable.md" />
+    <None Include="Benchmarks\GU0035ImplementIDisposable.md" />
+    <None Include="Benchmarks\GU0036DontDisposeInjected.md" />
+    <None Include="Benchmarks\GU0037DontMixInjectedAndCreatedForMember.md" />
+    <None Include="Benchmarks\GU0050IgnoreEventsWhenSerializing.md" />
+    <None Include="Benchmarks\GU0051XmlSerializerNotCached.md" />
     <None Include="paket.references" />
   </ItemGroup>
   <ItemGroup>

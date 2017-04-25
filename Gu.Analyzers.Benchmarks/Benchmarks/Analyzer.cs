@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.IO;
@@ -20,7 +21,7 @@
 
         protected Analyzer(DiagnosticAnalyzer analyzer)
         {
-            var project = CreateProject("C:\\Git\\Gu.Analyzers\\Gu.Analyzers.Analyzers\\Gu.Analyzers.Analyzers.csproj", analyzer);
+            var project = CreateProject(ProjFile().FullName, analyzer);
             var compilation = project.GetCompilationAsync(CancellationToken.None).Result;
             this.compilationWithAnalyzers = compilation.WithAnalyzers(
                 ImmutableArray.Create(analyzer),
@@ -33,6 +34,17 @@
         {
             return await this.compilationWithAnalyzers.GetAnalyzerDiagnosticsAsync(CancellationToken.None)
                                                       .ConfigureAwait(false);
+        }
+
+        private static FileInfo ProjFile()
+        {
+            return new FileInfo(new Uri(typeof(Analyzers.GU0007PreferInjecting).Assembly.CodeBase).LocalPath)
+                .Directory
+                .Parent
+                .Parent
+                .Parent
+                .EnumerateFiles("Gu.Analyzers.Analyzers.csproj", SearchOption.AllDirectories)
+                .Single();
         }
 
         private static Project CreateProject(string projFile, DiagnosticAnalyzer analyzer)
