@@ -261,7 +261,7 @@
                 if (Assignment.SingleForSymbol(
                         symbol,
                         node.FirstAncestor<TypeDeclarationSyntax>(),
-                        Search.Recursive,
+                        Search.TopLevel,
                         semanticModel,
                         cancellationToken,
                         out AssignmentExpressionSyntax assignment) &&

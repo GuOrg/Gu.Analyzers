@@ -5,6 +5,14 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal partial class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
     {
+        private static readonly string BarCode = @"
+    public class Bar
+    {
+        public void Baz()
+        {
+        }
+    }";
+
         [Test]
         public async Task WhenInjecting()
         {
@@ -19,11 +27,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         }
     }";
 
-            var barCode = @"
-    public class Bar
-    {
-    }";
-            await this.VerifyHappyPathAsync(fooCode, barCode)
+            await this.VerifyHappyPathAsync(fooCode, BarCode)
                       .ConfigureAwait(false);
         }
 
@@ -77,11 +81,45 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         }
     }";
 
+            await this.VerifyHappyPathAsync(fooCode, BarCode)
+                      .ConfigureAwait(false);
+        }
+
+        [TestCase("int")]
+        [TestCase("Abstract")]
+        public async Task WhenNewNotInjectable(string type)
+        {
+            var abstractCode = @"
+    public abstract class Abstract
+    {
+    }";
+
             var barCode = @"
     public class Bar
     {
+        private readonly int value;
+
+        public Bar(int value)
+        {
+            this.value = value;
+        }
     }";
-            await this.VerifyHappyPathAsync(fooCode, barCode)
+
+            barCode = barCode.AssertReplace("int", type);
+
+            var fooCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo()
+        {
+            bar = new Bar(default(int));
+        }
+    }";
+
+            fooCode = fooCode.AssertReplace("default(int)", $"default({type})");
+            await this.VerifyHappyPathAsync(abstractCode, barCode, fooCode)
                       .ConfigureAwait(false);
         }
     }
