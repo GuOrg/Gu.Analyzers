@@ -155,8 +155,9 @@
 
             if (symbol is IPropertySymbol property)
             {
-                if (!property.Type.IsSealed && 
-                    InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                if (!property.Type.IsSealed &&
+                    !property.Type.IsValueType &&
+                    AssignedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
                 {
                     return memberType;
                 }
@@ -167,7 +168,8 @@
             if (symbol is IFieldSymbol field)
             {
                 if (!field.Type.IsSealed &&
-                    InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                    !field.Type.IsValueType &&
+                    AssignedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
                 {
                     return memberType;
                 }
@@ -254,7 +256,7 @@
             }
         }
 
-        private static bool InjectedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
+        private static bool AssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
         {
             foreach (var reference in symbol.DeclaringSyntaxReferences)
             {
