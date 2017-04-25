@@ -16,6 +16,8 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     public class Foo
     {
+        private readonly IDisposable meh1;
+
         public Foo()
         {
             this.meh1 = this.RecursiveProperty;

@@ -75,6 +75,36 @@
             return false;
         }
 
+        internal static bool SingleForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        {
+            assignment = null;
+            if (symbol == null ||
+                scope == null)
+            {
+                return false;
+            }
+
+            using (var pooledAssignments = Create(scope, search, semanticModel, cancellationToken))
+            {
+                foreach (var candidate in pooledAssignments.Item.Assignments)
+                {
+                    var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
+                    if (SymbolComparer.Equals(symbol, assignedSymbol))
+                    {
+                        if (assignment != null)
+                        {
+                            assignment = null;
+                            return false;
+                        }
+
+                        assignment = candidate;
+                    }
+                }
+            }
+
+            return assignment != null;
+        }
+
         internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;

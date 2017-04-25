@@ -117,8 +117,7 @@
                         return Injectable.No;
                     }
 
-                    if (rootSymbol is IParameterSymbol &&
-                        memberAccess.FirstAncestor<ConstructorDeclarationSyntax>() != null)
+                    if (rootSymbol is IParameterSymbol)
                     {
                         return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
                     }
@@ -145,7 +144,37 @@
             return Injectable.No;
         }
 
-        internal static ITypeSymbol MemberType(ISymbol symbol) => (symbol as IPropertySymbol)?.Type;
+        internal static ITypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            if (symbol == null ||
+                symbol.IsStatic)
+            {
+                return null;
+            }
+
+            if (symbol is IPropertySymbol property)
+            {
+                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                {
+                    return memberType;
+                }
+
+                return property.Type;
+            }
+
+            if (symbol is IFieldSymbol field)
+            {
+                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                {
+                    return memberType;
+                }
+
+                return field.Type;
+            }
+
+            return null;
+        }
 
         internal static bool TryGetSingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
         {
@@ -198,14 +227,19 @@
             }
 
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
-            var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
-            if (symbol == null ||
-                symbol.IsStatic)
+            if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
+                assignment.Left == memberAccess)
             {
                 return;
             }
 
-            var memberType = MemberType(symbol);
+            if (memberAccess.Expression is ThisExpressionSyntax ||
+                memberAccess.Expression is BaseExpressionSyntax)
+            {
+                return;
+            }
+
+            var memberType = MemberType(memberAccess, context.SemanticModel, context.CancellationToken);
             if (memberType == null ||
                 !IsInjectionType(memberType))
             {
@@ -218,11 +252,43 @@
             }
         }
 
+        private static bool InjectedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
+        {
+            foreach (var reference in symbol.DeclaringSyntaxReferences)
+            {
+                var node = reference.GetSyntax(cancellationToken);
+
+                if (Assignment.SingleForSymbol(
+                        symbol,
+                        node.FirstAncestor<TypeDeclarationSyntax>(),
+                        Search.Recursive,
+                        semanticModel,
+                        cancellationToken,
+                        out AssignmentExpressionSyntax assignment) &&
+                    assignment.Right is IdentifierNameSyntax identifier)
+                {
+                    var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
+                    if (ctor != null &&
+                        ctor.ParameterList.TryGetFirst(
+                            p => p.Identifier.ValueText == identifier.Identifier.ValueText,
+                            out ParameterSyntax parameter))
+                    {
+                        memberType = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken)?.Type;
+                        return true;
+                    }
+                }
+            }
+
+            memberType = null;
+            return false;
+        }
+
         private static bool IsInjectionType(ITypeSymbol type)
         {
             if (type?.ContainingNamespace == null ||
                 type.IsValueType ||
-                type.IsStatic)
+                type.IsStatic ||
+                type == KnownSymbol.String)
             {
                 return false;
             }

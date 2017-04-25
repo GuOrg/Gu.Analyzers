@@ -184,11 +184,12 @@
                             var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
                             if (methodDeclaration.TryGetMatchingParameter(node, out ParameterSyntax parameterSyntax))
                             {
-                                if (this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken) is IParameterSymbol parameter)
+                                var parameterSymbol = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken);
+                                if (parameterSymbol != null)
                                 {
                                     if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
                                     {
-                                        this.refParameters.Add(parameter).IgnoreReturnValue();
+                                        this.refParameters.Add(parameterSymbol).IgnoreReturnValue();
                                     }
 
                                     if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))

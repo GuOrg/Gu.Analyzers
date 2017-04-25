@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
 
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+
     internal static class EnumerableExt
     {
         internal static bool TryGetAtIndex<TCollection, TItem>(this TCollection source, int index, out TItem result)
@@ -52,10 +54,16 @@
             return false;
         }
 
+        internal static bool TryGetFirst(this ParameterListSyntax source, out ParameterSyntax result)
+        {
+            return TryGetFirst(source.Parameters, out result);
+        }
+
         internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
-            if (source.Count == 0)
+            if (source == null ||
+                source.Count == 0)
             {
                 result = default(TItem);
                 return false;
@@ -63,6 +71,11 @@
 
             result = source[0];
             return true;
+        }
+
+        internal static bool TryGetFirst(this ParameterListSyntax source, Func<ParameterSyntax, bool> selector, out ParameterSyntax result)
+        {
+            return TryGetFirst(source.Parameters, selector, out result);
         }
 
         internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)

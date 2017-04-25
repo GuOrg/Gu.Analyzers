@@ -44,6 +44,7 @@ namespace RoslynSandbox
         public ServiceLocator(Bar bar)
         {
             this.Bar = bar;
+            this.BarObject = bar;
         }
 
         public Bar Bar { get; }
@@ -140,7 +141,7 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly object bar;
 
         public Foo(ServiceLocator locator)
         {
@@ -160,7 +161,7 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly object bar;
 
         public Foo(ServiceLocator locator, Bar bar)
         {
@@ -317,6 +318,53 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public async Task WhenUsingMethodInjectedLocator()
+            {
+                var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+        }
+
+        public void Meh(ServiceLocator locator)
+        {
+            locator.↓Bar.Baz();
+        }
+    }
+}";
+
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref fooCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
+                          .ConfigureAwait(false);
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(Bar bar)
+        {
+            this.bar = bar;
+        }
+
+        public void Meh(ServiceLocator locator)
+        {
+            this.bar.Baz();
+        }
+    }
+}";
+                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task WhenUsingLocatorInMethod()
             {
                 var fooCode = @"
@@ -349,13 +397,13 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly ServiceLocator locator;
         private readonly Bar bar;
+        private readonly ServiceLocator locator;
 
         public Foo(ServiceLocator locator, Bar bar)
         {
-            this.locator = locator;
             this.bar = bar;
+            this.locator = locator;
         }
 
         public void Meh()
@@ -409,13 +457,13 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly ServiceLocator locator;
         private readonly Bar bar;
+        private readonly ServiceLocator locator;
 
         public Foo(ServiceLocator locator, Bar bar)
         {
-            this.locator = locator;
             this.bar = bar;
+            this.locator = locator;
         }
 
         public void Meh1()
@@ -466,13 +514,13 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly ServiceLocator _locator;
         private readonly Bar _bar;
+        private readonly ServiceLocator _locator;
 
         public Foo(ServiceLocator locator, Bar bar)
         {
-            _locator = locator;
             _bar = bar;
+            _locator = locator;
         }
 
         public void Meh()
@@ -522,14 +570,14 @@ namespace RoslynSandbox
 {
     public class Foo : FooBase
     {
-        private readonly ServiceLocator locator;
         private readonly Bar bar;
+        private readonly ServiceLocator locator;
 
         public Foo(ServiceLocator locator, Bar bar)
             : base(bar)
         {
-            this.locator = locator;
             this.bar = bar;
+            this.locator = locator;
         }
 
         public void Meh()

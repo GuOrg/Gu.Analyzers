@@ -73,9 +73,10 @@
                     }
                 }
 
-                if (node is IdentifierNameSyntax identifierName)
+                if (node is IdentifierNameSyntax identifierName &&
+                    identifierName.Parent is MemberAccessExpressionSyntax memberAccess)
                 {
-                    var type = GU0007PreferInjecting.MemberType(semanticModel.GetSymbolSafe(identifierName, context.CancellationToken));
+                    var type = GU0007PreferInjecting.MemberType(memberAccess, semanticModel, context.CancellationToken);
                     var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
                                                        .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
                     switch (GU0007PreferInjecting.IsInjectable(identifierName, semanticModel, context.CancellationToken))
@@ -208,9 +209,9 @@
                   modifiers: DeclarationModifiers.ReadOnly,
                   type: parameter.Type);
             var members = containingType.Members;
-            if (members.TryGetLast(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
+            if (members.TryGetFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
             {
-                editor.InsertAfter(field, new[] { newField });
+                editor.InsertBefore(field, new[] { newField });
             }
             else if (members.TryGetFirst(out field))
             {
@@ -224,12 +225,24 @@
             var fieldAccess = usesUnderscoreNames
                                        ? SyntaxFactory.IdentifierName(name)
                                        : SyntaxFactory.ParseExpression($"this.{name}");
-            var assignmentStatement = editor.Generator.AssignmentStatement(fieldAccess, SyntaxFactory.IdentifierName(parameter.Identifier));
-            editor.InsertAfter(
-                ctor.Body.Statements.First(),
-                SyntaxFactory.ExpressionStatement((ExpressionSyntax)assignmentStatement)
-                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+
+            var assignStatement = SyntaxFactory.ExpressionStatement(
+                                                             (ExpressionSyntax)editor.Generator.AssignmentStatement(
+                                                                 fieldAccess,
+                                                                 SyntaxFactory.IdentifierName(parameter.Identifier)))
+                                                         .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                         .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+            if (ctor.Body.Statements.Any())
+            {
+                editor.InsertBefore(
+                    ctor.Body.Statements.First(),
+                    assignStatement);
+            }
+            else
+            {
+                editor.ReplaceNode(ctor.Body, ctor.Body.WithStatements(ctor.Body.Statements.Add(assignStatement)));
+            }
+
             return fieldAccess;
         }
 
@@ -269,7 +282,7 @@
 
             public override void VisitStructDeclaration(StructDeclarationSyntax node)
             {
-                return;
+                // NOP, we don't visit recursive types.
             }
 
             public override void VisitIdentifierName(IdentifierNameSyntax node)
@@ -307,7 +320,7 @@
                 }
 
                 var nodeSymbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                var expectedSymbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                var expectedSymbol = this.semanticModel.GetSymbolSafe(this.identifierName, this.cancellationToken);
                 if (nodeSymbol == null ||
                     expectedSymbol == null ||
                     !SymbolComparer.Equals(nodeSymbol, expectedSymbol))
