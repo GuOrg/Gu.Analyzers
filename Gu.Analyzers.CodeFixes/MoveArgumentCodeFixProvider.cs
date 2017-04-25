@@ -26,7 +26,7 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                              .ConfigureAwait(false);
+                                          .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)

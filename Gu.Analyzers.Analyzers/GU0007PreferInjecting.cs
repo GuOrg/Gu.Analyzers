@@ -1,9 +1,8 @@
 ﻿namespace Gu.Analyzers
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
-
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -48,7 +47,7 @@
             context.RegisterSyntaxNodeAction(HandleMemberAccess, SyntaxKind.SimpleMemberAccessExpression);
         }
 
-        internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, ConstructorDeclarationSyntax ctor)
+        internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (objectCreation?.ArgumentList?.Arguments.Any() != true)
             {
@@ -58,7 +57,7 @@
             var injectable = Injectable.Safe;
             foreach (var argument in objectCreation.ArgumentList.Arguments)
             {
-                var temp = IsInjectable(argument.Expression, ctor);
+                var temp = IsInjectable(argument.Expression, semanticModel, cancellationToken);
                 switch (temp)
                 {
                     case Injectable.No:
@@ -76,15 +75,124 @@
             return injectable;
         }
 
-        internal static Injectable IsInjectable(ExpressionSyntax expression, ConstructorDeclarationSyntax ctor)
+        internal static Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = SetPool<ExpressionSyntax>.Create())
+            var identifierName = expression as IdentifierNameSyntax;
+            if (identifierName?.Identifier != null)
             {
-                return IsInjectable(expression, ctor, pooled.Item);
+                var identifier = identifierName.Identifier.ValueText;
+                if (identifier == null)
+                {
+                    return Injectable.No;
+                }
+
+                if (!TryGetSingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
+                {
+                    return Injectable.No;
+                }
+
+                if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+                {
+                    return Injectable.No;
+                }
+
+                return Injectable.Safe;
             }
+
+            if (expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                if (memberAccess.Parent is AssignmentExpressionSyntax assignment)
+                {
+                    if (assignment.Left == expression)
+                    {
+                        return Injectable.No;
+                    }
+                }
+
+                if (MemberPath.TryFindRootMember(memberAccess, out ExpressionSyntax rootMember))
+                {
+                    var rootSymbol = semanticModel.GetSymbolSafe(rootMember, cancellationToken);
+                    if (rootSymbol == null)
+                    {
+                        return Injectable.No;
+                    }
+
+                    if (rootSymbol is IParameterSymbol)
+                    {
+                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                    }
+
+                    if (rootSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                    {
+                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                    }
+                }
+
+                return Injectable.No;
+            }
+
+            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
+            {
+                if (CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Injectable.No)
+                {
+                    return Injectable.No;
+                }
+
+                return Injectable.Safe;
+            }
+
+            return Injectable.No;
         }
 
-        internal static ITypeSymbol MemberType(ISymbol symbol) => (symbol as IPropertySymbol)?.Type;
+        internal static ITypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            if (symbol == null ||
+                symbol.IsStatic)
+            {
+                return null;
+            }
+
+            if (symbol is IPropertySymbol property)
+            {
+                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                {
+                    return memberType;
+                }
+
+                return property.Type;
+            }
+
+            if (symbol is IFieldSymbol field)
+            {
+                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                {
+                    return memberType;
+                }
+
+                return field.Type;
+            }
+
+            return null;
+        }
+
+        internal static bool TryGetSingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
+        {
+            ctor = null;
+            var classDeclaration = node.FirstAncestor<ClassDeclarationSyntax>();
+            if (classDeclaration == null)
+            {
+                return false;
+            }
+
+            if (classDeclaration.Members.TryGetSingle(x => x is ConstructorDeclarationSyntax, out MemberDeclarationSyntax single))
+            {
+                ctor = (ConstructorDeclarationSyntax)single;
+                return true;
+            }
+
+            return false;
+        }
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
@@ -94,7 +202,7 @@
             }
 
             var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+            if (objectCreation.FirstAncestor<ConstructorDeclarationSyntax>()?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
             {
                 return;
             }
@@ -105,7 +213,7 @@
                 return;
             }
 
-            if (CanInject(objectCreation, objectCreation.FirstAncestorOrSelf<ConstructorDeclarationSyntax>()) == Injectable.Safe)
+            if (CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
@@ -119,80 +227,68 @@
             }
 
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
-            var ctor = memberAccess.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
+            if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
+                assignment.Left == memberAccess)
             {
                 return;
             }
 
-            var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
-            var memberType = MemberType(symbol);
-            if (memberType == null || !IsInjectionType(memberType))
+            if (memberAccess.Expression is ThisExpressionSyntax ||
+                memberAccess.Expression is BaseExpressionSyntax)
             {
                 return;
             }
 
-            if (IsInjectable(memberAccess, ctor) != Injectable.No)
+            var memberType = MemberType(memberAccess, context.SemanticModel, context.CancellationToken);
+            if (memberType == null ||
+                !IsInjectionType(memberType))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.GetLocation()));
+                return;
+            }
+
+            if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) != Injectable.No)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.Name.GetLocation()));
             }
         }
 
-        private static Injectable IsInjectable(ExpressionSyntax expression, ConstructorDeclarationSyntax ctor, HashSet<ExpressionSyntax> @checked)
+        private static bool InjectedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
         {
-            if (!@checked.Add(expression))
+            foreach (var reference in symbol.DeclaringSyntaxReferences)
             {
-                return Injectable.No;
+                var node = reference.GetSyntax(cancellationToken);
+
+                if (Assignment.SingleForSymbol(
+                        symbol,
+                        node.FirstAncestor<TypeDeclarationSyntax>(),
+                        Search.Recursive,
+                        semanticModel,
+                        cancellationToken,
+                        out AssignmentExpressionSyntax assignment) &&
+                    assignment.Right is IdentifierNameSyntax identifier)
+                {
+                    var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
+                    if (ctor != null &&
+                        ctor.ParameterList.TryGetFirst(
+                            p => p.Identifier.ValueText == identifier.Identifier.ValueText,
+                            out ParameterSyntax parameter))
+                    {
+                        memberType = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken)?.Type;
+                        return true;
+                    }
+                }
             }
 
-            var identifierName = expression as IdentifierNameSyntax;
-            if (identifierName?.Identifier != null)
-            {
-                var identifier = identifierName.Identifier.ValueText;
-                if (identifier == null)
-                {
-                    return Injectable.No;
-                }
-
-                // ReSharper disable once UnusedVariable
-                if (ctor.ParameterList?.Parameters.TryGetSingle(x => x.Identifier.ValueText == identifier, out ParameterSyntax parameter) == false)
-                {
-                    return Injectable.No;
-                }
-
-                return Injectable.Safe;
-            }
-
-            if (expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                if (memberAccess.Parent is MemberAccessExpressionSyntax ||
-                    memberAccess.Expression is MemberAccessExpressionSyntax)
-                {
-                    // only handling simple servicelocator
-                    return Injectable.No;
-                }
-
-                return IsInjectable(memberAccess.Expression, ctor, @checked);
-            }
-
-            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
-            {
-                if (CanInject(nestedObjectCreation, ctor) == Injectable.No)
-                {
-                    return Injectable.No;
-                }
-
-                return Injectable.Safe;
-            }
-
-            return Injectable.No;
+            memberType = null;
+            return false;
         }
 
         private static bool IsInjectionType(ITypeSymbol type)
         {
             if (type?.ContainingNamespace == null ||
                 type.IsValueType ||
-                type.IsStatic)
+                type.IsStatic ||
+                type == KnownSymbol.String)
             {
                 return false;
             }

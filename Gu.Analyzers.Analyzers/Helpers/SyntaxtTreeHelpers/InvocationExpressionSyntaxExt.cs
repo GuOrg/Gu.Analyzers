@@ -68,7 +68,7 @@
                     {
                         if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameterSyntax))
                         {
-                            parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken) as IParameterSymbol;
+                            parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken);
                             return parameter != null;
                         }
                     }

@@ -23,6 +23,11 @@
             return this.parent.VerifyCSharpDiagnosticAsync(testCode, expected);
         }
 
+        public Task VerifyCSharpDiagnosticAsync(string[] testCode, DiagnosticResult[] expected)
+        {
+            return this.parent.VerifyCSharpDiagnosticAsync(testCode, expected);
+        }
+
         /// <summary>
         /// Called to test a C# code fix when applied on the input source as a string.
         /// </summary>
@@ -44,7 +49,7 @@
             string batchNewSource = null,
             int? codeFixIndex = null,
             bool allowNewCompilerDiagnostics = false,
-            int numberOfIncrementalIterations = -1000,
+            int numberOfIncrementalIterations = 1,
             int numberOfFixAllIterations = 1,
             CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -65,7 +70,7 @@
             string[] batchNewSource = null,
             int? codeFixIndex = null,
             bool allowNewCompilerDiagnostics = false,
-            int numberOfIncrementalIterations = -1000,
+            int numberOfIncrementalIterations = 1,
             int numberOfFixAllIterations = 1,
             CancellationToken cancellationToken = default(CancellationToken))
         {
