@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
+    internal partial class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
     {
         [Test]
         public async Task WhenInjecting()

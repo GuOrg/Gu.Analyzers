@@ -180,7 +180,7 @@ namespace Gu.Analyzers.Test
                 if (--numberOfIterations < 0)
                 {
                     return project;
-                    Assert.Fail("The upper limit for the number of code fix iterations was exceeded");
+                    ////Assert.Fail("The upper limit for the number of code fix iterations was exceeded");
                 }
 
                 previousDiagnostics = analyzerDiagnostics;

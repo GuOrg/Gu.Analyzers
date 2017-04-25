@@ -1,14 +1,18 @@
 ﻿namespace Gu.Analyzers
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InjectCodeFixProvider))]
     [Shared]
@@ -52,7 +56,7 @@
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Inject",
-                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, objectCreation, parameterSyntax),
+                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
                                     nameof(InjectCodeFixProvider)),
                                 diagnostic);
                             break;
@@ -60,7 +64,7 @@
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Inject UNSAFE",
-                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, objectCreation, parameterSyntax),
+                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
                                     nameof(InjectCodeFixProvider)),
                                 diagnostic);
                             break;
@@ -83,7 +87,7 @@
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Inject UNSAFE",
-                                    cancellationToken => ApplyFixAsync(context, syntaxRoot, identifierName, parameterSyntax),
+                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, parameterSyntax),
                                     nameof(InjectCodeFixProvider)),
                                 diagnostic);
                             break;
@@ -94,31 +98,54 @@
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
+        private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
         {
-            ExpressionSyntax OldNode(ExpressionSyntax e)
-            {
-                if (e is ObjectCreationExpressionSyntax)
-                {
-                    return e;
-                }
-
-                if (e.Parent is MemberAccessExpressionSyntax memberAccess)
-                {
-                    return OldNode(memberAccess);
-                }
-
-                return e;
-            }
-
             if (GU0007PreferInjecting.TryGetSingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
             {
+                var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
+                                                 .ConfigureAwait(false);
                 parameterSyntax = UniqueName(ctor.ParameterList, parameterSyntax);
-                var oldNode = OldNode(expression);
-                return Task.FromResult(context.Document.WithSyntaxRoot(new InjectRewriter(oldNode, parameterSyntax).Visit(syntaxRoot)));
+                if (expression is ObjectCreationExpressionSyntax)
+                {
+                    editor.ReplaceNode(expression, SyntaxFactory.IdentifierName(parameterSyntax.Identifier));
+                }
+                else if (expression is IdentifierNameSyntax identifierName &&
+                         expression.Parent is MemberAccessExpressionSyntax)
+                {
+                    var replaceNodes = new ReplaceNodes(identifierName, semanticModel, cancellationToken).Nodes;
+                    if (replaceNodes.Count == 0)
+                    {
+                        return context.Document;
+                    }
+
+                    ExpressionSyntax fieldAccess = null;
+                    foreach (var replaceNode in replaceNodes)
+                    {
+                        if (replaceNode.FirstAncestor<ConstructorDeclarationSyntax>() == null)
+                        {
+                            if (fieldAccess == null)
+                            {
+                                fieldAccess = WithField(editor, ctor, parameterSyntax);
+                            }
+
+                            editor.ReplaceNode(replaceNode, fieldAccess.WithLeadingTrivia(replaceNode.GetLeadingTrivia()));
+                        }
+                        else
+                        {
+                            editor.ReplaceNode(replaceNode, SyntaxFactory.IdentifierName(parameterSyntax.Identifier).WithLeadingTrivia(replaceNode.GetLeadingTrivia()));
+                        }
+                    }
+                }
+                else
+                {
+                    return context.Document;
+                }
+
+                editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
+                return editor.GetChangedDocument();
             }
 
-            return Task.FromResult(context.Document);
+            return context.Document;
         }
 
         private static ParameterSyntax UniqueName(ParameterListSyntax parameterList, ParameterSyntax parameter)
@@ -162,55 +189,134 @@
             return type.Name.FirstCharLower();
         }
 
-        private class InjectRewriter : CSharpSyntaxRewriter
+        private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            private readonly ExpressionSyntax oldNode;
-            private readonly ParameterSyntax parameter;
-
-            public InjectRewriter(ExpressionSyntax oldNode, ParameterSyntax parameter)
+            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
+            var name = usesUnderscoreNames
+                           ? "_" + parameter.Identifier.ValueText
+                           : parameter.Identifier.ValueText;
+            var containingType = ctor.FirstAncestor<TypeDeclarationSyntax>();
+            var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
+            while (declaredSymbol.MemberNames.Contains(name))
             {
-                this.oldNode = oldNode;
-                this.parameter = parameter;
+                name += "_";
             }
 
-            public override SyntaxNode VisitParameterList(ParameterListSyntax node)
+            var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
+                  name,
+                  accessibility: Accessibility.Private,
+                  modifiers: DeclarationModifiers.ReadOnly,
+                  type: parameter.Type);
+            var members = containingType.Members;
+            if (members.TryGetLast(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
             {
-                if (node.Parent is ConstructorDeclarationSyntax)
-                {
-                    return node.AddParameters(this.parameter);
-                }
-
-                return base.VisitParameterList(node);
+                editor.InsertAfter(field, new[] { newField });
+            }
+            else if (members.TryGetFirst(out field))
+            {
+                editor.InsertBefore(field, new[] { newField });
+            }
+            else
+            {
+                editor.AddMember(containingType, newField);
             }
 
-            public override SyntaxNode VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-            {
-                if (node == this.oldNode)
-                {
-                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
-                }
+            var fieldAccess = usesUnderscoreNames
+                                       ? SyntaxFactory.IdentifierName(name)
+                                       : SyntaxFactory.ParseExpression($"this.{name}");
+            var assignmentStatement = editor.Generator.AssignmentStatement(fieldAccess, SyntaxFactory.IdentifierName(parameter.Identifier));
+            editor.InsertAfter(
+                ctor.Body.Statements.First(),
+                SyntaxFactory.ExpressionStatement((ExpressionSyntax)assignmentStatement)
+                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+            return fieldAccess;
+        }
 
-                return base.VisitObjectCreationExpression(node);
+        private class ReplaceNodes : CSharpSyntaxWalker
+        {
+            internal readonly List<SyntaxNode> Nodes = new List<SyntaxNode>();
+
+            private readonly IdentifierNameSyntax identifierName;
+            private readonly SemanticModel semanticModel;
+            private readonly CancellationToken cancellationToken;
+
+            public ReplaceNodes(
+                IdentifierNameSyntax identifierName,
+                SemanticModel semanticModel,
+                CancellationToken cancellationToken)
+            {
+                this.identifierName = identifierName;
+                this.semanticModel = semanticModel;
+                this.cancellationToken = cancellationToken;
+                this.Visit(identifierName.FirstAncestor<ClassDeclarationSyntax>());
             }
 
-            public override SyntaxNode VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+            public sealed override void Visit(SyntaxNode node)
             {
-                if (node == this.oldNode)
-                {
-                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
-                }
-
-                return base.VisitMemberAccessExpression(node);
+                base.Visit(node);
             }
 
-            public override SyntaxNode VisitIdentifierName(IdentifierNameSyntax node)
+            public override void VisitClassDeclaration(ClassDeclarationSyntax node)
             {
-                if (node == this.oldNode)
+                if (this.identifierName.FirstAncestor<ClassDeclarationSyntax>() != node)
                 {
-                    return SyntaxFactory.IdentifierName(this.parameter.Identifier);
+                    return;
                 }
 
-                return base.VisitIdentifierName(node);
+                base.VisitClassDeclaration(node);
+            }
+
+            public override void VisitStructDeclaration(StructDeclarationSyntax node)
+            {
+                return;
+            }
+
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                if (this.TryGetReplaceNode(node, this.identifierName, out SyntaxNode replaceNode))
+                {
+                    this.Nodes.Add(replaceNode);
+                }
+
+                base.VisitIdentifierName(node);
+            }
+
+            private bool TryGetReplaceNode(IdentifierNameSyntax node, IdentifierNameSyntax expected, out SyntaxNode result)
+            {
+                result = null;
+                if (node.Identifier.ValueText != expected.Identifier.ValueText)
+                {
+                    return false;
+                }
+
+                return this.TryGetReplaceNode(node.Parent as MemberAccessExpressionSyntax, expected.Parent as MemberAccessExpressionSyntax, out result);
+            }
+
+            private bool TryGetReplaceNode(MemberAccessExpressionSyntax node, MemberAccessExpressionSyntax expected, out SyntaxNode result)
+            {
+                result = null;
+                if (node == null || expected == null)
+                {
+                    return false;
+                }
+
+                if (node.Name.Identifier.ValueText != expected.Name.Identifier.ValueText)
+                {
+                    return false;
+                }
+
+                var nodeSymbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                var expectedSymbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (nodeSymbol == null ||
+                    expectedSymbol == null ||
+                    !SymbolComparer.Equals(nodeSymbol, expectedSymbol))
+                {
+                    return false;
+                }
+
+                result = node;
+                return true;
             }
         }
     }

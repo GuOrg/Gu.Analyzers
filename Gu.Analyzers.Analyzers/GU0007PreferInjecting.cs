@@ -199,7 +199,8 @@
 
             var memberAccess = (MemberAccessExpressionSyntax)context.Node;
             var symbol = context.SemanticModel.GetSymbolSafe(memberAccess, context.CancellationToken);
-            if (symbol.IsStatic)
+            if (symbol == null ||
+                symbol.IsStatic)
             {
                 return;
             }
