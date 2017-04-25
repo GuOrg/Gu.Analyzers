@@ -294,17 +294,9 @@
             if (type?.ContainingNamespace == null ||
                 type.IsValueType ||
                 type.IsStatic ||
-                type == KnownSymbol.String)
+                type.DeclaringSyntaxReferences.Length == 0)
             {
                 return false;
-            }
-
-            foreach (var namespaceSymbol in type.ContainingNamespace.ConstituentNamespaces)
-            {
-                if (namespaceSymbol.Name == "System")
-                {
-                    return false;
-                }
             }
 
             return true;
