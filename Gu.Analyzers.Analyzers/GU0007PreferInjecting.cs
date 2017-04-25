@@ -155,7 +155,8 @@
 
             if (symbol is IPropertySymbol property)
             {
-                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                if (!property.Type.IsSealed && 
+                    InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
                 {
                     return memberType;
                 }
@@ -165,7 +166,8 @@
 
             if (symbol is IFieldSymbol field)
             {
-                if (InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
+                if (!field.Type.IsSealed &&
+                    InjectedType(symbol, semanticModel, cancellationToken, out ITypeSymbol memberType))
                 {
                     return memberType;
                 }
