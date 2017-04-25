@@ -8,6 +8,6 @@ Frequency=2435873 Hz, Resolution=410.5304 ns, Timer=TSC
 
 
 ```
- |                      Method |        Mean |      Error |     StdDev |  Gen 0 | Allocated |
- |---------------------------- |------------:|-----------:|-----------:|-------:|----------:|
- | GetAnalyzerDiagnosticsAsync | 850.5495 ns | 14.6508 ns | 12.9876 ns | 0.1077 |      0 GB |
+ |                      Method |        Mean |     Error |    StdDev |  Gen 0 | Allocated |
+ |---------------------------- |------------:|----------:|----------:|-------:|----------:|
+ | GetAnalyzerDiagnosticsAsync | 842.7157 ns | 7.0360 ns | 5.4932 ns | 0.1082 |      0 GB |

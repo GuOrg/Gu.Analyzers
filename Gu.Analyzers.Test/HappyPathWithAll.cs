@@ -3,6 +3,7 @@ namespace Gu.Analyzers.Test
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -21,6 +22,14 @@ namespace Gu.Analyzers.Test
         [Test]
         public void Dump()
         {
+            var projFile = new FileInfo(new Uri(typeof(GU0007PreferInjecting).Assembly.CodeBase).LocalPath)
+                .Directory
+                .Parent
+                .Parent
+                .Parent
+                .EnumerateFiles("Gu.Analyzers.Analyzers.csproj", SearchOption.AllDirectories)
+                .Single();
+            Console.WriteLine(projFile.FullName);
             foreach (var analyzer in AllAnalyzers)
             {
                 Console.WriteLine($"public class {analyzer.GetType().Name} : Analyzer");

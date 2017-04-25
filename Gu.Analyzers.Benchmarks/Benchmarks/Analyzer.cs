@@ -16,18 +16,15 @@
 
     public abstract class Analyzer
     {
-        private readonly ImmutableArray<DiagnosticAnalyzer> analyzer;
-        private readonly Project project;
         private readonly CompilationWithAnalyzers compilationWithAnalyzers;
 
         protected Analyzer(DiagnosticAnalyzer analyzer)
         {
-            this.analyzer = ImmutableArray.Create(analyzer);
-            this.project = CreateProject("C:\\Git\\Gu.Analyzers\\Gu.Analyzers.Analyzers\\Gu.Analyzers.Analyzers.csproj", analyzer);
-            var compilation = this.project.GetCompilationAsync(CancellationToken.None).Result;
+            var project = CreateProject("C:\\Git\\Gu.Analyzers\\Gu.Analyzers.Analyzers\\Gu.Analyzers.Analyzers.csproj", analyzer);
+            var compilation = project.GetCompilationAsync(CancellationToken.None).Result;
             this.compilationWithAnalyzers = compilation.WithAnalyzers(
-                this.analyzer,
-                this.project.AnalyzerOptions,
+                ImmutableArray.Create(analyzer),
+                project.AnalyzerOptions,
                 CancellationToken.None);
         }
 
@@ -89,6 +86,5 @@
             var solution = project.Solution.WithProjectCompilationOptions(project.Id, modifiedCompilationOptions);
             return solution.GetProject(project.Id);
         }
-
     }
 }
