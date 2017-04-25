@@ -13,6 +13,22 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         }
     }";
 
+        private static readonly string LocatorCode = @"
+namespace RoslynSandbox
+{
+    public class ServiceLocator
+    {
+        public ServiceLocator(Bar bar)
+        {
+            this.Bar = bar;
+            this.BarObject = bar;
+        }
+
+        public Bar Bar { get; }
+
+        public object BarObject { get; }
+    }
+}";
         [Test]
         public async Task WhenInjecting()
         {
@@ -82,6 +98,28 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     }";
 
             await this.VerifyHappyPathAsync(fooCode, BarCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task WhenMethodInjectedLocatorInStaticMethod()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+        }
+
+        public static void Meh(ServiceLocator locator)
+        {
+            locator.Bar.Baz();
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(LocatorCode, BarCode, fooCode)
                       .ConfigureAwait(false);
         }
 

@@ -200,7 +200,8 @@
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
+            if (context.IsExcludedFromAnalysis() ||
+                context.ContainingSymbol.IsStatic)
             {
                 return;
             }
@@ -225,7 +226,8 @@
 
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
+            if (context.IsExcludedFromAnalysis() ||
+                context.ContainingSymbol.IsStatic)
             {
                 return;
             }
