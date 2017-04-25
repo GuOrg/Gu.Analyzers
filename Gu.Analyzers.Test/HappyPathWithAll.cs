@@ -18,6 +18,22 @@ namespace Gu.Analyzers.Test
                                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                .ToImmutableArray();
 
+        [Test]
+        public void Dump()
+        {
+            foreach (var analyzer in AllAnalyzers)
+            {
+                Console.WriteLine($"public class {analyzer.GetType().Name} : Analyzer");
+                Console.WriteLine("{");
+                Console.WriteLine($"    public {analyzer.GetType().Name}()");
+                Console.WriteLine($"       : base(new Gu.Analyzers.{analyzer.GetType().Name}())");
+                Console.WriteLine("    {");
+                Console.WriteLine("    }");
+                Console.WriteLine("}");
+                Console.WriteLine();
+            }
+        }
+
         ////[Explicit("Temporarily ignore")]
         [Test]
         public async Task SomewhatRealisticSample()

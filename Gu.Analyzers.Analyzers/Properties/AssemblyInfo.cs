@@ -20,4 +20,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("0.1.11.23-dev")]
 
 [assembly: InternalsVisibleTo("Gu.Analyzers.CodeFixes")]
+[assembly: InternalsVisibleTo("Gu.Analyzers.Benchmarks")]
 [assembly: InternalsVisibleTo("Gu.Analyzers.Test")]

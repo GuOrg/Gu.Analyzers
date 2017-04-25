@@ -27,4 +27,10 @@ group Test
   nuget System.Reactive
   nuget System.Reactive.Linq
   nuget System.Reactive.PlatformServices
+
+group Benchmarks
+  source http://www.nuget.org/api/v2/
+  framework: net461
+  nuget BenchmarkDotNet.Diagnostics.Windows
+  nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   
