@@ -25,6 +25,18 @@ namespace Gu.Analyzers.Test
 
         private static readonly Project Project = Factory.CreateProject(AllAnalyzers);
 
+        public RunOnGuAnalyzers()
+        {
+            // A warmup so that the timings for the tests are more relevant.
+            var compilation = Project.GetCompilationAsync(CancellationToken.None)
+                                     .Result
+                                     .WithAnalyzers(
+                                         ImmutableArray.Create<DiagnosticAnalyzer>(new GU0001NameArguments()),
+                                         Project.AnalyzerOptions,
+                                         CancellationToken.None);
+            compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None).Wait();
+        }
+
         [TestCaseSource(nameof(AllAnalyzers))]
         public async Task GetAnalyzerDiagnosticsAsync(DiagnosticAnalyzer analyzer)
         {

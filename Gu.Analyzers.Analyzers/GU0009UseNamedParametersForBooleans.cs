@@ -44,7 +44,7 @@
             }
 
             var argumentSyntax = (ArgumentSyntax)context.Node;
-            if (!IsLiteralBool(argumentSyntax))
+            if (argumentSyntax.Expression?.IsEitherKind(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) != true)
             {
                 return;
             }
@@ -100,13 +100,6 @@
             }
 
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
-        }
-
-        private static bool IsLiteralBool(ArgumentSyntax argument)
-        {
-            var kind = argument.Expression?.Kind();
-            return kind == SyntaxKind.TrueLiteralExpression ||
-                   kind == SyntaxKind.FalseLiteralExpression;
         }
 
         private static bool IsIgnored(IMethodSymbol methodSymbol)

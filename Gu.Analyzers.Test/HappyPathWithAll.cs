@@ -3,6 +3,7 @@ namespace Gu.Analyzers.Test
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Threading;
@@ -18,6 +19,7 @@ namespace Gu.Analyzers.Test
                                .ToImmutableArray();
 
         [Test]
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public void Dump()
         {
             var projFile = new FileInfo(new Uri(typeof(GU0007PreferInjecting).Assembly.CodeBase).LocalPath)
