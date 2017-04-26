@@ -23,15 +23,16 @@ namespace Gu.Analyzers.Test
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                      .ToImmutableArray();
 
+        private static readonly Project Project = Factory.CreateProject(AllAnalyzers);
+
         [TestCaseSource(nameof(AllAnalyzers))]
         public async Task GetAnalyzerDiagnosticsAsync(DiagnosticAnalyzer analyzer)
         {
-            var project = Factory.CreateProject(analyzer);
-            var compilation = project.GetCompilationAsync(CancellationToken.None)
+            var compilation = Project.GetCompilationAsync(CancellationToken.None)
                                      .Result
                                      .WithAnalyzers(
                                          ImmutableArray.Create(analyzer),
-                                         project.AnalyzerOptions,
+                                         Project.AnalyzerOptions,
                                          CancellationToken.None);
             var diagnostics = await compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None)
                                                .ConfigureAwait(false);
@@ -49,9 +50,9 @@ namespace Gu.Analyzers.Test
         {
             [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
             [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-            internal static Project CreateProject(DiagnosticAnalyzer analyzer)
+            internal static Project CreateProject(IEnumerable<DiagnosticAnalyzer> analyzers)
             {
-                var projFile = ProjFile(analyzer.GetType()).FullName;
+                var projFile = ProjFile(typeof(KnownSymbol)).FullName;
                 var projectName = Path.GetFileNameWithoutExtension(projFile);
                 var projectId = ProjectId.CreateNewId(projectName);
                 var solution = CreateSolution(projectId, projectName);
@@ -75,7 +76,7 @@ namespace Gu.Analyzers.Test
                 }
 
                 var project = solution.GetProject(projectId);
-                return ApplyCompilationOptions(project, analyzer);
+                return ApplyCompilationOptions(project, analyzers);
             }
 
             [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
@@ -108,11 +109,13 @@ namespace Gu.Analyzers.Test
                 return solution.WithProjectParseOptions(projectId, parseOptions.WithDocumentationMode(DocumentationMode.Diagnose));
             }
 
-            private static Project ApplyCompilationOptions(Project project, DiagnosticAnalyzer analyzer)
+            private static Project ApplyCompilationOptions(Project project, IEnumerable<DiagnosticAnalyzer> analyzer)
             {
                 // update the project compilation options
                 var diagnostics = ImmutableDictionary.CreateRange(
-                    analyzer.SupportedDiagnostics.Select(x => new KeyValuePair<string, ReportDiagnostic>(x.Id, ReportDiagnostic.Warn)));
+                    analyzer.SelectMany(
+                        a => a.SupportedDiagnostics.Select(
+                            x => new KeyValuePair<string, ReportDiagnostic>(x.Id, ReportDiagnostic.Warn))));
 
                 var modifiedSpecificDiagnosticOptions = diagnostics.SetItems(project.CompilationOptions.SpecificDiagnosticOptions);
                 var modifiedCompilationOptions = project.CompilationOptions.WithSpecificDiagnosticOptions(modifiedSpecificDiagnosticOptions);
