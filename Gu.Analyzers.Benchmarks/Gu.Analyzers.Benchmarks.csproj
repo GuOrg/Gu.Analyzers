@@ -47,6 +47,7 @@
       <Paket>True</Paket>
     </Content>
     <Compile Include="Benchmarks\Analyzer.cs" />
+    <Compile Include="Benchmarks\Factory.cs" />
     <Compile Include="Benchmarks\GU0001NameArguments.cs" />
     <Compile Include="Benchmarks\GU0002NamedArgumentPositionMatches.cs" />
     <Compile Include="Benchmarks\GU0003CtorParameterNamesShouldMatch.cs" />
