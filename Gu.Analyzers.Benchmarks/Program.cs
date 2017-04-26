@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Benchmarks
+﻿// ReSharper disable UnusedMember.Local
+namespace Gu.Analyzers.Benchmarks
 {
     using System.Collections.Generic;
     using System.IO;
