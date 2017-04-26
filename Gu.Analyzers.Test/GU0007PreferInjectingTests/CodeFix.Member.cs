@@ -417,6 +417,52 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public async Task WhenUsingLocatorInLamdaClosure()
+            {
+                var fooCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.Linq;
+
+    public class Foo
+    {
+        private readonly ServiceLocator locator;
+
+        public Foo(IEnumerable<ServiceLocator> bars, ServiceLocator locator)
+        {
+            this.locator = bars.First(x => x.Bar == locator.↓Bar);
+        }
+    }
+}";
+
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref fooCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
+                          .ConfigureAwait(false);
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.Linq;
+
+    public class Foo
+    {
+        private readonly ServiceLocator locator;
+
+        public Foo(IEnumerable<ServiceLocator> bars, ServiceLocator locator, Bar bar)
+        {
+            this.locator = bars.First(x => x.Bar == bar);
+        }
+    }
+}";
+                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task WhenUsingLocatorInTwoMethods()
             {
                 var fooCode = @"

@@ -328,6 +328,11 @@
                     return false;
                 }
 
+                if (!GU0007PreferInjecting.IsRootValid(node, this.semanticModel, this.cancellationToken))
+                {
+                    return false;
+                }
+
                 result = node;
                 return true;
             }

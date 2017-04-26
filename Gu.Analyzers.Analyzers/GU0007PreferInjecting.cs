@@ -198,6 +198,43 @@
             return false;
         }
 
+        internal static bool IsRootValid(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (MemberPath.TryFindRootMember(memberAccess, out ExpressionSyntax root))
+            {
+                var symbol = semanticModel.GetSymbolSafe(root, cancellationToken);
+                if (symbol is IParameterSymbol parameter)
+                {
+                    if (parameter.IsParams)
+                    {
+                        return false;
+                    }
+
+                    if (parameter.ContainingSymbol is IMethodSymbol method)
+                    {
+                        switch (method.MethodKind)
+                        {
+                            case MethodKind.AnonymousFunction:
+                            case MethodKind.Conversion:
+                            case MethodKind.DelegateInvoke:
+                            case MethodKind.Destructor:
+                            case MethodKind.EventAdd:
+                            case MethodKind.EventRaise:
+                            case MethodKind.EventRemove:
+                            case MethodKind.UserDefinedOperator:
+                            case MethodKind.ReducedExtension:
+                            case MethodKind.StaticConstructor:
+                            case MethodKind.BuiltinOperator:
+                            case MethodKind.DeclareMethod:
+                                return false;
+                        }
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis() ||
@@ -241,6 +278,11 @@
 
             if (memberAccess.Expression is ThisExpressionSyntax ||
                 memberAccess.Expression is BaseExpressionSyntax)
+            {
+                return;
+            }
+
+            if (!IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken))
             {
                 return;
             }

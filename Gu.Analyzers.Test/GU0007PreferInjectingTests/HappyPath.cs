@@ -250,7 +250,6 @@ namespace RoslynSandbox
         }
 
         [Test]
-        [Explicit("Not sure how we want tio suppress this.")]
         public async Task IgnoreInLambda()
         {
             var fooCode = @"
