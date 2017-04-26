@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using System.Threading;
-    using System.Threading.Tasks;
     using BenchmarkDotNet.Attributes;
     using Microsoft.CodeAnalysis.Diagnostics;
 
@@ -22,10 +21,9 @@
         }
 
         [Benchmark]
-        public async Task<object> GetAnalyzerDiagnosticsAsync()
+        public object GetAnalyzerDiagnosticsAsync()
         {
-            return await this.compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None)
-                             .ConfigureAwait(false);
+            return this.compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None).Result;
         }
     }
 }
