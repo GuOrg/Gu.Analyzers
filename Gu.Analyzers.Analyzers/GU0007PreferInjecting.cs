@@ -299,7 +299,29 @@
                 return false;
             }
 
-            return true;
+            if (type is INamedTypeSymbol namedType)
+            {
+                if (namedType.Constructors.Length != 1)
+                {
+                    return false;
+                }
+
+                var ctor = namedType.Constructors[0];
+                if (ctor.Parameters.Length == 0)
+                {
+                    return true;
+                }
+
+                if (ctor.Parameters[ctor.Parameters.Length - 1]
+                        .IsParams)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

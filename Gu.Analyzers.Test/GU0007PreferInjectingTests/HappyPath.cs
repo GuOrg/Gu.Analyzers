@@ -184,6 +184,49 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task IgnoreWhenParams()
+        {
+            var abstractCode = @"
+namespace RoslynSandbox
+{
+    public class Baz
+    {
+    }
+}";
+
+            var barCode = @"
+namespace RoslynSandbox
+{
+    public class Bar
+    {
+        private readonly Baz[] values;
+
+        public Bar(params Baz[] values)
+        {
+            this.values = values;
+        }
+    }
+}";
+
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo()
+        {
+            bar = new Bar();
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(abstractCode, barCode, fooCode)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task IgnoreNewDictionaryOfBarAndBar()
         {
             var fooCode = @"
