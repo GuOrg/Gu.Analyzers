@@ -46,6 +46,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +115,7 @@
     <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpersTests\BaseMethodDeclarationSyntaxExtTests.cs" />
+    <Compile Include="RunOnGuAnalyzers.cs" />
     <Compile Include="TestHelpers\SyntaxNodeExt.cs" />
     <Compile Include="ReproBox.cs" />
     <Compile Include="Verifiers\IHappyPathVerifier.cs" />

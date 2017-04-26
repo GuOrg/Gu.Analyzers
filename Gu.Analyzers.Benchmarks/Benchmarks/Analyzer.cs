@@ -27,6 +27,5 @@
             return await this.compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None)
                              .ConfigureAwait(false);
         }
-
     }
 }

@@ -7,9 +7,7 @@ namespace Gu.Analyzers.Test
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
     using Microsoft.CodeAnalysis.Diagnostics;
-
     using NUnit.Framework;
 
     public class HappyPathWithAll
@@ -414,7 +412,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public async Task WithSyntaxcErrors()
+        public async Task WithSyntaxErrors()
         {
             var syntaxErrorCode = @"
     using System;

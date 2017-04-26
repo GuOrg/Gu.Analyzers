@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     using Microsoft.CodeAnalysis.Diagnostics;
     using Microsoft.CodeAnalysis.Text;
 
-    public static class Factory
+    internal static class Factory
     {
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
