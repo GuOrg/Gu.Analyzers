@@ -1114,7 +1114,7 @@ public class Foo : BaseClass
         base.Dispose(disposing);
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
                       .ConfigureAwait(false);
         }
 
@@ -1213,7 +1213,7 @@ public class Foo : BaseClass
         base.Dispose(disposing);
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode }, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
+            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
                       .ConfigureAwait(false);
         }
 
