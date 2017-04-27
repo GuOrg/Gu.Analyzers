@@ -12,6 +12,19 @@
 
     internal class CodeFix : CodeFixVerifier<GU0035ImplementIDisposable, ImplementIDisposableCodeFixProvider>
     {
+        private static readonly string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
         [Test]
         public async Task ImplementIDisposable0()
         {
@@ -951,6 +964,25 @@ public sealed class Foo
             var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
                                .WithLocationIndicated(ref testCode);
             await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task Issue111PartialUserControl()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Windows.Controls;
+
+    public partial class CodeTabView : UserControl
+    {
+        ↓private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode);
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
                       .ConfigureAwait(false);
         }
 
