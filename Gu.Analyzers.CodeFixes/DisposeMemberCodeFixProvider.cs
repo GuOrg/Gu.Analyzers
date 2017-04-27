@@ -19,8 +19,7 @@
     internal class DisposeMemberCodeFixProvider : CodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-            ImmutableArray.Create(GU0031DisposeMember.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0031DisposeMember.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => BacthFixer.Default;
@@ -137,7 +136,9 @@
             if (disposeMethod.ParameterList.Parameters.Count == 1 && disposeMethod.Body != null)
             {
                 if (fix.DisposeStatement is ExpressionStatementSyntax expressionStatement &&
-                    expressionStatement.Expression is InvocationExpressionSyntax)
+                    expressionStatement.Expression is InvocationExpressionSyntax invocation &&
+                    invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                    memberAccess.Expression is BaseExpressionSyntax)
                 {
                     var statements = disposeMethod.Body.Statements.Add(fix.DisposeStatement);
                     var newBlock = disposeMethod.Body.WithStatements(statements);

@@ -4,7 +4,6 @@
     using System.Threading;
     using BenchmarkDotNet.Attributes;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     public abstract class Analyzer
@@ -17,8 +16,9 @@
         {
             this.analyzer = analyzer;
             this.project = Factory.CreateProject(analyzer);
-            this.compilation = this.project.GetCompilationAsync(CancellationToken.None)
-                                      .Result;
+            this.compilation = this.project
+                                   .GetCompilationAsync(CancellationToken.None)
+                                   .Result;
         }
 
         [Benchmark]

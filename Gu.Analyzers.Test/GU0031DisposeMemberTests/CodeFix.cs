@@ -936,6 +936,96 @@ public class Foo : IDisposable
         }
 
         [Test]
+        public async Task DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class Foo : IDisposable
+    {
+        ↓private readonly IDisposable _disposable = new Disposable();
+
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic(GU0031DisposeMember.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class Foo : IDisposable
+    {
+        private readonly IDisposable _disposable = new Disposable();
+
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+                _disposable.Dispose();
+            }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task DisposeFirstMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
