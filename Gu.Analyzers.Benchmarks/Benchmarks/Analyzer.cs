@@ -3,27 +3,33 @@
     using System.Collections.Immutable;
     using System.Threading;
     using BenchmarkDotNet.Attributes;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     public abstract class Analyzer
     {
-        private readonly CompilationWithAnalyzers compilation;
+        private readonly DiagnosticAnalyzer analyzer;
+        private readonly Project project;
+        private readonly Compilation compilation;
 
         protected Analyzer(DiagnosticAnalyzer analyzer)
         {
-            var project = Factory.CreateProject(analyzer);
-            this.compilation = project.GetCompilationAsync(CancellationToken.None)
-                                      .Result
-                                      .WithAnalyzers(
-                                          ImmutableArray.Create(analyzer),
-                                          project.AnalyzerOptions,
-                                          CancellationToken.None);
+            this.analyzer = analyzer;
+            this.project = Factory.CreateProject(analyzer);
+            this.compilation = this.project.GetCompilationAsync(CancellationToken.None)
+                                      .Result;
         }
 
         [Benchmark]
         public object GetAnalyzerDiagnosticsAsync()
         {
-            return this.compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None).Result;
+            return this.compilation.WithAnalyzers(
+                           ImmutableArray.Create(this.analyzer),
+                           this.project.AnalyzerOptions,
+                           CancellationToken.None)
+                       .GetAnalyzerDiagnosticsAsync(CancellationToken.None)
+                       .Result;
         }
     }
 }
