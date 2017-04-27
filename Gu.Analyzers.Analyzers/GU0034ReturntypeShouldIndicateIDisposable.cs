@@ -126,6 +126,21 @@
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
                           .IsEither(Result.Yes, Result.Maybe))
             {
+                var symbol = context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken);
+                if (symbol == null)
+                {
+                    return;
+                }
+
+                foreach (var reference in symbol.DeclaringSyntaxReferences)
+                {
+                    var node = reference.GetSyntax(context.CancellationToken);
+                    if (node?.Parent?.Parent is UsingStatementSyntax)
+                    {
+                        return;
+                    }
+                }
+
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, returnValue.GetLocation()));
             }
         }

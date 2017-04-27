@@ -913,5 +913,27 @@ namespace RoslynSandbox
             await this.VerifyHappyPathAsync(DisposableCode, testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task ReturningDisposedFromUsing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static object Meh()
+        {
+            using (var disposable = new Disposable())
+            {
+                return disposable;
+            }
+        }
+    }
+}";
+
+            await this.VerifyHappyPathAsync(DisposableCode, testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
