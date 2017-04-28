@@ -379,8 +379,8 @@
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
 
-                if (node.FirstAncestorOrSelf<PropertyDeclarationSyntax>()
-                        .Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
+                if (node.FirstAncestor<PropertyDeclarationSyntax>()
+                        ?.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
                 {
                     if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
                     {
