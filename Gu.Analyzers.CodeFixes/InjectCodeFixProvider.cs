@@ -142,7 +142,22 @@
                     return context.Document;
                 }
 
-                editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
+                if (ctor.ParameterList == null)
+                {
+                    editor.ReplaceNode(ctor, ctor.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SingletonSeparatedList(parameterSyntax))));
+                }
+                else
+                {
+                    if (ctor.ParameterList.TryGetFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
+                    {
+                        editor.InsertBefore(existing, parameterSyntax);
+                    }
+                    else
+                    {
+                        editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
+                    }
+                }
+
                 return editor.GetChangedDocument();
             }
 

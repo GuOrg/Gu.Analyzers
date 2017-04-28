@@ -129,6 +129,72 @@
             }
 
             [Test]
+            public async Task WhenNotInjectingOptional()
+            {
+                var testCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(int value = 1)
+        {
+            this.bar = ↓new Bar();
+        }
+    }";
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, testCode }, expected)
+                          .ConfigureAwait(false);
+
+                var fixedCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(Bar bar, int value = 1)
+        {
+            this.bar = bar;
+        }
+    }";
+                await this.VerifyCSharpFixAsync(new[] { BarCode, testCode }, new[] { BarCode, fixedCode })
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
+            public async Task WhenNotInjectingParams()
+            {
+                var testCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(params int[] values)
+        {
+            this.bar = ↓new Bar();
+        }
+    }";
+                var expected = this.CSharpDiagnostic()
+                                   .WithLocationIndicated(ref testCode)
+                                   .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, testCode }, expected)
+                          .ConfigureAwait(false);
+
+                var fixedCode = @"
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo(Bar bar, params int[] values)
+        {
+            this.bar = bar;
+        }
+    }";
+                await this.VerifyCSharpFixAsync(new[] { BarCode, testCode }, new[] { BarCode, fixedCode })
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task WhenNotInjectingChainedGeneric()
             {
                 var fooCode = @"
