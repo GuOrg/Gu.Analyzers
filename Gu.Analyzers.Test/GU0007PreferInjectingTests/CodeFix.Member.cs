@@ -635,6 +635,61 @@ namespace RoslynSandbox
                 await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { BarCode, LocatorCode, FooBaseCode, fixedCode })
                           .ConfigureAwait(false);
             }
+
+            [Test]
+            public async Task WhenUsingLocatorInStaticMethod()
+            {
+                var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo : FooBase
+    {
+        private readonly Bar bar;
+
+        public Foo(ServiceLocator locator)
+            : base(locator.Bar)
+        {
+            this.bar = locator.Bar;
+        }
+
+        public static void Meh(ServiceLocator locator)
+        {
+            locator.Bar.Baz();
+        }
+    }
+}";
+
+                var expected1 = this.CSharpDiagnostic()
+                                    .WithLocation("Foo.cs", 9, 28)
+                                    .WithMessage("Prefer injecting.");
+                var expected2 = this.CSharpDiagnostic()
+                                    .WithLocation("Foo.cs", 11, 32)
+                                    .WithMessage("Prefer injecting.");
+                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { expected1, expected2 })
+                          .ConfigureAwait(false);
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo : FooBase
+    {
+        private readonly Bar bar;
+
+        public Foo(ServiceLocator locator, Bar bar)
+            : base(bar)
+        {
+            this.bar = bar;
+        }
+
+        public static void Meh(ServiceLocator locator)
+        {
+            locator.Bar.Baz();
+        }
+    }
+}";
+                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { BarCode, LocatorCode, FooBaseCode, fixedCode })
+                          .ConfigureAwait(false);
+            }
         }
     }
 }

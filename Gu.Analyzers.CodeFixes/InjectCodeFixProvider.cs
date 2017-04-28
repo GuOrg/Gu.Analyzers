@@ -303,6 +303,13 @@
                     return false;
                 }
 
+                var member = node.FirstAncestor<MemberDeclarationSyntax>();
+                if (member == null ||
+                    this.semanticModel.GetDeclaredSymbolSafe(member, this.cancellationToken)?.IsStatic != false)
+                {
+                    return false;
+                }
+
                 return this.TryGetReplaceNode(node.Parent as MemberAccessExpressionSyntax, expected.Parent as MemberAccessExpressionSyntax, out result);
             }
 
