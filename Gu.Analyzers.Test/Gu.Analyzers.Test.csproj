@@ -61,6 +61,7 @@
     <Compile Include="GU0007PreferInjectingTests\HappyPath.cs" />
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
+    <Compile Include="GU0030DisposeCreatedTests\AddUsingCodeFix.cs" />
     <Compile Include="GU0030DisposeCreatedTests\Diagnostics.AsyncAwait.cs" />
     <Compile Include="GU0030DisposeCreatedTests\HappyPath.Assigned.cs" />
     <Compile Include="GU0030DisposeCreatedTests\HappyPath.Assigns.cs" />

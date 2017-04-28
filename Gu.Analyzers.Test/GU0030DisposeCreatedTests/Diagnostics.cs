@@ -12,8 +12,8 @@ using System;
 public class Disposable : IDisposable
 {
     public void Dispose()
-	{
-	}
+    {
+    }
 }";
 
         [TestCase("new Disposable()")]
