@@ -16,7 +16,9 @@ namespace Gu.Analyzers
     internal class AddUsingCodeFixProvider : CodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0030DisposeCreated.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0030DisposeCreated.DiagnosticId,
+            GU0033DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -34,15 +36,32 @@ namespace Gu.Analyzers
                 }
 
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                if (statement?.FirstAncestor<BlockSyntax>() != null)
+                if (diagnostic.Id == GU0030DisposeCreated.DiagnosticId)
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Add using.",
-                            _ => ApplyAddUsingFixAsync(context, statement),
-                            nameof(AddUsingCodeFixProvider)),
-                        diagnostic);
+                    var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
+                    if (statement?.FirstAncestor<BlockSyntax>() != null)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Add using.",
+                                _ => ApplyAddUsingFixAsync(context, statement),
+                                nameof(AddUsingCodeFixProvider)),
+                            diagnostic);
+                    }
+                }
+
+                if (diagnostic.Id == GU0033DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
+                {
+                    var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
+                    if (statement?.FirstAncestor<BlockSyntax>() != null)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Add using.",
+                                _ => ApplyAddUsingFixAsync(context, statement),
+                                nameof(AddUsingCodeFixProvider)),
+                            diagnostic);
+                    }
                 }
             }
         }
@@ -61,6 +80,24 @@ namespace Gu.Analyzers
                 SyntaxFactory.UsingStatement(
                     declaration: statement.Declaration,
                     expression: null,
+                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))));
+            return editor.GetChangedDocument();
+        }
+
+        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, ExpressionStatementSyntax statement)
+        {
+            var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
+            var statements = statement.FirstAncestor<BlockSyntax>().Statements.Where(s => s.SpanStart > statement.SpanStart);
+            foreach (var statementSyntax in statements)
+            {
+                editor.RemoveNode(statementSyntax);
+            }
+
+            editor.ReplaceNode(
+                statement,
+                SyntaxFactory.UsingStatement(
+                    declaration: null,
+                    expression: statement.Expression,
                     statement: SyntaxFactory.Block(SyntaxFactory.List(statements))));
             return editor.GetChangedDocument();
         }

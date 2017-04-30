@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="AddNonSerializedFixProvider.cs" />
     <Compile Include="AddUsingCodeFixProvider.cs" />
+    <Compile Include="CreateAndAssignFieldCodeFixProvider.cs" />
     <Compile Include="DisposeBeforeAssignCodeFixProvider.cs" />
     <Compile Include="ImplementIDisposableCodeFixProvider.cs" />
     <Compile Include="DisposeMemberCodeFixProvider.cs" />

@@ -62,6 +62,7 @@
     <Compile Include="GU0011DontIgnoreReturnValueTests\HappyPath.Ignore.cs" />
     <Compile Include="GU0020SortPropertiesTests\CodeFixAll.cs" />
     <Compile Include="GU0030DisposeCreatedTests\AddUsingCodeFix.cs" />
+    <Compile Include="GU0030DisposeCreatedTests\CreateAndAssignFieldCodeFix.cs" />
     <Compile Include="GU0030DisposeCreatedTests\Diagnostics.AsyncAwait.cs" />
     <Compile Include="GU0030DisposeCreatedTests\HappyPath.Assigned.cs" />
     <Compile Include="GU0030DisposeCreatedTests\HappyPath.Assigns.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="GU0032DisposeBeforeReassigningTests\CodeFixAll.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0032DisposeBeforeReassigningTests\HappyPath.RefAndOut.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\CodeFixAddUsing.cs" />
+    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\CodeFixCreateAndAssignField.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Rx.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Recursion.cs" />
     <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposableTests\HappyPath.Returned.cs" />

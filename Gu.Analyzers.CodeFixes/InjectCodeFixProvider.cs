@@ -263,8 +263,6 @@
 
         private class ReplaceNodes : CSharpSyntaxWalker
         {
-            internal readonly List<SyntaxNode> Nodes = new List<SyntaxNode>();
-
             private readonly IdentifierNameSyntax identifierName;
             private readonly SemanticModel semanticModel;
             private readonly CancellationToken cancellationToken;
@@ -279,6 +277,8 @@
                 this.cancellationToken = cancellationToken;
                 this.Visit(identifierName.FirstAncestor<ClassDeclarationSyntax>());
             }
+
+            internal List<SyntaxNode> Nodes { get; } = new List<SyntaxNode>();
 
             public sealed override void Visit(SyntaxNode node)
             {

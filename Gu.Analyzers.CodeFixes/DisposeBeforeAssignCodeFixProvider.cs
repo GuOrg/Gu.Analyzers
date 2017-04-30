@@ -118,8 +118,8 @@
             if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
             {
                 result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as IDisposable)?.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 

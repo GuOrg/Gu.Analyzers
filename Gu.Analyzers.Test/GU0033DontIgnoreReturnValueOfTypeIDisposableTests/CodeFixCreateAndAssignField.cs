@@ -1,12 +1,12 @@
-﻿namespace Gu.Analyzers.Test.GU0030DisposeCreatedTests
+﻿namespace Gu.Analyzers.Test.GU0033DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    internal class CodeFixAddUsing : CodeFixVerifier<GU0030DisposeCreated, AddUsingCodeFixProvider>
+    internal class CodeFixCreateAndAssignField : CodeFixVerifier<GU0033DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>
     {
         [Test]
-        public async Task AddUsingForLocal()
+        public async Task AssignIgnoredReturnValueToFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -14,18 +14,17 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    internal sealed class Foo
     {
-        public void Meh()
+        internal Foo()
         {
-            ↓var stream = File.OpenRead(string.Empty);
-            var i = 1;
+            ↓File.OpenRead(string.Empty);
         }
     }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
@@ -34,14 +33,13 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    internal sealed class Foo
     {
-        public void Meh()
+        private readonly IDisposable disposable;
+
+        internal Foo()
         {
-            using (var stream = File.OpenRead(string.Empty))
-            {
-                var i = 1;
-            }
+            this.disposable = File.OpenRead(string.Empty);
         }
     }
 }";
