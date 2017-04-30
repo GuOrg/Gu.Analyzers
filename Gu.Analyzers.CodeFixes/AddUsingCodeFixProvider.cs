@@ -11,6 +11,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddUsingCodeFixProvider))]
     [Shared]
@@ -101,7 +102,8 @@ namespace Gu.Analyzers
                 SyntaxFactory.UsingStatement(
                     declaration: null,
                     expression: statement.Expression,
-                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))));
+                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
+                                            .WithAdditionalAnnotations(Formatter.Annotation)));
             return editor.GetChangedDocument();
         }
     }

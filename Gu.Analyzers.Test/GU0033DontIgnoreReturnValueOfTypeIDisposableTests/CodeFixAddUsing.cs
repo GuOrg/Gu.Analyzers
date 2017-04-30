@@ -120,19 +120,18 @@ namespace RoslynSandbox
             using (File.OpenRead(string.Empty))
             {
                 var a = 1;
-            var b = 2;
-            if (a == b)
-            {
-                var c = 3;
-            }
+                var b = 2;
+                if (a == b)
+                {
+                    var c = 3;
+                }
 
-            var d = 4;
+                var d = 4;
             }
         }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
-            Assert.Inconclusive("poor formatting");
         }
     }
 }
