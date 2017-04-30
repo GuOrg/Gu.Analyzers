@@ -12,9 +12,9 @@
             {
                 if (member is FieldDeclarationSyntax fieldDeclaration)
                 {
-                    if (IsInsertBefore(existing, field))
+                    if (IsInsertBefore(fieldDeclaration, field))
                     {
-                        editor.InsertBefore(existing, field);
+                        editor.InsertBefore(fieldDeclaration, field);
                     }
 
                     existing = fieldDeclaration;
