@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -66,6 +67,7 @@ namespace Gu.Analyzers
             }
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, LocalDeclarationStatementSyntax statement)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
@@ -84,6 +86,7 @@ namespace Gu.Analyzers
             return editor.GetChangedDocument();
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, ExpressionStatementSyntax statement)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
