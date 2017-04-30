@@ -49,28 +49,67 @@ namespace Gu.Analyzers
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Add to CompositeDisposable.",
-                                    _ => ApplyAddToCompositeDisposableFixAsync(context, statement, field, usesUnderscoreNames),
+                                    cancellationToken => ApplyFixAsync(context, cancellationToken, statement, field, usesUnderscoreNames),
                                     nameof(AddToCompositeDisposableCodeFixProvider)),
                                 diagnostic);
                         }
                         else
                         {
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Add to new CompositeDisposable.",
-                                    _ => ApplyAddToCompositeDisposableFixAsync(context, statement, usesUnderscoreNames),
-                                    nameof(AddToCompositeDisposableCodeFixProvider)),
-                                diagnostic);
+                            if (semanticModel.Compilation.ReferencedAssemblyNames.Any(
+                                x => x.Name.Contains("System.Reactive")))
+                            {
+                                context.RegisterCodeFix(
+                                    CodeAction.Create(
+                                        "Add to new CompositeDisposable.",
+                                        cancellationToken => ApplyFixAsync(context, cancellationToken, statement, usesUnderscoreNames),
+                                        nameof(AddToCompositeDisposableCodeFixProvider)),
+                                    diagnostic);
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static async Task<Document> ApplyAddToCompositeDisposableFixAsync(CodeFixContext context, ExpressionStatementSyntax statement, IFieldSymbol field, bool usesUnderscoreNames)
+        private static async Task<Document> ApplyFixAsync(CodeFixContext context, CancellationToken cancellationToken, ExpressionStatementSyntax statement, IFieldSymbol field, bool usesUnderscoreNames)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document)
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
+            var block = statement.FirstAncestor<BlockSyntax>();
+            if (block?.Statements != null)
+            {
+                var index = block.Statements.IndexOf(statement);
+                if (index > 0 &&
+                    block.Statements[index - 1] is ExpressionStatementSyntax expressionStatement &&
+                    expressionStatement.Expression is AssignmentExpressionSyntax assignment &&
+                    assignment.Right is ObjectCreationExpressionSyntax objectCreation)
+                {
+                    if ((assignment.Left is IdentifierNameSyntax identifierName &&
+                         identifierName.Identifier.ValueText == field.Name) ||
+                        (assignment.Left is MemberAccessExpressionSyntax memberAccess &&
+                         memberAccess.Expression is ThisExpressionSyntax &&
+                         memberAccess.Name.Identifier.ValueText == field.Name))
+                    {
+                        editor.RemoveNode(statement);
+                        if (objectCreation.Initializer != null)
+                        {
+                            editor.ReplaceNode(
+                                objectCreation.Initializer,
+                                objectCreation.Initializer.AddExpressions(statement.Expression));
+                            return editor.GetChangedDocument();
+                        }
+
+                        editor.ReplaceNode(
+                            objectCreation,
+                            objectCreation.WithInitializer(
+                                SyntaxFactory.InitializerExpression(
+                                    SyntaxKind.CollectionInitializerExpression,
+                                    SyntaxFactory.SingletonSeparatedList(statement.Expression))));
+                        return editor.GetChangedDocument();
+                    }
+                }
+            }
+
             var memberAccessExpressionSyntax = usesUnderscoreNames
                                                    ? (MemberAccessExpressionSyntax)editor
                                                        .Generator.MemberAccessExpression(
@@ -91,15 +130,15 @@ namespace Gu.Analyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ApplyAddToCompositeDisposableFixAsync(CodeFixContext context, ExpressionStatementSyntax statement, bool usesUnderscoreNames)
+        private static async Task<Document> ApplyFixAsync(CodeFixContext context, CancellationToken cancellationToken, ExpressionStatementSyntax statement, bool usesUnderscoreNames)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document)
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
             var name = usesUnderscoreNames
                            ? "_disposable"
                            : "disposable";
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
+            var declaredSymbol = (INamedTypeSymbol)editor.SemanticModel.GetDeclaredSymbolSafe(containingType, cancellationToken);
             while (declaredSymbol.MemberNames.Contains(name))
             {
                 name += "_";
@@ -110,19 +149,7 @@ namespace Gu.Analyzers
                 accessibility: Accessibility.Private,
                 modifiers: DeclarationModifiers.ReadOnly,
                 type: CompositeDisposableType);
-            var members = containingType.Members;
-            if (members.TryGetFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else if (members.TryGetFirst(out field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else
-            {
-                editor.AddMember(containingType, newField);
-            }
+            editor.AddField(containingType, newField);
 
             var fieldAccess = usesUnderscoreNames
                                   ? SyntaxFactory.IdentifierName(name)

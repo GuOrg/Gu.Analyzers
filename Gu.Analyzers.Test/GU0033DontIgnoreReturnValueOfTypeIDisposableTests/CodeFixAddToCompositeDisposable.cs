@@ -54,6 +54,50 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable();
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable() { File.OpenRead(string.Empty) };
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
+        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
     using System.Reactive.Disposables;
@@ -92,13 +136,13 @@ namespace RoslynSandbox
         {
             this.disposable = new CompositeDisposable
             {
-                File.OpenRead(string.Empty),
                 File.OpenRead(string.Empty)
-            };
+,            File.OpenRead(string.Empty)            };
         }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            Assert.Inconclusive("Nasty formatting.");
         }
 
         [Test]
@@ -197,7 +241,6 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -220,7 +263,6 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -230,8 +272,7 @@ namespace RoslynSandbox
 
         internal Foo()
         {
-            this.disposable = new CompositeDisposable();
-            this.disposable.Add(File.OpenRead(string.Empty));
+            this.disposable = new CompositeDisposable() { File.OpenRead(string.Empty) };
         }
     }
 }";
