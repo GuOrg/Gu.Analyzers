@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
@@ -12,9 +14,10 @@
             {
                 if (member is FieldDeclarationSyntax fieldDeclaration)
                 {
-                    if (IsInsertBefore(fieldDeclaration, field))
+                    if (IsInsertBefore(fieldDeclaration))
                     {
                         editor.InsertBefore(fieldDeclaration, field);
+                        return;
                     }
 
                     existing = fieldDeclaration;
@@ -35,9 +38,59 @@
             }
         }
 
-        private static bool IsInsertBefore(FieldDeclarationSyntax existing, FieldDeclarationSyntax field)
+        private static bool IsInsertBefore(FieldDeclarationSyntax existing)
         {
+            if (!existing.IsPrivate() ||
+                existing.IsStatic())
+            {
+                return false;
+            }
+
             return true;
+        }
+
+        private static bool IsPrivate(this FieldDeclarationSyntax field)
+        {
+            foreach (var modifier in field.Modifiers)
+            {
+                switch (modifier.Kind())
+                {
+                    case SyntaxKind.PrivateKeyword:
+                        return true;
+                    case SyntaxKind.ProtectedKeyword:
+                    case SyntaxKind.InternalKeyword:
+                    case SyntaxKind.PublicKeyword:
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool IsStatic(this FieldDeclarationSyntax field)
+        {
+            foreach (var modifier in field.Modifiers)
+            {
+                if (modifier.IsKind(SyntaxKind.StaticKeyword))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsReadOnly(this FieldDeclarationSyntax field)
+        {
+            foreach (var modifier in field.Modifiers)
+            {
+                if (modifier.IsKind(SyntaxKind.ReadOnlyKeyword))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

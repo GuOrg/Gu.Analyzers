@@ -51,7 +51,6 @@ namespace RoslynSandbox
         [Test]
         public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
         {
-            Assert.Inconclusive();
             var testCode = @"
 namespace RoslynSandbox
 {
@@ -80,19 +79,16 @@ namespace RoslynSandbox
 {
     using System;
     using System.IO;
-    using System.Reactive.Disposables;
 
     internal sealed class Foo
     {
         private static int value1;
-
-        private readonly CompositeDisposable disposable;
-
+        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
         private int value2;
 
         internal Foo()
         {
-            this.disposable = new CompositeDisposable() { File.OpenRead(string.Empty) };
+            this.disposable = new System.Reactive.Disposables.CompositeDisposable() { File.OpenRead(string.Empty) };
         }
     }
 }";
@@ -144,6 +140,56 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+                File.OpenRead(string.Empty)
+            };
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
         {
             var testCode = @"
@@ -159,7 +205,7 @@ namespace RoslynSandbox
 
         internal Foo()
         {
-            this.disposable = new CompositeDisposable
+            this.disposable = new CompositeDisposable()
             {
                 File.OpenRead(string.Empty)
             };
@@ -188,12 +234,14 @@ namespace RoslynSandbox
             this.disposable = new CompositeDisposable
             {
                 File.OpenRead(string.Empty)
-,            File.OpenRead(string.Empty)            };
+,
+                File.OpenRead(string.Empty)
+            };
         }
     }
 }";
+
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
-            Assert.Inconclusive("Nasty formatting.");
         }
 
         [Test]

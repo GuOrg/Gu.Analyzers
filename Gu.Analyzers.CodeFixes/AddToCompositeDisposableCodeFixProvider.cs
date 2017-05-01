@@ -11,12 +11,15 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddToCompositeDisposableCodeFixProvider))]
     [Shared]
     internal class AddToCompositeDisposableCodeFixProvider : CodeFixProvider
     {
-        private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("CompositeDisposable");
+        private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("System.Reactive.Disposables.CompositeDisposable")
+                                                                                  .WithAdditionalAnnotations(Simplifier.Annotation);
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0033DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
@@ -94,8 +97,8 @@ namespace Gu.Analyzers
                         if (objectCreation.Initializer != null)
                         {
                             editor.ReplaceNode(
-                                objectCreation.Initializer,
-                                objectCreation.Initializer.AddExpressions(statement.Expression));
+                                objectCreation,
+                                GetNewObjectCreation(objectCreation, statement.Expression));
                             return editor.GetChangedDocument();
                         }
 
@@ -104,7 +107,8 @@ namespace Gu.Analyzers
                             objectCreation.WithInitializer(
                                 SyntaxFactory.InitializerExpression(
                                     SyntaxKind.CollectionInitializerExpression,
-                                    SyntaxFactory.SingletonSeparatedList(statement.Expression))));
+                                    SyntaxFactory.SingletonSeparatedList(statement.Expression))
+                                          .WithAdditionalAnnotations(Simplifier.Annotation, Formatter.Annotation)));
                         return editor.GetChangedDocument();
                     }
                 }
@@ -160,8 +164,7 @@ namespace Gu.Analyzers
                 SyntaxFactory.ExpressionStatement(
                                  (ExpressionSyntax)editor.Generator.AssignmentStatement(
                                      fieldAccess,
-                                     ((ObjectCreationExpressionSyntax)editor
-                                         .Generator.ObjectCreationExpression(
+                                     ((ObjectCreationExpressionSyntax)editor.Generator.ObjectCreationExpression(
                                              CompositeDisposableType))
                                      .WithInitializer(
                                          SyntaxFactory.InitializerExpression(
@@ -199,6 +202,25 @@ namespace Gu.Analyzers
             }
 
             return false;
+        }
+
+        private static ObjectCreationExpressionSyntax GetNewObjectCreation(ObjectCreationExpressionSyntax objectCreation, ExpressionSyntax newExpression)
+        {
+            var openBrace = SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
+                                         .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
+            var initializer = SyntaxFactory.InitializerExpression(
+                                               SyntaxKind.ObjectInitializerExpression,
+                                               objectCreation.Initializer.Expressions.Add(newExpression))
+                                           .WithOpenBraceToken(openBrace);
+
+            if (objectCreation.ArgumentList != null &&
+                objectCreation.ArgumentList.Arguments.Count == 0)
+            {
+                objectCreation = objectCreation.WithType(objectCreation.Type.WithTrailingTrivia(objectCreation.ArgumentList.GetTrailingTrivia()))
+                                               .WithArgumentList(null);
+            }
+
+            return objectCreation.WithInitializer(initializer);
         }
     }
 }
