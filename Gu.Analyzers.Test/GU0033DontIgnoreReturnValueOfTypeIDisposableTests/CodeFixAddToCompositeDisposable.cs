@@ -243,6 +243,61 @@ namespace RoslynSandbox
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
+        [Explicit("Fix later.")]
+        [Test]
+        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable()
+            {
+                File.OpenRead(string.Empty) // comment
+            };
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty), // comment
+                File.OpenRead(string.Empty)
+            };
+        }
+    }
+}";
+
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
         [Test]
         public async Task AddIgnoredReturnValueToExistingCompositeDisposableCtor()
         {
