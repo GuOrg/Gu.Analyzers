@@ -233,8 +233,7 @@ namespace RoslynSandbox
         {
             this.disposable = new CompositeDisposable
             {
-                File.OpenRead(string.Empty)
-,
+                File.OpenRead(string.Empty),
                 File.OpenRead(string.Empty)
             };
         }

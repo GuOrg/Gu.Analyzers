@@ -208,9 +208,10 @@ namespace Gu.Analyzers
         {
             var openBrace = SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
                                          .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
+            var expressions = objectCreation.Initializer.Expressions;
             var initializer = SyntaxFactory.InitializerExpression(
                                                SyntaxKind.ObjectInitializerExpression,
-                                               objectCreation.Initializer.Expressions.Add(newExpression))
+                                               expressions.Replace(expressions.Last(), expressions.Last().WithoutTrailingTrivia()).Add(newExpression))
                                            .WithOpenBraceToken(openBrace);
 
             if (objectCreation.ArgumentList != null &&
