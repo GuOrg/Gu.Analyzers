@@ -28,6 +28,47 @@
         }
 
         [Test]
+        public async Task NotSettingGetOnlyPropertyInOneCtor()
+        {
+            var testCode = @"
+namespace RoslyynSandbox
+{
+    using System;
+    using System.ComponentModel;
+    using System.Windows.Markup;
+
+    public class DisplayPropertyNameExtension : MarkupExtension
+    {
+        ↓public DisplayPropertyNameExtension()
+        {
+        }
+
+        public DisplayPropertyNameExtension(string propertyName)
+        {
+            PropertyName = propertyName;
+        }
+
+        public string PropertyName { get; }
+
+        public Type Type { get; set; }
+
+        public override object ProvideValue(IServiceProvider serviceProvider)
+        {
+            // (This code has zero tolerance)
+            var prop = Type.GetProperty(PropertyName);
+            var attributes = prop.GetCustomAttributes(typeof(DisplayNameAttribute), inherit: false);
+            return (attributes[0] as DisplayNameAttribute)?.DisplayName;
+        }
+    }
+}";
+
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("The following readonly members are not assigned: PropertyName.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotSettingReadOnlyField()
         {
             var testCode = @"
