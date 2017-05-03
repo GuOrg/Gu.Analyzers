@@ -799,5 +799,35 @@ namespace TaxonomyWpf
 }";
             await this.VerifyHappyPathAsync(code).ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task DisposingBackingFieldInSetter()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        private set 
+        { 
+            this.stream?.Dispose();
+            this.stream = value; 
+        }
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+        }
     }
 }

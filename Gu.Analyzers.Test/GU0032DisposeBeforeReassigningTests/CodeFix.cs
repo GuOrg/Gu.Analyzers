@@ -290,6 +290,58 @@ public class Foo
         }
 
         [Test]
+        public async Task NotDisposingBackingFieldInCtor()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+        ↓this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        private set { this.stream = value; }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public class Foo
+{
+    private Stream stream;
+
+    public Foo()
+    {
+        this.Stream = File.OpenRead(string.Empty);
+        this.stream?.Dispose();
+        this.Stream = File.OpenRead(string.Empty);
+    }
+
+    public Stream Stream
+    {
+        get { return this.stream; }
+        private set { this.stream = value; }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingFieldInMethod()
         {
             var testCode = @"
