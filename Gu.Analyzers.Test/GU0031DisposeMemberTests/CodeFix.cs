@@ -53,6 +53,45 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ArrayOfStreamsFieldInitializer()
+        {
+            var testCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    ↓private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+
+    public void Dispose()
+    {
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose member.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+
+    public void Dispose()
+    {
+        foreach(var stream in this.streams)
+        {
+            stream.Dispose();
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingPrivateReadonlyFieldInitializedWithNewInDisposeMethod()
         {
             var testCode = @"
