@@ -29,6 +29,28 @@ namespace Gu.Analyzers.Test.GU0030DisposeCreatedTests
             }
 
             [Test]
+            public async Task DontUseUsingWhenAssigningAFieldTernary()
+            {
+                var testCode = @"
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            var temp = File.OpenRead(string.Empty);
+            this.stream = true 
+                ? temp
+                : temp;
+        }
+    }";
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
+
+            [Test]
             public async Task DontUseUsingWhenAssigningAFieldInAMethod()
             {
                 var testCode = @"
