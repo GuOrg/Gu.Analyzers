@@ -40,57 +40,14 @@
 
         private static bool IsInsertBefore(FieldDeclarationSyntax existing)
         {
-            if (!existing.IsPrivate() ||
-                existing.IsStatic())
+            if (!existing.Modifiers.Any(SyntaxKind.PrivateKeyword) ||
+                existing.Modifiers.Any(SyntaxKind.StaticKeyword) ||
+                existing.Modifiers.Any(SyntaxKind.ConstKeyword))
             {
                 return false;
             }
 
             return true;
-        }
-
-        private static bool IsPrivate(this FieldDeclarationSyntax field)
-        {
-            foreach (var modifier in field.Modifiers)
-            {
-                switch (modifier.Kind())
-                {
-                    case SyntaxKind.PrivateKeyword:
-                        return true;
-                    case SyntaxKind.ProtectedKeyword:
-                    case SyntaxKind.InternalKeyword:
-                    case SyntaxKind.PublicKeyword:
-                        return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static bool IsStatic(this FieldDeclarationSyntax field)
-        {
-            foreach (var modifier in field.Modifiers)
-            {
-                if (modifier.IsKind(SyntaxKind.StaticKeyword))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsReadOnly(this FieldDeclarationSyntax field)
-        {
-            foreach (var modifier in field.Modifiers)
-            {
-                if (modifier.IsKind(SyntaxKind.ReadOnlyKeyword))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

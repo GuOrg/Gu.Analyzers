@@ -57,7 +57,7 @@ namespace Gu.Analyzers
             public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
                 if (!node.IsMissing &&
-                    !node.Modifiers.Any(SyntaxKind.StaticKeyword) &&
+                    !(node.Modifiers.Any(SyntaxKind.StaticKeyword) || node.Modifiers.Any(SyntaxKind.ConstKeyword)) &&
                      node.Modifiers.Any(SyntaxKind.PrivateKeyword))
                 {
                     foreach (var variable in node.Declaration.Variables)

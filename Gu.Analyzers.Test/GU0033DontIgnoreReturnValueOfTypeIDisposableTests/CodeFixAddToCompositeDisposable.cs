@@ -59,9 +59,13 @@ namespace RoslynSandbox
 
     internal sealed class Foo
     {
-        private static int value1;
+        const int value1 = 2;
 
-        private int value2;
+        private static readonly int value2;
+
+        private static int value3;
+
+        private int value4;
 
         internal Foo()
         {
@@ -82,9 +86,13 @@ namespace RoslynSandbox
 
     internal sealed class Foo
     {
-        private static int value1;
+        const int value1 = 2;
+
+        private static readonly int value2;
+
+        private static int value3;
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;
-        private int value2;
+        private int value4;
 
         internal Foo()
         {
@@ -96,7 +104,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields2()
+        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -106,11 +114,13 @@ namespace RoslynSandbox
 
     internal sealed class Foo
     {
-        const int value1;
+        const int value1 = 2;
 
-        private static int value2;
+        private static readonly int value2;
 
-        private int value3;
+        private static int value3;
+
+        private int _value4;
 
         internal Foo()
         {
@@ -131,15 +141,17 @@ namespace RoslynSandbox
 
     internal sealed class Foo
     {
-        const int value1;
+        const int value1 = 2;
 
-        private static int value2;
-        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
-        private int value3;
+        private static readonly int value2;
+
+        private static int value3;
+        private readonly System.Reactive.Disposables.CompositeDisposable _disposable;
+        private int _value4;
 
         internal Foo()
         {
-            this.disposable = new System.Reactive.Disposables.CompositeDisposable() { File.OpenRead(string.Empty) };
+            _disposable = new System.Reactive.Disposables.CompositeDisposable() { File.OpenRead(string.Empty) };
         }
     }
 }";
