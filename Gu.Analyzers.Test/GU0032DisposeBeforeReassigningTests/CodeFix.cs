@@ -380,6 +380,82 @@ public class Foo
         }
 
         [Test]
+        public async Task NotDisposingFieldInLambda()
+        {
+            var testCode = @"
+using System;
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public Foo()
+        {
+            this.Bar += (o, e) => this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public event EventHandler Bar;
+
+        public Stream Stream
+        {
+            get
+            {
+                return this.stream;
+            }
+
+            private set
+            {
+                this.stream = value;
+            }
+        }
+    }
+}
+";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Dispose before re-assigning.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream;
+
+        public Foo()
+        {
+            this.Bar += (o, e) => this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public event EventHandler Bar;
+
+        public Stream Stream
+        {
+            get
+            {
+                return this.stream;
+            }
+
+            private set
+            {
+                this.stream = value;
+            }
+        }
+    }
+}
+";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task NotDisposingFieldAssignedInReturnMethodStatementBody()
         {
             var testCode = @"
