@@ -796,15 +796,15 @@ internal static class Foo
 {
     internal static async Task<Stream> ReadAsync(string file)
     {
-	    var stream = new MemoryStream();
-	    using (var fileStream = File.OpenRead(file))
-	    {
-		    await fileStream.CopyToAsync(stream)
-						    .ConfigureAwait(false);
-	    }
+        var stream = new MemoryStream();
+        using (var fileStream = File.OpenRead(file))
+        {
+            await fileStream.CopyToAsync(stream)
+                            .ConfigureAwait(false);
+        }
 
-	    stream.Position = 0;
-	    return stream;
+        stream.Position = 0;
+        return stream;
     }
 }";
 
@@ -825,8 +825,8 @@ internal static class Foo
     {
         Func<IDisposable> f = () =>
         {
-	        var file = System.IO.File.OpenRead(null);
-	        return file;
+            var file = System.IO.File.OpenRead(null);
+            return file;
         };
     }
 }";

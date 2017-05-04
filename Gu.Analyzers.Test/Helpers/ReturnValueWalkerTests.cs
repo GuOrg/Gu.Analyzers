@@ -448,21 +448,21 @@ namespace RoslynSandbox
 
         internal static async int CreateInt() => 1;
 
-		private static async Task<int> RecursiveAsync1(int value)
+        private static async Task<int> RecursiveAsync1(int value)
         {
             return await RecursiveAsync2(value);
         }
-		
+        
         private static async Task<int> RecursiveAsync2(int value)
         {
             return await RecursiveAsync1(value);
         }
 
-		private static async Task<int> RecursiveAsync3(int value)
+        private static async Task<int> RecursiveAsync3(int value)
         {
             return RecursiveAsync4(value);
         }
-		
+        
         private static async Task<int> RecursiveAsync4(int value)
         {
             return await RecursiveAsync3(value);

@@ -217,32 +217,32 @@ using System.IO;
 
 public class Disposal : IDisposable
 {
-	private Stream stream;
+    private Stream stream;
 
-	public Disposal() :
-		this(File.OpenRead(string.Empty))
-	{
-	}
+    public Disposal() :
+        this(File.OpenRead(string.Empty))
+    {
+    }
 
-	private Disposal(Stream stream)
-	{
-		this.stream = stream;
-	}
+    private Disposal(Stream stream)
+    {
+        this.stream = stream;
+    }
 
-	public static Disposal CreateNew()
-	{
-		Stream stream = File.OpenRead(string.Empty);
-		return new Disposal(stream);
-	}
+    public static Disposal CreateNew()
+    {
+        Stream stream = File.OpenRead(string.Empty);
+        return new Disposal(stream);
+    }
 
-	public void Dispose()
-	{
-		if (stream != null)
-		{
-			stream.Dispose();
-			stream = null;
-		}
-	}
+    public void Dispose()
+    {
+        if (stream != null)
+        {
+            stream.Dispose();
+            stream = null;
+        }
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -279,12 +279,12 @@ using System.Data.Common;
 
 public class Foo
 {
-	public static void Bar(DbConnection conn)
-	{
-		using(var command = conn.CreateCommand())
-		{
-		}
-	}
+    public static void Bar(DbConnection conn)
+    {
+        using(var command = conn.CreateCommand())
+        {
+        }
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -300,17 +300,17 @@ public class Foo
 {
     private readonly DbConnection connection;
 
-	public Foo(DbConnection connection)
-	{
-		this.connection = connection;
-	}
+    public Foo(DbConnection connection)
+    {
+        this.connection = connection;
+    }
 
-	public void Bar()
-	{
-		using(var command = this.connection.CreateCommand())
-		{
-		}
-	}
+    public void Bar()
+    {
+        using(var command = this.connection.CreateCommand())
+        {
+        }
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

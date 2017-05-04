@@ -696,106 +696,106 @@ using System.Threading.Tasks;
 
 namespace TaxonomyWpf
 {
-	public class IndexedList<T> : IList<KeyValuePair<int, T>>
-	{
-		protected IList<T> decorated;
+    public class IndexedList<T> : IList<KeyValuePair<int, T>>
+    {
+        protected IList<T> decorated;
 
-		public IndexedList(IList<T> decorated)
-		{
-			if(decorated == null)
-				throw new ArgumentNullException(nameof(decorated));
+        public IndexedList(IList<T> decorated)
+        {
+            if(decorated == null)
+                throw new ArgumentNullException(nameof(decorated));
 
-			this.decorated = decorated;
-		}
+            this.decorated = decorated;
+        }
 
-		public IEnumerator<KeyValuePair<int, T>> GetEnumerator()
-		{
-			return decorated.Select((element, index) => new KeyValuePair<int, T>(index, element)).GetEnumerator();
-		}
+        public IEnumerator<KeyValuePair<int, T>> GetEnumerator()
+        {
+            return decorated.Select((element, index) => new KeyValuePair<int, T>(index, element)).GetEnumerator();
+        }
 
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
-		void ICollection<KeyValuePair<int, T>>.Add(KeyValuePair<int, T> item)
-		{
-			Add(item.Value);
-		}
+        void ICollection<KeyValuePair<int, T>>.Add(KeyValuePair<int, T> item)
+        {
+            Add(item.Value);
+        }
 
-		public void Add(T item)
-		{
-			decorated.Add(item);
-		}
+        public void Add(T item)
+        {
+            decorated.Add(item);
+        }
 
-		public void Clear()
-		{
-			decorated.Clear();
-		}
+        public void Clear()
+        {
+            decorated.Clear();
+        }
 
-		bool ICollection<KeyValuePair<int, T>>.Contains(KeyValuePair<int, T> item)
-		{
-			return Contains(item.Value);
-		}
+        bool ICollection<KeyValuePair<int, T>>.Contains(KeyValuePair<int, T> item)
+        {
+            return Contains(item.Value);
+        }
 
-		public bool Contains(T item)
-		{
-			return decorated.Contains(item);
-		}
+        public bool Contains(T item)
+        {
+            return decorated.Contains(item);
+        }
 
-		public void CopyTo(KeyValuePair<int, T>[] array, int arrayIndex)
-		{
-			throw new NotImplementedException();
-		}
+        public void CopyTo(KeyValuePair<int, T>[] array, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
 
-		public bool Remove(KeyValuePair<int, T> item)
-		{
-			return decorated.Remove(item.Value);
-		}
+        public bool Remove(KeyValuePair<int, T> item)
+        {
+            return decorated.Remove(item.Value);
+        }
 
-		public int Count => decorated.Count;
-		public bool IsReadOnly => decorated.IsReadOnly;
+        public int Count => decorated.Count;
+        public bool IsReadOnly => decorated.IsReadOnly;
 
-		public int IndexOf(KeyValuePair<int, T> item)
-		{
-			return decorated.IndexOf(item.Value);
-		}
+        public int IndexOf(KeyValuePair<int, T> item)
+        {
+            return decorated.IndexOf(item.Value);
+        }
 
-		void IList<KeyValuePair<int, T>>.Insert(int index, KeyValuePair<int, T> item)
-		{
-			Insert(index, item.Value);
-		}
+        void IList<KeyValuePair<int, T>>.Insert(int index, KeyValuePair<int, T> item)
+        {
+            Insert(index, item.Value);
+        }
 
-		public void Insert(int index, T item)
-		{
-			decorated.Insert(index, item);
-		}
+        public void Insert(int index, T item)
+        {
+            decorated.Insert(index, item);
+        }
 
-		public void RemoveAt(int index)
-		{
-			decorated.RemoveAt(index);
-		}
-		public KeyValuePair<int, T> this[int index]
-		{
-			get { return new KeyValuePair<int, T>(index, decorated[index]); }
-			set { decorated[index] = value.Value; }
-		}
-	}
+        public void RemoveAt(int index)
+        {
+            decorated.RemoveAt(index);
+        }
+        public KeyValuePair<int, T> this[int index]
+        {
+            get { return new KeyValuePair<int, T>(index, decorated[index]); }
+            set { decorated[index] = value.Value; }
+        }
+    }
 
-	public class ObservableIndexedList<T> : IndexedList<T>, INotifyCollectionChanged
-	{
-		public ObservableIndexedList(ObservableCollection<T> decorated) : 
-			base(decorated)
-		{
+    public class ObservableIndexedList<T> : IndexedList<T>, INotifyCollectionChanged
+    {
+        public ObservableIndexedList(ObservableCollection<T> decorated) : 
+            base(decorated)
+        {
 
-		}
+        }
 
-		public event NotifyCollectionChangedEventHandler CollectionChanged
-		{
-			add { ((ObservableCollection<T>)decorated).CollectionChanged += value; }
-			remove { ((ObservableCollection<T>)decorated).CollectionChanged -= value; }
-		}
-	}
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add { ((ObservableCollection<T>)decorated).CollectionChanged += value; }
+            remove { ((ObservableCollection<T>)decorated).CollectionChanged -= value; }
+        }
+    }
 }";
             await this.VerifyHappyPathAsync(code).ConfigureAwait(false);
         }

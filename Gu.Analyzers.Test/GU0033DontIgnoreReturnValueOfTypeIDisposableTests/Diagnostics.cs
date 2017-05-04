@@ -43,8 +43,8 @@ using System;
 class Disposable : IDisposable
 {
     public void Dispose()
-	{
-	}
+    {
+    }
 }";
 
             var testCode = @"
@@ -70,8 +70,8 @@ using System;
 class Disposable : IDisposable
 {
     public void Dispose()
-	{
-	}
+    {
+    }
 }";
 
             var testCode = @"
@@ -131,8 +131,8 @@ using System;
 class Disposable : IDisposable
 {
     public void Dispose()
-	{
-	}
+    {
+    }
 }";
             var barCode = @"
 using System;
