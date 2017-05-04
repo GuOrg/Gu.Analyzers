@@ -96,6 +96,57 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields2()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    internal sealed class Foo
+    {
+        const int value1;
+
+        private static int value2;
+
+        private int value3;
+
+        internal Foo()
+        {
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Don't ignore returnvalue of type IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    internal sealed class Foo
+    {
+        const int value1;
+
+        private static int value2;
+        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
+        private int value3;
+
+        internal Foo()
+        {
+            this.disposable = new System.Reactive.Disposables.CompositeDisposable() { File.OpenRead(string.Empty) };
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
         {
             var testCode = @"

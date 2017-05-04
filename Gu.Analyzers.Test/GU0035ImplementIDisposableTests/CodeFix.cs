@@ -347,6 +347,56 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
+        public async Task ImplementIDisposableSealedClassUnderscoreWithConst()
+        {
+            var testCode = @"
+using System.IO;
+
+public sealed class Foo
+{
+    public const int Value = 2;
+
+    ↓private readonly Stream _stream = File.OpenRead(string.Empty);
+}";
+            var expected = this.CSharpDiagnostic(GU0035ImplementIDisposable.DiagnosticId)
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Implement IDisposable.");
+            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
+                      .ConfigureAwait(false);
+
+            var fixedCode = @"using System;
+using System.IO;
+
+public sealed class Foo : IDisposable
+{
+    public const int Value = 2;
+
+    private readonly Stream _stream = File.OpenRead(string.Empty);
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        _disposed = true;
+    }
+
+    private void ThrowIfDisposed()
+    {
+        if (_disposed)
+        {
+            throw new ObjectDisposedException(GetType().FullName);
+        }
+    }
+}";
+            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, numberOfFixAllIterations: 2)
+                      .ConfigureAwait(false);
+        }
+
+        [Test]
         public async Task ImplementIDisposableAbstractClass()
         {
             var testCode = @"
