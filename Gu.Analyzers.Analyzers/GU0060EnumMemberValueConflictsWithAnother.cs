@@ -1,5 +1,8 @@
+using System.Linq.Expressions;
+
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -33,7 +36,21 @@ namespace Gu.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(this.HandleEnumMember, SyntaxKind.EnumMemberDeclaration);
+            context.RegisterSyntaxNodeAction(this.HandleEnumMember, SyntaxKind.EnumDeclaration);
+        }
+
+        private static bool HasFlagsAttribute(INamedTypeSymbol enumType)
+        {
+            return enumType.GetAttributes()
+                  .TryGetFirst(attr => attr.AttributeClass == KnownSymbol.FlagsAttribute, out AttributeData _);
+        }
+
+        // unboxes a boxed integral value to ulong, regardless of the original boxed type
+        // negative values are converted to their U2 representation
+        // see http://stackoverflow.com/a/10022661/1012936
+        private static ulong UnboxUMaxInt(object a)
+        {
+            return a is ulong ? (ulong)a : (ulong)Convert.ToInt64(a);
         }
 
         private void HandleEnumMember(SyntaxNodeAnalysisContext context)
@@ -43,7 +60,31 @@ namespace Gu.Analyzers
                 return;
             }
 
-            // context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+            var enumDeclaration = (EnumDeclarationSyntax)context.Node;
+            var enumSymbol = context.SemanticModel.GetDeclaredSymbolSafe(enumDeclaration, context.CancellationToken) as INamedTypeSymbol;
+            if (enumSymbol == null)
+            {
+                return;
+            }
+
+            var enumUnderlyingType = enumSymbol.EnumUnderlyingType;
+            var hasFlagAttribute = HasFlagsAttribute(enumSymbol);
+            var enumMembers = enumDeclaration.Members;
+
+            ulong bitSumOfLiterals = 0;
+            foreach (var enumMember in enumMembers)
+            {
+                var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
+                bool isLiteralOrImplicit = enumMember.EqualsValue == null ||
+                                         enumMember.EqualsValue.Value is LiteralExpressionSyntax;
+                var value = UnboxUMaxInt(symbol.ConstantValue);
+                if (isLiteralOrImplicit && (bitSumOfLiterals & value) != 0)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
+                }
+
+                bitSumOfLiterals |= value;
+            }
         }
     }
 }

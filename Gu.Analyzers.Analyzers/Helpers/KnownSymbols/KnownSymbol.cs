@@ -41,6 +41,8 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType ImmutableDictionaryOfTKeyTValue = Create("System.Collections.Immutable.ImmutableDictionary`2");
         internal static readonly QualifiedType ImmutableSortedDictionaryOfTKeyTValue = Create("System.Collections.Immutable.ImmutableSortedDictionary`2");
 
+        internal static readonly QualifiedType FlagsAttribute = Create("System.FlagsAttribute");
+
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
 
         internal static readonly TextReaderType TextReader = new TextReaderType();

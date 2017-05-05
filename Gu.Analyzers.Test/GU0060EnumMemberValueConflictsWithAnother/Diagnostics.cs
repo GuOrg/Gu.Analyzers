@@ -17,7 +17,7 @@ public enum Bad2
 {
     A = 1,
     B = 2,
-    Baaaaaaad = 2
+    ↓Baaaaaaad = 2
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -37,7 +37,7 @@ public enum Bad
 {
     A = 1,
     B = 2,
-    Baaaaaaad = 3
+    ↓Baaaaaaad = 3
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
