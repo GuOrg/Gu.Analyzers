@@ -62,7 +62,10 @@ namespace Gu.Analyzers
                 {
                     bool isEnumMember = sema.GetSymbolSafe(identifier, cancellationToken)
                                             .TryGetSingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
-                    return isEnumMember;
+                    if (!isEnumMember)
+                    {
+                        return false;
+                    }
                 }
             }
 

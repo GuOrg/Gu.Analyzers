@@ -131,5 +131,25 @@ public enum Bad
             await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task ExplicitValueSharingPartial()
+        {
+            var testCode = @"
+using System;
+
+[Flags]
+public enum Bad
+{
+    A = 1,
+    B = 2,
+    ↓Baaaaaaad = A | 2
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("Enum member value conflicts with another.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
+                      .ConfigureAwait(false);
+        }
     }
 }
