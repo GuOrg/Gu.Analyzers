@@ -1,10 +1,8 @@
-using System.Linq.Expressions;
-using System.Threading;
-
 namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
