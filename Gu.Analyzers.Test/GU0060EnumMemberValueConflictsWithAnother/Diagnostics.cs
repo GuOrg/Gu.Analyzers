@@ -7,7 +7,7 @@
     internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0060EnumMemberValueConflictsWithAnother>
     {
         [Test]
-        public async Task ImplicitValueSharing()
+        public async Task ExplicitValueSharing()
         {
             var testCode = @"
 using System;
@@ -27,7 +27,7 @@ public enum Bad2
         }
 
         [Test]
-        public async Task ImplicitValueSharingWithBitwiseSum()
+        public async Task ExplicitValueSharingWithBitwiseSum()
         {
             var testCode = @"
 using System;
