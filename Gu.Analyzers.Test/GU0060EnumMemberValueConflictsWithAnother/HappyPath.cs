@@ -39,5 +39,22 @@ public enum Good
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task SequentialNonFlagEnum()
+        {
+            var testCode = @"
+using System;
+
+public enum Bad
+{
+    None,
+    A,
+    B,
+    Baaaaaaad
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
