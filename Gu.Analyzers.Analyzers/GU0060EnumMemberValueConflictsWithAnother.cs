@@ -68,8 +68,13 @@ namespace Gu.Analyzers
             }
 
             var enumUnderlyingType = enumSymbol.EnumUnderlyingType;
-            var hasFlagAttribute = HasFlagsAttribute(enumSymbol);
+            var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
             var enumMembers = enumDeclaration.Members;
+
+            if (!hasFlagsAttribute)
+            {
+                return;
+            }
 
             ulong bitSumOfLiterals = 0;
             foreach (var enumMember in enumMembers)
