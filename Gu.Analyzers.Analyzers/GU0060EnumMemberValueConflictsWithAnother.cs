@@ -1,3 +1,6 @@
+using System.Linq.Expressions;
+using System.Threading;
+
 namespace Gu.Analyzers
 {
     using System;
@@ -35,6 +38,37 @@ namespace Gu.Analyzers
         {
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(this.HandleEnumMember, SyntaxKind.EnumDeclaration);
+        }
+
+        private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel sema, CancellationToken cancellationToken)
+        {
+            if (enumMember.EqualsValue == null)
+            {
+                return false;
+            }
+
+            var expression = enumMember.EqualsValue.Value;
+            foreach (var node in expression.DescendantNodesAndSelf())
+            {
+                if (!(node is ExpressionSyntax))
+                {
+                    continue;
+                }
+
+                if (node is LiteralExpressionSyntax)
+                {
+                    return false;
+                }
+
+                if (node is IdentifierNameSyntax identifier)
+                {
+                    bool isEnumMember = sema.GetSymbolSafe(identifier, cancellationToken)
+                                            .TryGetSingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
+                    return isEnumMember;
+                }
+            }
+
+            return true;
         }
 
         private static bool HasFlagsAttribute(INamedTypeSymbol enumType)
@@ -77,10 +111,10 @@ namespace Gu.Analyzers
             foreach (var enumMember in enumMembers)
             {
                 var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
-                bool isLiteralOrImplicit = enumMember.EqualsValue == null ||
-                                         enumMember.EqualsValue.Value is LiteralExpressionSyntax;
+                bool notDerivedFromOther =
+                    !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
                 var value = UnboxUMaxInt(symbol.ConstantValue);
-                if (isLiteralOrImplicit && (bitSumOfLiterals & value) != 0)
+                if (notDerivedFromOther && (bitSumOfLiterals & value) != 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
                 }
