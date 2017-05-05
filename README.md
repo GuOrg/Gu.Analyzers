@@ -103,6 +103,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0051.md">GU0051</a></td>
   <td>Cache the XmlSerializer.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0060.md">GU0060</a></td>
+  <td>Enum member value conflict.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
