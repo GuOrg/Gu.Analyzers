@@ -65,6 +65,7 @@
     <Compile Include="GU0035ImplementIDisposable.cs" />
     <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
+    <Compile Include="GU0060EnumMemberValueConflictsWithAnother.cs" />
     <Compile Include="GU0051XmlSerializerNotCached.cs" />
     <Compile Include="Helpers\DebugInfo.cs" />
     <Compile Include="Helpers\AsyncAwait.cs" />

@@ -99,6 +99,8 @@
     <Compile Include="GU0037DontMixInjectedAndCreatedForMemberTests\HappyPath.Rx.cs" />
     <Compile Include="GU0009UseNamedParametersForBooleansTests\Diagnostics.cs" />
     <Compile Include="GU0009UseNamedParametersForBooleansTests\HappyPath.cs" />
+    <Compile Include="GU0060EnumMemberValueConflictsWithAnother\Diagnostics.cs" />
+    <Compile Include="GU0060EnumMemberValueConflictsWithAnother\HappyPath.cs" />
     <Compile Include="GU0051XmlSerializerNotCached\Diagnostics.cs" />
     <Compile Include="GU0051XmlSerializerNotCached\HappyPath.cs" />
     <Compile Include="HappyPathWithAll.cs" />
