@@ -1,5 +1,3 @@
-using System.Linq.Expressions;
-
 namespace Gu.Analyzers
 {
     using System;
@@ -67,7 +65,6 @@ namespace Gu.Analyzers
                 return;
             }
 
-            var enumUnderlyingType = enumSymbol.EnumUnderlyingType;
             var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
             var enumMembers = enumDeclaration.Members;
 
