@@ -56,5 +56,22 @@ public enum Bad
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
+
+        [Test]
+        public async Task AliasingEnumMembersNonFlag()
+        {
+            var testCode = @"
+using System;
+
+public enum Bad
+{
+    None,
+    A,
+    B,
+    Baaaaaaad = B
+}";
+            await this.VerifyHappyPathAsync(testCode)
+                      .ConfigureAwait(false);
+        }
     }
 }
