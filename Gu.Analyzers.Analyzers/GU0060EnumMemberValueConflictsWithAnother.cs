@@ -98,15 +98,41 @@ namespace Gu.Analyzers
             }
 
             var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
-            var enumMembers = enumDeclaration.Members;
 
-            if (!hasFlagsAttribute)
+            if (hasFlagsAttribute)
             {
-                return;
+                this.HandleFlagEnumMember(context, enumDeclaration);
             }
+            else
+            {
+                this.HandleNonFlagEnumMember(context, enumDeclaration);
+            }
+        }
 
+        private void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
+        {
+            using (var enumValuesSet = SetPool<ulong>.Create())
+            {
+                foreach (var enumMember in enumDeclaration.Members)
+                {
+                    var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
+                    bool notDerivedFromOther =
+                        !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
+                    var value = UnboxUMaxInt(symbol.ConstantValue);
+                    if (notDerivedFromOther && enumValuesSet.Item.Contains(value))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
+                    }
+
+                    enumValuesSet.Item.Add(value).IgnoreReturnValue();
+                }
+            }
+        }
+
+        private void HandleFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
+        {
             ulong bitSumOfLiterals = 0;
-            foreach (var enumMember in enumMembers)
+            foreach (var enumMember in enumDeclaration.Members)
             {
                 var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
                 bool notDerivedFromOther =
