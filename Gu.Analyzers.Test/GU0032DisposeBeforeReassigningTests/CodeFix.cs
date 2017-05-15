@@ -395,7 +395,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Bar += (o, e) => this.Stream = File.OpenRead(string.Empty);
+            this.Bar += (o, e) => ↓this.Stream = File.OpenRead(string.Empty);
         }
 
         public event EventHandler Bar;
