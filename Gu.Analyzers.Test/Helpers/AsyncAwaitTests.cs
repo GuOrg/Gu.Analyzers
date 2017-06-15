@@ -32,8 +32,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value as InvocationExpressionSyntax;
-            ExpressionSyntax result;
-            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskFromResult(value, semanticModel, CancellationToken.None, out result));
+            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskFromResult(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }
 
@@ -67,8 +66,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value as InvocationExpressionSyntax;
-            ExpressionSyntax result;
-            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskRun(value, semanticModel, CancellationToken.None, out result));
+            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskRun(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }
     }

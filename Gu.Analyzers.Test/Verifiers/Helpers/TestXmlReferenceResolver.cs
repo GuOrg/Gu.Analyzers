@@ -26,8 +26,7 @@ namespace Gu.Analyzers.Test
 
         public override Stream OpenRead(string resolvedPath)
         {
-            string content;
-            if (!this.XmlReferences.TryGetValue(resolvedPath, out content))
+            if (!this.XmlReferences.TryGetValue(resolvedPath, out string content))
             {
                 return null;
             }

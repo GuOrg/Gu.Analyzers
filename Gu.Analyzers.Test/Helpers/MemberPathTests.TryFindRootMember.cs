@@ -47,8 +47,7 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("foo.Inner", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var temp = ").Value;
-                ExpressionSyntax member;
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out member));
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
@@ -102,14 +101,36 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("this.foo.Get<int>(1)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var invocation = syntaxTree.BestMatch<InvocationExpressionSyntax>("Get<int>(1)");
-                ExpressionSyntax member;
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out member));
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var symbol = semanticModel.GetSymbolSafe(member, CancellationToken.None);
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);
+            }
+
+            [Test]
+            public void Recursive()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        private int value;
+
+        public int Value
+        {
+            get { return this.Value; }
+            set { this.Value = value; }
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var invocation = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.Value");
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
+                Assert.AreEqual("this.Value", member.ToString());
             }
         }
     }

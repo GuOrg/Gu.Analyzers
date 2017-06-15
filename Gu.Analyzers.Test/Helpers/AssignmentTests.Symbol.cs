@@ -33,9 +33,8 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.value");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
-                AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, Assignment.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 

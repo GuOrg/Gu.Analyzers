@@ -33,9 +33,8 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<AssignmentExpressionSyntax>("this.value = arg").Right;
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
-                AssignmentExpressionSyntax result;
                 var arg = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, Assignment.FirstWith(arg, ctor, search, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstWith(arg, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
@@ -63,9 +62,8 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<ParameterSyntax>("stream");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(Stream stream)");
-                AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, search, semanticModel, CancellationToken.None, out result));
+                Assert.AreEqual(true, Assignment.FirstWith(symbol, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
                 Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
             }
 
