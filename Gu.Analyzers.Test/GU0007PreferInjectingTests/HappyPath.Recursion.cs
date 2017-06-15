@@ -29,6 +29,43 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
                           .ConfigureAwait(false);
             }
 
+            [TestCase("this.foo = foo.Inner.Inner;")]
+            [TestCase("this.foo = foo?.Inner.Inner;")]
+            [TestCase("this.foo = foo?.Inner.Inner?.Inner;")]
+            [TestCase("this.foo = foo.Inner?.Inner?.Inner;")]
+            [TestCase("this.foo = foo.Inner?.Inner.Inner?.Inner;")]
+            public async Task IgnoresRecursivePropertyElvis(string assignment)
+            {
+                var fooCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        private readonly Foo foo;
+
+        public Foo Inner => this.foo;
+    }
+}";
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Bar
+    {
+        private readonly Foo foo;
+
+        public Bar(Foo foo)
+        {
+            this.foo = foo.Inner.Inner;
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("this.foo = foo.Inner.Inner;", assignment);
+                await this.VerifyHappyPathAsync(fooCode, testCode)
+                          .ConfigureAwait(false);
+            }
+
             [Test]
             public async Task IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {

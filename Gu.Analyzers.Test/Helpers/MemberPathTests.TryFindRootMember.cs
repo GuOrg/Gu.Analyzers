@@ -22,7 +22,9 @@ namespace Gu.Analyzers.Test.Helpers
             [TestCase("this.foo?.Inner?.foo?.Inner", "this.foo")]
             [TestCase("this.foo.Inner?.foo.Inner", "this.foo")]
             [TestCase("this.foo.Inner?.foo?.Inner", "this.foo")]
+            [TestCase("this.foo?.Inner.foo?.Inner", "this.foo")]
             [TestCase("this.foo.Inner.foo?.Inner", "this.foo")]
+            [TestCase("this.foo.Inner?.Inner.Inner?.Inner", "this.foo")]
             [TestCase("(meh as Foo)?.Inner", "meh")]
             public void ForPropertyOrField(string code, string expected)
             {
