@@ -83,7 +83,6 @@
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Local.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.Property.cs" />
     <Compile Include="Helpers\AssignedValueWalkerTests\AssignedValueWalkerTests.RefAndOut.cs" />
-    <Compile Include="Helpers\DisposableTests.IsCreation.cs" />
     <Compile Include="Helpers\SyntaxNodeExtTests.cs" />
     <Compile Include="Helpers\SyntaxtTreeHelpersTests\BaseMethodDeclarationSyntaxExtTests.cs" />
     <Compile Include="RunOnGuAnalyzers.cs" />

@@ -63,10 +63,6 @@
     <Compile Include="Helpers\AsyncAwait.cs" />
     <Compile Include="Helpers\Break.cs" />
     <Compile Include="Helpers\Collection\ConcurrentQueueExt.cs" />
-    <Compile Include="Helpers\Disposable.IsCreation.cs" />
-    <Compile Include="Helpers\Disposable.IsMemberDisposed.cs" />
-    <Compile Include="Helpers\Disposable.IsInjected.cs" />
-    <Compile Include="Helpers\Disposable.RecursiveValues.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyObjectType.cs" />
     <Compile Include="Helpers\KnownSymbols\EnumerableType.cs" />
     <Compile Include="Helpers\KnownSymbols\FileType.cs" />
@@ -104,7 +100,6 @@
     <Compile Include="Helpers\Walkers\AssignedValueWalker.cs" />
     <Compile Include="Helpers\Collection\EnumerableExt.cs" />
     <Compile Include="Helpers\KnownSymbols\DependencyPropertyType.cs" />
-    <Compile Include="Helpers\Disposable.cs" />
     <Compile Include="Helpers\KnownSymbols\DisposableType.cs" />
     <Compile Include="Helpers\KnownSymbols\KnownSymbol.cs" />
     <Compile Include="Helpers\KnownSymbols\BaseTypes\NamespaceParts.cs" />
