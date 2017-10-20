@@ -1,29 +1,69 @@
 ﻿// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
+#pragma warning disable CS0162 // Unreachable code detected
+#pragma warning disable GU0011 // Don't ignore the returnvalue.
 namespace Gu.Analyzers.Benchmarks
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
+    using Gu.Analyzers.Benchmarks.Benchmarks;
+    using Gu.Roslyn.Asserts;
 
     public class Program
     {
-        // ReSharper disable PossibleNullReferenceException
-        private static readonly string DestinationDirectory = Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "Benchmarks");
-        // ReSharper restore PossibleNullReferenceException
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
+
+        public static string ProjectDirectory
+        {
+            get
+            {
+                var directoryInfo = new DirectoryInfo(Path.GetDirectoryName(new Uri(typeof(Program).Assembly.CodeBase, UriKind.Absolute).LocalPath));
+                if (CodeFactory.TryFindFileInParentDirectory(directoryInfo, "Gu.Analyzers.Benchmarks.csproj", out var projectfile))
+                {
+                    return projectfile.Directory.FullName;
+                }
+
+                throw new FileNotFoundException();
+            }
+        }
+
+        private static string ArtifactsDirectory { get; } = Path.Combine(ProjectDirectory, "BenchmarkDotNet.Artifacts", "results");
 
         public static void Main()
         {
-            foreach (var summary in RunAll())
+            if (false)
             {
-                CopyResult(summary.Title);
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(
+                    Code.AnalyzersProject,
+                    new GU0001NameArguments());
+
+                // Warmup
+                benchmark.Run();
+                Console.WriteLine("Attach profiler and press any key to continue...");
+                Console.ReadKey();
+                benchmark.Run();
+            }
+            else if (false)
+            {
+                foreach (var summary in RunSingle<AllBenchmarks>())
+                {
+                    CopyResult(summary.Title);
+                }
+            }
+            else
+            {
+                foreach (var summary in RunAll())
+                {
+                    CopyResult(summary.Title);
+                }
             }
         }
 
         private static IEnumerable<Summary> RunAll()
         {
-            ////ClearAllResults();
             var switcher = new BenchmarkSwitcher(typeof(Program).Assembly);
             var summaries = switcher.Run(new[] { "*" });
             return summaries;
@@ -37,23 +77,13 @@ namespace Gu.Analyzers.Benchmarks
 
         private static void CopyResult(string name)
         {
-#if DEBUG
-#else
-            var sourceFileName = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results", name + "-report-github.md");
-            Directory.CreateDirectory(DestinationDirectory);
-            var destinationFileName = Path.Combine(DestinationDirectory, name + ".md");
-            File.Copy(sourceFileName, destinationFileName, overwrite: true);
-#endif
-        }
-
-        private static void ClearAllResults()
-        {
-            if (Directory.Exists(DestinationDirectory))
+            Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
+            if (Directory.Exists(BenchmarksDirectory))
             {
-                foreach (var resultFile in Directory.EnumerateFiles(DestinationDirectory, "*.md"))
-                {
-                    File.Delete(resultFile);
-                }
+                var sourceFileName = Path.Combine(ArtifactsDirectory, name + "-report-github.md");
+                var destinationFileName = Path.Combine(BenchmarksDirectory, name + ".md");
+                Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
+                File.Copy(sourceFileName, destinationFileName, overwrite: true);
             }
         }
     }

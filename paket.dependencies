@@ -29,8 +29,10 @@ group Test
   nuget System.Reactive.PlatformServices
 
 group Benchmarks
+  storage: none
   source http://www.nuget.org/api/v2/
-  framework: net461
   nuget BenchmarkDotNet.Diagnostics.Windows
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
+  nuget Gu.Roslyn.Asserts
+  nuget NUnit
   
