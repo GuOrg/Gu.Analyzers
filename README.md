@@ -64,38 +64,6 @@
   <td>Use get-only.</td>
 </tr>
 <tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0030.md">GU0030</a></td>
-  <td>Dispose created.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0031.md">GU0031</a></td>
-  <td>Dispose member.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0032.md">GU0032</a></td>
-  <td>Dispose before re-assigning.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0033.md">GU0033</a></td>
-  <td>Don't ignore returnvalue of type IDisposable.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0034.md">GU0034</a></td>
-  <td>Return type should indicate that the value should be disposed.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0035.md">GU0035</a></td>
-  <td>Implement IDisposable.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0036.md">GU0036</a></td>
-  <td>Don't dispose injected.</td>
-</tr>
-<tr>
-  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0037.md">GU0037</a></td>
-  <td>Don't assign member with injected and created disposables.</td>
-</tr>
-<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0050.md">GU0050</a></td>
   <td>Ignore events when serializing.</td>
 </tr>
