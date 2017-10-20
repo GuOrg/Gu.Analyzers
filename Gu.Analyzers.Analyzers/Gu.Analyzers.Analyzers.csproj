@@ -54,16 +54,8 @@
     <Compile Include="GU0011DontIgnoreReturnValue.cs" />
     <Compile Include="GU0020SortProperties.cs" />
     <Compile Include="GU0021CalculatedPropertyAllocates.cs" />
-    <Compile Include="GU0030DisposeCreated.cs" />
-    <Compile Include="GU0031DisposeMember.cs" />
-    <Compile Include="GU0036DontDisposeInjected.cs" />
-    <Compile Include="GU0032DisposeBeforeReassigning.cs" />
     <Compile Include="AnalyzerCategory.cs" />
     <Compile Include="AnalyzerConstants.cs" />
-    <Compile Include="GU0033DontIgnoreReturnValueOfTypeIDisposable.cs" />
-    <Compile Include="GU0034ReturntypeShouldIndicateIDisposable.cs" />
-    <Compile Include="GU0035ImplementIDisposable.cs" />
-    <Compile Include="GU0037DontMixInjectedAndCreatedForMember.cs" />
     <Compile Include="GU0050IgnoreEventsWhenSerializing.cs" />
     <Compile Include="GU0060EnumMemberValueConflictsWithAnother.cs" />
     <Compile Include="GU0051XmlSerializerNotCached.cs" />

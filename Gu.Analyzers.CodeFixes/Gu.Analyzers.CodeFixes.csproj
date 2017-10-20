@@ -41,16 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddNonSerializedFixProvider.cs" />
-    <Compile Include="AddToCompositeDisposableCodeFixProvider.cs" />
-    <Compile Include="AddUsingCodeFixProvider.cs" />
-    <Compile Include="CreateAndAssignFieldCodeFixProvider.cs" />
-    <Compile Include="DisposeBeforeAssignCodeFixProvider.cs" />
     <Compile Include="Helpers\DocumentEditorExt.cs" />
-    <Compile Include="ImplementIDisposableCodeFixProvider.cs" />
-    <Compile Include="DisposeMemberCodeFixProvider.cs" />
     <Compile Include="Helpers\RenameHelper.cs" />
     <Compile Include="FinishedTasks.cs" />
-    <Compile Include="ImplementIDisposableHelper.cs" />
     <Compile Include="InjectCodeFixProvider.cs" />
     <Compile Include="MoveArgumentCodeFixProvider.cs" />
     <Compile Include="NameArgumentsCodeFixProvider.cs" />
