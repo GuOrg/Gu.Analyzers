@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>AllBenchmarks</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.10.9, OS=Windows 10 Redstone 2 (10.0.15063)
+Processor=Intel Core i7-3667U CPU 2.00GHz (Ivy Bridge), ProcessorCount=4
+Frequency=2435876 Hz, Resolution=410.5299 ns, Timer=TSC
+  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
+  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
+</code></pre>
+<pre><code></code></pre>
+
+<table>
+<thead><tr><th>                             Method</th><th>  Mean</th><th>  Error</th><th> StdDev</th><th>Median</th><th>Gen 0</th><th>Gen 1</th><th>Allocated</th>
+</tr>
+</thead><tbody><tr><td>GU0009UseNamedParametersForBooleans</td><td>2,898.65 us</td><td>47.0396 us</td><td>44.0009 us</td><td>2,900.51 us</td><td> -</td><td>-</td><td>64 B</td>
+</tr><tr><td>                   GU0022UseGetOnly</td><td>8,977.33 us</td><td>360.2198 us</td><td>385.4311 us</td><td>8,841.25 us</td><td>62.5000</td><td>-</td><td>142724 B</td>
+</tr><tr><td>                GU0001NameArguments</td><td>2,594.63 us</td><td>49.4209 us</td><td>43.8104 us</td><td>2,581.80 us</td><td>3.9063</td><td>-</td><td>14016 B</td>
+</tr><tr><td> GU0002NamedArgumentPositionMatches</td><td>4,640.53 us</td><td>183.6851 us</td><td>518.0870 us</td><td>4,421.33 us</td><td>85.9375</td><td>-</td><td>194376 B</td>
+</tr><tr><td>GU0003CtorParameterNamesShouldMatch</td><td>277.84 us</td><td>5.3113 us</td><td>5.4543 us</td><td>278.48 us</td><td>3.4180</td><td>-</td><td>7568 B</td>
+</tr><tr><td>     GU0004AssignAllReadOnlyMembers</td><td>3,756.64 us</td><td>85.0428 us</td><td>71.0146 us</td><td>3,732.41 us</td><td>46.8750</td><td>-</td><td>104741 B</td>
+</tr><tr><td>  GU0005ExceptionArgumentsPositions</td><td>669.61 us</td><td>8.2206 us</td><td>7.6895 us</td><td>668.58 us</td><td>0.9766</td><td>-</td><td>2136 B</td>
+</tr><tr><td>                    GU0006UseNameof</td><td>23,896.74 us</td><td>223.5292 us</td><td>186.6570 us</td><td>23,915.85 us</td><td>687.5000</td><td>-</td><td>1471324 B</td>
+</tr><tr><td>              GU0007PreferInjecting</td><td>64,722.29 us</td><td>1,291.5028 us</td><td>2,295.6450 us</td><td>64,589.42 us</td><td>812.5000</td><td>-</td><td>1734963 B</td>
+</tr><tr><td>         GU0008AvoidRelayProperties</td><td>8,641.51 us</td><td>166.8044 us</td><td>156.0289 us</td><td>8,625.33 us</td><td>78.1250</td><td>-</td><td>185605 B</td>
+</tr><tr><td>         GU0010DoNotAssignSameValue</td><td>457.56 us</td><td>10.6137 us</td><td>29.9361 us</td><td>443.64 us</td><td> -</td><td>-</td><td>1008 B</td>
+</tr><tr><td>        GU0011DontIgnoreReturnValue</td><td>9,424.53 us</td><td>191.1486 us</td><td>372.8207 us</td><td>9,356.38 us</td><td>187.5000</td><td>-</td><td>413581 B</td>
+</tr><tr><td>               GU0020SortProperties</td><td>247.22 us</td><td>2.6868 us</td><td>2.5132 us</td><td>247.03 us</td><td>4.3945</td><td>-</td><td>10024 B</td>
+</tr><tr><td>  GU0021CalculatedPropertyAllocates</td><td>101.71 us</td><td>2.3217 us</td><td>6.5861 us</td><td>100.44 us</td><td> -</td><td>-</td><td>41 B</td>
+</tr><tr><td>  GU0050IgnoreEventsWhenSerializing</td><td>681.60 us</td><td>13.5586 us</td><td>21.1091 us</td><td>684.57 us</td><td>13.6719</td><td>-</td><td>30025 B</td>
+</tr><tr><td>GU0060EnumMemberValueConflictsWithAnother</td><td>38.23 us</td><td>0.4834 us</td><td>0.4521 us</td><td>38.15 us</td><td>0.4272</td><td>0.0610</td><td>1046 B</td>
+</tr><tr><td>       GU0051XmlSerializerNotCached</td><td>2,136.31 us</td><td>43.7001 us</td><td>108.0157 us</td><td>2,102.33 us</td><td>93.7500</td><td>-</td><td>200778 B</td>
+</tr></tbody></table>
+</body>
+</html>
