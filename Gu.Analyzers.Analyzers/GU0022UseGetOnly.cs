@@ -57,9 +57,9 @@
                 return;
             }
 
-            using (var pooled = AssignedValueWalker.Create(propertySymbol, context.SemanticModel, context.CancellationToken))
+            using (var walker = AssignedValueWalker.Borrow(propertySymbol, context.SemanticModel, context.CancellationToken))
             {
-                foreach (var value in pooled.Item)
+                foreach (var value in walker)
                 {
                     if (MeansPropertyIsMutable(value))
                     {

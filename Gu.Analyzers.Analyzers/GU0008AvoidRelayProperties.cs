@@ -117,9 +117,9 @@
         {
             if (member is IFieldSymbol field)
             {
-                using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+                using (var walker = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in pooled.Item)
+                    foreach (var assignedValue in walker)
                     {
                         if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {
@@ -136,9 +136,9 @@
 
             if (member is IPropertySymbol property)
             {
-                using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+                using (var walker = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
                 {
-                    foreach (var assignedValue in pooled.Item)
+                    foreach (var assignedValue in walker)
                     {
                         if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
                         {

@@ -114,7 +114,7 @@ namespace Gu.Analyzers
 
         private void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
         {
-            using (var enumValuesSet = SetPool<ulong>.Create())
+            using (var enumValuesSet = PooledHashSet<ulong>.Borrow())
             {
                 foreach (var enumMember in enumDeclaration.Members)
                 {
@@ -122,12 +122,12 @@ namespace Gu.Analyzers
                     bool notDerivedFromOther =
                         !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
                     var value = UnboxUMaxInt(symbol.ConstantValue);
-                    if (notDerivedFromOther && enumValuesSet.Item.Contains(value))
+                    if (notDerivedFromOther && enumValuesSet.Contains(value))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
                     }
 
-                    enumValuesSet.Item.Add(value).IgnoreReturnValue();
+                    enumValuesSet.Add(value).IgnoreReturnValue();
                 }
             }
         }

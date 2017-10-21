@@ -306,7 +306,7 @@
             {
                 var node = reference.GetSyntax(cancellationToken);
 
-                if (Assignment.SingleForSymbol(
+                if (AssignmentWalker.SingleForSymbol(
                         symbol,
                         node.FirstAncestor<TypeDeclarationSyntax>(),
                         Search.TopLevel,
