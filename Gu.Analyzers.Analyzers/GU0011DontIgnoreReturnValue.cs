@@ -115,12 +115,12 @@
 
                 if (method.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
                 {
-                    using (var pooled = ReturnValueWalker.Create(declaration, Search.Recursive, semanticModel, cancellationToken))
+                    using (var walker = ReturnValueWalker.Borrow(declaration, Search.Recursive, semanticModel, cancellationToken))
                     {
                         if (method.IsExtensionMethod)
                         {
                             var identifier = declaration.ParameterList.Parameters[0].Identifier;
-                            foreach (var returnValue in pooled.Item)
+                            foreach (var returnValue in walker)
                             {
                                 if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
                                 {
@@ -131,7 +131,7 @@
                             return true;
                         }
 
-                        foreach (var returnValue in pooled.Item)
+                        foreach (var returnValue in walker)
                         {
                             if (!returnValue.IsKind(SyntaxKind.ThisExpression))
                             {
