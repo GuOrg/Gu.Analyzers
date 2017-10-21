@@ -6,18 +6,8 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignmentWalker : ExecutionWalker
+    internal sealed class AssignmentWalker : ExecutionWalker<AssignmentWalker>
     {
-        private static readonly Pool<AssignmentWalker> Cache = new Pool<AssignmentWalker>(
-            () => new AssignmentWalker(),
-            x =>
-                {
-                    x.assignments.Clear();
-                    x.Clear();
-                    x.SemanticModel = null;
-                    x.CancellationToken = CancellationToken.None;
-                });
-
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
 
         private AssignmentWalker()
@@ -35,14 +25,14 @@
             this.assignments.Add(node);
         }
 
-        internal static Pool<AssignmentWalker>.Pooled Create(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignmentWalker Create(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Cache.GetOrCreate();
-            pooled.Item.SemanticModel = semanticModel;
-            pooled.Item.CancellationToken = cancellationToken;
-            pooled.Item.Search = search;
-            pooled.Item.Visit(node);
-            return pooled;
+            var walker = Borrow(() => new AssignmentWalker());
+            walker.SemanticModel = semanticModel;
+            walker.CancellationToken = cancellationToken;
+            walker.Search = search;
+            walker.Visit(node);
+            return walker;
         }
 
         internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -61,7 +51,7 @@
 
             using (var pooledAssignments = Create(scope, search, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Item.Assignments)
+                foreach (var candidate in pooledAssignments.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -86,7 +76,7 @@
 
             using (var pooledAssignments = Create(scope, search, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Item.Assignments)
+                foreach (var candidate in pooledAssignments.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -116,7 +106,7 @@
 
             using (var pooledAssignments = Create(scope, search, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Item.Assignments)
+                foreach (var candidate in pooledAssignments.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Right, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -136,6 +126,14 @@
             }
 
             return false;
+        }
+
+        protected override void Clear()
+        {
+            this.assignments.Clear();
+            this.SemanticModel = null;
+            this.CancellationToken = CancellationToken.None;
+            base.Clear();
         }
     }
 }
