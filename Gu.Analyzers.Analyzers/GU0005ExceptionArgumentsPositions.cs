@@ -10,21 +10,16 @@
     internal class GU0005ExceptionArgumentsPositions : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0005";
-        private const string Title = "Use correct argument positions.";
-        private const string MessageFormat = "Use correct argument positions.";
-        private const string Description = "Use correct position for name and message.";
-
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Use correct argument positions.",
+            messageFormat: "Use correct argument positions.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Use correct position for name and message.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

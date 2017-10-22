@@ -11,20 +11,16 @@
     internal class GU0011DontIgnoreReturnValue : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0011";
-        private const string Title = "Don't ignore the returnvalue.";
-        private const string MessageFormat = "Don't ignore the returnvalue.";
-        private const string Description = "Don't ignore the returnvalue.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Don't ignore the returnvalue.",
+            messageFormat: "Don't ignore the returnvalue.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Don't ignore the returnvalue.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

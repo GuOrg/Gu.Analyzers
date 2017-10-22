@@ -11,20 +11,16 @@
     internal class GU0001NameArguments : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0001";
-        private const string Title = "Name the arguments.";
-        private const string MessageFormat = "Name the arguments.";
-        private const string Description = "Name the arguments of calls to methods that have more than 3 arguments and are placed on separate lines.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-                                                                      id: DiagnosticId,
-                                                                      title: Title,
-                                                                      messageFormat: MessageFormat,
-                                                                      category: AnalyzerCategory.Correctness,
-                                                                      defaultSeverity: DiagnosticSeverity.Hidden,
-                                                                      isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-                                                                      description: Description,
-                                                                      helpLinkUri: HelpLink);
+            id: DiagnosticId,
+            title: "Name the arguments.",
+            messageFormat: "Name the arguments.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "Name the arguments of calls to methods that have more than 3 arguments and are placed on separate lines.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

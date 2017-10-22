@@ -13,20 +13,16 @@
     internal class GU0003CtorParameterNamesShouldMatch : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0003";
-        private const string Title = "Name the parameters to match the members.";
-        private const string MessageFormat = "Name the parameters to match the members.";
-        private const string Description = "Name the constructor parameters to match the properties or fields.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-                                                                      id: DiagnosticId,
-                                                                      title: Title,
-                                                                      messageFormat: MessageFormat,
-                                                                      category: AnalyzerCategory.Correctness,
-                                                                      defaultSeverity: DiagnosticSeverity.Hidden,
-                                                                      isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-                                                                      description: Description,
-                                                                      helpLinkUri: HelpLink);
+            id: DiagnosticId,
+            title: "Name the parameters to match the members.",
+            messageFormat: "Name the parameters to match the members.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "Name the constructor parameters to match the assigned member.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

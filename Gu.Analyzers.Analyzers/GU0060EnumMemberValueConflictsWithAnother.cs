@@ -12,20 +12,16 @@ namespace Gu.Analyzers
     internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0060";
-        private const string Title = "Enum member value conflict.";
-        private const string MessageFormat = "Enum member value conflicts with another.";
-        private const string Description = "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Enum member value conflict.",
+            messageFormat: "Enum member value conflicts with another.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

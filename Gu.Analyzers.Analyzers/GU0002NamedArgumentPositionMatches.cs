@@ -11,20 +11,16 @@
     internal class GU0002NamedArgumentPositionMatches : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0002";
-        private const string Title = "The position of a named argument should match.";
-        private const string MessageFormat = "Use correct positions.";
-        private const string Description = "The position of a named argument should match.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "The position of a named argument should match.",
+            messageFormat: "Use correct positions.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "The position of a named argument should match.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

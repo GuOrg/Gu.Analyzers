@@ -10,20 +10,16 @@
     internal class GU0009UseNamedParametersForBooleans : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0009";
-        private const string Title = "Name the boolean parameter.";
-        private const string MessageFormat = "The boolean parameter is not named.";
-        private const string Description = "The unnamed boolean parameters aren't obvious about their purpose. Consider naming the boolean argument for clarity.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-                                                                      id: DiagnosticId,
-                                                                      title: Title,
-                                                                      messageFormat: MessageFormat,
-                                                                      category: AnalyzerCategory.Correctness,
-                                                                      defaultSeverity: DiagnosticSeverity.Warning,
-                                                                      isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-                                                                      description: Description,
-                                                                      helpLinkUri: HelpLink);
+            id: DiagnosticId,
+            title: "Name the boolean parameter.",
+            messageFormat: "The boolean parameter is not named.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "The unnamed boolean parameters aren't obvious about their purpose. Consider naming the boolean argument for clarity.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

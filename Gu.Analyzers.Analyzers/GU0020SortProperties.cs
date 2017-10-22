@@ -14,20 +14,16 @@
     internal class GU0020SortProperties : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0020";
-        private const string Title = "Sort properties.";
-        private const string MessageFormat = "Move property.";
-        private const string Description = "Sort properties by StyleCop rules then by mutability.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Sort properties.",
+            messageFormat: "Move property.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Sort properties by StyleCop rules then by mutability.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

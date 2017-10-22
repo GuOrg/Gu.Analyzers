@@ -12,20 +12,16 @@
     internal class GU0007PreferInjecting : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0007";
-        private const string Title = "Prefer injecting.";
-        private const string MessageFormat = "Prefer injecting.";
-        private const string Description = "Prefer injecting.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Prefer injecting.",
+            messageFormat: "Prefer injecting.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Prefer injecting.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         internal enum Injectable
         {

@@ -14,20 +14,16 @@
     internal class GU0004AssignAllReadOnlyMembers : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0004";
-        private const string Title = "Assign all readonly members.";
-        private const string MessageFormat = "The following readonly members are not assigned: {0}.";
-        private const string Description = "Assign all readonly members.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Assign all readonly members.",
+            messageFormat: "The following readonly members are not assigned: {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Assign all readonly members.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);

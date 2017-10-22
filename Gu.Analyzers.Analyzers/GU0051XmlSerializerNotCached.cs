@@ -10,20 +10,16 @@ namespace Gu.Analyzers
     internal class GU0051XmlSerializerNotCached : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0051";
-        private const string Title = "Cache the XmlSerializer.";
-        private const string MessageFormat = "The serializer is not cached.";
-        private const string Description = "This constructor loads assemblies in non-GC memory, which may cause memory leaks.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Cache the XmlSerializer.",
+            messageFormat: "The serializer is not cached.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "This constructor loads assemblies in non-GC memory, which may cause memory leaks.",
+            helpLinkUri: Analyzers.HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
