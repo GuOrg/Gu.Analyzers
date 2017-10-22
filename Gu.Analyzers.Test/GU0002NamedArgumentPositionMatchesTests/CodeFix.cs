@@ -9,6 +9,8 @@
         public async Task Constructor()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -35,13 +37,16 @@
                 c: c,
                 d: d);
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use correct positions.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -68,7 +73,8 @@
                 c: c,
                 d: d);
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -76,6 +82,8 @@
         public async Task ConstructorInArrayInitializer()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -105,13 +113,16 @@
                                 d: d)
                        };
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use correct positions.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -141,7 +152,8 @@
                                 d: d)
                        };
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -149,6 +161,8 @@
         public async Task ConstructorInFunc()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -177,13 +191,16 @@
                 c: c,
                 d: d);
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use correct positions.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -212,7 +229,8 @@
                 c: c,
                 d: d);
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -220,6 +238,8 @@
         public async Task ConstructorIgnoredIfNonWhitespaceTrivia()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -246,7 +266,8 @@
                 c: c,
                 d: d);
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use correct positions.");

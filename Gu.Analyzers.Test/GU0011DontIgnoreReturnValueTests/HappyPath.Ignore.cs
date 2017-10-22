@@ -13,13 +13,17 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
             public async Task StringBuilderAppendLine()
             {
                 var testCode = @"
-using System.Text;
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
+    using System.Text;
+
+    public class Foo
     {
-        var sb = new StringBuilder();
-        sb.AppendLine(""test"");
+        public void Bar()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine(""test"");
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -30,13 +34,17 @@ public class Foo
             public async Task StringBuilderAppend()
             {
                 var testCode = @"
-using System.Text;
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
+    using System.Text;
+
+    public class Foo
     {
-        var sb = new StringBuilder();
-        sb.Append(""test"");
+        public void Bar()
+        {
+            var sb = new StringBuilder();
+            sb.Append(""test"");
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -47,13 +55,17 @@ public class Foo
             public async Task StringBuilderAppendChained()
             {
                 var testCode = @"
-using System.Text;
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
+    using System.Text;
+
+    public class Foo
     {
-        var sb = new StringBuilder();
-        sb.Append(""1"").Append(""2"");
+        public void Bar()
+        {
+            var sb = new StringBuilder();
+            sb.Append(""1"").Append(""2"");
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -64,16 +76,19 @@ public class Foo
             public async Task WhenReturningThis()
             {
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Foo
     {
-        return this;
-    }
+        public Foo Bar()
+        {
+            return this;
+        }
 
-    public void Meh()
-    {
-        Bar();
+        public void Meh()
+        {
+            Bar();
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -84,51 +99,57 @@ public class Foo
             public async Task WhenExtensionMethodReturningThis()
             {
                 var barCode = @"
-internal static class Bar
+namespace RoslynSandbox
 {
-    internal static T Id<T>(this T value)
+    internal static class Bar
     {
-        return value;
+        internal static T Id<T>(this T value)
+        {
+            return value;
+        }
     }
 }";
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private Foo()
+    public class Foo
     {
-        var meh =1;
-        meh.Id();
+        private Foo()
+        {
+            var meh =1;
+            meh.Id();
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(barCode, testCode)
                           .ConfigureAwait(false);
             }
 
-////            [Explicit("Don't know if we want this.")]
-////            [TestCase("this.ints.Add(1);")]
-////            [TestCase("ints.Add(1);")]
-////            [TestCase("this.ints.Remove(1);")]
-////            public async Task HashSet(string operation)
-////            {
-////                var testCode = @"
-////namespace RoslynSandbox
-////{
-////    using System.Collections.Generic;
+            [Explicit("Don't know if we want this.")]
+            [TestCase("this.ints.Add(1);")]
+            [TestCase("ints.Add(1);")]
+            [TestCase("this.ints.Remove(1);")]
+            public async Task HashSet(string operation)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
 
-////    public sealed class Foo
-////    {
-////        private readonly HashSet<int> ints = new HashSet<int>();
+    public sealed class Foo
+    {
+        private readonly HashSet<int> ints = new HashSet<int>();
 
-////        public Foo()
-////        {
-////            this.ints.Add(1);
-////        }
-////    }
-////}";
-////                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
-////                await this.VerifyHappyPathAsync(testCode)
-////                          .ConfigureAwait(false);
-////            }
+        public Foo()
+        {
+            this.ints.Add(1);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
+                await this.VerifyHappyPathAsync(testCode)
+                          .ConfigureAwait(false);
+            }
 
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]

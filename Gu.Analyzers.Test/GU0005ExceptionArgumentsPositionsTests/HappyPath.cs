@@ -9,6 +9,8 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         public async Task ArgumentExceptionWithMessageAndNameof()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -17,7 +19,8 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         {
             throw new ArgumentException(""message"", nameof(o));
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -26,6 +29,8 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         public async Task ArgumentNullExceptionWithMessageAndNameof()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -34,7 +39,8 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         {
             throw new ArgumentNullException(nameof(o), ""message"");
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -43,6 +49,8 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         public async Task ArgumentOutOfRangeExceptionWithMessageAndNameof()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -51,9 +59,9 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         {
             throw new ArgumentOutOfRangeException(nameof(o), ""message"");
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
     }
 }

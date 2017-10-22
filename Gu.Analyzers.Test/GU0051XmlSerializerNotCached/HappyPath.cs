@@ -10,17 +10,20 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCached
         public async Task NoCreationsOfTheSerializer()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        public Foo(int a, int b, int c, int d)
         {
+            for(int i = 0; i < 100; ++i)
+            {
             
+            }
         }
     }
 }";
@@ -32,19 +35,22 @@ public class Foo
         public async Task CachedStaticReadonlyInitializedInlineXmlSerializer()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
 
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+
+        public Foo(int a, int b, int c, int d)
         {
+            for(int i = 0; i < 100; ++i)
+            {
             
+            }
         }
     }
 }";
@@ -56,24 +62,27 @@ public class Foo
         public async Task CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private static readonly XmlSerializer serializer;
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
 
-    static Foo()
+    public class Foo
     {
-        serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
-    }
+        private static readonly XmlSerializer serializer;
 
-    public Foo(int a, int b, int c, int d)
-    {
-        for(int i = 0; i < 100; ++i)
+        static Foo()
         {
+            serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+        }
+
+        public Foo(int a, int b, int c, int d)
+        {
+            for(int i = 0; i < 100; ++i)
+            {
             
+            }
         }
     }
 }";
@@ -85,19 +94,22 @@ public class Foo
         public async Task CachedStaticInitializedInlineXmlSerializer()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
 
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+
+        public Foo(int a, int b, int c, int d)
         {
+            for(int i = 0; i < 100; ++i)
+            {
             
+            }
         }
     }
 }";
@@ -110,17 +122,20 @@ public class Foo
         public async Task NonLeakyConstructor(string code)
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        public Foo(int a, int b, int c, int d)
         {
-            XmlSerializer serializer = default(XmlSerializer);
+            for(int i = 0; i < 100; ++i)
+            {
+                XmlSerializer serializer = default(XmlSerializer);
+            }
         }
     }
 }";

@@ -10,6 +10,8 @@
         public async Task ConstructorSettingProperties()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -27,7 +29,8 @@
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -36,6 +39,8 @@
         public async Task ConstructorSettingPropertiesStruct()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public struct Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -53,7 +58,8 @@
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -62,6 +68,8 @@
         public async Task ChainedConstructorSettingProperties()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c)
@@ -84,7 +92,8 @@
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -93,14 +102,19 @@
         public async Task BaseConstructorCall()
         {
             var fooCode = @"
+namespace RoslynSandbox
+{
     public class Bar : Foo
     {
         public Bar(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
-    }";
+    }
+}";
             var barCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -118,7 +132,8 @@
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(fooCode, barCode)
                       .ConfigureAwait(false);
         }
@@ -127,6 +142,8 @@
         public async Task ConstructorSettingField()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly int a;
@@ -141,7 +158,8 @@
             this.c = c;
             this.d = d;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -150,6 +168,8 @@
         public async Task ConstructorSettingFieldPrefixedByUnderscore()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly int _a;
@@ -164,7 +184,8 @@
             _c = c;
             _d = d;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -173,6 +194,8 @@
         public async Task IgnoresWhenSettingTwoProperties()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a)
@@ -184,7 +207,8 @@
         public int A { get; }
 
         public int B { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -193,14 +217,19 @@
         public async Task IgnoresWhenBaseIsParams()
         {
             var fooCode = @"
+namespace RoslynSandbox
+{
     public class Bar : Foo
     {
         public Bar(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
-    }";
+    }
+}";
             var barCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(params int[] values)
@@ -209,7 +238,8 @@
         }
 
         public int[] Values { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(fooCode, barCode)
                       .ConfigureAwait(false);
         }
@@ -218,14 +248,19 @@
         public async Task IgnoresWhenBaseIsParams2()
         {
             var fooCode = @"
+namespace RoslynSandbox
+{
     public class Bar : Foo
     {
         public Bar(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
-    }";
+    }
+}";
             var barCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, params int[] values)
@@ -237,7 +272,8 @@
         public int A { get; }
 
         public int[] Values { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(fooCode, barCode)
                       .ConfigureAwait(false);
         }
@@ -246,6 +282,8 @@
         public async Task IgnoresIdCaps()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int id)
@@ -254,7 +292,8 @@
         }
 
         public int ID { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
         }
 
@@ -262,6 +301,8 @@
         public async Task IgnoredWhenAssigningWeakReferenceTarget()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Text;
 
@@ -273,7 +314,8 @@
         {
             this.wr.Target = builder;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }

@@ -9,6 +9,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task WithCustomEvent()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -22,7 +24,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         }
 
         public int Value { get; set; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -31,6 +34,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task GetOnlies()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -48,7 +53,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -56,19 +62,25 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public async Task ExplicitImplementationGetOnly()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         object Value { get; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         public int Value { get; } = 5;
 
         object IValue.Value { get; } = 5;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
@@ -76,19 +88,25 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public async Task ExplicitImplementationGetOnlyIndexer()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         object this[int index] { get; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         public int this[int index] => index;
 
         object IValue.this[int index] => index;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
@@ -96,13 +114,18 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public async Task ExplicitGetSetIndexerAndGetOnlyIndexer()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         int this[int index] { get; set; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         public int this[int index] => index;
@@ -112,7 +135,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             get { return this[index]; }
             set { return; }
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
@@ -120,13 +144,18 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public async Task ExplicitGetSetIndexerAndGetSetIndexer()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         int this[int index] { get; set; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         private int meh;
@@ -142,7 +171,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             get { return this.meh; }
             set { this.meh = index; }
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
@@ -150,19 +180,25 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public async Task ExplicitImplementationCalculatedBeforeGetSet()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         object Value { get; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         object IValue.Value => this.Value;
 
         public int Value { get; set; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(interfaceCode, testCode)
                       .ConfigureAwait(false);
         }
@@ -171,6 +207,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task Mutables()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -188,7 +226,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public int C { get; set; }
 
         public int D { get; set; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -197,6 +236,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task NotifyingMutables()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
@@ -277,7 +318,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -286,6 +328,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task MutablesBySetter()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -303,7 +347,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public int C { get; set; }
 
         public int D { get; set; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -312,6 +357,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task ExpressionBodies()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly int a;
@@ -328,7 +375,8 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public int C => this.a;
 
         public int D => this.a;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -337,34 +385,37 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public async Task Calculated()
         {
             var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(StringComparison stringComparison)
+    using System;
+
+    public class Foo
     {
-        this.StringComparison = stringComparison;
-    }
-
-    public StringComparison StringComparison { get; }
-
-    public bool IsCurrentCulture => this.StringComparison == StringComparison.CurrentCulture;
-
-    public bool IsOrdinalIgnoreCase => this.StringComparison == StringComparison.OrdinalIgnoreCase;
-
-    public bool IsOrdinal
-    {
-        get
+        public Foo(StringComparison stringComparison)
         {
-            return this.StringComparison == StringComparison.Ordinal;
+            this.StringComparison = stringComparison;
         }
-    }
 
-    public bool IsInvariantCulture
-    {
-        get
+        public StringComparison StringComparison { get; }
+
+        public bool IsCurrentCulture => this.StringComparison == StringComparison.CurrentCulture;
+
+        public bool IsOrdinalIgnoreCase => this.StringComparison == StringComparison.OrdinalIgnoreCase;
+
+        public bool IsOrdinal
         {
-            return this.StringComparison == StringComparison.InvariantCulture;
+            get
+            {
+                return this.StringComparison == StringComparison.Ordinal;
+            }
+        }
+
+        public bool IsInvariantCulture
+        {
+            get
+            {
+                return this.StringComparison == StringComparison.InvariantCulture;
+            }
         }
     }
 }";
@@ -376,11 +427,14 @@ public class Foo
         public async Task InternalBeforePublicIndexer()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    internal int Value { get; set; }
+    public class Foo
+    {
+        internal int Value { get; set; }
 
-    public int this[int index] => index;
+        public int this[int index] => index;
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -390,6 +444,8 @@ public class Foo
         public async Task StaticBeforeInstance()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int b)
@@ -400,7 +456,8 @@ public class Foo
         public static int A { get; } = 1;
 
         public int B { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -409,12 +466,15 @@ public class Foo
         public async Task StaticGetOnlyBeforeCalculated()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static int A { get; } = 1;
 
         public int B => A;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -423,6 +483,8 @@ public class Foo
         public async Task PublicBeforeProtectedStatic()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a)
@@ -433,7 +495,8 @@ public class Foo
         public int A { get; }
 
         protected static int B { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -442,6 +505,8 @@ public class Foo
         public async Task Realistic()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b)
@@ -473,7 +538,8 @@ public class Foo
         public int H { get; set; }
 
         public int I { get; set; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }

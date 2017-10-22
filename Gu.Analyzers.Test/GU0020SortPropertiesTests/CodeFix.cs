@@ -9,35 +9,44 @@
         [Test]
         public async Task ExplicitImplementation()
         {
-            var interfaceCode = @"    
+            var interfaceCode = @"
+namespace RoslynSandbox
+{
     interface IValue
     {
         object Value { get; }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         private int Value { get; } = 5;
 
         object IValue.Value { get; } = 5;
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 4, 9)
+                               .WithLocation("Foo.cs", 6, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 6, 9)
+                                .WithLocation("Foo.cs", 8, 9)
                                 .WithMessage("Move property.");
 
             await this.VerifyCSharpDiagnosticAsync(new[] { interfaceCode, testCode }, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo : IValue
     {
         object IValue.Value { get; } = 5;
 
         private int Value { get; } = 5;
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(new[] { interfaceCode, testCode }, new[] { interfaceCode, fixedCode }, codeFixIndex: 0).ConfigureAwait(false);
         }
 
@@ -45,6 +54,8 @@
         public async Task WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -62,17 +73,20 @@
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 12, 9)
+                               .WithLocation("Foo.cs", 14, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 14, 9)
+                                .WithLocation("Foo.cs", 16, 9)
                                 .WithMessage("Move property.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -90,7 +104,8 @@
         public int D { get; }
 
         public int A { get; set; }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode, codeFixIndex: 0).ConfigureAwait(false);
         }
 
@@ -98,7 +113,7 @@
         public async Task WhenMutableBeforeGetOnlyFirstWithNamespaces()
         {
             var testCode = @"
-namespace Test
+namespace RoslynSandbox
 {
     using System;
 
@@ -132,7 +147,7 @@ namespace Test
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
-namespace Test
+namespace RoslynSandbox
 {
     using System;
 
@@ -162,6 +177,8 @@ namespace Test
         public async Task WhenMutableBeforeGetOnlyLast()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -179,16 +196,19 @@ namespace Test
         public int C { get; set; }
 
         public int D { get; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 16, 9)
+                               .WithLocation("Foo.cs", 18, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 18, 9)
+                                .WithLocation("Foo.cs", 20, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -206,7 +226,8 @@ namespace Test
         public int D { get; }
 
         public int C { get; set; }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -214,90 +235,96 @@ namespace Test
         public async Task WhenPrivateSetAfterPublicSet()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private int c;
-    private int d;
-
-    public int A { get; }
-
-    public int B
+    public class Foo
     {
-        get
-        {
-            return this.A;
-        }
-    }
+        private int c;
+        private int d;
 
-    public int C
-    {
-        get
-        {
-            return this.c;
-        }
-        set
-        {
-            this.c = value;
-        }
-    }
+        public int A { get; }
 
-    public int D
-    {
-        get
+        public int B
         {
-            return this.d;
+            get
+            {
+                return this.A;
+            }
         }
-        private set
+
+        public int C
         {
-            this.d = value;
+            get
+            {
+                return this.c;
+            }
+            set
+            {
+                this.c = value;
+            }
+        }
+
+        public int D
+        {
+            get
+            {
+                return this.d;
+            }
+            private set
+            {
+                this.d = value;
+            }
         }
     }
 }";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 17, 5)
+                               .WithLocation("Foo.cs", 19, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 29, 5)
+                                .WithLocation("Foo.cs", 31, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private int c;
-    private int d;
-
-    public int A { get; }
-
-    public int B
+    public class Foo
     {
-        get
-        {
-            return this.A;
-        }
-    }
+        private int c;
+        private int d;
 
-    public int D
-    {
-        get
-        {
-            return this.d;
-        }
-        private set
-        {
-            this.d = value;
-        }
-    }
+        public int A { get; }
 
-    public int C
-    {
-        get
+        public int B
         {
-            return this.c;
+            get
+            {
+                return this.A;
+            }
         }
-        set
+
+        public int D
         {
-            this.c = value;
+            get
+            {
+                return this.d;
+            }
+            private set
+            {
+                this.d = value;
+            }
+        }
+
+        public int C
+        {
+            get
+            {
+                return this.c;
+            }
+            set
+            {
+                this.c = value;
+            }
         }
     }
 }";
@@ -308,6 +335,8 @@ public class Foo
         public async Task WhenMutableBeforeGetOnlyFirstWithInitializers()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -325,17 +354,20 @@ public class Foo
         public int C { get; } = 3;
 
         public int D { get; } = 4;
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 12, 9)
+                               .WithLocation("Foo.cs", 14, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 14, 9)
+                                .WithLocation("Foo.cs", 16, 9)
                                 .WithMessage("Move property.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -353,7 +385,8 @@ public class Foo
         public int D { get; } = 4;
 
         public int A { get; set; } = 1;
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -361,6 +394,8 @@ public class Foo
         public async Task WhenMutableBeforeGetOnlyWithComments()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -384,16 +419,19 @@ public class Foo
         /// D
         /// </summary>
         public int D { get; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 19, 9)
+                               .WithLocation("Foo.cs", 21, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 24, 9)
+                                .WithLocation("Foo.cs", 26, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -417,7 +455,8 @@ public class Foo
         /// C
         /// </summary>
         public int C { get; set; }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -425,6 +464,8 @@ public class Foo
         public async Task ExpressionBodyBeforeGetOnly()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int b)
@@ -435,16 +476,19 @@ public class Foo
         public int A => B;
 
         public int B { get; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 9, 9)
+                               .WithLocation("Foo.cs", 11, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 11, 9)
+                                .WithLocation("Foo.cs", 13, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int b)
@@ -455,7 +499,8 @@ public class Foo
         public int B { get; }
 
         public int A => B;
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -463,6 +508,8 @@ public class Foo
         public async Task CalculatedBeforeGetOnly()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int b)
@@ -479,16 +526,19 @@ public class Foo
         }
 
         public int B { get; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 9, 9)
+                               .WithLocation("Foo.cs", 11, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 17, 9)
+                                .WithLocation("Foo.cs", 19, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int b)
@@ -505,7 +555,8 @@ public class Foo
                 return B;
             }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -513,6 +564,8 @@ public class Foo
         public async Task IndexerBeforeMutable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -545,16 +598,19 @@ public class Foo
         {
             return this.GetEnumerator();
         }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 10, 9)
+                               .WithLocation("Foo.cs", 12, 9)
                                .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 23, 9)
+                                .WithLocation("Foo.cs", 25, 9)
                                 .WithMessage("Move property.");
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -587,7 +643,8 @@ public class Foo
         {
             return this.GetEnumerator();
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -595,6 +652,8 @@ public class Foo
         public async Task PublicSetBeforePrivateSetFirst()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b)
@@ -606,17 +665,20 @@ public class Foo
         public int A { get; set; }
 
         public int B { get; private set; }
-    }";
+    }
+}";
             var expected1 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 10, 9)
+                                .WithLocation("Foo.cs", 12, 9)
                                 .WithMessage("Move property.");
             var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 12, 9)
+                                .WithLocation("Foo.cs", 14, 9)
                                 .WithMessage("Move property.");
 
             await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b)
@@ -628,7 +690,8 @@ public class Foo
         public int B { get; private set; }
 
         public int A { get; set; }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 

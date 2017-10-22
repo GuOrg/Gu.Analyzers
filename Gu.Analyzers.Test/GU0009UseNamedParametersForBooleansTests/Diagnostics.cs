@@ -10,20 +10,23 @@
         public async Task UnnamedBooleanParameters()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, bool useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
 
-    public void Another()
+    public class Foo
     {
-        Floof(42, ↓false);
+        public void Floof(int howMuch, bool useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, ↓false);
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -37,21 +40,24 @@ public class Foo
         public async Task HandlesAnAlias()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using Alias = System.Boolean;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, Alias useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+    using Alias = System.Boolean;
 
-    public void Another()
+    public class Foo
     {
-        Floof(42, ↓false);
+        public void Floof(int howMuch, Alias useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, ↓false);
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -65,20 +71,23 @@ public class Foo
         public async Task HandlesAFullyQualifiedName()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, System.Boolean useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
 
-    public void Another()
+    public class Foo
     {
-        Floof(42, ↓false);
+        public void Floof(int howMuch, System.Boolean useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, ↓false);
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()

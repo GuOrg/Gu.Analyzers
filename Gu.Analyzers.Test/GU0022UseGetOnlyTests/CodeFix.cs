@@ -9,23 +9,26 @@
         public async Task InitializedInCtor()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; ↓private set; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
     }
-
-    public int A { get; ↓private set; }
-
-    public int B { get; }
-
-    public int C { get; }
-
-    public int D { get; }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -34,23 +37,26 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
     }
-
-    public int A { get; }
-
-    public int B { get; }
-
-    public int C { get; }
-
-    public int D { get; }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
@@ -59,23 +65,26 @@ public class Foo
         public async Task InitializedInCtorAndPropertyInitializer()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; ↓private set; } = 2;
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
     }
-
-    public int A { get; ↓private set; } = 2;
-
-    public int B { get; }
-
-    public int C { get; }
-
-    public int D { get; }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -84,23 +93,26 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; } = 2;
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
     }
-
-    public int A { get; } = 2;
-
-    public int B { get; }
-
-    public int C { get; }
-
-    public int D { get; }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }

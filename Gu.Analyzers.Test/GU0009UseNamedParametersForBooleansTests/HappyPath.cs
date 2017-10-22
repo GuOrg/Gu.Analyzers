@@ -10,19 +10,22 @@
         public async Task UsesNamedParameter()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, bool useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
 
-    public void Another()
+    public class Foo
     {
-        Floof(42, useFluffyBuns: false);
+        public void Floof(int howMuch, bool useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, useFluffyBuns: false);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -33,19 +36,22 @@ public class Foo
         public async Task UsingADefaultBooleanParameter()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, bool useFluffyBuns = true)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
 
-    public void Another()
+    public class Foo
     {
-        Floof(42);
+        public void Floof(int howMuch, bool useFluffyBuns = true)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -56,15 +62,18 @@ public class Foo
         public async Task NondeducedGenericBooleanParameter()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Another()
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
     {
-        var a = new List<bool>();
-        a.Add(true);
+        public void Another()
+        {
+            var a = new List<bool>();
+            a.Add(true);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -75,14 +84,17 @@ public class Foo
         public async Task DeducedGenericBooleanParameter()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Another()
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
     {
-        var a = Tuple.Create(true, false);
+        public void Another()
+        {
+            var a = Tuple.Create(true, false);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -93,19 +105,22 @@ public class Foo
         public async Task FunctionAcceptingABooleanVariable()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(int howMuch, bool useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
 
-    public void Another(bool useFluffyBuns)
+    public class Foo
     {
-        Floof(42, useFluffyBuns);
+        public void Floof(int howMuch, bool useFluffyBuns)
+        {
+        
+        }
+
+        public void Another(bool useFluffyBuns)
+        {
+            Floof(42, useFluffyBuns);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -116,19 +131,22 @@ public class Foo
         public async Task BooleanParamsArray()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Floof(params bool[] useFluffyBuns)
-    {
-        
-    }
+    using System;
+    using System.Collections.Generic;
 
-    public void Another()
+    public class Foo
     {
-        Floof(true, true, true, false, true, false);
+        public void Floof(params bool[] useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(true, true, true, false, true, false);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -139,31 +157,34 @@ public class Foo
         public async Task DontWarnOnDisposePattern()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public abstract class FooBase : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed = false;
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public abstract class FooBase : IDisposable
     {
-        this.Dispose(true);
-    }
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed = false;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.stream.Dispose();
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
         }
     }
 }";
@@ -175,14 +196,17 @@ public abstract class FooBase : IDisposable
         public async Task DontWarnOnAssertAreEqual()
         {
             var testCode = @"
-using NUnit.Framework;
-
-public class FooTests
+namespace RoslynSandbox
 {
-    [Test]
-    public void Bar()
+    using NUnit.Framework;
+
+    public class FooTests
     {
-        Assert.AreEqual(true, true);
+        [Test]
+        public void Bar()
+        {
+            Assert.AreEqual(true, true);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -193,18 +217,21 @@ public class FooTests
         public async Task DontWarnOnConfigureAwait()
         {
             var testCode = @"
-using System.Threading.Tasks;
-
-public class FooTests
+namespace RoslynSandbox
 {
-    public void Bar()
+    using System.Threading.Tasks;
+
+    public class FooTests
     {
-        Task<int> a = null;
-        Task b = null;
-        a.ConfigureAwait(false);
-        a.ConfigureAwait(true);
-        b.ConfigureAwait(false);
-        b.ConfigureAwait(true);
+        public void Bar()
+        {
+            Task<int> a = null;
+            Task b = null;
+            a.ConfigureAwait(false);
+            a.ConfigureAwait(true);
+            b.ConfigureAwait(false);
+            b.ConfigureAwait(true);
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -216,7 +243,7 @@ public class FooTests
         public async Task DontWarnOn(string method)
         {
             var testCode = @"
-namespace Gu.Wpf.NumericInput.Demo
+namespace RoslynSandbox
 {
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
@@ -240,7 +267,7 @@ namespace Gu.Wpf.NumericInput.Demo
         public async Task DontWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
-namespace Gu.Wpf.NumericInput.Demo
+namespace RoslynSandbox
 {
     using System.Windows;
     using System.Windows.Controls;
@@ -265,7 +292,7 @@ namespace Gu.Wpf.NumericInput.Demo
     }
 }";
             var testCode = @"
-namespace Gu.Wpf.NumericInput.Demo
+namespace RoslynSandbox
 {
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;

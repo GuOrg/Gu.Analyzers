@@ -10,31 +10,34 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
         public async Task IgnoredEvent()
         {
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    [Serializable]
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        [field:NonSerialized]
+        public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    [field:NonSerialized]
-    public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -44,13 +47,16 @@ public class Foo
         public async Task IgnoredEventSimple()
         {
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    [field:NonSerialized]
-    public event EventHandler SomeEvent;
+    using System;
+
+    [Serializable]
+    public class Foo
+    {
+        [field:NonSerialized]
+        public event EventHandler SomeEvent;
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -60,18 +66,21 @@ public class Foo
         public async Task IgnoredEventHandler()
         {
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    [NonSerialized]
-    private EventHandler someEvent;
+    using System;
 
-    public event EventHandler SomeEvent
+    [Serializable]
+    public class Foo
     {
-        add { this.someEvent += value; }
-        remove { this.someEvent -= value; }
+        [NonSerialized]
+        private EventHandler someEvent;
+
+        public event EventHandler SomeEvent
+        {
+            add { this.someEvent += value; }
+            remove { this.someEvent -= value; }
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -82,29 +91,32 @@ public class Foo
         public async Task NotSerializable()
         {
             var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

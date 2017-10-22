@@ -10,17 +10,20 @@
         public async Task TrivialConstructionUnsaved()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        public Foo(int a, int b, int c, int d)
         {
-            ↓new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+            for(int i = 0; i < 100; ++i)
+            {
+                ↓new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+            }
         }
     }
 }";
@@ -35,17 +38,20 @@ public class Foo
         public async Task LocalVariable(string code)
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        public Foo(int a, int b, int c, int d)
         {
-            ↓XmlSerializer serializer = default(XmlSerializer);
+            for(int i = 0; i < 100; ++i)
+            {
+                ↓XmlSerializer serializer = default(XmlSerializer);
+            }
         }
     }
 }";
@@ -61,19 +67,22 @@ public class Foo
         public async Task PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private static XmlSerializer serializer;
-    
-    public Foo(int a, int b, int c, int d)
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
     {
-        for(int i = 0; i < 100; ++i)
+        private static XmlSerializer serializer;
+    
+        public Foo(int a, int b, int c, int d)
         {
-            ↓serializer = default(XmlSerializer);
+            for(int i = 0; i < 100; ++i)
+            {
+                ↓serializer = default(XmlSerializer);
+            }
         }
     }
 }";

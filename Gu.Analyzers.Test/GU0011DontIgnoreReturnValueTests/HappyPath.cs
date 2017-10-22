@@ -9,21 +9,24 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
         public async Task ChainedCtor()
         {
             var testCode = @"
-using System.Text;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo()
-        : this(new StringBuilder())
-    {
-    }
+    using System.Text;
 
-    private Foo(StringBuilder builder)
+    public class Foo
     {
-        this.Builder = builder;
-    }
+        public Foo()
+            : this(new StringBuilder())
+        {
+        }
 
-    public StringBuilder Builder { get; }
+        private Foo(StringBuilder builder)
+        {
+            this.Builder = builder;
+        }
+
+        public StringBuilder Builder { get; }
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -33,17 +36,20 @@ public class Foo
         public async Task RealisticClass()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int Value { get; set; }
+    public class Foo
+    {
+        public int Value { get; set; }
     
-    private void Bar()
-    {
-        Meh();
-    }
+        private void Bar()
+        {
+            Meh();
+        }
 
-    private void Meh()
-    {
+        private void Meh()
+        {
+        }
     }
 }";
 
@@ -55,6 +61,8 @@ public class Foo
         public async Task Using()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -75,7 +83,8 @@ public class Foo
 
             return await task.ConfigureAwait(false);
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -84,6 +93,8 @@ public class Foo
         public async Task RealisticExtensionMethodClass()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -194,7 +205,8 @@ public class Foo
             result = default(TItem);
             return false;
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -204,15 +216,18 @@ public class Foo
         public async Task VoidMethod()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private void Bar()
+    public class Foo
     {
-        Meh();
-    }
+        private void Bar()
+        {
+            Meh();
+        }
 
-    private void Meh()
-    {
+        private void Meh()
+        {
+        }
     }
 }";
 
@@ -224,16 +239,19 @@ public class Foo
         public async Task VoidMethodWithReturn()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private void Bar()
+    public class Foo
     {
-        Meh();
-    }
+        private void Bar()
+        {
+            Meh();
+        }
 
-    private void Meh()
-    {
-        return;
+        private void Meh()
+        {
+            return;
+        }
     }
 }";
 
@@ -245,15 +263,18 @@ public class Foo
         public async Task StaticVoidMethod()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private void Bar()
+    public class Foo
     {
-        Meh();
-    }
+        private void Bar()
+        {
+            Meh();
+        }
 
-    private static void Meh()
-    {
+        private static void Meh()
+        {
+        }
     }
 }";
 
@@ -265,16 +286,19 @@ public class Foo
         public async Task StaticVoidMethodWithReturn()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private void Bar()
+    public class Foo
     {
-        Meh();
-    }
+        private void Bar()
+        {
+            Meh();
+        }
 
-    private static void Meh()
-    {
-        return;
+        private static void Meh()
+        {
+            return;
+        }
     }
 }";
 
@@ -286,20 +310,23 @@ public class Foo
         public async Task IfTry()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private void Bar()
+    public class Foo
     {
-        int value;
-        if(Try(out value))
+        private void Bar()
         {
+            int value;
+            if(Try(out value))
+            {
+            }
         }
-    }
 
-    private bool Try(out int value)
-    {
-        value = 1;
-        return true;
+        private bool Try(out int value)
+        {
+            value = 1;
+            return true;
+        }
     }
 }";
 
@@ -311,12 +338,16 @@ public class Foo
         public async Task WhenThrowing()
         {
             var testCode = @"
-using System;
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    using System;
+
+    public class Foo
     {
-        throw new Exception();
+        public Foo Bar()
+        {
+            throw new Exception();
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -327,14 +358,17 @@ public class Foo
         public async Task WhenInvocationInExpressionBody()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Foo
     {
-        return this;
-    }
+        public Foo Bar()
+        {
+            return this;
+        }
 
-    public void Meh() => Bar();
+        public void Meh() => Bar();
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -344,9 +378,12 @@ public class Foo
         public async Task WhenNewInExpressionBody()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh() => new Foo();
+    public class Foo
+    {
+        public void Meh() => new Foo();
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

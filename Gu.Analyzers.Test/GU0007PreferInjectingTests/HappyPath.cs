@@ -6,12 +6,15 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     internal partial class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
     {
         private static readonly string BarCode = @"
+namespace RoslynSandbox
+{
     public class Bar
     {
         public void Baz()
         {
         }
-    }";
+    }
+}";
 
         private static readonly string LocatorCode = @"
 namespace RoslynSandbox
@@ -34,6 +37,8 @@ namespace RoslynSandbox
         public async Task WhenInjecting()
         {
             var fooCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly Bar bar;
@@ -42,7 +47,8 @@ namespace RoslynSandbox
         {
             this.bar = bar;
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(fooCode, BarCode)
                       .ConfigureAwait(false);

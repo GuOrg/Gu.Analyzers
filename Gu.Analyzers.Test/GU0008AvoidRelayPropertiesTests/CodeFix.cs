@@ -10,27 +10,33 @@
         public async Task WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Bar bar;
-
-    public Foo(Bar bar)
+    public class Foo
     {
-        this.bar = bar;
-    }
+        private readonly Bar bar;
 
-    ↓public int Value
-    { 
-        get
+        public Foo(Bar bar)
         {
-            return this.bar.Value;
+            this.bar = bar;
+        }
+
+        ↓public int Value
+        { 
+            get
+            {
+                return this.bar.Value;
+            }
         }
     }
 }";
             var barCode = @"
-public class Bar
+namespace RoslynSandbox
 {
-    public int Value { get; }
+    public class Bar
+    {
+        public int Value { get; }
+    }
 }";
             fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
             var expected = this.CSharpDiagnostic()
@@ -44,21 +50,27 @@ public class Bar
         public async Task WhenReturningPropertyOfFieldExpressionBody(string body)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Bar bar;
-
-    public Foo(Bar bar)
+    public class Foo
     {
-        this.bar = bar;
-    }
+        private readonly Bar bar;
 
-    ↓public int Value => this.bar.Value;
+        public Foo(Bar bar)
+        {
+            this.bar = bar;
+        }
+
+        ↓public int Value => this.bar.Value;
+    }
 }";
             var barCode = @"
-public class Bar
+namespace RoslynSandbox
 {
-    public int Value { get; }
+    public class Bar
+    {
+        public int Value { get; }
+    }
 }";
             fooCode = fooCode.AssertReplace("this.bar.Value;", body);
             var expected = this.CSharpDiagnostic()
