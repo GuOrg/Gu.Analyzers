@@ -12,20 +12,16 @@
     internal class GU0008AvoidRelayProperties : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0008";
-        private const string Title = "Avoid relay properties.";
-        private const string MessageFormat = "Avoid relay properties.";
-        private const string Description = "Avoid relay properties.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Avoid relay properties.",
+            messageFormat: "Avoid relay properties.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Avoid relay properties.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

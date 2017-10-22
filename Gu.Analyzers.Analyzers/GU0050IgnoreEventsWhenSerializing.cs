@@ -10,20 +10,16 @@
     internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0050";
-        private const string Title = "Ignore events when serializing.";
-        private const string MessageFormat = "Ignore events when serializing.";
-        private const string Description = "Ignore events when serializing.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Ignore events when serializing.",
+            messageFormat: "Ignore events when serializing.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Ignore events when serializing.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

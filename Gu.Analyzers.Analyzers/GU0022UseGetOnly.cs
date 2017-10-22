@@ -10,20 +10,16 @@
     internal class GU0022UseGetOnly : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0022";
-        private const string Title = "Use get-only.";
-        private const string MessageFormat = "Use get-only.";
-        private const string Description = "Use get-only.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Use get-only.",
+            messageFormat: "Use get-only.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Use get-only.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

@@ -10,20 +10,16 @@
     internal class GU0021CalculatedPropertyAllocates : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0021";
-        private const string Title = "Calculated property allocates reference type.";
-        private const string MessageFormat = "Calculated property allocates reference type.";
-        private const string Description = "Calculated property allocates reference type.";
-        private static readonly string HelpLink = Analyzers.HelpLink.ForId(DiagnosticId);
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Calculated property allocates reference type.",
+            messageFormat: "Calculated property allocates reference type.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
-            helpLinkUri: HelpLink);
+            description: "Calculated property allocates reference type.",
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
