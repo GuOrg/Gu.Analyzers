@@ -10,27 +10,33 @@
         public async Task WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int A { get; set; }
+    public class Foo
+    {
+        public int A { get; set; }
 
-    public int B { get; }
+        public int B { get; }
 
-    public int C { get; }
+        public int C { get; }
 
-    public int D { get; }
+        public int D { get; }
+    }
 }";
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int B { get; }
+    public class Foo
+    {
+        public int B { get; }
 
-    public int C { get; }
+        public int C { get; }
 
-    public int D { get; }
+        public int D { get; }
 
-    public int A { get; set; }
+        public int A { get; set; }
+    }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
                       .ConfigureAwait(false);
@@ -40,27 +46,33 @@ public class Foo
         public async Task WhenAMess1()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int A { get; set; }
+    public class Foo
+    {
+        public int A { get; set; }
 
-    public int B { get; private set; }
+        public int B { get; private set; }
 
-    public int C { get; }
+        public int C { get; }
 
-    public int D => C;
+        public int D => C;
+    }
 }";
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int C { get; }
+    public class Foo
+    {
+        public int C { get; }
 
-    public int D => C;
+        public int D => C;
 
-    public int B { get; private set; }
+        public int B { get; private set; }
 
-    public int A { get; set; }
+        public int A { get; set; }
+    }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
                       .ConfigureAwait(false);
@@ -70,51 +82,57 @@ public class Foo
         public async Task WhenAMess1WithDocs()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    /// <summary>
-    /// Docs for A
-    /// </summary>
-    public int A { get; set; }
+    public class Foo
+    {
+        /// <summary>
+        /// Docs for A
+        /// </summary>
+        public int A { get; set; }
 
-    /// <summary>
-    /// Docs for B
-    /// </summary>
-    public int B { get; private set; }
+        /// <summary>
+        /// Docs for B
+        /// </summary>
+        public int B { get; private set; }
 
-    /// <summary>
-    /// Docs for C
-    /// </summary>
-    public int C { get; }
+        /// <summary>
+        /// Docs for C
+        /// </summary>
+        public int C { get; }
 
-    /// <summary>
-    /// Docs for D
-    /// </summary>
-    public int D => C;
+        /// <summary>
+        /// Docs for D
+        /// </summary>
+        public int D => C;
+    }
 }";
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    /// <summary>
-    /// Docs for C
-    /// </summary>
-    public int C { get; }
+    public class Foo
+    {
+        /// <summary>
+        /// Docs for C
+        /// </summary>
+        public int C { get; }
 
-    /// <summary>
-    /// Docs for D
-    /// </summary>
-    public int D => C;
+        /// <summary>
+        /// Docs for D
+        /// </summary>
+        public int D => C;
 
-    /// <summary>
-    /// Docs for B
-    /// </summary>
-    public int B { get; private set; }
+        /// <summary>
+        /// Docs for B
+        /// </summary>
+        public int B { get; private set; }
 
-    /// <summary>
-    /// Docs for A
-    /// </summary>
-    public int A { get; set; }
+        /// <summary>
+        /// Docs for A
+        /// </summary>
+        public int A { get; set; }
+    }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
                       .ConfigureAwait(false);
@@ -124,27 +142,33 @@ public class Foo
         public async Task PreservesDocumentOrder()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int A { get; set; }
+    public class Foo
+    {
+        public int A { get; set; }
 
-    public int B { get; private set; }
+        public int B { get; private set; }
 
-    public int C { get; set; }
+        public int C { get; set; }
 
-    public int D { get; private set; }
+        public int D { get; private set; }
+    }
 }";
 
             var fixedCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int B { get; private set; }
+    public class Foo
+    {
+        public int B { get; private set; }
 
-    public int D { get; private set; }
+        public int D { get; private set; }
 
-    public int A { get; set; }
+        public int A { get; set; }
 
-    public int C { get; set; }
+        public int C { get; set; }
+    }
 }";
             await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
                       .ConfigureAwait(false);

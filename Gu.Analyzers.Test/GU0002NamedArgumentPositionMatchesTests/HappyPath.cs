@@ -10,6 +10,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task ConstructorCallWithTwoArguments(string call)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b)
@@ -26,7 +28,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         {
             return new Foo(a, b);
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace("new Foo(a, b)", call);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -37,6 +40,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public struct Foo
     {
         public Foo(int a, int b)
@@ -53,7 +58,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         {
             return new Foo(a, b);
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace("new Foo(a, b)", call);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -63,6 +69,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task ConstructorCallWithNamedArgumentsOnSameRow()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -85,7 +93,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         {
             return new Foo(a: a, b: b, c: c, d: d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -95,6 +104,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task ConstructorCallWithArgumentsOnSameRow()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -117,7 +128,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         {
             return new Foo(a, b, c, d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -127,6 +139,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task ConstructorCallWithNamedArgumentsOnSeparateRows()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -153,7 +167,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
                 c: c, 
                 d: d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -163,6 +178,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task IgnoresStringFormat()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Globalization;
 
     public static class Foo
@@ -177,7 +194,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
                 c,
                 d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -187,6 +205,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task IgnoresWhendifferentTypes()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, double b, string c, int d)
@@ -213,7 +233,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
                 c, 
                 d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -223,6 +244,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public async Task IgnoresWhenInExpressionTree()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Linq.Expressions;
 
@@ -252,7 +275,8 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
                 c,
                 d);
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

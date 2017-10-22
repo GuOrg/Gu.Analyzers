@@ -9,6 +9,8 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         public async Task ConstructorSettingProperties()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -26,7 +28,8 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         public int C { get; }
 
         public int D { get; }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -35,15 +38,18 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         public async Task ConstructorSettingFields()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly int value1;
-    private readonly int value2;
-
-    public Foo(int value1, int value2)
+    public class Foo
     {
-        this.value1 = value1;
-        this.value2 = value2;
+        private readonly int value1;
+        private readonly int value2;
+
+        public Foo(int value1, int value2)
+        {
+            this.value1 = value1;
+            this.value2 = value2;
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -54,6 +60,8 @@ public class Foo
         public async Task Increment()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -62,7 +70,8 @@ public class Foo
         {
             A = A + 1;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -71,6 +80,8 @@ public class Foo
         public async Task ObjectInitializer()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -79,7 +90,8 @@ public class Foo
         {
             return new Foo { A = A };
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -88,6 +100,8 @@ public class Foo
         public async Task ObjectInitializerStruct()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public struct Foo
     {
         public int A { get; private set; }
@@ -96,7 +110,8 @@ public class Foo
         {
             return new Foo { A = A };
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -106,6 +121,8 @@ public class Foo
         public async Task SetSameMemberOnOtherInstance(string before, string after)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -115,7 +132,8 @@ public class Foo
             var foo = new Foo();
             foo.A = A;
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace(before, after);
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -125,6 +143,8 @@ public class Foo
         public async Task SetSameMemberOnOtherInstance2()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -135,7 +155,8 @@ public class Foo
             var foo2 = new Foo();
             foo1.A = foo2.A;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -144,6 +165,8 @@ public class Foo
         public async Task SetSameMemberOnOtherInstanceRecursive()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo Next { get; private set; }
@@ -154,7 +177,8 @@ public class Foo
             var foo2 = new Foo();
             foo1.Next.Next = foo2.Next.Next;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }

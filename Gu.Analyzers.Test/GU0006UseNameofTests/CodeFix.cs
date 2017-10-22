@@ -9,6 +9,8 @@
         public async Task WhenThrowingArgumentException()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -20,13 +22,16 @@
                 throw new ArgumentNullException(↓""value"");
             }
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -38,7 +43,8 @@
                 throw new ArgumentNullException(nameof(value));
             }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -46,6 +52,8 @@
         public async Task WhenThrowingArgumentOutOfRangeException()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -58,13 +66,16 @@
                     throw new ArgumentOutOfRangeException(↓""value"", value, null);
             }
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -77,7 +88,8 @@
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -85,6 +97,8 @@
         public async Task WhenRaisingPropertyChanged()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
@@ -120,13 +134,16 @@
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
@@ -162,7 +179,8 @@
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -170,6 +188,8 @@
         public async Task WhenRaisingStaticPropertyChanged()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.ComponentModel;
 
@@ -197,13 +217,16 @@
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(↓""Name""));
             }
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.ComponentModel;
 
@@ -231,7 +254,8 @@
                 StaticPropertyChanged?.Invoke(null, new PropertyChangedEventArgs(nameof(Name)));
             }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -239,6 +263,8 @@
         public async Task WhenRaisingStaticPropertyChanged2()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.ComponentModel;
 
@@ -279,13 +305,16 @@
                 this.value = value;
             }
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.ComponentModel;
 
@@ -326,7 +355,8 @@
                 this.value = value;
             }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -334,6 +364,8 @@
         public async Task WhenStaticNameofInstance()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int Value { get; set; }
@@ -346,13 +378,16 @@
         public static void Bar(string meh)
         {
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int Value { get; set; }
@@ -365,7 +400,8 @@
         public static void Bar(string meh)
         {
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -373,6 +409,8 @@
         public async Task WhenStaticNameofInstance2()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static readonly string Name = Bar(↓""Value"");
@@ -380,13 +418,16 @@
         public int Value { get; set; }
 
         public static string Bar(string meh) => meh;
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static readonly string Name = Bar(nameof(Value));
@@ -394,7 +435,8 @@
         public int Value { get; set; }
 
         public static string Bar(string meh) => meh;
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -402,6 +444,8 @@
         public async Task WhenStaticNameofInstance3()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static readonly string Name = string.Format(↓""Value"");
@@ -413,13 +457,16 @@
             get { return this.value; }
             set { this.value = value; }
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static readonly string Name = string.Format(nameof(Value));
@@ -431,7 +478,8 @@
             get { return this.value; }
             set { this.value = value; }
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
 
@@ -439,6 +487,8 @@
         public async Task WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
@@ -474,13 +524,16 @@
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("Use nameof.");
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
@@ -516,7 +569,8 @@
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-    }";
+    }
+}";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
     }

@@ -10,14 +10,17 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnother
         public async Task ExplicitAlias()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Good
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    Gooooood = B
+    using System;
+
+    [Flags]
+    public enum Good
+    {
+        A = 1,
+        B = 2,
+        Gooooood = B
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -27,14 +30,17 @@ public enum Good
         public async Task ExplicitBitwiseOrSum()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Good
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    Gooooood = A | B
+    using System;
+
+    [Flags]
+    public enum Good
+    {
+        A = 1,
+        B = 2,
+        Gooooood = A | B
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -44,14 +50,17 @@ public enum Good
         public async Task SequentialNonFlagEnum()
         {
             var testCode = @"
-using System;
-
-public enum Bad
+namespace RoslynSandbox
 {
-    None,
-    A,
-    B,
-    Baaaaaaad
+    using System;
+
+    public enum Bad
+    {
+        None,
+        A,
+        B,
+        C
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -61,14 +70,17 @@ public enum Bad
         public async Task AliasingEnumMembersNonFlag()
         {
             var testCode = @"
-using System;
-
-public enum Bad
+namespace RoslynSandbox
 {
-    None,
-    A,
-    B,
-    Baaaaaaad = B
+    using System;
+
+    public enum Bad
+    {
+        None,
+        A,
+        B,
+        C = B
+    }
 }";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);

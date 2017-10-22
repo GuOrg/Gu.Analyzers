@@ -11,13 +11,16 @@
         public async Task Linq(string linq)
         {
             var testCode = @"
-using System.Linq;
-class Foo
+namespace RoslynSandbox
 {
-    void Bar()
+    using System.Linq;
+    class Foo
     {
-        var ints = new[] { 1, 2, 3 };
-        ↓ints.Select(x => x);
+        void Bar()
+        {
+            var ints = new[] { 1, 2, 3 };
+            ↓ints.Select(x => x);
+        }
     }
 }";
             testCode = testCode.AssertReplace("ints.Select(x => x);", linq);
@@ -31,15 +34,18 @@ class Foo
         public async Task StringBuilderWriteLine()
         {
             var testCode = @"
-using System.Text;
-public class Foo
+namespace RoslynSandbox
 {
-    private int value;
-
-    public void Bar()
+    using System.Text;
+    public class Foo
     {
-        var sb = new StringBuilder();
-        ↓sb.AppendLine(""test"").ToString();
+        private int value;
+
+        public void Bar()
+        {
+            var sb = new StringBuilder();
+            ↓sb.AppendLine(""test"").ToString();
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()

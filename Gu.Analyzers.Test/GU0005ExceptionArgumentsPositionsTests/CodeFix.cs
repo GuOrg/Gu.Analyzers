@@ -11,6 +11,8 @@
         public async Task WhenThrowingArgumentException(string error, string @fixed)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -19,7 +21,8 @@
         {
             throw new ArgumentException(↓nameof(o), ""message"");
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -27,6 +30,8 @@
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -35,7 +40,8 @@
         {
             throw new ArgumentException(""message"", nameof(o));
         }
-    }";
+    }
+}";
             fixedCode = fixedCode.AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }

@@ -9,6 +9,8 @@
         public async Task NotSettingGetOnlyProperty()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         ↓public Foo(int a)
@@ -19,7 +21,8 @@
         public int A { get; }
 
         public int B { get; }
-    }";
+    }
+}";
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -31,7 +34,7 @@
         public async Task NotSettingGetOnlyPropertyInOneCtor()
         {
             var testCode = @"
-namespace RoslyynSandbox
+namespace RoslynSandbox
 {
     using System;
     using System.ComponentModel;
@@ -72,6 +75,8 @@ namespace RoslyynSandbox
         public async Task NotSettingReadOnlyField()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly int a;
@@ -81,7 +86,8 @@ namespace RoslyynSandbox
         {
             this.a = a;
         }
-    }";
+    }
+}";
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -93,6 +99,8 @@ namespace RoslyynSandbox
         public async Task StaticConstructorSettingProperties()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         ↓static Foo()
@@ -103,7 +111,8 @@ namespace RoslyynSandbox
         public static int A { get; }
 
         public static int B { get; }
-    }";
+    }
+}";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
                                .WithMessage("The following readonly members are not assigned: B.");
@@ -114,6 +123,8 @@ namespace RoslyynSandbox
         public async Task StaticConstructorNotSettingField()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public static readonly int A;
@@ -124,7 +135,8 @@ namespace RoslyynSandbox
         {
             A = 1;
         }
-    }";
+    }
+}";
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)

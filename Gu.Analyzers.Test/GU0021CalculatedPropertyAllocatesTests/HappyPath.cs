@@ -9,6 +9,8 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public async Task ArrowAdd()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -28,7 +30,8 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public int D { get; }
 
         public int Sum => this.A + this.B + this.C + this.D;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -37,6 +40,8 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public async Task ArrowStruct()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public struct Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -56,7 +61,8 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public int D { get; }
 
         public Foo Sum => new Foo(this.A, this.B, this.C, this.D);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -65,25 +71,28 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public async Task ExpressionBodyMethodIsNoError()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+
+        public Foo Bar() => new Foo(this.A, this.B, this.C, this.D);
     }
-
-    public int A { get; }
-
-    public int B { get; }
-
-    public int C { get; }
-
-    public int D { get; }
-
-    public Foo Bar() => new Foo(this.A, this.B, this.C, this.D);
 }";
 
             await this.VerifyHappyPathAsync(testCode)

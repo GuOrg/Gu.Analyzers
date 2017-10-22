@@ -10,9 +10,12 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
         public async Task AutoProp(string property)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public int Value { get; set; }
+    public class Foo
+    {
+        public int Value { get; set; }
+    }
 }";
 
             fooCode = fooCode.AssertReplace("public int Value { get; set; }", property);
@@ -25,14 +28,17 @@ public class Foo
         public async Task WithBackingField(string getter)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private int value;
-
-    public int Value
+    public class Foo
     {
-        get { return this.value; }
-        set { this.value = value; }
+        private int value;
+
+        public int Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
     }
 }";
             fooCode = fooCode.AssertReplace("get { return this.value; }", getter);
@@ -45,27 +51,33 @@ public class Foo
         public async Task WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Bar bar;
-
-    public Foo(Bar bar)
+    public class Foo
     {
-        this.bar = new Bar();
-    }
+        private readonly Bar bar;
 
-    public int Value
-    { 
-        get
+        public Foo(Bar bar)
         {
-            return this.bar.Value;
+            this.bar = new Bar();
+        }
+
+        public int Value
+        { 
+            get
+            {
+                return this.bar.Value;
+            }
         }
     }
 }";
             var barCode = @"
-public class Bar
+namespace RoslynSandbox
 {
-    public int Value { get; }
+    public class Bar
+    {
+        public int Value { get; }
+    }
 }";
             fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
             await this.VerifyHappyPathAsync(fooCode, barCode)
@@ -77,21 +89,27 @@ public class Bar
         public async Task WhenReturningPropertyOfInjectedFieldExpressionBody(string getter)
         {
             var fooCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Bar bar;
-
-    public Foo(Bar bar)
+    public class Foo
     {
-        this.bar = new Bar();
-    }
+        private readonly Bar bar;
 
-    public int Value => this.bar.Value;
+        public Foo(Bar bar)
+        {
+            this.bar = new Bar();
+        }
+
+        public int Value => this.bar.Value;
+    }
 }";
             var barCode = @"
-public class Bar
+namespace RoslynSandbox
 {
-    public int Value { get; }
+    public class Bar
+    {
+        public int Value { get; }
+    }
 }";
             fooCode = fooCode.AssertReplace("this.bar.Value;", getter);
             await this.VerifyHappyPathAsync(fooCode, barCode)

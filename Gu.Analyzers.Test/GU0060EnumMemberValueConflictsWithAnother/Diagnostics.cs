@@ -10,15 +10,18 @@
         public async Task ImplicitValueSharing()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad
+namespace RoslynSandbox
 {
-    None,
-    A,
-    B,
-    ↓Baaaaaaad
+    using System;
+
+    [Flags]
+    public enum Bad
+    {
+        None,
+        A,
+        B,
+        ↓Baaaaaaad
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -31,14 +34,17 @@ public enum Bad
         public async Task ExplicitValueSharing()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad2
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    ↓Baaaaaaad = 2
+    using System;
+
+    [Flags]
+    public enum Bad2
+    {
+        A = 1,
+        B = 2,
+        ↓Baaaaaaad = 2
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -51,14 +57,17 @@ public enum Bad2
         public async Task ExplicitValueSharingWithBitwiseSum()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    ↓Baaaaaaad = 3
+    using System;
+
+    [Flags]
+    public enum Bad
+    {
+        A = 1,
+        B = 2,
+        ↓Baaaaaaad = 3
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -71,18 +80,21 @@ public enum Bad
         public async Task ExplicitValueSharingDifferentBases()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    C = 4,
-    D = 8,
-    E = 16,
-    F = 32,
-    ↓Baaaaaaad = 0x0F
+    using System;
+
+    [Flags]
+    public enum Bad
+    {
+        A = 1,
+        B = 2,
+        C = 4,
+        D = 8,
+        E = 16,
+        F = 32,
+        ↓Baaaaaaad = 0x0F
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -95,15 +107,18 @@ public enum Bad
         public async Task ExplicitValueSharingBitshifts()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad
+namespace RoslynSandbox
 {
-    A = 1 << 0,
-    B = 1 << 1,
-    C = 1 << 2,
-    ↓Baaaaaaad = 1 << 2
+    using System;
+
+    [Flags]
+    public enum Bad
+    {
+        A = 1 << 0,
+        B = 1 << 1,
+        C = 1 << 2,
+        ↓Baaaaaaad = 1 << 2
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -116,14 +131,17 @@ public enum Bad
         public async Task ExplicitValueSharingNonFlag()
         {
             var testCode = @"
-using System;
-
-public enum Bad
+namespace RoslynSandbox
 {
-    A,
-    B,
-    C,
-    ↓Baaaaaaad = 2
+    using System;
+
+    public enum Bad
+    {
+        A,
+        B,
+        C,
+        ↓Baaaaaaad = 2
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -136,14 +154,17 @@ public enum Bad
         public async Task ExplicitValueSharingPartial()
         {
             var testCode = @"
-using System;
-
-[Flags]
-public enum Bad
+namespace RoslynSandbox
 {
-    A = 1,
-    B = 2,
-    ↓Baaaaaaad = A | 2
+    using System;
+
+    [Flags]
+    public enum Bad
+    {
+        A = 1,
+        B = 2,
+        ↓Baaaaaaad = A | 2
+    }
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)

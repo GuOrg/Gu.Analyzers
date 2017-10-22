@@ -12,6 +12,8 @@
         public async Task SetPropertyToSelf(string before, string after)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -20,7 +22,8 @@
         {
             ↓this.A = this.A;
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace(before, after);
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -32,6 +35,8 @@
         public async Task SetPropertyToSelfWithThis()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public int A { get; private set; }
@@ -40,7 +45,8 @@
         {
             ↓this.A = this.A;
         }
-    }";
+    }
+}";
 
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)

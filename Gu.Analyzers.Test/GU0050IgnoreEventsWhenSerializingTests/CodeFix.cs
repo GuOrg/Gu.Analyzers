@@ -10,30 +10,33 @@
         public async Task NotIgnoredEvent()
         {
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    [Serializable]
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        ↓public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    ↓public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -42,31 +45,34 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    [Serializable]
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        [field: NonSerialized]
+        public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    [field: NonSerialized]
-    public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
         }
@@ -75,36 +81,43 @@ public class Foo
         public async Task NotIgnoredEventWithAttribute()
         {
             var attributeCode = @"
-using System;
-class BarAttribute : Attribute
+namespace RoslynSandbox
 {
+    using System;
+
+    class BarAttribute : Attribute
+    {
+    }
 }";
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    [Serializable]
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        ↓[Bar]
+        public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    ↓[Bar]
-    public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             var expected = this.CSharpDiagnostic()
                                .WithLocationIndicated(ref testCode)
@@ -113,32 +126,35 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(new[] { attributeCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo(int a, int b, int c, int d)
+    using System;
+
+    [Serializable]
+    public class Foo
     {
-        this.A = a;
-        this.B = b;
-        this.C = c;
-        this.D = d;
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        [Bar]
+        [field: NonSerialized]
+        public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
     }
-
-    [Bar]
-    [field: NonSerialized]
-    public event EventHandler SomeEvent;
-
-    public int A { get; }
-
-    public int B { get; protected set;}
-
-    public int C { get; internal set; }
-
-    public int D { get; set; }
-
-    public int E => A;
 }";
             await this.VerifyCSharpFixAsync(new[] { attributeCode, testCode }, new[] { attributeCode, fixedCode }).ConfigureAwait(false);
         }
@@ -147,17 +163,20 @@ public class Foo
         public async Task NotIgnoredEventHandler()
         {
             var testCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    ↓private EventHandler someEvent;
+    using System;
 
-    public event EventHandler SomeEvent
+    [Serializable]
+    public class Foo
     {
-        add { this.someEvent += value; }
-        remove { this.someEvent -= value; }
+        ↓private EventHandler someEvent;
+
+        public event EventHandler SomeEvent
+        {
+            add { this.someEvent += value; }
+            remove { this.someEvent -= value; }
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -167,18 +186,21 @@ public class Foo
             await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-[Serializable]
-public class Foo
+namespace RoslynSandbox
 {
-    [NonSerialized]
-    private EventHandler someEvent;
+    using System;
 
-    public event EventHandler SomeEvent
+    [Serializable]
+    public class Foo
     {
-        add { this.someEvent += value; }
-        remove { this.someEvent -= value; }
+        [NonSerialized]
+        private EventHandler someEvent;
+
+        public event EventHandler SomeEvent
+        {
+            add { this.someEvent += value; }
+            remove { this.someEvent -= value; }
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
