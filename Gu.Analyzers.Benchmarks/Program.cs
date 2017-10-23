@@ -14,9 +14,9 @@ namespace Gu.Analyzers.Benchmarks
 
     public class Program
     {
-        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
+        public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
 
-        public static string ProjectDirectory => CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
         private static string ArtifactsDirectory { get; } = Path.Combine(ProjectDirectory, "BenchmarkDotNet.Artifacts", "results");
 

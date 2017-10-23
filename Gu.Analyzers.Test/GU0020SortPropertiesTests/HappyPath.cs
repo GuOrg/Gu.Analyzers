@@ -488,22 +488,6 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PublicInitializedWithPrivate()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        private int B { get; }
-
-        public int A { get; } = B;
-    }
-}";
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
-
-        [Test]
         public void PublicInitializedWithProtectedStatic()
         {
             var testCode = @"

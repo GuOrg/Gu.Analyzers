@@ -28,7 +28,6 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false) as CompilationUnitSyntax;
-            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
             if (syntaxRoot == null)
             {
                 return;
@@ -50,8 +49,8 @@
 
                 using (var sorted = new SortedMembers())
                 {
-                    sorted.Sort(property, semanticModel, context.CancellationToken);
-                    var updated = new SortRewriter(sorted, semanticModel, context.CancellationToken).Visit(syntaxRoot);
+                    sorted.Sort(property);
+                    var updated = new SortRewriter(sorted).Visit(syntaxRoot);
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             "Move property.",
@@ -71,19 +70,19 @@
                 this.sorted = DictionaryPool<TypeDeclarationSyntax, List<MemberDeclarationSyntax>>.Create();
             }
 
-            public void Sort(TypeDeclarationSyntax type, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public void Sort(TypeDeclarationSyntax type)
             {
                 foreach (var member in type.Members)
                 {
                     var property = member as BasePropertyDeclarationSyntax;
                     if (property.IsPropertyOrIndexer())
                     {
-                        this.Sort(property, semanticModel, cancellationToken);
+                        this.Sort(property);
                     }
                 }
             }
 
-            public void Sort(BasePropertyDeclarationSyntax propertyDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public void Sort(BasePropertyDeclarationSyntax propertyDeclaration)
             {
                 var type = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
                 if (type == null)
@@ -123,22 +122,20 @@
                         continue;
                     }
 
-                    var property = (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
-                    var otherProperty = (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(otherPropertyDeclaration, cancellationToken);
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(property, otherProperty) == 0 &&
+                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) == 0 &&
                         fromIndex < i)
                     {
                         toIndex = i + 1;
                         continue;
                     }
 
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(property, otherProperty) > 0)
+                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) > 0)
                     {
                         toIndex = i + 1;
                         continue;
                     }
 
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(property, otherProperty) < 0)
+                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) < 0)
                     {
                         toIndex = i;
                         break;
@@ -215,21 +212,17 @@
         private class SortRewriter : CSharpSyntaxRewriter
         {
             private readonly SortedMembers sorted;
-            private readonly SemanticModel semanticModel;
-            private readonly CancellationToken cancellationToken;
 
-            public SortRewriter(SortedMembers sorted, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public SortRewriter(SortedMembers sorted)
             {
                 this.sorted = sorted;
-                this.semanticModel = semanticModel;
-                this.cancellationToken = cancellationToken;
             }
 
             public override SyntaxNode Visit(SyntaxNode node)
             {
                 if (node is TypeDeclarationSyntax type)
                 {
-                    this.sorted.Sort(type, this.semanticModel, this.cancellationToken);
+                    this.sorted.Sort(type);
                     return base.Visit(node);
                 }
 
@@ -278,10 +271,9 @@
             {
                 var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                               .ConfigureAwait(false);
-                var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
                 using (var sorted = new SortedMembers())
                 {
-                    var updated = new SortRewriter(sorted, semanticModel, context.CancellationToken).Visit(syntaxRoot);
+                    var updated = new SortRewriter(sorted).Visit(syntaxRoot);
                     return context.Document.WithSyntaxRoot(updated);
                 }
             }

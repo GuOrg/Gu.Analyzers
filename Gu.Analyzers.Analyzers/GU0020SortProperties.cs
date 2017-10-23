@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Threading;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -45,32 +44,28 @@
                 return;
             }
 
-            var property = context.ContainingSymbol as IPropertySymbol;
-            if (property == null)
+            if (context.Node is BasePropertyDeclarationSyntax basePropertyDeclarationSyntax)
             {
-                return;
-            }
-
-            var basePropertyDeclaration = (BasePropertyDeclarationSyntax)context.Node;
-            var neighbors = GetNeighbors(basePropertyDeclaration, context.SemanticModel, context.CancellationToken);
-            if (neighbors.Before != null)
-            {
-                if (PropertyPositionComparer.Default.Compare(neighbors.Before, property) > 0)
+                var neighbors = GetNeighbors(basePropertyDeclarationSyntax);
+                if (neighbors.Before != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    if (PropertyPositionComparer.Default.Compare(neighbors.Before, basePropertyDeclarationSyntax) > 0)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    }
                 }
-            }
 
-            if (neighbors.After != null)
-            {
-                if (PropertyPositionComparer.Default.Compare(neighbors.After, property) < 0)
+                if (neighbors.After != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    if (PropertyPositionComparer.Default.Compare(neighbors.After, basePropertyDeclarationSyntax) < 0)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    }
                 }
             }
         }
 
-        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static Neighbors GetNeighbors(BasePropertyDeclarationSyntax propertyDeclaration)
         {
             var typeDeclaration = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
             if (typeDeclaration == null)
@@ -107,45 +102,45 @@
                 }
             }
 
-            return new Neighbors((IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(before, cancellationToken), (IPropertySymbol)semanticModel.GetDeclaredSymbolSafe(after, cancellationToken));
+            return new Neighbors(before, after);
         }
 
         private struct Neighbors
         {
 #pragma warning disable RS1008 // Avoid storing per-compilation data into the fields of a diagnostic analyzer.
-            internal readonly IPropertySymbol Before;
-            internal readonly IPropertySymbol After;
+            internal readonly BasePropertyDeclarationSyntax Before;
+            internal readonly BasePropertyDeclarationSyntax After;
 #pragma warning restore RS1008 // Avoid storing per-compilation data into the fields of a diagnostic analyzer.
 
-            public Neighbors(IPropertySymbol before, IPropertySymbol after)
+            public Neighbors(BasePropertyDeclarationSyntax before, BasePropertyDeclarationSyntax after)
             {
                 this.Before = before;
                 this.After = after;
             }
         }
 
-        internal class PropertyPositionComparer : IComparer<IPropertySymbol>
+        internal class PropertyPositionComparer : IComparer<BasePropertyDeclarationSyntax>
         {
             public static readonly PropertyPositionComparer Default = new PropertyPositionComparer();
 
-            public int Compare(IPropertySymbol x, IPropertySymbol y)
+            private static readonly Accessibility[] AccessibilityOrder =
             {
-                if (TryCompare(x, y, p => !p.IsIndexer, out int result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Public), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Friend), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndFriend), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Internal), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Protected), out result) ||
-    TryCompare(x, y, p => IsDeclaredAccessibility(p, Accessibility.Private), out result) ||
-    TryCompare(x, y, p => p.IsStatic, out result) ||
-    TryCompare(x, y, IsGetOnly, out result) ||
-    TryCompare(x, y, IsCalculated, out result) ||
-    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Private), out result) ||
-    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Protected), out result) ||
-    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.ProtectedAndInternal), out result) ||
-    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Friend), out result) ||
-    TryCompare(x, y, p => IsSetMethodDeclaredAccessibility(p, Accessibility.Internal), out result))
+                Accessibility.Public,
+                Accessibility.ProtectedAndInternal,
+                Accessibility.Internal,
+                Accessibility.Protected,
+                Accessibility.Private
+            };
+
+            public int Compare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y)
+            {
+                if (IsInitializedWithOther(x, y, out var result) ||
+                    TryCompare(x, y, IsNotIndexer, out result) ||
+                    TryCompareAccessibility(x, y, out result) ||
+                    TryCompare(x, y, IsStatic, out result) ||
+                    TryCompare(x, y, IsGetOnly, out result) ||
+                    TryCompare(x, y, IsCalculated, out result) ||
+                    TryCompareSetMethodDeclaredAccessibility(x, y, out result))
                 {
                     return result;
                 }
@@ -153,24 +148,121 @@
                 return 0;
             }
 
-            private static bool IsDeclaredAccessibility(IPropertySymbol property, Accessibility accessibility)
+            private static bool IsInitializedWithOther(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, out int result)
             {
-                if (property.ExplicitInterfaceImplementations.TryGetSingle(out IPropertySymbol interfaceProperty))
+                bool IsInitializedWith(EqualsValueClauseSyntax initializer, PropertyDeclarationSyntax other)
                 {
-                    return interfaceProperty.DeclaredAccessibility == accessibility;
+                    using (var identifiers = IdentifierNameWalker.Borrow(initializer))
+                    {
+                        foreach (var identifier in identifiers.IdentifierNames)
+                        {
+                            if (identifier.Identifier.ValueText == other.Identifier.ValueText)
+                            {
+                                if (identifier.Parent is MemberAccessExpressionSyntax memberAccess &&
+                                    memberAccess.Expression is IdentifierNameSyntax typeIdentifier &&
+                                    other.Parent is TypeDeclarationSyntax typeDeclarationSyntax &&
+                                    typeIdentifier.Identifier.ValueText != typeDeclarationSyntax.Identifier.ValueText)
+                                {
+                                    continue;
+                                }
+
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
                 }
 
-                return property.DeclaredAccessibility == accessibility;
+                if (x is PropertyDeclarationSyntax xDeclaration &&
+                    y is PropertyDeclarationSyntax yDeclaration &&
+                    xDeclaration.Parent == yDeclaration.Parent)
+                {
+                    if (xDeclaration.Initializer is EqualsValueClauseSyntax xi &&
+                        IsInitializedWith(xi, yDeclaration))
+                    {
+                        result = 1;
+                        return true;
+                    }
+
+                    if (yDeclaration.Initializer is EqualsValueClauseSyntax yi &&
+                        IsInitializedWith(yi, xDeclaration))
+                    {
+                        result = -1;
+                        return true;
+                    }
+                }
+
+                result = 0;
+                return false;
             }
 
-            private static bool IsSetMethodDeclaredAccessibility(IPropertySymbol property, Accessibility accessibility)
+            private static bool TryCompareAccessibility(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, out int result)
             {
-                if (property.ExplicitInterfaceImplementations.TryGetSingle(out IPropertySymbol interfaceProperty))
+                var xa = x.GetAccessibility();
+                var ya = y.GetAccessibility();
+                if (xa == ya)
                 {
-                    return interfaceProperty.DeclaredAccessibility == accessibility;
+                    result = 0;
+                    return false;
                 }
 
-                return property.SetMethod?.DeclaredAccessibility == accessibility;
+                result = Array.IndexOf(AccessibilityOrder, xa)
+                              .CompareTo(Array.IndexOf(AccessibilityOrder, ya));
+                return true;
+            }
+
+            private static bool TryCompareSetMethodDeclaredAccessibility(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, out int result)
+            {
+                if (TryGetSetter(x, out AccessorDeclarationSyntax xs) &&
+                    TryGetSetter(y, out AccessorDeclarationSyntax ys))
+                {
+                    var xa = GetAccessibility(xs.Modifiers, x.GetAccessibility());
+                    var ya = GetAccessibility(ys.Modifiers, y.GetAccessibility());
+                    if (xa == ya)
+                    {
+                        result = 0;
+                        return false;
+                    }
+
+                    result = -1 * Array.IndexOf(AccessibilityOrder, xa)
+                                       .CompareTo(Array.IndexOf(AccessibilityOrder, ya));
+                    return true;
+                }
+
+                result = 0;
+                return false;
+            }
+
+            private static Accessibility GetAccessibility(SyntaxTokenList modifiers, Accessibility @default)
+            {
+                if (modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    return Accessibility.Private;
+                }
+
+                if (modifiers.Any(SyntaxKind.PublicKeyword))
+                {
+                    return Accessibility.Public;
+                }
+
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword) &&
+                    modifiers.Any(SyntaxKind.InternalKeyword))
+                {
+                    return Accessibility.ProtectedAndInternal;
+                }
+
+                if (modifiers.Any(SyntaxKind.InternalKeyword))
+                {
+                    return Accessibility.Internal;
+                }
+
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword))
+                {
+                    return Accessibility.Protected;
+                }
+
+                return @default;
             }
 
             private static bool TryCompare<T>(T x, T y, Func<T, bool> criteria, out int result)
@@ -196,46 +288,47 @@
                 return true;
             }
 
-            private static bool IsGetOnly(IPropertySymbol property)
+            private static bool IsNotIndexer(BasePropertyDeclarationSyntax property)
             {
-                if (!TryGetDeclaration(property, out BasePropertyDeclarationSyntax declaration))
-                {
-                    return false;
-                }
-
-                if (!TryGetGetter(declaration, out AccessorDeclarationSyntax getter) ||
-    getter.Body != null)
-                {
-                    return false;
-                }
-
-                return !TryGetSetter(declaration, out AccessorDeclarationSyntax _);
+                return !(property is IndexerDeclarationSyntax);
             }
 
-            private static bool IsCalculated(IPropertySymbol property)
+            private static bool IsStatic(BasePropertyDeclarationSyntax property)
             {
-                if (!TryGetDeclaration(property, out BasePropertyDeclarationSyntax declaration))
+                return property.Modifiers.Any(SyntaxKind.StaticKeyword);
+            }
+
+            private static bool IsGetOnly(BasePropertyDeclarationSyntax property)
+            {
+                if (!TryGetGetter(property, out var getter) ||
+                    getter.Body != null)
                 {
                     return false;
                 }
 
-                if (!(declaration is PropertyDeclarationSyntax || declaration is IndexerDeclarationSyntax))
+                return !TryGetSetter(property, out AccessorDeclarationSyntax _);
+            }
+
+            private static bool IsCalculated(BasePropertyDeclarationSyntax property)
+            {
+                if (!(property is PropertyDeclarationSyntax || property is IndexerDeclarationSyntax))
                 {
                     return false;
                 }
 
-                if (TryGetSetter(declaration, out AccessorDeclarationSyntax _))
+                if (TryGetSetter(property, out AccessorDeclarationSyntax _))
                 {
                     return false;
                 }
 
-                if (TryGetGetter(declaration, out AccessorDeclarationSyntax getter) && getter.Body != null)
+                if (TryGetGetter(property, out var getter) &&
+                    getter.Body != null)
                 {
                     return true;
                 }
 
-                return (declaration as PropertyDeclarationSyntax)?.ExpressionBody != null ||
-                       (declaration as IndexerDeclarationSyntax)?.ExpressionBody != null;
+                return (property as PropertyDeclarationSyntax)?.ExpressionBody != null ||
+                       (property as IndexerDeclarationSyntax)?.ExpressionBody != null;
             }
 
             private static bool TryGetGetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax getter)
@@ -246,18 +339,6 @@
             private static bool TryGetSetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax setter)
             {
                 return declaration.TryGetSetAccessorDeclaration(out setter);
-            }
-
-            private static bool TryGetDeclaration(IPropertySymbol property, out BasePropertyDeclarationSyntax declaration)
-            {
-                if (property.DeclaringSyntaxReferences.Length != 1)
-                {
-                    declaration = null;
-                    return false;
-                }
-
-                declaration = (BasePropertyDeclarationSyntax)property.DeclaringSyntaxReferences[0].GetSyntax();
-                return declaration != null;
             }
         }
     }
