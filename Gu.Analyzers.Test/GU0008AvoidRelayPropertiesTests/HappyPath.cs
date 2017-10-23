@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0008AvoidRelayProperties>
+    internal class HappyPath
     {
         private static readonly GU0008AvoidRelayProperties Analyzer = new GU0008AvoidRelayProperties();
 

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0020SortProperties>
+    internal class HappyPath
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
 
