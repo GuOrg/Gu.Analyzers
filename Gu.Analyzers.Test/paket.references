@@ -1,18 +1,13 @@
-Microsoft.CodeAnalysis.CSharp.Workspaces
-Microsoft.CodeAnalysis.Common
-Microsoft.CodeAnalysis.CSharp
-Microsoft.CodeAnalysis.Workspaces.Common
-Microsoft.Composition
-System.Collections.Immutable
-
-group Analyzers
-  Gu.Analyzers
-  StyleCop.Analyzers
-  AsyncUsageAnalyzers
-  Microsoft.CodeAnalysis.Analyzers
-
 group Test
+  Microsoft.CodeAnalysis.CSharp.Workspaces
+  Gu.Roslyn.Asserts
   NUnit
   System.Reactive
   System.Reactive.Linq
   System.Reactive.PlatformServices
+
+group Analyzers
+  AsyncUsageAnalyzers
+  IDisposableAnalyzers
+  StyleCop.Analyzers
+  Gu.Analyzers

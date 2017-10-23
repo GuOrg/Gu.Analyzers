@@ -6,23 +6,24 @@
     using System.IO;
     using System.Linq;
     using System.Text;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public class Tests
     {
-        private static readonly IReadOnlyList<DescriptorInfo> Descriptors =
-            typeof(AnalyzerCategory).Assembly.GetTypes()
-                                    .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                    .Select(DescriptorInfo.Create)
-                                    .ToArray();
+        private static readonly IReadOnlyList<DescriptorInfo> Descriptors = typeof(AnalyzerCategory)
+            .Assembly
+            .GetTypes()
+            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+            .Select(DescriptorInfo.Create)
+            .ToArray();
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\");
+        private static string SolutionDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\");
 
         private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
 
@@ -70,19 +71,19 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            var expected = new CodeReader(GetTable(CreateStub(descriptorInfo)));
-            DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetTable(File.ReadAllText(descriptorInfo.DocFileName)));
-            Assert.AreEqual(expected, actual);
+            var expected = GetTable(CreateStub(descriptorInfo));
+            DumpIfDebug(expected);
+            var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void ConfigSeverity(DescriptorInfo descriptorInfo)
         {
-            var expected = new CodeReader(GetConfigSeverity(CreateStub(descriptorInfo)));
-            DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName)));
-            Assert.AreEqual(expected, actual);
+            var expected = GetConfigSeverity(CreateStub(descriptorInfo));
+            DumpIfDebug(expected);
+            var actual = GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -109,26 +110,10 @@
 
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
-            var expected = new CodeReader(builder.ToString());
-            DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md"))));
-            Assert.AreEqual(expected, actual);
-        }
-
-        ////[Test, Explicit] // commenting this out so that it does not show up as excluded.
-        public void DumpStub()
-        {
-            var stub = CreateStub(
-                id: "WPF0041",
-                title: "Avoid side effects in CLR accessor.",
-                severity: DiagnosticSeverity.Warning,
-                codeFileUrl: "https://github.com/JohanLarsson/Gu.Analyzers",
-                category: AnalyzerCategory.Correctness,
-                typeName: "AvoidSideEffectsInClrAccessor.",
-                description: "Bindings do not call accessor when updating value. Use callbacks.");
-
-            File.WriteAllText(Path.Combine(DocumentsDirectory, "Generated.md"), stub);
-            Console.Write(stub);
+            var expected = builder.ToString();
+            DumpIfDebug(expected);
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md")));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         private static string CreateStub(DescriptorInfo descriptorInfo)
@@ -138,6 +123,7 @@
                 id: descriptor.Id,
                 title: descriptor.Title.ToString(),
                 severity: descriptor.DefaultSeverity,
+                enabled: descriptor.IsEnabledByDefault,
                 codeFileUrl: descriptorInfo.CodeFileUri,
                 category: descriptor.Category,
                 typeName: descriptorInfo.DiagnosticAnalyzer.GetType().Name,
@@ -148,6 +134,7 @@
             string id,
             string title,
             DiagnosticSeverity severity,
+            bool enabled,
             string codeFileUrl,
             string category,
             string typeName,
@@ -156,8 +143,9 @@
             return Properties.Resources.DiagnosticDocTemplate.Replace("{ID}", id)
                              .Replace("## ADD TITLE HERE", $"## {title}")
                              .Replace("{SEVERITY}", severity.ToString())
+                             .Replace("{ENABLED}", enabled ? "true" : "false")
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/JohanLarsson/Gu.Analyzers")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/JohanLarsson/Gu.Analyzers/")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)

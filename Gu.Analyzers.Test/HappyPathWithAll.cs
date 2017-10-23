@@ -3,11 +3,10 @@ namespace Gu.Analyzers.Test
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Diagnostics.CodeAnalysis;
-    using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -18,34 +17,37 @@ namespace Gu.Analyzers.Test
                                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                .ToImmutableArray();
 
+        private static readonly Solution Solution = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
+           Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
+        private static readonly Solution PropertyChangedAnalyzersProjectSln = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
+            Gu.Roslyn.Asserts.CodeFactory.FindProjectFile("Gu.Analyzers.Analyzers.csproj"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
         [Test]
-        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
-        public void Dump()
+        public void NotEmpty()
         {
-            var projFile = new FileInfo(new Uri(typeof(GU0007PreferInjecting).Assembly.CodeBase).LocalPath)
-                .Directory
-                .Parent
-                .Parent
-                .Parent
-                .EnumerateFiles("Gu.Analyzers.Analyzers.csproj", SearchOption.AllDirectories)
-                .Single();
-            Console.WriteLine(projFile.FullName);
-            foreach (var analyzer in AllAnalyzers)
-            {
-                Console.WriteLine($"public class {analyzer.GetType().Name} : Analyzer");
-                Console.WriteLine("{");
-                Console.WriteLine($"    public {analyzer.GetType().Name}()");
-                Console.WriteLine($"       : base(new Gu.Analyzers.{analyzer.GetType().Name}())");
-                Console.WriteLine("    {");
-                Console.WriteLine("    }");
-                Console.WriteLine("}");
-                Console.WriteLine();
-            }
+            CollectionAssert.IsNotEmpty(AllAnalyzers);
+            Assert.Pass($"Count: {AllAnalyzers.Length}");
         }
 
-        ////[Explicit("Temporarily ignore")]
-        [Test]
-        public async Task SomewhatRealisticSample()
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void PropertyChangedAnalyzersSln(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, Solution);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void PropertyChangedAnalyzersProject(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, PropertyChangedAnalyzersProjectSln);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void SomewhatRealisticSample(DiagnosticAnalyzer analyzer)
         {
             var disposableCode = @"
 using System;
@@ -294,11 +296,11 @@ namespace RoslynSandbox
 }";
 
             var sources = new[] { disposableCode, fooListCode, fooCode, fooBaseCode, fooImplCode, withOptionalParameterCode, reactiveCode };
-            await DiagnosticVerifier.VerifyHappyPathAsync(sources, AllAnalyzers).ConfigureAwait(false);
+            AnalyzerAssert.Valid(analyzer, sources);
         }
 
-        [Test]
-        public async Task ReactiveSample()
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void ReactiveSample(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -336,12 +338,11 @@ namespace RoslynSandbox
         }
      }
 }";
-
-            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { testCode }, AllAnalyzers).ConfigureAwait(false);
+            AnalyzerAssert.Valid(analyzer, testCode);
         }
 
-        [Test]
-        public async Task RecursiveSample()
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -410,11 +411,11 @@ namespace RoslynSandbox
      }
 }";
 
-            await DiagnosticVerifier.VerifyHappyPathAsync(new[] { testCode }, AllAnalyzers).ConfigureAwait(false);
+            AnalyzerAssert.Valid(analyzer, testCode);
         }
 
-        [Test]
-        public async Task WithSyntaxErrors()
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var syntaxErrorCode = @"
     using System;
@@ -441,15 +442,7 @@ namespace RoslynSandbox
             base.Dispose(disposing);
         }
     }";
-            var analyzers = this.GetCSharpDiagnosticAnalyzers().ToImmutableArray();
-            await DiagnosticVerifier.GetSortedDiagnosticsFromDocumentsAsync(
-                          analyzers,
-                          CodeFactory.GetDocuments(
-                              new[] { syntaxErrorCode },
-                              analyzers,
-                              Enumerable.Empty<string>()),
-                          CancellationToken.None)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(analyzer, syntaxErrorCode);
         }
 
         public async Task VerifyHappyPathAsync(params string[] testCode)

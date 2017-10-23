@@ -2,10 +2,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0009 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0022 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0001 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0001NameArguments());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0002 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0002NamedArgumentPositionMatches());
@@ -22,6 +18,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0008 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0008AvoidRelayProperties());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0009 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0010 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0010DoNotAssignSameValue());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
@@ -30,23 +28,13 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0021 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0050 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0022 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0060 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0050 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0051 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0051XmlSerializerNotCached());
 
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0009UseNamedParametersForBooleans()
-        {
-            GU0009.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0022UseGetOnly()
-        {
-            GU0022.Run();
-        }
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0060 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0001NameArguments()
@@ -97,6 +85,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0009UseNamedParametersForBooleans()
+        {
+            GU0009.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0010DoNotAssignSameValue()
         {
             GU0010.Run();
@@ -121,21 +115,27 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0022UseGetOnly()
+        {
+            GU0022.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0050IgnoreEventsWhenSerializing()
         {
             GU0050.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0060EnumMemberValueConflictsWithAnother()
-        {
-            GU0060.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0051XmlSerializerNotCached()
         {
             GU0051.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0060EnumMemberValueConflictsWithAnother()
+        {
+            GU0060.Run();
         }
     }
 }
