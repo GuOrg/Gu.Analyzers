@@ -35,6 +35,12 @@
     <DocumentationFile>
     </DocumentationFile>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>  
+    <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup> 
+  
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

@@ -8,6 +8,11 @@
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
   
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>  
+    <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  
   <ItemGroup>
     <Content Include="TraceEvent.ReadMe.txt">
       <Paket>True</Paket>
