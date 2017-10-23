@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<GU0011DontIgnoreReturnValue>
+    internal partial class HappyPath
     {
+        private static readonly GU0011DontIgnoreReturnValue Analyzer = new GU0011DontIgnoreReturnValue();
+
         [Test]
-        public async Task ChainedCtor()
+        public void ChainedCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,12 +30,11 @@ namespace RoslynSandbox
         public StringBuilder Builder { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task RealisticClass()
+        public void RealisticClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,12 +54,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task Using()
+        public void Using()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -85,12 +85,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task RealisticExtensionMethodClass()
+        public void RealisticExtensionMethodClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -208,12 +207,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task VoidMethod()
+        public void VoidMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -231,12 +229,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task VoidMethodWithReturn()
+        public void VoidMethodWithReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -255,12 +252,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task StaticVoidMethod()
+        public void StaticVoidMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -278,12 +274,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task StaticVoidMethodWithReturn()
+        public void StaticVoidMethodWithReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -302,12 +297,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IfTry()
+        public void IfTry()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -330,12 +324,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task WhenThrowing()
+        public void WhenThrowing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -350,12 +343,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task WhenInvocationInExpressionBody()
+        public void WhenInvocationInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -370,12 +362,11 @@ namespace RoslynSandbox
         public void Meh() => Bar();
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task WhenNewInExpressionBody()
+        public void WhenNewInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -385,8 +376,7 @@ namespace RoslynSandbox
         public void Meh() => new Foo();
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

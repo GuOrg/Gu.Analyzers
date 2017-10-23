@@ -1,15 +1,14 @@
 namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
+    internal partial class HappyPath
     {
-        public class Recursion : NestedHappyPathVerifier<HappyPath>
+        public class Recursion
         {
             [Test]
-            public async Task IgnoresRecursiveProperty()
+            public void IgnoresRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -28,12 +27,11 @@ namespace RoslynSandbox
         public IDisposable RecursiveProperty => RecursiveProperty;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -57,12 +55,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -85,12 +82,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveMethod()
+            public void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -107,8 +103,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0021CalculatedPropertyAllocates>
+    internal class HappyPath
     {
+        private static readonly GU0021CalculatedPropertyAllocates Analyzer = new GU0021CalculatedPropertyAllocates();
+
         [Test]
-        public async Task ArrowAdd()
+        public void ArrowAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,12 +34,11 @@ namespace RoslynSandbox
         public int Sum => this.A + this.B + this.C + this.D;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ArrowStruct()
+        public void ArrowStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -63,12 +64,11 @@ namespace RoslynSandbox
         public Foo Sum => new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ExpressionBodyMethodIsNoError()
+        public void ExpressionBodyMethodIsNoError()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,8 +95,7 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

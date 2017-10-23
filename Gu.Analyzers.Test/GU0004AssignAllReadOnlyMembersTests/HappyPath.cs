@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0004AssignAllReadOnlyMembers>
+    internal class HappyPath
     {
+        private static readonly GU0004AssignAllReadOnlyMembers Analyzer = new GU0004AssignAllReadOnlyMembers();
+
         [Test]
-        public async Task ConstructorSettingProperties()
+        public void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,12 +26,11 @@ namespace RoslynSandbox
         public int B { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingPropertiesStruct()
+        public void ConstructorSettingPropertiesStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,12 +48,11 @@ namespace RoslynSandbox
         public int B { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task StaticConstructorSettingProperties()
+        public void StaticConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -70,12 +70,11 @@ namespace RoslynSandbox
         public static int B { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingAllFields()
+        public void ConstructorSettingAllFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,12 +91,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ChainedConstructorSettingAllFields()
+        public void ChainedConstructorSettingAllFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -119,12 +117,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task WhenNoUninitializedFields()
+        public void WhenNoUninitializedFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -140,12 +137,11 @@ namespace RoslynSandbox
         public int A => a;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task StaticConstructorSettingFields()
+        public void StaticConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -163,12 +159,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task StaticConstructorSettingUninitializedField()
+        public void StaticConstructorSettingUninitializedField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -186,12 +181,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingReadonlyFieldIgnoringMutable()
+        public void ConstructorSettingReadonlyFieldIgnoringMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -207,12 +201,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingPropertiesIgnoringMutable()
+        public void ConstructorSettingPropertiesIgnoringMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -229,12 +222,11 @@ namespace RoslynSandbox
         public int B { get; private set; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingReadonlyFieldIgnoringInitialized()
+        public void ConstructorSettingReadonlyFieldIgnoringInitialized()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -250,12 +242,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingPropertiesIgnoringInitialized()
+        public void ConstructorSettingPropertiesIgnoringInitialized()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -272,12 +263,11 @@ namespace RoslynSandbox
         public int B { get; } = 6;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoreAbstract()
+        public void IgnoreAbstract()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -294,12 +284,11 @@ namespace RoslynSandbox
         public abstract int OtherValue { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoreIndexer()
+        public void IgnoreIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -316,12 +305,11 @@ namespace RoslynSandbox
         public int this[int index] => index;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoreCalculatedStatementBody()
+        public void IgnoreCalculatedStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -344,12 +332,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoreCalculatedExpressionBody()
+        public void IgnoreCalculatedExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -366,8 +353,7 @@ namespace RoslynSandbox
         public int Value => this.value;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

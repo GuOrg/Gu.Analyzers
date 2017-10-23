@@ -1,13 +1,14 @@
 ﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0009UseNamedParametersForBooleans>
+    internal class HappyPath
     {
+        private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
+
         [Test]
-        public async Task UsesNamedParameter()
+        public void UsesNamedParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,12 +29,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task UsingADefaultBooleanParameter()
+        public void UsingADefaultBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,12 +54,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task NondeducedGenericBooleanParameter()
+        public void NondeducedGenericBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,12 +75,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task DeducedGenericBooleanParameter()
+        public void DeducedGenericBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -97,12 +95,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task FunctionAcceptingABooleanVariable()
+        public void FunctionAcceptingABooleanVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -123,12 +120,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task BooleanParamsArray()
+        public void BooleanParamsArray()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -149,12 +145,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task DontWarnOnDisposePattern()
+        public void DontWarnOnDisposePattern()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -188,12 +183,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task DontWarnOnAssertAreEqual()
+        public void DontWarnOnAssertAreEqual()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -209,12 +203,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task DontWarnOnConfigureAwait()
+        public void DontWarnOnConfigureAwait()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -234,13 +227,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("SetValue")]
         [TestCase("SetCurrentValue")]
-        public async Task DontWarnOn(string method)
+        public void DontWarnOn(string method)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -258,13 +250,12 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("SetValue", method);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("textBox.SetBar(true)")]
         [TestCase("Foo.SetBar(textBox, true)")]
-        public async Task DontWarnOnAttachedPropertySetter(string method)
+        public void DontWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
 namespace RoslynSandbox
@@ -307,12 +298,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("textBox.SetBar(true)", method);
-            await this.VerifyHappyPathAsync(apCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, apCode, testCode);
         }
 
         [Test]
-        public async Task DontWarnInExpressionTree()
+        public void DontWarnInExpressionTree()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -334,8 +324,7 @@ namespace RoslynSandbox
         private static bool Id(bool self) => self;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

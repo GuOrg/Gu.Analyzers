@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0006UseNameof>
+    internal class HappyPath
     {
+        private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
+
         [Test]
-        public async Task WhenThrowingArgumentException()
+        public void WhenThrowingArgumentException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,12 +26,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ArgumentOutOfRangeException()
+        public void ArgumentOutOfRangeException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,12 +49,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresDebuggerDisplay()
+        public void IgnoresDebuggerDisplay()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,12 +64,11 @@ namespace RoslynSandbox
         public string Name { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresTypeName()
+        public void IgnoresTypeName()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,12 +88,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresVariableDeclaredAfter()
+        public void IgnoresVariableDeclaredAfter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -114,12 +112,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresNamespaceName()
+        public void IgnoresNamespaceName()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -139,8 +136,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

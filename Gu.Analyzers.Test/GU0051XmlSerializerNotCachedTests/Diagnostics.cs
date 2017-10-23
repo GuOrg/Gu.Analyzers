@@ -1,7 +1,6 @@
-﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCached
+﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
     using System.Threading.Tasks;
-
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0051XmlSerializerNotCached>

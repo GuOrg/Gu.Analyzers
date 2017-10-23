@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0010DoNotAssignSameValue>
+    internal class HappyPath
     {
+        private static readonly GU0010DoNotAssignSameValue Analyzer = new GU0010DoNotAssignSameValue();
+
         [Test]
-        public async Task ConstructorSettingProperties()
+        public void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,12 +32,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingFields()
+        public void ConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -52,12 +53,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task Increment()
+        public void Increment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -72,12 +72,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ObjectInitializer()
+        public void ObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,12 +91,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ObjectInitializerStruct()
+        public void ObjectInitializerStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -112,13 +110,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [TestCase("foo.A = A;", "foo.A = this.A;")]
-        [TestCase("foo.A = A;", "foo.A = A;")]
-        public async Task SetSameMemberOnOtherInstance(string before, string after)
+        [TestCase("foo.A = this.A;")]
+        [TestCase("foo.A = A;")]
+        public void SetSameMemberOnOtherInstance(string after)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -134,13 +131,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace(before, after);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            testCode = testCode.AssertReplace("foo.A = A;", after);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task SetSameMemberOnOtherInstance2()
+        public void SetSameMemberOnOtherInstance2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -157,12 +153,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task SetSameMemberOnOtherInstanceRecursive()
+        public void SetSameMemberOnOtherInstanceRecursive()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -179,8 +174,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

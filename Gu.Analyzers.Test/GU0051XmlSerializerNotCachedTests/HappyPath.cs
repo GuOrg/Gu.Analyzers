@@ -1,13 +1,14 @@
-namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCached
+namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<Analyzers.GU0051XmlSerializerNotCached>
+    internal class HappyPath
     {
+        private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
+
         [Test]
-        public async Task NoCreationsOfTheSerializer()
+        public void NoCreationsOfTheSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,12 +28,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task CachedStaticReadonlyInitializedInlineXmlSerializer()
+        public void CachedStaticReadonlyInitializedInlineXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,12 +54,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
+        public void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,12 +85,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task CachedStaticInitializedInlineXmlSerializer()
+        public void CachedStaticInitializedInlineXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,13 +111,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), ""rootNode"")")]
         [TestCase(@"new XmlSerializer(typeof(Foo))")]
-        public async Task NonLeakyConstructor(string code)
+        public void NonLeakyConstructor(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -140,8 +137,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

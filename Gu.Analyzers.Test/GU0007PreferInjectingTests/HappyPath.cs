@@ -1,10 +1,12 @@
 namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<GU0007PreferInjecting>
+    internal partial class HappyPath
     {
+        private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
+
         private static readonly string BarCode = @"
 namespace RoslynSandbox
 {
@@ -34,7 +36,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public async Task WhenInjecting()
+        public void WhenInjecting()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -49,13 +51,11 @@ namespace RoslynSandbox
         }
     }
 }";
-
-            await this.VerifyHappyPathAsync(fooCode, BarCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, BarCode);
         }
 
         [Test]
-        public async Task WhenNotInjectingChained()
+        public void WhenNotInjectingChained()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -95,12 +95,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(fooCode, barCode, mehCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode, mehCode);
         }
 
         [Test]
-        public async Task WhenStatic()
+        public void WhenStatic()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -116,12 +115,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(fooCode, BarCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, BarCode);
         }
 
         [Test]
-        public async Task WhenMethodInjectedLocatorInStaticMethod()
+        public void WhenMethodInjectedLocatorInStaticMethod()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -138,13 +136,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(LocatorCode, BarCode, fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, LocatorCode, BarCode, fooCode);
         }
 
         [TestCase("int")]
         [TestCase("Abstract")]
-        public async Task IgnoreWhenNewNotInjectable(string type)
+        public void IgnoreWhenNewNotInjectable(string type)
         {
             var abstractCode = @"
 namespace RoslynSandbox
@@ -185,12 +182,11 @@ namespace RoslynSandbox
 }";
 
             fooCode = fooCode.AssertReplace("default(int)", $"default({type})");
-            await this.VerifyHappyPathAsync(abstractCode, barCode, fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
         }
 
         [Test]
-        public async Task IgnoreWhenParams()
+        public void IgnoreWhenParams()
         {
             var abstractCode = @"
 namespace RoslynSandbox
@@ -228,12 +224,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(abstractCode, barCode, fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
         }
 
         [Test]
-        public async Task IgnoreNewDictionaryOfBarAndBar()
+        public void IgnoreNewDictionaryOfBarAndBar()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -251,12 +246,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(BarCode, fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, BarCode, fooCode);
         }
 
         [Test]
-        public async Task IgnoreInLambda()
+        public void IgnoreInLambda()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -274,8 +268,7 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(BarCode, LocatorCode, fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, BarCode, LocatorCode, fooCode);
         }
     }
 }

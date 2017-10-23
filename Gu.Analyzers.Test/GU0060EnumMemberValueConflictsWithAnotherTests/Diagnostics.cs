@@ -1,7 +1,6 @@
-﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnother
+﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
 {
     using System.Threading.Tasks;
-
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0060EnumMemberValueConflictsWithAnother>

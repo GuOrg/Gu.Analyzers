@@ -1,13 +1,14 @@
 namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0050IgnoreEventsWhenSerializing>
+    internal class HappyPath
     {
+        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
+
         [Test]
-        public async Task IgnoredEvent()
+        public void IgnoredEvent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,12 +40,11 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoredEventSimple()
+        public void IgnoredEventSimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,12 +58,11 @@ namespace RoslynSandbox
         public event EventHandler SomeEvent;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoredEventHandler()
+        public void IgnoredEventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -83,12 +82,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task NotSerializable()
+        public void NotSerializable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -118,8 +116,7 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

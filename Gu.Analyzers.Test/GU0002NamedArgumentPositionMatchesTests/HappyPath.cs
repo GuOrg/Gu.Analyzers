@@ -1,13 +1,15 @@
 namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0002NamedArgumentPositionMatches>
+    internal class HappyPath
     {
+        private static readonly GU0002NamedArgumentPositionMatches Analyzer = new GU0002NamedArgumentPositionMatches();
+
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
-        public async Task ConstructorCallWithTwoArguments(string call)
+        public void ConstructorCallWithTwoArguments(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,13 +33,12 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new Foo(a, b)", call);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
-        public async Task ConstructorCallWithTwoArgumentsStruct(string call)
+        public void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -61,12 +62,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new Foo(a, b)", call);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorCallWithNamedArgumentsOnSameRow()
+        public void ConstructorCallWithNamedArgumentsOnSameRow()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -96,12 +96,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorCallWithArgumentsOnSameRow()
+        public void ConstructorCallWithArgumentsOnSameRow()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -131,12 +130,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorCallWithNamedArgumentsOnSeparateRows()
+        public void ConstructorCallWithNamedArgumentsOnSeparateRows()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -170,12 +168,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresStringFormat()
+        public void IgnoresStringFormat()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -197,12 +194,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresWhendifferentTypes()
+        public void IgnoresWhendifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -236,12 +232,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresWhenInExpressionTree()
+        public void IgnoresWhenInExpressionTree()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -278,8 +273,7 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

@@ -1,16 +1,15 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        internal class Ignore : NestedHappyPathVerifier<HappyPath>
+        internal class Ignore
         {
             [Test]
-            public async Task StringBuilderAppendLine()
+            public void StringBuilderAppendLine()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -26,12 +25,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task StringBuilderAppend()
+            public void StringBuilderAppend()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -47,12 +45,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task StringBuilderAppendChained()
+            public void StringBuilderAppendChained()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -68,12 +65,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task WhenReturningThis()
+            public void WhenReturningThis()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -91,12 +87,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public async Task WhenExtensionMethodReturningThis()
+            public void WhenExtensionMethodReturningThis()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -121,15 +116,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(barCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, barCode, testCode);
             }
 
             [Explicit("Don't know if we want this.")]
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]
             [TestCase("this.ints.Remove(1);")]
-            public async Task HashSet(string operation)
+            public void HashSet(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -147,14 +141,13 @@ namespace RoslynSandbox
     }
 }";
                 testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]
             [TestCase("this.ints.Remove(1);")]
-            public async Task IList(string operation)
+            public void IList(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -173,8 +166,7 @@ namespace RoslynSandbox
     }
 }";
                 testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

@@ -1,13 +1,15 @@
 namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal class HappyPath : HappyPathVerifier<GU0008AvoidRelayProperties>
     {
+        private static readonly GU0008AvoidRelayProperties Analyzer = new GU0008AvoidRelayProperties();
+
         [TestCase("public int Value { get; set; }")]
         [TestCase("public int Value { get; } = 1;")]
-        public async Task AutoProp(string property)
+        public void AutoProp(string property)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -19,13 +21,12 @@ namespace RoslynSandbox
 }";
 
             fooCode = fooCode.AssertReplace("public int Value { get; set; }", property);
-            await this.VerifyHappyPathAsync(fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
         [TestCase("get { return this.value; }")]
         [TestCase("get { return value; }")]
-        public async Task WithBackingField(string getter)
+        public void WithBackingField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -42,13 +43,12 @@ namespace RoslynSandbox
     }
 }";
             fooCode = fooCode.AssertReplace("get { return this.value; }", getter);
-            await this.VerifyHappyPathAsync(fooCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]
-        public async Task WhenReturningPropertyOfInjectedField(string getter)
+        public void WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -80,13 +80,12 @@ namespace RoslynSandbox
     }
 }";
             fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
-            await this.VerifyHappyPathAsync(fooCode, barCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
-        public async Task WhenReturningPropertyOfInjectedFieldExpressionBody(string getter)
+        public void WhenReturningPropertyOfInjectedFieldExpressionBody(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -112,8 +111,7 @@ namespace RoslynSandbox
     }
 }";
             fooCode = fooCode.AssertReplace("this.bar.Value;", getter);
-            await this.VerifyHappyPathAsync(fooCode, barCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
     }
 }

@@ -1,11 +1,13 @@
 namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0022UseGetOnly>
+    internal class HappyPath
     {
-        public static readonly TestCase[] TestCases =
+        private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
+
+        private static readonly TestCase[] TestCases =
         {
             new TestCase("int", "A++;"),
             new TestCase("int", "A--;"),
@@ -18,8 +20,73 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
             new TestCase("bool", "A|=a;"),
         };
 
+        [TestCaseSource(nameof(TestCases))]
+        public void UpdatedInMethodThis(TestCase data)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public int A { get; private set; }
+
+        public void Update(int a)
+        {
+            this.A = a;
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("A = a;", data.Update)
+                               .AssertReplace("int", data.Type);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCaseSource(nameof(TestCases))]
+        public void UpdatedInMethodUnderscoreNames(TestCase data)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public int A { get; private set; }
+
+        public void Update(int a)
+        {
+            A = a;
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("A = a;", data.Update)
+                               .AssertReplace("int", data.Type);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [Test]
-        public async Task DifferentProperties()
+        public void UpdatedInLambdaInCtor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            this.E += (_, __) => this.A = 5;
+        }
+
+        public event EventHandler E;
+
+        public int A { get; private set; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void DifferentProperties()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -67,80 +134,11 @@ namespace RoslynSandbox
         // }
     }
 }";
-            await this.VerifyHappyPathAsync(interfaceCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, interfaceCode, testCode);
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public async Task UpdatedInMethodThis(TestCase data)
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        public int A { get; private set; }
-
-        public void Update(int a)
-        {
-            this.A = a;
-        }
-    }
-}";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [TestCaseSource(nameof(TestCases))]
-        public async Task UpdatedInMethodUnderscoreNames(TestCase data)
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        public int A { get; private set; }
-
-        public void Update(int a)
-        {
-            A = a;
-        }
-    }
-}";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task UpdatedInLambdaInCtor()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            this.E += (_, __) => this.A = 5;
-        }
-
-        public event EventHandler E;
-
-        public int A { get; private set; }
-    }
-}";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [TestCaseSource(nameof(TestCases))]
-        public async Task UpdatingOtherInstanceInCtor(TestCase data)
+        public void UpdatingOtherInstanceInCtor(TestCase data)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -157,8 +155,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("A = a;", data.Update)
                                .AssertReplace("int", data.Type);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         internal class TestCase

@@ -1,13 +1,14 @@
 ﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0003CtorParameterNamesShouldMatch>
+    internal class HappyPath
     {
+        private static readonly GU0003CtorParameterNamesShouldMatch Analyzer = new GU0003CtorParameterNamesShouldMatch();
+
         [Test]
-        public async Task ConstructorSettingProperties()
+        public void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,12 +32,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingPropertiesStruct()
+        public void ConstructorSettingPropertiesStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -60,12 +60,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ChainedConstructorSettingProperties()
+        public void ChainedConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -94,12 +93,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task BaseConstructorCall()
+        public void BaseConstructorCall()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -134,12 +132,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(fooCode, barCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [Test]
-        public async Task ConstructorSettingField()
+        public void ConstructorSettingField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -160,12 +157,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ConstructorSettingFieldPrefixedByUnderscore()
+        public void ConstructorSettingFieldPrefixedByUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -186,12 +182,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresWhenSettingTwoProperties()
+        public void IgnoresWhenSettingTwoProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -209,12 +204,11 @@ namespace RoslynSandbox
         public int B { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoresWhenBaseIsParams()
+        public void IgnoresWhenBaseIsParams()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -240,12 +234,11 @@ namespace RoslynSandbox
         public int[] Values { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(fooCode, barCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [Test]
-        public async Task IgnoresWhenBaseIsParams2()
+        public void IgnoresWhenBaseIsParams2()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -274,12 +267,11 @@ namespace RoslynSandbox
         public int[] Values { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(fooCode, barCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [Test]
-        public async Task IgnoresIdCaps()
+        public void IgnoresIdCaps()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -294,11 +286,11 @@ namespace RoslynSandbox
         public int ID { get; }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task IgnoredWhenAssigningWeakReferenceTarget()
+        public void IgnoredWhenAssigningWeakReferenceTarget()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -316,8 +308,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

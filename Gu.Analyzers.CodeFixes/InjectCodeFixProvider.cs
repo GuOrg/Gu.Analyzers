@@ -148,7 +148,7 @@
                 }
                 else
                 {
-                    if (ctor.ParameterList.TryGetFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
+                    if (ctor.ParameterList.Parameters.TryGetFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
                     {
                         editor.InsertBefore(existing, parameterSyntax);
                     }

@@ -1,13 +1,14 @@
-namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnother
+namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<Analyzers.GU0060EnumMemberValueConflictsWithAnother>
+    internal class HappyPath
     {
+        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
+
         [Test]
-        public async Task ExplicitAlias()
+        public void ExplicitAlias()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -22,12 +23,11 @@ namespace RoslynSandbox
         Gooooood = B
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ExplicitBitwiseOrSum()
+        public void ExplicitBitwiseOrSum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -42,12 +42,11 @@ namespace RoslynSandbox
         Gooooood = A | B
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task SequentialNonFlagEnum()
+        public void SequentialNonFlagEnum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -62,12 +61,11 @@ namespace RoslynSandbox
         C
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task AliasingEnumMembersNonFlag()
+        public void AliasingEnumMembersNonFlag()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -82,8 +80,7 @@ namespace RoslynSandbox
         C = B
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

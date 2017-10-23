@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class HappyPath : HappyPathVerifier<GU0005ExceptionArgumentsPositions>
+    internal class HappyPath
     {
+        private static readonly GU0005ExceptionArgumentsPositions Analyzer = new GU0005ExceptionArgumentsPositions();
+
         [Test]
-        public async Task ArgumentExceptionWithMessageAndNameof()
+        public void ArgumentExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -21,12 +23,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ArgumentNullExceptionWithMessageAndNameof()
+        public void ArgumentNullExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -41,12 +42,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
-        public async Task ArgumentOutOfRangeExceptionWithMessageAndNameof()
+        public void ArgumentOutOfRangeExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }
