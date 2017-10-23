@@ -26,7 +26,8 @@
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
+            ImmutableArray.Create(Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -45,16 +46,24 @@
 
             var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
             var ctor = (IMethodSymbol)context.ContainingSymbol;
-            if (!ctor.IsStatic && ctor.DeclaredAccessibility == Accessibility.Private)
+            if (!ctor.IsStatic &&
+                ctor.DeclaredAccessibility == Accessibility.Private)
             {
                 return;
             }
 
-            using (var pooled = CtorWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
+            using (var pooled = CtorWalker.Create(
+                constructorDeclarationSyntax,
+                context.SemanticModel,
+                context.CancellationToken))
             {
                 if (pooled.Item.Unassigned.Any())
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, constructorDeclarationSyntax.GetLocation(), string.Join(", ", pooled.Item.Unassigned)));
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptor,
+                            constructorDeclarationSyntax.GetLocation(),
+                            string.Join(", ", pooled.Item.Unassigned)));
                 }
             }
         }
@@ -95,7 +104,8 @@
             {
                 if (TryGetIdentifier(node.Left, out IdentifierNameSyntax left))
                 {
-                    this.readOnlies.Remove(left.Identifier.ValueText).IgnoreReturnValue();
+                    this.readOnlies.Remove(left.Identifier.ValueText)
+                        .IgnoreReturnValue();
                 }
 
                 base.VisitAssignmentExpression(node);
@@ -125,7 +135,9 @@
                         if (declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax variable))
                         {
                             var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-                            if (field.IsReadOnly && field.IsStatic == isStatic && variable.Initializer == null)
+                            if (field.IsReadOnly &&
+                                field.IsStatic == isStatic &&
+                                variable.Initializer == null)
                             {
                                 yield return field.Name;
                             }
@@ -136,9 +148,9 @@
 
                     var propertyDeclaration = member as PropertyDeclarationSyntax;
                     if (propertyDeclaration != null &&
-    propertyDeclaration.ExpressionBody == null &&
-    propertyDeclaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
-    getter.Body == null)
+                        propertyDeclaration.ExpressionBody == null &&
+                        propertyDeclaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
+                        getter.Body == null)
                     {
                         var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
                         if (property.IsReadOnly &&

@@ -4,7 +4,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis;
 
     // ReSharper disable once UseNameofExpression
-        [System.Diagnostics.DebuggerDisplay("FullName: {FullName}")]
+    [System.Diagnostics.DebuggerDisplay("FullName: {FullName}")]
     internal class QualifiedType
     {
         internal readonly string FullName;

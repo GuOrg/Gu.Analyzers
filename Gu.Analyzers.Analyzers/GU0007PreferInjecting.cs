@@ -313,7 +313,8 @@
                 {
                     var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
                     if (ctor != null &&
-                        ctor.ParameterList.TryGetFirst(
+                        ctor.ParameterList != null &&
+                        ctor.ParameterList.Parameters.TryGetFirst(
                             p => p.Identifier.ValueText == identifier.Identifier.ValueText,
                             out ParameterSyntax parameter))
                     {

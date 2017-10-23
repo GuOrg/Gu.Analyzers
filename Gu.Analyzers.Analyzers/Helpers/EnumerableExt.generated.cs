@@ -1,4 +1,4 @@
-﻿namespace WpfAnalyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
