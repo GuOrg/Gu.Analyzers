@@ -13,7 +13,7 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        ↓public Foo(int a)
+        public ↓Foo(int a)
         {
             this.A = a;
         }
@@ -42,7 +42,7 @@ namespace RoslynSandbox
 
     public class DisplayPropertyNameExtension : MarkupExtension
     {
-        ↓public DisplayPropertyNameExtension()
+        public ↓DisplayPropertyNameExtension()
         {
         }
 
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         private readonly int a;
         private readonly int b;
 
-        ↓public Foo(int a)
+        public ↓Foo(int a)
         {
             this.a = a;
         }
@@ -103,7 +103,7 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        ↓static Foo()
+        static ↓Foo()
         {
             A = 1;
         }
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 
         public static readonly int B;
 
-        ↓static Foo()
+        static ↓Foo()
         {
             A = 1;
         }

@@ -44,41 +44,31 @@
                 return;
             }
 
-            var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
-            var ctor = (IMethodSymbol)context.ContainingSymbol;
-            if (!ctor.IsStatic &&
-                ctor.DeclaredAccessibility == Accessibility.Private)
+            if (context.Node is ConstructorDeclarationSyntax constructorDeclaration &&
+                context.ContainingSymbol is IMethodSymbol ctor)
             {
-                return;
-            }
-
-            using (var pooled = CtorWalker.Create(
-                constructorDeclarationSyntax,
-                context.SemanticModel,
-                context.CancellationToken))
-            {
-                if (pooled.Item.Unassigned.Any())
+                if (!ctor.IsStatic &&
+                     ctor.DeclaredAccessibility == Accessibility.Private)
                 {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptor,
-                            constructorDeclarationSyntax.GetLocation(),
-                            string.Join(", ", pooled.Item.Unassigned)));
+                    return;
+                }
+
+                using (var pooled = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
+                {
+                    if (pooled.Unassigned.Any())
+                    {
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptor,
+                                constructorDeclaration.Identifier.GetLocation(),
+                                string.Join(", ", pooled.Unassigned)));
+                    }
                 }
             }
         }
 
-        private class CtorWalker : CSharpSyntaxWalker
+        private class CtorWalker : PooledWalker<CtorWalker>
         {
-            private static readonly Pool<CtorWalker> Cache = new Pool<CtorWalker>(
-                () => new CtorWalker(),
-                x =>
-                {
-                    x.readOnlies.Clear();
-                    x.semanticModel = null;
-                    x.cancellationToken = CancellationToken.None;
-                });
-
             private readonly List<string> readOnlies = new List<string>();
 
             private SemanticModel semanticModel;
@@ -90,14 +80,14 @@
 
             public IReadOnlyList<string> Unassigned => this.readOnlies;
 
-            public static Pool<CtorWalker>.Pooled Create(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var pooled = Cache.GetOrCreate();
-                pooled.Item.readOnlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
-                pooled.Item.semanticModel = semanticModel;
-                pooled.Item.cancellationToken = cancellationToken;
-                pooled.Item.Visit(constructor);
-                return pooled;
+                var walker = Borrow(() => new CtorWalker());
+                walker.readOnlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
+                walker.Visit(constructor);
+                return walker;
             }
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
@@ -179,6 +169,13 @@
                 }
 
                 return false;
+            }
+
+            protected override void Clear()
+            {
+                this.readOnlies.Clear();
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
             }
         }
     }

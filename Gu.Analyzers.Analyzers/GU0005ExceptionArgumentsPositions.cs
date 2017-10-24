@@ -39,28 +39,36 @@
                 return;
             }
 
-            var objectCreationExpressionSyntax = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreationExpressionSyntax.IsMissing ||
-                objectCreationExpressionSyntax.ArgumentList == null ||
-                objectCreationExpressionSyntax.ArgumentList.Arguments.Count < 2)
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+                objectCreation.ArgumentList != null &&
+                objectCreation.ArgumentList.Arguments.Count > 0)
             {
-                return;
-            }
-
-            var type = context.SemanticModel.GetTypeInfo(objectCreationExpressionSyntax, context.CancellationToken).Type;
-            if (type == KnownSymbol.ArgumentException ||
-                type == KnownSymbol.ArgumentNullException ||
-                type == KnownSymbol.ArgumentOutOfRangeException)
-            {
-                var symbols = context.SemanticModel.LookupSymbols(objectCreationExpressionSyntax.SpanStart);
-                var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(objectCreationExpressionSyntax, context.CancellationToken);
-                if (TryGetIndexOfParameter(ctor, "paramName", out int parameterIndex) &&
-                    TryGetIndexOfNameArgument(symbols, objectCreationExpressionSyntax.ArgumentList, out ArgumentSyntax argument, out int argumentIndex) &&
-                    argumentIndex != parameterIndex)
+                if (TryGet(objectCreation, context, KnownSymbol.ArgumentException, out var ctor) ||
+                    TryGet(objectCreation, context, KnownSymbol.ArgumentNullException, out ctor) ||
+                    TryGet(objectCreation, context, KnownSymbol.ArgumentOutOfRangeException, out ctor))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                    var symbols = context.SemanticModel.LookupSymbols(objectCreation.SpanStart);
+                    if (TryGetIndexOfParameter(ctor, "paramName", out var parameterIndex) &&
+                        TryGetIndexOfNameArgument(symbols, objectCreation.ArgumentList, out var argument, out var argumentIndex) &&
+                        argumentIndex != parameterIndex)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                    }
                 }
             }
+        }
+
+        private static bool TryGet(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, QualifiedType qualifiedType, out IMethodSymbol ctor)
+        {
+            if (objectCreation.Type is IdentifierNameSyntax typeName &&
+                typeName.Identifier.ValueText == qualifiedType.Type)
+            {
+                ctor = context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) as IMethodSymbol;
+                return ctor?.ContainingType == qualifiedType;
+            }
+
+            ctor = null;
+            return false;
         }
 
         private static bool TryGetIndexOfParameter(IMethodSymbol method, string name, out int index)
