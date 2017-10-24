@@ -1,7 +1,7 @@
 namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -29,10 +29,10 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value as InvocationExpressionSyntax;
-            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskFromResult(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
+            var value = syntaxTree.FindEqualsValueClause(code).Value as InvocationExpressionSyntax;
+            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskFromResult(value, semanticModel, CancellationToken.None, out var result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }
 
@@ -63,10 +63,10 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value as InvocationExpressionSyntax;
-            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskRun(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
+            var value = syntaxTree.FindEqualsValueClause(code).Value as InvocationExpressionSyntax;
+            Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskRun(value, semanticModel, CancellationToken.None, out var result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }
     }

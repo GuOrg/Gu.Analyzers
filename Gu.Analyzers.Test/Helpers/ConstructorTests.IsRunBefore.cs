@@ -280,8 +280,8 @@ internal class Foo : FooBase
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
-                var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(firstSignature);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(otherSignature);
                 Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
@@ -334,8 +334,8 @@ internal class Foo : FooBase
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
-                var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(firstSignature);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(otherSignature);
                 Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
@@ -388,8 +388,8 @@ internal class Foo : FooBase
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
-                var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(firstSignature);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(otherSignature);
                 Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
         }

@@ -3,9 +3,8 @@ namespace Gu.Analyzers.Test.Helpers
     using System;
     using System.Linq;
     using System.Threading;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -29,9 +28,9 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindClassDeclaration("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -58,9 +57,9 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindClassDeclaration("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -87,9 +86,9 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindClassDeclaration("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));

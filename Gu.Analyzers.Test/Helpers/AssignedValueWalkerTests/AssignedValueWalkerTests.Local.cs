@@ -1,6 +1,7 @@
 namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
@@ -35,9 +36,9 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("1", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -57,9 +58,9 @@ internal class Foo<T>
         var temp = value;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
+                var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -82,9 +83,9 @@ internal class Foo
         var temp2 = value;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -104,9 +105,9 @@ internal class Foo
         var value = temp;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -126,9 +127,9 @@ internal class Foo
         var value = temp;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -148,9 +149,9 @@ internal class Foo<T>
         var value = temp;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var value = temp").Value;
+                var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
@@ -197,9 +198,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause("var temp = toDispose;").Value;
+                var value = syntaxTree.FindEqualsValueClause("var temp = toDispose;").Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);

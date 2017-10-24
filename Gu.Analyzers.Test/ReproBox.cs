@@ -2,11 +2,9 @@ namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     using NUnit.Framework;
@@ -22,7 +20,7 @@ namespace Gu.Analyzers.Test
                                .ToArray();
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task Repro(DiagnosticAnalyzer analyzer)
+        public void Repro(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace Gu.Analyzers
@@ -417,17 +415,7 @@ namespace Gu.Analyzers
         }
     }
     }";
-
-            Console.WriteLine(analyzer);
-            var analyzers = ImmutableArray.Create(analyzer);
-            await DiagnosticVerifier.GetSortedDiagnosticsFromDocumentsAsync(
-                          analyzers,
-                          CodeFactory.GetDocuments(
-                              new[] { testCode },
-                              analyzers,
-                              Enumerable.Empty<string>()),
-                          CancellationToken.None)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid(analyzer, testCode);
         }
     }
 }

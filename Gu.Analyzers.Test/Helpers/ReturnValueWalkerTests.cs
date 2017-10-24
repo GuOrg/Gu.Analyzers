@@ -1,8 +1,8 @@
 namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal class ReturnValueWalkerTests
@@ -28,9 +28,9 @@ internal class Foo
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var text = await CreateAsync()").Value;
+            var value = syntaxTree.FindEqualsValueClause("var text = await CreateAsync()").Value;
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled);
@@ -117,9 +117,9 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled);
@@ -291,9 +291,9 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled);
@@ -339,9 +339,9 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("Func<int> temp = () => 1", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled);
@@ -471,9 +471,9 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual(expected, string.Join(", ", pooled));

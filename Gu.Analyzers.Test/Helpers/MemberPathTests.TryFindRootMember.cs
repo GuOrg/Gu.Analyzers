@@ -2,6 +2,7 @@ namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
@@ -46,11 +47,11 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("foo.Inner", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var temp = ").Value;
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out ExpressionSyntax member));
+                var value = syntaxTree.FindEqualsValueClause("var temp = ").Value;
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out var member));
                 Assert.AreEqual(expected, member.ToString());
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var symbol = semanticModel.GetSymbolSafe(member, CancellationToken.None);
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);
@@ -100,11 +101,11 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("this.foo.Get<int>(1)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var invocation = syntaxTree.BestMatch<InvocationExpressionSyntax>("Get<int>(1)");
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
+                var invocation = syntaxTree.FindInvocation("Get<int>(1)");
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out var member));
                 Assert.AreEqual(expected, member.ToString());
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var symbol = semanticModel.GetSymbolSafe(member, CancellationToken.None);
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);
@@ -128,8 +129,8 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var invocation = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.Value");
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
+                var invocation = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.Value");
+                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out var member));
                 Assert.AreEqual("this.Value", member.ToString());
             }
         }

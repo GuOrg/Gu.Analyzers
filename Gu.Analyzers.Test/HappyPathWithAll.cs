@@ -1,10 +1,8 @@
 namespace Gu.Analyzers.Test
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -443,16 +441,6 @@ namespace RoslynSandbox
         }
     }";
             AnalyzerAssert.Valid(analyzer, syntaxErrorCode);
-        }
-
-        public async Task VerifyHappyPathAsync(params string[] testCode)
-        {
-            await DiagnosticVerifier.VerifyHappyPathAsync(testCode, AllAnalyzers).ConfigureAwait(false);
-        }
-
-        internal IEnumerable<DiagnosticAnalyzer> GetCSharpDiagnosticAnalyzers()
-        {
-            return AllAnalyzers;
         }
     }
 }

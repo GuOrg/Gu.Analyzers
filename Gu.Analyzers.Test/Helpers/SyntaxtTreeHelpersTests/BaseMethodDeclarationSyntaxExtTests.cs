@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers.Test.Helpers.SyntaxtTreeHelpersTests
 {
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -33,16 +34,16 @@ namespace RoslynSandbox
         }
     }
 }");
-                var argument = syntaxTree.BestMatch<InvocationExpressionSyntax>("Meh(1, 2, 3)")
+                var argument = syntaxTree.FindInvocation("Meh(1, 2, 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.BestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -70,16 +71,16 @@ namespace RoslynSandbox
         }
     }
 }");
-                var argument = syntaxTree.BestMatch<InvocationExpressionSyntax>("Meh(v1: 1, v2: 2, v3: 3)")
+                var argument = syntaxTree.FindInvocation("Meh(v1: 1, v2: 2, v3: 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.BestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -107,16 +108,16 @@ namespace RoslynSandbox
         }
     }
 }");
-                var argument = syntaxTree.BestMatch<InvocationExpressionSyntax>("Meh(v2: 2, v1: 1, v3: 3)")
+                var argument = syntaxTree.FindInvocation("Meh(v2: 2, v1: 1, v3: 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.BestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -144,16 +145,16 @@ namespace RoslynSandbox
         }
     }
 }");
-                var argument = syntaxTree.BestMatch<InvocationExpressionSyntax>("Meh(1, 2, 3)")
+                var argument = syntaxTree.FindInvocation("Meh(1, 2, 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.BestMatch<MethodDeclarationSyntax>("internal void Meh(params int[] values)");
+                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(params int[] values)");
 
                 Assert.AreEqual(
                     true,
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
         }

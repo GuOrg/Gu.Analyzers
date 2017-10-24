@@ -1,6 +1,7 @@
 namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
@@ -23,9 +24,9 @@ internal class Foo
         var temp2 = ints[0];
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -49,9 +50,9 @@ internal class Foo
         var temp2 = ints[0];
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -80,9 +81,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -111,9 +112,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -146,9 +147,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -181,9 +182,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -216,9 +217,9 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
