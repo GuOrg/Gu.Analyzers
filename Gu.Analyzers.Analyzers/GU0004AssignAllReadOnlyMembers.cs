@@ -112,6 +112,13 @@
                 base.VisitConstructorInitializer(node);
             }
 
+            protected override void Clear()
+            {
+                this.readOnlies.Clear();
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
+            }
+
             private static IEnumerable<string> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var isStatic = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken)
@@ -169,13 +176,6 @@
                 }
 
                 return false;
-            }
-
-            protected override void Clear()
-            {
-                this.readOnlies.Clear();
-                this.semanticModel = null;
-                this.cancellationToken = CancellationToken.None;
             }
         }
     }

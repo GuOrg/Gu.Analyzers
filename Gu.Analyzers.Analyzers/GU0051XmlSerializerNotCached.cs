@@ -29,55 +29,38 @@ namespace Gu.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(this.HandleObjectCreation, SyntaxKind.ObjectCreationExpression);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression);
         }
 
-        private bool IsLeakyConstructor(SyntaxNodeAnalysisContext context)
-        {
-            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            var ctor = (IMethodSymbol)context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken);
-            var parameters = ctor.Parameters;
-            if (parameters.Length == 1 && parameters[0].Type == KnownSymbol.Type)
-            {
-                return false;
-            }
-
-            if (parameters.Length == 2 && parameters[0].Type == KnownSymbol.Type && parameters[1].Type == KnownSymbol.String)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private void HandleObjectCreation(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreation.IsSameType(KnownSymbol.XmlSerializer, context))
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+                TryGetConstructor(objectCreation, context, out var ctor) &&
+                IsLeakyConstructor(ctor))
             {
-                if (!this.IsLeakyConstructor(context))
-                {
-                    return;
-                }
-
                 var assignment = objectCreation.FirstAncestor<AssignmentExpressionSyntax>();
                 if (assignment != null)
                 {
-                    var assignmentSymbol = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
+                    var assignmentSymbol = context.SemanticModel.GetSymbolSafe(
+                        assignment.Left,
+                        context.CancellationToken);
                     if (assignmentSymbol != null &&
-                       assignmentSymbol.CanBeReferencedByName &&
-                       assignmentSymbol.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference assignedToDeclaration))
+                        assignmentSymbol.CanBeReferencedByName &&
+                        assignmentSymbol.DeclaringSyntaxReferences.TryGetSingle(out var assignedToDeclaration))
                     {
-                        var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
+                        var assignedToDeclarator =
+                            assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
                         if (context.SemanticModel.SemanticModelFor(assignedToDeclarator)
-                         ?.GetDeclaredSymbol(assignedToDeclarator, context.CancellationToken) is IFieldSymbol fieldSymbol &&
-   fieldSymbol.IsReadOnly &&
-   fieldSymbol.IsStatic)
+                                   ?.GetDeclaredSymbol(
+                                       assignedToDeclarator,
+                                       context.CancellationToken) is IFieldSymbol fieldSymbol &&
+                            fieldSymbol.IsReadOnly &&
+                            fieldSymbol.IsStatic)
                         {
                             return;
                         }
@@ -90,9 +73,11 @@ namespace Gu.Analyzers
                 var declarator = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
                 if (declarator != null)
                 {
-                    if (context.SemanticModel.SemanticModelFor(declarator)?.GetDeclaredSymbol(declarator, context.CancellationToken) is IFieldSymbol fieldSymbol &&
-   fieldSymbol.IsReadOnly &&
-   fieldSymbol.IsStatic)
+                    if (context.SemanticModel.SemanticModelFor(declarator)
+                               ?.GetDeclaredSymbol(declarator, context.CancellationToken) is IFieldSymbol
+                            fieldSymbol &&
+                        fieldSymbol.IsReadOnly &&
+                        fieldSymbol.IsStatic)
                     {
                         return;
                     }
@@ -107,6 +92,35 @@ namespace Gu.Analyzers
 
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
+        }
+
+        private static bool TryGetConstructor(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, out IMethodSymbol ctor)
+        {
+            if (objectCreation.Type is IdentifierNameSyntax typeName &&
+                typeName.Identifier.ValueText == KnownSymbol.XmlSerializer.Type)
+            {
+                ctor = context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) as IMethodSymbol;
+                return ctor?.ContainingType == KnownSymbol.XmlSerializer;
+            }
+
+            ctor = null;
+            return false;
+        }
+
+        private static bool IsLeakyConstructor(IMethodSymbol ctor)
+        {
+            var parameters = ctor.Parameters;
+            if (parameters.Length == 1 && parameters[0].Type == KnownSymbol.Type)
+            {
+                return false;
+            }
+
+            if (parameters.Length == 2 && parameters[0].Type == KnownSymbol.Type && parameters[1].Type == KnownSymbol.String)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

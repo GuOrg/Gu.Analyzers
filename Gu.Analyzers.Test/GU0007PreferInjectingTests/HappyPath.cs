@@ -97,6 +97,5 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, fooCode, barCode, mehCode);
         }
-
     }
 }
