@@ -41,34 +41,32 @@
                 return;
             }
 
-            var type = context.ContainingSymbol.ContainingType;
-            if (!HasSerializableAttribute(type))
+            if (context.Node is EventFieldDeclarationSyntax eventFieldDeclaration &&
+                context.ContainingSymbol is IEventSymbol eventSymbol &&
+                HasSerializableAttribute(eventSymbol.ContainingType))
             {
-                return;
-            }
-
-            var eventFieldDeclaration = (EventFieldDeclarationSyntax)context.Node;
-            foreach (var attributeList in eventFieldDeclaration.AttributeLists)
-            {
-                foreach (var attribute in attributeList.Attributes)
+                foreach (var attributeList in eventFieldDeclaration.AttributeLists)
                 {
-                    if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") ==
-                        true)
+                    foreach (var attribute in attributeList.Attributes)
                     {
-                        var attributeType =
-                            context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
-                                   ?.ContainingType;
-                        if (attributeType != KnownSymbol.NonSerializedAttribute)
+                        if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") ==
+                            true)
                         {
-                            continue;
-                        }
+                            var attributeType =
+                                context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
+                                       ?.ContainingType;
+                            if (attributeType != KnownSymbol.NonSerializedAttribute)
+                            {
+                                continue;
+                            }
 
-                        return;
+                            return;
+                        }
                     }
                 }
-            }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, eventFieldDeclaration.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, eventFieldDeclaration.GetLocation()));
+            }
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)

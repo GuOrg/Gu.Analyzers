@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0010DoNotAssignSameValue>
+    internal class Diagnostics
     {
         [TestCase("this.A = this.A;", "this.A = this.A;")]
         [TestCase("this.A = this.A;", "this.A = A;")]

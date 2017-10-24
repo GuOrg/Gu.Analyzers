@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
+        public void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,11 +32,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -63,11 +58,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
+        public void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -93,11 +88,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(A, B, C, D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -124,11 +114,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
+        public void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -157,11 +147,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -188,11 +173,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
+        public void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -218,11 +203,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(A, B, C, D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -249,11 +229,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromReadOnlyFields()
+        public void AllocatingReferenceTypeFromReadOnlyFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -276,11 +256,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(this.a, this.b, this.c, this.d);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -304,11 +279,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
+        public void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -331,11 +306,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(_a, _b, _c, _d);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -359,11 +329,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeEmptyCtor()
+        public void AllocatingReferenceTypeEmptyCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -377,11 +347,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo();
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -396,11 +361,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeLambdaUsingMutableCtor()
+        public void AllocatingReferenceTypeLambdaUsingMutableCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -419,11 +384,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(() => this.Value);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -443,11 +403,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeMethodGroup()
+        public void AllocatingReferenceTypeMethodGroup()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -468,11 +428,6 @@ namespace RoslynSandbox
         private static int CreateNumber() => 2;
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -494,11 +449,11 @@ namespace RoslynSandbox
         private static int CreateNumber() => 2;
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromMutablePropertyNoFix1()
+        public void AllocatingReferenceTypeFromMutablePropertyNoFix1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -524,11 +479,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -555,11 +505,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromMutablePropertyNoFix2()
+        public void AllocatingReferenceTypeFromMutablePropertyNoFix2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -585,11 +535,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(A, B, C, D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -616,11 +561,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromMutableFieldNoFix()
+        public void AllocatingReferenceTypeFromMutableFieldNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -643,11 +588,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(this.a, this.b, this.c, this.d);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -671,11 +611,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
+        public void AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -698,11 +638,6 @@ namespace RoslynSandbox
         public Foo Bar ↓=> new Foo(_a, _b, _c, _d);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -726,11 +661,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
+        public void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -759,11 +694,6 @@ namespace RoslynSandbox
             };
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -793,11 +723,11 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromSecondLevelNoFix1()
+        public void AllocatingReferenceTypeFromSecondLevelNoFix1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -826,11 +756,6 @@ namespace RoslynSandbox
         public Foo Bar2 ↓=> new Foo(this.A, this.B, this.C, this.Bar1.D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -860,11 +785,11 @@ namespace RoslynSandbox
         public Foo Bar2 { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AllocatingReferenceTypeFromSecondLevelNoFix2()
+        public void AllocatingReferenceTypeFromSecondLevelNoFix2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -893,11 +818,6 @@ namespace RoslynSandbox
         public Foo Bar2 ↓=> new Foo(this.A, this.B, this.C, this.Bar1.D);
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Calculated property allocates reference type.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -927,7 +847,7 @@ namespace RoslynSandbox
         public Foo Bar2 { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

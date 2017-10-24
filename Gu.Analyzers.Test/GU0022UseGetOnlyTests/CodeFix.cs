@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0022UseGetOnly, UseGetOnlyCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task InitializedInCtor()
+        public void InitializedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,11 +30,6 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use get-only.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -58,11 +53,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0022UseGetOnly, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task InitializedInCtorAndPropertyInitializer()
+        public void InitializedInCtorAndPropertyInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,11 +81,6 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use get-only.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -114,7 +104,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0022UseGetOnly, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

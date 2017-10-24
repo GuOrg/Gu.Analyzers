@@ -1,13 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
-    using System.Threading;
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0020SortProperties, SortPropertiesCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task ExplicitImplementation()
+        public void ExplicitImplementation()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -23,19 +22,11 @@ namespace RoslynSandbox
 {
     public class Foo : IValue
     {
-        private int Value { get; } = 5;
+        ↓private int Value { get; } = 5;
 
-        object IValue.Value { get; } = 5;
+        ↓object IValue.Value { get; } = 5;
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 6, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 8, 9)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(new[] { interfaceCode, testCode }, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -47,11 +38,11 @@ namespace RoslynSandbox
         private int Value { get; } = 5;
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { interfaceCode, testCode }, new[] { interfaceCode, fixedCode }, codeFixIndex: 0).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(new[] { interfaceCode, testCode }, fixedCode);
         }
 
         [Test]
-        public async Task WhenMutableBeforeGetOnlyFirst()
+        public void WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -66,23 +57,15 @@ namespace RoslynSandbox
             this.D = d;
         }
 
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; }
+        ↓public int B { get; }
 
         public int C { get; }
 
         public int D { get; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 14, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -106,11 +89,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode, codeFixIndex: 0).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenMutableBeforeGetOnlyFirstWithNamespaces()
+        public void WhenMutableBeforeGetOnlyFirstWithNamespaces()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -127,24 +110,15 @@ namespace RoslynSandbox
             this.D = d;
         }
 
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; }
+        ↓public int B { get; }
 
         public int C { get; }
 
         public int D { get; }
     }
 }";
-
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 16, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 18, 9)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -170,11 +144,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode, codeFixIndex: 0).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenMutableBeforeGetOnlyLast()
+        public void WhenMutableBeforeGetOnlyLast()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -193,18 +167,11 @@ namespace RoslynSandbox
 
         public int B { get; }
 
-        public int C { get; set; }
+        ↓public int C { get; set; }
 
-        public int D { get; }
+        ↓public int D { get; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 18, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 20, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -228,11 +195,11 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenPrivateSetAfterPublicSet()
+        public void WhenPrivateSetAfterPublicSet()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -252,7 +219,7 @@ namespace RoslynSandbox
             }
         }
 
-        public int C
+        ↓public int C
         {
             get
             {
@@ -264,7 +231,7 @@ namespace RoslynSandbox
             }
         }
 
-        public int D
+        ↓public int D
         {
             get
             {
@@ -277,13 +244,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 19, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 31, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -328,11 +288,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenMutableBeforeGetOnlyFirstWithInitializers()
+        public void WhenMutableBeforeGetOnlyFirstWithInitializers()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -347,23 +307,15 @@ namespace RoslynSandbox
             this.D = d;
         }
 
-        public int A { get; set; } = 1;
+        ↓public int A { get; set; } = 1;
 
-        public int B { get; } = 2;
+        ↓public int B { get; } = 2;
 
         public int C { get; } = 3;
 
         public int D { get; } = 4;
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 14, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 16, 9)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -387,11 +339,11 @@ namespace RoslynSandbox
         public int A { get; set; } = 1;
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenMutableBeforeGetOnlyWithComments()
+        public void WhenMutableBeforeGetOnlyWithComments()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -413,21 +365,14 @@ namespace RoslynSandbox
         /// <summary>
         /// C
         /// </summary>
-        public int C { get; set; }
+        ↓public int C { get; set; }
 
         /// <summary>
         /// D
         /// </summary>
-        public int D { get; }
+        ↓public int D { get; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 21, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 26, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -457,11 +402,11 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ExpressionBodyBeforeGetOnly()
+        public void ExpressionBodyBeforeGetOnly()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -473,18 +418,11 @@ namespace RoslynSandbox
             this.B = b;
         }
 
-        public int A => B;
+        ↓public int A => B;
 
-        public int B { get; }
+        ↓public int B { get; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 11, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 13, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -501,11 +439,11 @@ namespace RoslynSandbox
         public int A => B;
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task CalculatedBeforeGetOnly()
+        public void CalculatedBeforeGetOnly()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -517,7 +455,7 @@ namespace RoslynSandbox
             this.B = b;
         }
 
-        public int A
+        ↓public int A
         {
             get
             {
@@ -525,16 +463,9 @@ namespace RoslynSandbox
             }
         }
 
-        public int B { get; }
+        ↓public int B { get; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 11, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 19, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -557,11 +488,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task IndexerBeforeMutable()
+        public void IndexerBeforeMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -574,7 +505,7 @@ namespace RoslynSandbox
     {
         public int Count { get; }
 
-        public int this[int index]
+        ↓public int this[int index]
         {
             get
             {
@@ -587,7 +518,7 @@ namespace RoslynSandbox
             }
         }
 
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
         public IEnumerator<int> GetEnumerator()
         {
@@ -600,13 +531,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                               .WithLocation("Foo.cs", 12, 9)
-                               .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 25, 9)
-                                .WithMessage("Move property.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -645,11 +569,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task PublicSetBeforePrivateSetFirst()
+        public void PublicSetBeforePrivateSetFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -662,19 +586,11 @@ namespace RoslynSandbox
             this.B = b;
         }
 
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; private set; }
+        ↓public int B { get; private set; }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 12, 9)
-                                .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 14, 9)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -692,11 +608,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NestedClass()
+        public void NestedClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -715,20 +631,12 @@ namespace RoslynSandbox
 
         public class Nested
         {
-            public int Value1 { get; set; }
+            ↓public int Value1 { get; set; }
             
-            public int Value2 { get; private set; }
+            ↓public int Value2 { get; private set; }
         }
     }
 }";
-            var expected1 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 18, 13)
-                                .WithMessage("Move property.");
-            var expected2 = this.CSharpDiagnostic()
-                                .WithLocation("Foo.cs", 20, 13)
-                                .WithMessage("Move property.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, new[] { expected1, expected2 }, CancellationToken.None).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -754,7 +662,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

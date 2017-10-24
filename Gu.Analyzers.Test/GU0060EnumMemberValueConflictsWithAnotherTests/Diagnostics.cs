@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0060EnumMemberValueConflictsWithAnother>
+    internal class Diagnostics
     {
         [Test]
         public void ImplicitValueSharing()

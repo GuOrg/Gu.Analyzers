@@ -1,22 +1,21 @@
 ﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAll : CodeFixVerifier<GU0020SortProperties, SortPropertiesCodeFixProvider>
+    internal class CodeFixAll
     {
         [Test]
-        public async Task WhenMutableBeforeGetOnlyFirst()
+        public void WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; }
+        ↓public int B { get; }
 
         public int C { get; }
 
@@ -38,23 +37,22 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenAMess1()
+        public void WhenAMess1()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; private set; }
+        ↓public int B { get; private set; }
 
-        public int C { get; }
+        ↓public int C { get; }
 
         public int D => C;
     }
@@ -74,12 +72,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task WhenAMess1WithDocs()
+        public void WhenAMess1WithDocs()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,17 +86,17 @@ namespace RoslynSandbox
         /// <summary>
         /// Docs for A
         /// </summary>
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
         /// <summary>
         /// Docs for B
         /// </summary>
-        public int B { get; private set; }
+        ↓public int B { get; private set; }
 
         /// <summary>
         /// Docs for C
         /// </summary>
-        public int C { get; }
+        ↓public int C { get; }
 
         /// <summary>
         /// Docs for D
@@ -134,25 +131,24 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task PreservesDocumentOrder()
+        public void PreservesDocumentOrder()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
-        public int A { get; set; }
+        ↓public int A { get; set; }
 
-        public int B { get; private set; }
+        ↓public int B { get; private set; }
 
-        public int C { get; set; }
+        ↓public int C { get; set; }
 
-        public int D { get; private set; }
+        ↓public int D { get; private set; }
     }
 }";
 
@@ -170,8 +166,7 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

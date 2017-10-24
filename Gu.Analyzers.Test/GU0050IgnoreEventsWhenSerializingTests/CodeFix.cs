@@ -1,13 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task NotIgnoredEvent()
+        public void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -38,11 +37,43 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Ignore events when serializing.");
 
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0050", "Ignore events when serializing.", testCode, out testCode);
+            AnalyzerAssert.Diagnostics<GU0050IgnoreEventsWhenSerializing>(expectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void NotIgnoredEvent()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    [Serializable]
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        ↓public event EventHandler SomeEvent;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
+    }
+}";
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -74,11 +105,11 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotIgnoredEventWithAttribute()
+        public void NotIgnoredEventWithAttribute()
         {
             var attributeCode = @"
 namespace RoslynSandbox
@@ -119,11 +150,6 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Ignore events when serializing.");
-
-            await this.VerifyCSharpDiagnosticAsync(new[] { attributeCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -156,11 +182,11 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { attributeCode, testCode }, new[] { attributeCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(new[] { attributeCode, testCode }, fixedCode);
         }
 
         [Test]
-        public async Task NotIgnoredEventHandler()
+        public void NotIgnoredEventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -179,11 +205,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Ignore events when serializing.");
-
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -203,7 +224,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(testCode, fixedCode);
         }
     }
 }
