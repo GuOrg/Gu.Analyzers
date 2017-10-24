@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test
                                .ToImmutableArray();
 
         private static readonly Solution Solution = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
-           Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
+            Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
