@@ -1,6 +1,6 @@
 ﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<GU0010DoNotAssignSameValue>
@@ -9,7 +9,7 @@
         [TestCase("this.A = this.A;", "this.A = A;")]
         [TestCase("this.A = this.A;", "A = A;")]
         [TestCase("this.A = this.A;", "A = this.A;")]
-        public async Task SetPropertyToSelf(string before, string after)
+        public void SetPropertyToSelf(string before, string after)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,15 +24,17 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace(before, after);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assigning made to same, did you mean to assign something else?");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
+                diagnosticId: "GU0010",
+                message: "Assigning made to same, did you mean to assign something else?",
+                code: testCode,
+                cleanedSources: out testCode);
+            AnalyzerAssert.Diagnostics<GU0010DoNotAssignSameValue>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task SetPropertyToSelfWithThis()
+        public void SetPropertyToSelfWithThis()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,10 +50,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Assigning made to same, did you mean to assign something else?");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0010DoNotAssignSameValue>(testCode);
         }
     }
 }

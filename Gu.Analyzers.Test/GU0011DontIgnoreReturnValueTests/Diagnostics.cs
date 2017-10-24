@@ -1,14 +1,14 @@
 ﻿namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0011DontIgnoreReturnValue>
+    internal class Diagnostics
     {
         [TestCase("ints.Select(x => x);")]
         [TestCase("ints.Select(x => x).Where(x => x > 1);")]
         [TestCase("ints.Where(x => x > 1);")]
-        public async Task Linq(string linq)
+        public void Linq(string linq)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,14 +24,17 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("ints.Select(x => x);", linq);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore the returnvalue.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected).ConfigureAwait(false);
+
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
+                diagnosticId: "GU0011",
+                message: "Don't ignore the returnvalue.",
+                code: testCode,
+                cleanedSources: out testCode);
+            AnalyzerAssert.Diagnostics<GU0011DontIgnoreReturnValue>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task StringBuilderWriteLine()
+        public void StringBuilderWriteLineToString()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,10 +51,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore the returnvalue.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0011DontIgnoreReturnValue>(testCode);
         }
     }
 }

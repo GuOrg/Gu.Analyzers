@@ -1,13 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0009UseNamedParametersForBooleans>
+    internal class Diagnostics
     {
         [Test]
-        public async Task UnnamedBooleanParameters()
+        public void UnnamedBooleanParameters()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -29,15 +28,16 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The boolean parameter is not named.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
+                diagnosticId: "GU0009",
+                message: "The boolean parameter is not named.",
+                code: testCode,
+                cleanedSources: out testCode);
+            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task HandlesAnAlias()
+        public void HandlesAnAlias()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -60,15 +60,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The boolean parameter is not named.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+
+            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(testCode);
         }
 
         [Test]
-        public async Task HandlesAFullyQualifiedName()
+        public void HandlesAFullyQualifiedName()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -90,11 +87,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The boolean parameter is not named.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(testCode);
         }
     }
 }

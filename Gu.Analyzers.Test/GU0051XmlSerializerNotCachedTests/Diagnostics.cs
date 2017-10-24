@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0051XmlSerializerNotCached>
+    internal class Diagnostics
     {
         [Test]
-        public async Task TrivialConstructionUnsaved()
+        public void TrivialConstructionUnsaved()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -26,15 +26,16 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The serializer is not cached.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
+                diagnosticId: "GU0051",
+                message: "The serializer is not cached.",
+                code: testCode,
+                cleanedSources: out testCode);
+            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task TrivialConstructionUnsavedFullyQualified()
+        public void TrivialConstructionUnsavedFullyQualified()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,15 +54,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The serializer is not cached.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public async Task LocalVariable(string code)
+        public void LocalVariable(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -82,15 +79,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The serializer is not cached.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public async Task PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
+        public void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,11 +106,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The serializer is not cached.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
         }
     }
 }

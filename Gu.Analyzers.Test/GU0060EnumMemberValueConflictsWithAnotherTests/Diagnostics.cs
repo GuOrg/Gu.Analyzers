@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<Analyzers.GU0060EnumMemberValueConflictsWithAnother>
+    internal class Diagnostics : DiagnosticVerifier<GU0060EnumMemberValueConflictsWithAnother>
     {
         [Test]
-        public async Task ImplicitValueSharing()
+        public void ImplicitValueSharing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -19,18 +19,20 @@ namespace RoslynSandbox
         None,
         A,
         B,
-        ↓Baaaaaaad
+        ↓Bad
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
+                diagnosticId: "GU0060",
+                message: "Enum member value conflicts with another.",
+                code: testCode,
+                cleanedSources: out testCode);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharing()
+        public void ExplicitValueSharing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -42,18 +44,14 @@ namespace RoslynSandbox
     {
         A = 1,
         B = 2,
-        ↓Baaaaaaad = 2
+        ↓Bad = 2
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharingWithBitwiseSum()
+        public void ExplicitValueSharingWithBitwiseSum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,18 +63,14 @@ namespace RoslynSandbox
     {
         A = 1,
         B = 2,
-        ↓Baaaaaaad = 3
+        ↓Bad = 3
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharingDifferentBases()
+        public void ExplicitValueSharingDifferentBases()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,18 +86,14 @@ namespace RoslynSandbox
         D = 8,
         E = 16,
         F = 32,
-        ↓Baaaaaaad = 0x0F
+        ↓Bad = 0x0F
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharingBitshifts()
+        public void ExplicitValueSharingBitshifts()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,18 +106,14 @@ namespace RoslynSandbox
         A = 1 << 0,
         B = 1 << 1,
         C = 1 << 2,
-        ↓Baaaaaaad = 1 << 2
+        ↓Bad = 1 << 2
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharingNonFlag()
+        public void ExplicitValueSharingNonFlag()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -139,18 +125,14 @@ namespace RoslynSandbox
         A,
         B,
         C,
-        ↓Baaaaaaad = 2
+        ↓Bad = 2
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
 
         [Test]
-        public async Task ExplicitValueSharingPartial()
+        public void ExplicitValueSharingPartial()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -162,14 +144,10 @@ namespace RoslynSandbox
     {
         A = 1,
         B = 2,
-        ↓Baaaaaaad = A | 2
+        ↓Bad = A | 2
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Enum member value conflicts with another.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
         }
     }
 }
