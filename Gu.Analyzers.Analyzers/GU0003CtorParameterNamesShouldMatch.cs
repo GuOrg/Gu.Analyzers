@@ -16,8 +16,8 @@
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Name the parameters to match the members.",
-            messageFormat: "Name the parameters to match the members.",
+            title: "Name the parameters to match the assigned members.",
+            messageFormat: "Name the parameters to match the assigned members.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,

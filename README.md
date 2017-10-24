@@ -17,7 +17,7 @@
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0003.md">GU0003</a></td>
-  <td>Name the parameters to match the members.</td>
+  <td>Name the parameters to match the assigned members.</td>
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0004.md">GU0004</a></td>

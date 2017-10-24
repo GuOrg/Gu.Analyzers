@@ -6,6 +6,36 @@
     internal class CodeFix
     {
         [Test]
+        public void Message()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int ↓a1, int b, int c, int d)
+        {
+            this.A = a1;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+    }
+}";
+
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0003", "Name the parameters to match the assigned members.", testCode, out testCode);
+            AnalyzerAssert.Diagnostics<GU0003CtorParameterNamesShouldMatch>(expectedDiagnostic, testCode);
+        }
+
+        [Test]
         public void ConstructorSettingProperties()
         {
             var testCode = @"

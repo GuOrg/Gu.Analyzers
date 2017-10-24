@@ -6,6 +6,45 @@
     internal class CodeFix
     {
         [Test]
+        public void Message()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+
+        private Foo Create(int a, int b, int c, int d)
+        {
+            return new Foo↓(
+                b: b,
+                a: a,
+                c: c,
+                d: d);
+        }
+    }
+}";
+
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0002", "The position of a named arguments and parameters should match.", testCode, out testCode);
+            AnalyzerAssert.Diagnostics<GU0002NamedArgumentPositionMatches>(expectedDiagnostic, testCode);
+        }
+
+        [Test]
         public void Constructor()
         {
             var testCode = @"

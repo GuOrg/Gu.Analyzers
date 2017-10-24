@@ -14,7 +14,7 @@
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "The position of a named argument should match.",
-            messageFormat: "Use correct positions.",
+            messageFormat: "The position of a named arguments and parameters should match.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
