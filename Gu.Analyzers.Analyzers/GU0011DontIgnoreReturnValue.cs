@@ -43,8 +43,8 @@
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                !CanIgnore(objectCreation) &&
-                IsIgnored(objectCreation))
+                IsIgnored(objectCreation) &&
+                !CanIgnore(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

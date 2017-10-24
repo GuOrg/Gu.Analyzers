@@ -19,7 +19,7 @@ namespace Gu.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: "This constructor loads assemblies in non-GC memory, which may cause memory leaks.",
-            helpLinkUri: Analyzers.HelpLink.ForId(DiagnosticId));
+            helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
