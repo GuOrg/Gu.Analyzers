@@ -42,17 +42,17 @@
                 return;
             }
 
-            var propertySymbol = (IPropertySymbol)context.ContainingSymbol;
-            if (propertySymbol.IsStatic ||
-                propertySymbol.DeclaredAccessibility == Accessibility.Protected ||
-                propertySymbol.DeclaredAccessibility == Accessibility.Private)
+            if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
+                !propertyDeclaration.TryGetSetAccessorDeclaration(out _) &&
+                context.ContainingSymbol is IPropertySymbol propertySymbol &&
+                !propertySymbol.IsStatic &&
+                propertySymbol.DeclaredAccessibility != Accessibility.Protected &&
+                propertySymbol.DeclaredAccessibility != Accessibility.Private)
             {
-                return;
-            }
-
-            if (IsRelayProperty((PropertyDeclarationSyntax)context.Node, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                if (IsRelayProperty(propertyDeclaration, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                }
             }
         }
 
