@@ -1,13 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0001NameArguments, NameArgumentsCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task Constructor()
+        public void Constructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -40,10 +39,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the arguments.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -76,11 +71,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorInArrayInitializer()
+        public void ConstructorInArrayInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,10 +111,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the arguments.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -155,11 +146,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorInFunc()
+        public void ConstructorInFunc()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -194,10 +185,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the arguments.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -232,11 +219,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorIgnoredIfAnyNamed()
+        public void ConstructorIgnoredIfAnyNamed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -269,12 +256,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the arguments.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
-            CollectionAssert.IsEmpty(await this.GetOfferedCSharpFixesAsync(testCode).ConfigureAwait(false));
+            AnalyzerAssert.NoFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode);
         }
     }
 }

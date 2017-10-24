@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Linq;
@@ -18,7 +19,7 @@
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Assign all readonly members.",
-            messageFormat: "The following readonly members are not assigned: {0}.",
+            messageFormat: "The following readonly members are not assigned:\r\n{0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
@@ -61,7 +62,7 @@
                             Diagnostic.Create(
                                 Descriptor,
                                 constructorDeclaration.Identifier.GetLocation(),
-                                string.Join(", ", pooled.Unassigned)));
+                                string.Join(Environment.NewLine, pooled.Unassigned)));
                     }
                 }
             }
@@ -69,7 +70,7 @@
 
         private class CtorWalker : PooledWalker<CtorWalker>
         {
-            private readonly List<string> readOnlies = new List<string>();
+            private readonly List<ISymbol> readonlies = new List<ISymbol>();
 
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
@@ -78,12 +79,12 @@
             {
             }
 
-            public IReadOnlyList<string> Unassigned => this.readOnlies;
+            public IReadOnlyList<ISymbol> Unassigned => this.readonlies;
 
             public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var walker = Borrow(() => new CtorWalker());
-                walker.readOnlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
+                walker.readonlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
                 walker.semanticModel = semanticModel;
                 walker.cancellationToken = cancellationToken;
                 walker.Visit(constructor);
@@ -92,9 +93,9 @@
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
-                if (TryGetIdentifier(node.Left, out IdentifierNameSyntax left))
+                if (TryGetIdentifier(node.Left, out var left))
                 {
-                    this.readOnlies.Remove(left.Identifier.ValueText)
+                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(left, this.cancellationToken))
                         .IgnoreReturnValue();
                 }
 
@@ -114,39 +115,39 @@
 
             protected override void Clear()
             {
-                this.readOnlies.Clear();
+                this.readonlies.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;
             }
 
-            private static IEnumerable<string> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            private static IEnumerable<ISymbol> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var isStatic = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken)
-                                            .IsStatic;
+                var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
-                    if (member is FieldDeclarationSyntax fieldDeclaration)
+                    if (member is FieldDeclarationSyntax fieldDeclaration &&
+                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword))
                     {
                         var declaration = fieldDeclaration.Declaration;
-                        if (declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax variable))
+                        if (declaration.Variables.TryGetSingle(out var variable))
                         {
                             var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
                             if (field.IsReadOnly &&
                                 field.IsStatic == isStatic &&
                                 variable.Initializer == null)
                             {
-                                yield return field.Name;
+                                yield return field;
                             }
                         }
 
                         continue;
                     }
 
-                    var propertyDeclaration = member as PropertyDeclarationSyntax;
-                    if (propertyDeclaration != null &&
+                    if (member is PropertyDeclarationSyntax propertyDeclaration &&
                         propertyDeclaration.ExpressionBody == null &&
-                        propertyDeclaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
+                        !propertyDeclaration.TryGetSetAccessorDeclaration(out _) &&
+                        propertyDeclaration.TryGetGetAccessorDeclaration(out var getter) &&
                         getter.Body == null)
                     {
                         var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
@@ -155,7 +156,7 @@
                             !property.IsAbstract &&
                             propertyDeclaration.Initializer == null)
                         {
-                            yield return propertyDeclaration.Identifier.ValueText;
+                            yield return semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
                         }
                     }
                 }

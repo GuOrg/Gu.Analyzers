@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task Constructor()
+        public void Constructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,10 +39,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use correct positions.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -75,11 +71,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorInArrayInitializer()
+        public void ConstructorInArrayInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,10 +111,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use correct positions.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -154,11 +146,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorInFunc()
+        public void ConstructorInFunc()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -193,10 +185,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use correct positions.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -231,11 +219,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorIgnoredIfNonWhitespaceTrivia()
+        public void ConstructorIgnoredIfNonWhitespaceTrivia()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -268,12 +256,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use correct positions.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
-            CollectionAssert.IsEmpty(await this.GetOfferedCSharpFixesAsync(testCode).ConfigureAwait(false));
+            AnalyzerAssert.NoFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode);
         }
     }
 }

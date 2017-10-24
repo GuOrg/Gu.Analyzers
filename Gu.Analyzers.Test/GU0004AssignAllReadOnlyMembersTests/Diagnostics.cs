@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<GU0004AssignAllReadOnlyMembers>
+    internal class Diagnostics
     {
         [Test]
-        public async Task NotSettingGetOnlyProperty()
+        public void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,14 +24,36 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The following readonly members are not assigned: B.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            var message = "The following readonly members are not assigned:\r\n" +
+                          "RoslynSandbox.Foo.B";
+            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0004", message, testCode, out testCode);
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(expectedDiagnostic, testCode);
         }
 
         [Test]
-        public async Task NotSettingGetOnlyPropertyInOneCtor()
+        public void NotSettingGetOnlyProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public ↓Foo(int a)
+        {
+            this.A = a;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+    }
+}";
+
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+        }
+
+        [Test]
+        public void NotSettingGetOnlyPropertyInOneCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,14 +87,11 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The following readonly members are not assigned: PropertyName.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
         }
 
         [Test]
-        public async Task NotSettingReadOnlyField()
+        public void NotSettingReadOnlyField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,14 +108,11 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The following readonly members are not assigned: b.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
         }
 
         [Test]
-        public async Task StaticConstructorSettingProperties()
+        public void StaticConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,14 +129,11 @@ namespace RoslynSandbox
         public static int B { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The following readonly members are not assigned: B.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
         }
 
         [Test]
-        public async Task StaticConstructorNotSettingField()
+        public void StaticConstructorNotSettingField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -138,10 +151,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("The following readonly members are not assigned: B.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
         }
     }
 }

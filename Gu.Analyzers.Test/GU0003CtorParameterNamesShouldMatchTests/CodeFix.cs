@@ -1,13 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task ConstructorSettingProperties()
+        public void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,10 +30,6 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -58,11 +53,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ChainedConstructorSettingProperties()
+        public void ChainedConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -91,10 +86,6 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -123,11 +114,11 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task BaseConstructorCall()
+        public void BaseConstructorCall()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -162,10 +153,6 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref fooCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -178,11 +165,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode }, new[] { fixedCode, barCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(new[] { fooCode, barCode }, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorSettingFields()
+        public void ConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -203,10 +190,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -227,11 +210,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ConstructorSettingFieldsPrefixedWithUnderscore()
+        public void ConstructorSettingFieldsPrefixedWithUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -252,10 +235,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -276,11 +255,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task IgnoresWhenBaseIsParams()
+        public void IgnoresWhenBaseIsParams()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -309,10 +288,6 @@ namespace RoslynSandbox
         public int[] Values { get; }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref fooCode)
-                               .WithMessage("Name the parameters to match the members.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { fooCode, barCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -325,7 +300,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { fooCode, barCode }, new[] { fixedCode, barCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(new[] { fooCode, barCode }, fixedCode);
         }
     }
 }
