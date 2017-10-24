@@ -40,52 +40,51 @@
                 return;
             }
 
-            var argument = (ArgumentSyntax)context.Node;
-            var literal = argument.Expression as LiteralExpressionSyntax;
-            if (literal?.IsKind(SyntaxKind.StringLiteralExpression) != true)
+            if (context.Node is ArgumentSyntax argument &&
+                argument.Expression is LiteralExpressionSyntax literal &&
+                literal.IsKind(SyntaxKind.StringLiteralExpression) &&
+                SyntaxFacts.IsValidIdentifier(literal.Token.ValueText))
             {
-                return;
-            }
-
-            var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart);
-            if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out ISymbol symbol))
-            {
-                if (symbol is IParameterSymbol ||
-                    symbol is ILocalSymbol ||
-                    symbol is IFieldSymbol ||
-                    symbol is IEventSymbol ||
-                    symbol is IPropertySymbol ||
-                    symbol is IMethodSymbol)
+                var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart, name: literal.Token.ValueText);
+                if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out var symbol))
                 {
-                    if (symbol is ILocalSymbol local)
+                    if (symbol is IParameterSymbol ||
+                        symbol is ILocalSymbol ||
+                        symbol is IFieldSymbol ||
+                        symbol is IEventSymbol ||
+                        symbol is IPropertySymbol ||
+                        symbol is IMethodSymbol)
                     {
-                        if (local.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference reference))
+                        if (symbol is ILocalSymbol local)
                         {
-                            var statement = argument.FirstAncestor<StatementSyntax>();
-                            if (statement.Span.Start < reference.Span.Start)
+                            if (local.DeclaringSyntaxReferences.TryGetSingle(out var reference))
+                            {
+                                var statement = argument.FirstAncestor<StatementSyntax>();
+                                if (statement.Span.Start < reference.Span.Start)
+                                {
+                                    return;
+                                }
+                            }
+                            else
                             {
                                 return;
                             }
                         }
-                        else
+
+                        if (symbol is IParameterSymbol ||
+                            symbol is ILocalSymbol ||
+                            symbol.IsStatic ||
+                            context.ContainingSymbol.IsStatic)
                         {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                             return;
                         }
-                    }
 
-                    if (symbol is IParameterSymbol ||
-                        symbol is ILocalSymbol ||
-                        symbol.IsStatic ||
-                        context.ContainingSymbol.IsStatic)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
-                        return;
-                    }
-
-                    if (symbol.ContainingType == context.ContainingSymbol.ContainingType)
-                    {
-                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation(), properties));
+                        if (symbol.ContainingType == context.ContainingSymbol.ContainingType)
+                        {
+                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation(), properties));
+                        }
                     }
                 }
             }
