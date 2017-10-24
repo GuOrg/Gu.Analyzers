@@ -91,7 +91,7 @@ namespace Gu.Analyzers
 
                 using (var pooled = IdentifierNameWalker.Create(node))
                 {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
+                    foreach (var identifier in pooled.Item.Aliases)
                     {
                         var memberAccess = identifier.Parent as MemberAccessExpressionSyntax;
                         if (memberAccess?.Expression is BaseExpressionSyntax)

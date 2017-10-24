@@ -1,12 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix : CodeFixVerifier<GU0006UseNameof, UseNameofCodeFixProvider>
+    internal class CodeFix
     {
         [Test]
-        public async Task WhenThrowingArgumentException()
+        public void WhenThrowingArgumentException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,10 +24,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -45,11 +41,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenThrowingArgumentOutOfRangeException()
+        public void WhenThrowingArgumentOutOfRangeException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,10 +64,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -90,11 +82,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenRaisingPropertyChanged()
+        public void WhenRaisingPropertyChanged()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -136,10 +128,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -181,11 +169,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenRaisingStaticPropertyChanged()
+        public void WhenRaisingStaticPropertyChanged()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -219,10 +207,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -256,11 +240,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenRaisingStaticPropertyChanged2()
+        public void WhenRaisingStaticPropertyChanged2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -307,10 +291,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -357,11 +337,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenStaticNameofInstance()
+        public void WhenStaticNameofInstance()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -380,10 +360,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -402,11 +378,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenStaticNameofInstance2()
+        public void WhenStaticNameofInstance2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -420,10 +396,6 @@ namespace RoslynSandbox
         public static string Bar(string meh) => meh;
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -437,11 +409,11 @@ namespace RoslynSandbox
         public static string Bar(string meh) => meh;
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenStaticNameofInstance3()
+        public void WhenStaticNameofInstance3()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -459,10 +431,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -480,11 +448,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
 
         [Test]
-        public async Task WhenRaisingPropertyChangedUnderscoreNames()
+        public void WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -526,10 +494,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Use nameof.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -571,7 +535,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
         }
     }
 }

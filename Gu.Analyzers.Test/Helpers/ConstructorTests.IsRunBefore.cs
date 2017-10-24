@@ -1,8 +1,8 @@
 namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -40,10 +40,10 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
-                var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(code1);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(code2);
                 Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
             }
 
@@ -101,10 +101,10 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
-                var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(code1);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(code2);
                 Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
             }
 
@@ -163,10 +163,10 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
-                var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(code1);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(code2);
                 Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
             }
 
@@ -177,7 +177,7 @@ namespace RoslynSandbox
             [TestCase("Foo(string text)", "Foo()", false)]
             [TestCase("Foo(int value)", "Foo(string text)", true)]
             [TestCase("Foo(string text)", "Foo(int value)", false)]
-            public void ThisChained(string firstSignature, string otherSignature, bool expected)
+            public void ThisChained(string code1, string code2, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -196,10 +196,10 @@ internal class Foo
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
-                var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(code1);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(code2);
                 Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
@@ -211,7 +211,7 @@ internal class Foo
             [TestCase("Foo(int value)", "Foo(string text)", false)]
             [TestCase("Foo(int value)", "Foo(int value)", false)]
             [TestCase("Foo(string text)", "Foo(int value)", false)]
-            public void WhenNotChained(string firstSignature, string otherSignature, bool expected)
+            public void WhenNotChained(string code1, string code2, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
@@ -228,10 +228,10 @@ internal class Foo
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
-                var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
+                var first = syntaxTree.FindConstructorDeclarationSyntax(code1);
+                var other = syntaxTree.FindConstructorDeclarationSyntax(code2);
                 Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
@@ -278,7 +278,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -332,7 +332,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -386,7 +386,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, AnalyzerAssert.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);

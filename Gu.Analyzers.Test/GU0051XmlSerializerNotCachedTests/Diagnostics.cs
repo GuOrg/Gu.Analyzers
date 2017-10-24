@@ -33,6 +33,33 @@ namespace RoslynSandbox
                       .ConfigureAwait(false);
         }
 
+        [Test]
+        public async Task TrivialConstructionUnsavedFullyQualified()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            for(int i = 0; i < 100; ++i)
+            {
+                ↓new System.Xml.Serialization.XmlSerializer(typeof(Foo), new System.Xml.Serialization.XmlRootAttribute(""rootNode""));
+            }
+        }
+    }
+}";
+            var expected = this.CSharpDiagnostic()
+                               .WithLocationIndicated(ref testCode)
+                               .WithMessage("The serializer is not cached.");
+            await this.VerifyCSharpDiagnosticAsync(new[] { testCode }, expected)
+                      .ConfigureAwait(false);
+        }
+
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
         public async Task LocalVariable(string code)
         {

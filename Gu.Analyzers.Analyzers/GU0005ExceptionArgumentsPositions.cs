@@ -43,9 +43,9 @@
                 objectCreation.ArgumentList != null &&
                 objectCreation.ArgumentList.Arguments.Count > 0)
             {
-                if (TryGetConstructor(objectCreation, context, KnownSymbol.ArgumentException, out var ctor) ||
-                    TryGetConstructor(objectCreation, context, KnownSymbol.ArgumentNullException, out ctor) ||
-                    TryGetConstructor(objectCreation, context, KnownSymbol.ArgumentOutOfRangeException, out ctor))
+                if (objectCreation.TryGetConstructor(KnownSymbol.ArgumentException, context.SemanticModel, context.CancellationToken, out var ctor) ||
+                    objectCreation.TryGetConstructor(KnownSymbol.ArgumentNullException, context.SemanticModel, context.CancellationToken, out ctor) ||
+                    objectCreation.TryGetConstructor(KnownSymbol.ArgumentOutOfRangeException, context.SemanticModel, context.CancellationToken, out ctor))
                 {
                     var symbols = context.SemanticModel.LookupSymbols(objectCreation.SpanStart);
                     if (TryGetIndexOfParameter(ctor, "paramName", out var parameterIndex) &&
@@ -56,19 +56,6 @@
                     }
                 }
             }
-        }
-
-        private static bool TryGetConstructor(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, QualifiedType qualifiedType, out IMethodSymbol ctor)
-        {
-            if (objectCreation.Type is IdentifierNameSyntax typeName &&
-                typeName.Identifier.ValueText == qualifiedType.Type)
-            {
-                ctor = context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) as IMethodSymbol;
-                return ctor?.ContainingType == qualifiedType;
-            }
-
-            ctor = null;
-            return false;
         }
 
         private static bool TryGetIndexOfParameter(IMethodSymbol method, string name, out int index)

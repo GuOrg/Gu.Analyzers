@@ -40,7 +40,7 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                TryGetConstructor(objectCreation, context, out var ctor) &&
+                objectCreation.TryGetConstructor(KnownSymbol.XmlSerializer, context.SemanticModel, context.CancellationToken, out var ctor) &&
                 IsLeakyConstructor(ctor))
             {
                 var assignment = objectCreation.FirstAncestor<AssignmentExpressionSyntax>();
@@ -92,19 +92,6 @@ namespace Gu.Analyzers
 
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
-        }
-
-        private static bool TryGetConstructor(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, out IMethodSymbol ctor)
-        {
-            if (objectCreation.Type is IdentifierNameSyntax typeName &&
-                typeName.Identifier.ValueText == KnownSymbol.XmlSerializer.Type)
-            {
-                ctor = context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) as IMethodSymbol;
-                return ctor?.ContainingType == KnownSymbol.XmlSerializer;
-            }
-
-            ctor = null;
-            return false;
         }
 
         private static bool IsLeakyConstructor(IMethodSymbol ctor)
