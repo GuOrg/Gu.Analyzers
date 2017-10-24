@@ -11,24 +11,47 @@ namespace Gu.Analyzers
     {
         internal static bool UsesUnderscoreNames(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = Walker.Create(node, semanticModel, cancellationToken))
+            using (var walker = Walker.Borrow(node, semanticModel, cancellationToken))
             {
-                return pooled.Item.UsesUnderScore == Result.Yes || pooled.Item.UsesThis == Result.No;
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
+                {
+                    return false;
+                }
+
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
+                {
+                    return true;
+                }
+
+                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+                {
+                    if (tree.FilePath.EndsWith(".g.i.cs"))
+                    {
+                        continue;
+                    }
+
+                    walker.Visit(tree.GetRoot(cancellationToken));
+                    if (walker.UsesThis == Result.Yes ||
+                        walker.UsesUnderScore == Result.No)
+                    {
+                        return false;
+                    }
+
+                    if (walker.UsesUnderScore == Result.Yes ||
+                        walker.UsesThis == Result.No)
+                    {
+                        return true;
+                    }
+                }
             }
+
+            return false;
         }
 
-        internal sealed class Walker : CSharpSyntaxWalker
+        internal sealed class Walker : PooledWalker<Walker>
         {
-            private static readonly Pool<Walker> Cache = new Pool<Walker>(
-                () => new Walker(),
-                x =>
-                {
-                    x.UsesThis = Result.Unknown;
-                    x.UsesUnderScore = Result.Unknown;
-                    x.semanticModel = null;
-                    x.cancellationToken = CancellationToken.None;
-                });
-
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
 
@@ -40,64 +63,70 @@ namespace Gu.Analyzers
 
             public Result UsesUnderScore { get; private set; }
 
-            public static Pool<Walker>.Pooled Create(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var pooled = Cache.GetOrCreate();
+                var walker = Borrow(() => new Walker());
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
                 while (node.Parent != null)
                 {
                     node = node.Parent;
                 }
 
-                pooled.Item.semanticModel = semanticModel;
-                pooled.Item.cancellationToken = cancellationToken;
-                pooled.Item.Visit(node);
-                return pooled;
+                walker.Visit(node);
+                return walker;
             }
 
             public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
-                if (!node.IsMissing &&
-                    !(node.Modifiers.Any(SyntaxKind.StaticKeyword) || node.Modifiers.Any(SyntaxKind.ConstKeyword)) &&
-                     node.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                if (node.IsMissing ||
+                    node.Modifiers.Any(SyntaxKind.StaticKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.ConstKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.PublicKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.ProtectedKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.InternalKeyword))
                 {
-                    foreach (var variable in node.Declaration.Variables)
+                    base.VisitFieldDeclaration(node);
+                    return;
+                }
+
+                foreach (var variable in node.Declaration.Variables)
+                {
+                    var name = variable.Identifier.ValueText;
+                    if (name.StartsWith("_"))
                     {
-                        var name = variable.Identifier.ValueText;
-                        if (name.StartsWith("_"))
+                        switch (this.UsesUnderScore)
                         {
-                            switch (this.UsesUnderScore)
-                            {
-                                case Result.Unknown:
-                                    this.UsesUnderScore = Result.Yes;
-                                    break;
-                                case Result.Yes:
-                                    break;
-                                case Result.No:
-                                    this.UsesUnderScore = Result.Maybe;
-                                    break;
-                                case Result.Maybe:
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
+                            case Result.Unknown:
+                                this.UsesUnderScore = Result.Yes;
+                                break;
+                            case Result.Yes:
+                                break;
+                            case Result.No:
+                                this.UsesUnderScore = Result.Maybe;
+                                break;
+                            case Result.Maybe:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
-                        else
+                    }
+                    else
+                    {
+                        switch (this.UsesUnderScore)
                         {
-                            switch (this.UsesUnderScore)
-                            {
-                                case Result.Unknown:
-                                    this.UsesUnderScore = Result.No;
-                                    break;
-                                case Result.Yes:
-                                    this.UsesUnderScore = Result.Maybe;
-                                    break;
-                                case Result.No:
-                                    break;
-                                case Result.Maybe:
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
+                            case Result.Unknown:
+                                this.UsesUnderScore = Result.No;
+                                break;
+                            case Result.Yes:
+                                this.UsesUnderScore = Result.Maybe;
+                                break;
+                            case Result.No:
+                                break;
+                            case Result.Maybe:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
@@ -150,6 +179,14 @@ namespace Gu.Analyzers
                 base.VisitConditionalAccessExpression(node);
             }
 
+            protected override void Clear()
+            {
+                this.UsesThis = Result.Unknown;
+                this.UsesUnderScore = Result.Unknown;
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
+            }
+
             private void CheckUsesThis(ExpressionSyntax expression)
             {
                 if (expression == null)
@@ -178,7 +215,9 @@ namespace Gu.Analyzers
 
                 if (expression is IdentifierNameSyntax)
                 {
-                    if (this.semanticModel.GetSymbolSafe(expression, this.cancellationToken)?.IsStatic == false)
+                    if (this.semanticModel.GetSymbolSafe(expression, this.cancellationToken)
+                            ?.IsStatic ==
+                        false)
                     {
                         switch (this.UsesThis)
                         {
