@@ -1,13 +1,13 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.9, OS=Windows 10 Redstone 2 (10.0.15063)
-Processor=Intel Core i7-3667U CPU 2.00GHz (Ivy Bridge), ProcessorCount=4
-Frequency=2435876 Hz, Resolution=410.5299 ns, Timer=TSC
-  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
-  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
+BenchmarkDotNet=v0.10.9, OS=Windows 7 SP1 (6.1.7601)
+Processor=Intel Xeon CPU E5-2637 v4 3.50GHzIntel Xeon CPU E5-2637 v4 3.50GHz, ProcessorCount=16
+Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
+  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
+  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
 
 
 ```
- |                        Method |     Mean |     Error |    StdDev |    Gen 0 | Allocated |
- |------------------------------ |---------:|----------:|----------:|---------:|----------:|
- | RunOnGuAnalyzersProject | 22.20 ms | 0.2812 ms | 0.2630 ms | 687.5000 |    1.4 MB |
+ |                  Method |     Mean |    Error |   StdDev |    Gen 0 | Allocated |
+ |------------------------ |---------:|---------:|---------:|---------:|----------:|
+ | RunOnGuAnalyzersProject | 47.55 ms | 1.281 ms | 3.757 ms | 812.5000 |    5.1 MB |

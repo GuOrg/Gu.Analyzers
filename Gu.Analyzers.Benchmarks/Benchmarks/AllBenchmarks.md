@@ -1,29 +1,29 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.9, OS=Windows 10 Redstone 2 (10.0.15063)
-Processor=Intel Core i7-3667U CPU 2.00GHz (Ivy Bridge), ProcessorCount=4
-Frequency=2435876 Hz, Resolution=410.5299 ns, Timer=TSC
-  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
-  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2115.0
+BenchmarkDotNet=v0.10.9, OS=Windows 7 SP1 (6.1.7601)
+Processor=Intel Xeon CPU E5-2637 v4 3.50GHzIntel Xeon CPU E5-2637 v4 3.50GHz, ProcessorCount=16
+Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
+  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
+  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
 
 
 ```
  |                                    Method |         Mean |         Error |        StdDev |       Median |    Gen 0 |  Gen 1 | Allocated |
  |------------------------------------------ |-------------:|--------------:|--------------:|-------------:|---------:|-------:|----------:|
- |       GU0009UseNamedParametersForBooleans |  2,898.65 us |    47.0396 us |    44.0009 us |  2,900.51 us |        - |      - |      64 B |
- |                          GU0022UseGetOnly |  8,977.33 us |   360.2198 us |   385.4311 us |  8,841.25 us |  62.5000 |      - |  142724 B |
- |                       GU0001NameArguments |  2,594.63 us |    49.4209 us |    43.8104 us |  2,581.80 us |   3.9063 |      - |   14016 B |
- |        GU0002NamedArgumentPositionMatches |  4,640.53 us |   183.6851 us |   518.0870 us |  4,421.33 us |  85.9375 |      - |  194376 B |
- |       GU0003CtorParameterNamesShouldMatch |    277.84 us |     5.3113 us |     5.4543 us |    278.48 us |   3.4180 |      - |    7568 B |
- |            GU0004AssignAllReadOnlyMembers |  3,756.64 us |    85.0428 us |    71.0146 us |  3,732.41 us |  46.8750 |      - |  104741 B |
- |         GU0005ExceptionArgumentsPositions |    669.61 us |     8.2206 us |     7.6895 us |    668.58 us |   0.9766 |      - |    2136 B |
- |                           GU0006UseNameof | 23,896.74 us |   223.5292 us |   186.6570 us | 23,915.85 us | 687.5000 |      - | 1471324 B |
- |                     GU0007PreferInjecting | 64,722.29 us | 1,291.5028 us | 2,295.6450 us | 64,589.42 us | 812.5000 |      - | 1734963 B |
- |                GU0008AvoidRelayProperties |  8,641.51 us |   166.8044 us |   156.0289 us |  8,625.33 us |  78.1250 |      - |  185605 B |
- |                GU0010DoNotAssignSameValue |    457.56 us |    10.6137 us |    29.9361 us |    443.64 us |        - |      - |    1008 B |
- |               GU0011DontIgnoreReturnValue |  9,424.53 us |   191.1486 us |   372.8207 us |  9,356.38 us | 187.5000 |      - |  413581 B |
- |                      GU0020SortProperties |    247.22 us |     2.6868 us |     2.5132 us |    247.03 us |   4.3945 |      - |   10024 B |
- |         GU0021CalculatedPropertyAllocates |    101.71 us |     2.3217 us |     6.5861 us |    100.44 us |        - |      - |      41 B |
- |         GU0050IgnoreEventsWhenSerializing |    681.60 us |    13.5586 us |    21.1091 us |    684.57 us |  13.6719 |      - |   30025 B |
- | GU0060EnumMemberValueConflictsWithAnother |     38.23 us |     0.4834 us |     0.4521 us |     38.15 us |   0.4272 | 0.0610 |    1046 B |
- |              GU0051XmlSerializerNotCached |  2,136.31 us |    43.7001 us |   108.0157 us |  2,102.33 us |  93.7500 |      - |  200778 B |
+ |                       GU0001NameArguments |  1,721.35 us |    34.7436 us |     95.110 us |  1,719.87 us |        - |      - |   11728 B |
+ |        GU0002NamedArgumentPositionMatches |  2,518.71 us |    56.5631 us |    165.890 us |  2,524.69 us |  27.3438 |      - |  186050 B |
+ |       GU0003CtorParameterNamesShouldMatch |    137.54 us |     4.3758 us |     12.764 us |    135.79 us |   0.7324 | 0.2441 |    6510 B |
+ |            GU0004AssignAllReadOnlyMembers |  2,670.69 us |    75.6582 us |    223.080 us |  2,637.29 us |  15.6250 |      - |  104739 B |
+ |         GU0005ExceptionArgumentsPositions |    348.02 us |     7.9839 us |     23.289 us |    345.48 us |        - |      - |     692 B |
+ |                           GU0006UseNameof | 54,638.96 us | 3,525.0473 us | 10,393.681 us | 49,226.67 us | 812.5000 |      - | 5348734 B |
+ |                     GU0007PreferInjecting | 37,791.62 us | 1,345.0969 us |  3,966.049 us | 37,524.44 us | 312.5000 |      - | 2126360 B |
+ |                GU0008AvoidRelayProperties |  4,678.71 us |   121.4725 us |    352.414 us |  4,626.31 us |   7.8125 |      - |  105537 B |
+ |       GU0009UseNamedParametersForBooleans |  2,020.21 us |    48.8660 us |    142.544 us |  1,977.40 us |        - |      - |     160 B |
+ |                GU0010DoNotAssignSameValue |    496.87 us |    10.4368 us |     30.773 us |    494.01 us |        - |      - |    1008 B |
+ |               GU0011DontIgnoreReturnValue |  4,779.84 us |   161.7515 us |    476.928 us |  4,578.06 us |  70.3125 |      - |  491270 B |
+ |                      GU0020SortProperties |     83.68 us |     1.8023 us |      5.257 us |     83.07 us |   0.6104 |      - |    4392 B |
+ |         GU0021CalculatedPropertyAllocates |     61.61 us |     1.2846 us |      3.788 us |     61.54 us |        - |      - |      41 B |
+ |                          GU0022UseGetOnly |  5,943.50 us |   131.9130 us |    388.948 us |  5,908.48 us |  15.6250 |      - |  148609 B |
+ |         GU0050IgnoreEventsWhenSerializing |    302.73 us |     7.7728 us |     22.674 us |    299.39 us |   2.4414 |      - |   16664 B |
+ |              GU0051XmlSerializerNotCached |  1,093.16 us |    37.6978 us |    111.153 us |  1,065.50 us |  28.3203 |      - |  182315 B |
+ | GU0060EnumMemberValueConflictsWithAnother |     19.52 us |     0.4614 us |      1.324 us |     19.07 us |   0.1221 | 0.0305 |     950 B |
