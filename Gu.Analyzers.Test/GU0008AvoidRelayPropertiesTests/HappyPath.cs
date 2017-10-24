@@ -24,6 +24,24 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
+        [TestCase("this.value;")]
+        [TestCase("value;")]
+        public void ExpressionBodyReturningField(string getter)
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int value = 2;
+
+        public int Value => this.value;
+    }
+}";
+            fooCode = fooCode.AssertReplace("this.value;", getter);
+            AnalyzerAssert.Valid(Analyzer, fooCode);
+        }
+
         [TestCase("get { return this.value; }")]
         [TestCase("get { return value; }")]
         public void WithBackingField(string getter)
@@ -48,7 +66,7 @@ namespace RoslynSandbox
 
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]
-        public void WhenReturningPropertyOfInjectedField(string getter)
+        public void WhenReturningPropertyOfCreatedField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -85,7 +103,7 @@ namespace RoslynSandbox
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
-        public void WhenReturningPropertyOfInjectedFieldExpressionBody(string getter)
+        public void WhenReturningPropertyOfCreatedFieldExpressionBody(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox

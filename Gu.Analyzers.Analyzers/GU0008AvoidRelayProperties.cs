@@ -60,33 +60,35 @@
         {
             if (property.ExpressionBody != null)
             {
-                return IsRelayReturn(property.ExpressionBody.Expression, semanticModel, cancellationToken);
+                return IsRelayReturn(property.ExpressionBody.Expression as MemberAccessExpressionSyntax, semanticModel, cancellationToken);
             }
 
-            if (property.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter))
+            if (property.TryGetGetAccessorDeclaration(out var getter))
             {
                 if (getter.Body == null)
                 {
                     return false;
                 }
 
-                if (getter.Body.Statements.TryGetSingle(out StatementSyntax statement))
+                if (getter.Body.Statements.TryGetSingle(out var statement))
                 {
-                    return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression, semanticModel, cancellationToken);
+                    return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression as MemberAccessExpressionSyntax, semanticModel, cancellationToken);
                 }
             }
 
             return false;
         }
 
-        private static bool IsRelayReturn(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsRelayReturn(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (expression == null || !expression.IsKind(SyntaxKind.SimpleMemberAccessExpression))
+            if (memberAccess == null ||
+                !memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) ||
+                memberAccess.Expression is InstanceExpressionSyntax ||
+                memberAccess.Expression == null)
             {
                 return false;
             }
 
-            var memberAccess = (MemberAccessExpressionSyntax)expression;
             var member = semanticModel.GetSymbolSafe(memberAccess.Expression, cancellationToken);
             if (member == null ||
                 !IsInjected(member, semanticModel, cancellationToken))
