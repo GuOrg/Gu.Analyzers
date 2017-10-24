@@ -42,19 +42,22 @@
                 return;
             }
 
-            var constructorDeclarationSyntax = (ConstructorDeclarationSyntax)context.Node;
-            if (constructorDeclarationSyntax.ParameterList.Parameters.Count == 0)
+            if (context.Node is ConstructorDeclarationSyntax constructorDeclaration)
             {
-                return;
-            }
-
-            using (var pooled = ConstructorAssignmentsWalker.Create(constructorDeclarationSyntax, context.SemanticModel, context.CancellationToken))
-            {
-                foreach (var kvp in pooled.Item.ParameterNameMap)
+                if (constructorDeclaration.ParameterList == null ||
+                    constructorDeclaration.ParameterList.Parameters.Count == 0)
                 {
-                    if (kvp.Value != null && !IsMatch(kvp.Key.Identifier, kvp.Value))
+                    return;
+                }
+
+                using (var pooled = ConstructorAssignmentsWalker.Create(constructorDeclaration, context.SemanticModel, context.CancellationToken))
+                {
+                    foreach (var kvp in pooled.Item.ParameterNameMap)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, kvp.Key.Identifier.GetLocation()));
+                        if (kvp.Value != null && !IsMatch(kvp.Key.Identifier, kvp.Value))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, kvp.Key.Identifier.GetLocation()));
+                        }
                     }
                 }
             }

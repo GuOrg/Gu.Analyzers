@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -40,32 +39,31 @@
                 return;
             }
 
-            var argumentSyntax = (ArgumentListSyntax)context.Node;
-            if (argumentSyntax.Arguments.Any(x => x.NameColon == null))
+            if (context.Node is ArgumentListSyntax argumentList)
             {
-                return;
-            }
-
-            var argumentListSyntax = argumentSyntax.FirstAncestorOrSelf<ArgumentListSyntax>();
-            if (argumentListSyntax == null)
-            {
-                return;
-            }
-
-            var method = context.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, context.CancellationToken) as IMethodSymbol;
-            if (method == null || method.Parameters.Length != argumentListSyntax.Arguments.Count)
-            {
-                return;
-            }
-
-            for (var i = 0; i < argumentListSyntax.Arguments.Count; i++)
-            {
-                var argument = argumentListSyntax.Arguments[i];
-                var parameter = method.Parameters[i];
-                if (parameter.Name != argument.NameColon.Name.Identifier.ValueText)
+                if (!argumentList.Arguments.TryGetFirst(x => x.NameColon != null, out _))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentListSyntax.GetLocation()));
                     return;
+                }
+
+                if (context.SemanticModel.GetSymbolSafe(argumentList.Parent, context.CancellationToken) is IMethodSymbol method)
+                {
+                    if (method.Parameters.Length != argumentList.Arguments.Count)
+                    {
+                        return;
+                    }
+
+                    for (var i = 0; i < argumentList.Arguments.Count; i++)
+                    {
+                        var argument = argumentList.Arguments[i];
+                        var parameter = method.Parameters[i];
+                        if (argument.NameColon?.Name is IdentifierNameSyntax nameColon &&
+                            parameter.Name != nameColon.Identifier.ValueText)
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentList.GetLocation()));
+                            return;
+                        }
+                    }
                 }
             }
         }

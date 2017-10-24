@@ -9,6 +9,7 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
+        [TestCase("new Foo(a, b: b)")]
         public void ConstructorCallWithTwoArguments(string call)
         {
             var testCode = @"
@@ -38,6 +39,7 @@ namespace RoslynSandbox
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
+        [TestCase("new Foo(a, b: b)")]
         public void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var testCode = @"
