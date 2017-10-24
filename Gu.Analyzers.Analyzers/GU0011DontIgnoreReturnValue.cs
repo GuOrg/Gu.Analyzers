@@ -42,13 +42,9 @@
                 return;
             }
 
-            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (objectCreation == null || CanIgnore(objectCreation))
-            {
-                return;
-            }
-
-            if (IsIgnored(objectCreation))
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+                !CanIgnore(objectCreation) &&
+                IsIgnored(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -61,13 +57,9 @@
                 return;
             }
 
-            var invocation = (InvocationExpressionSyntax)context.Node;
-            if (invocation == null || CanIgnore(invocation, context.SemanticModel, context.CancellationToken))
-            {
-                return;
-            }
-
-            if (IsIgnored(invocation))
+            if (context.Node is InvocationExpressionSyntax invocation &&
+                IsIgnored(invocation) &&
+                !CanIgnore(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
