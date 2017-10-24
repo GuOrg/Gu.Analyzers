@@ -1,11 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix : CodeFixVerifier<GU0007PreferInjecting, InjectCodeFixProvider>
+    internal partial class CodeFix
     {
-        internal class Member : NestedCodeFixVerifier<CodeFix>
+        internal class Member
         {
             private static readonly string BarCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public async Task WhenNotInjectingFieldInitialization()
+            public void WhenNotInjectingFieldInitialization()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -70,12 +70,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -89,12 +83,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenNotInjectingFieldInitializationUnderscore()
+            public void WhenNotInjectingFieldInitializationUnderscore()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -110,12 +103,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -129,12 +116,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenNotInjectingFieldInitializationObject()
+            public void WhenNotInjectingFieldInitializationObject()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -150,12 +136,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -169,12 +149,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenNotInjectingFieldInitializationWithNameCollision()
+            public void WhenNotInjectingFieldInitializationWithNameCollision()
             {
                 var enumCode = @"
 namespace RoslynSandbox
@@ -201,12 +180,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, enumCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -223,12 +196,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, enumCode, fooCode }, new[] { BarCode, LocatorCode, enumCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, enumCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task FieldInitializationAndBaseCall()
+            public void FieldInitializationAndBaseCall()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -238,21 +210,12 @@ namespace RoslynSandbox
         private readonly Bar bar;
 
         public Foo(ServiceLocator locator)
-            : base(locator.Bar)
+            : base(locator.↓Bar)
         {
-            this.bar = locator.Bar;
+            this.bar = locator.↓Bar;
         }
     }
 }";
-
-                var expected1 = this.CSharpDiagnostic()
-                                   .WithLocation("Foo.cs", 9, 28)
-                                   .WithMessage("Prefer injecting.");
-                var expected2 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 11, 32)
-                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { expected1, expected2 })
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -268,12 +231,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task FieldInitializationAndBaseCallUnderscoreNames()
+            public void FieldInitializationAndBaseCallUnderscoreNames()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -283,21 +245,12 @@ namespace RoslynSandbox
         private readonly Bar _bar;
 
         public Foo(ServiceLocator locator)
-            : base(locator.Bar)
+            : base(locator.↓Bar)
         {
-            _bar = locator.Bar;
+            _bar = locator.↓Bar;
         }
     }
 }";
-
-                var expected1 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 9, 28)
-                                    .WithMessage("Prefer injecting.");
-                var expected2 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 11, 28)
-                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { expected1, expected2 })
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -313,12 +266,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingMethodInjectedLocator()
+            public void WhenUsingMethodInjectedLocator()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -335,12 +287,6 @@ namespace RoslynSandbox
         }
     }
 }";
-
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -360,12 +306,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInMethod()
+            public void WhenUsingLocatorInMethod()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -386,12 +331,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -412,12 +351,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInLamdaClosure()
+            public void WhenUsingLocatorInLamdaClosure()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -436,12 +374,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -458,12 +390,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInTwoMethods()
+            public void WhenUsingLocatorInTwoMethods()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -479,24 +410,15 @@ namespace RoslynSandbox
 
         public void Meh1()
         {
-            this.locator.Bar.Baz();
+            this.locator.↓Bar.Baz();
         }
 
         public void Meh2()
         {
-            this.locator.Bar.Baz(2);
+            this.locator.↓Bar.Baz(2);
         }
     }
 }";
-
-                var expected1 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 15, 26)
-                                    .WithMessage("Prefer injecting.");
-                var expected2 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 20, 26)
-                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { expected1, expected2 })
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -523,12 +445,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInMethodUnderscoreNames()
+            public void WhenUsingLocatorInMethodUnderscoreNames()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -548,12 +469,6 @@ namespace RoslynSandbox
         }
     }
 }";
-
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref fooCode)
-                                   .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, fooCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -575,12 +490,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, fooCode }, new[] { BarCode, LocatorCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInMethodAndBaseCall()
+            public void WhenUsingLocatorInMethodAndBaseCall()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -590,26 +504,17 @@ namespace RoslynSandbox
         private readonly ServiceLocator locator;
 
         public Foo(ServiceLocator locator)
-            : base(locator.Bar)
+            : base(locator.↓Bar)
         {
             this.locator = locator;
         }
 
         public void Meh()
         {
-            this.locator.Bar.Baz();
+            this.locator.↓Bar.Baz();
         }
     }
 }";
-
-                var expected1 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 9, 28)
-                                    .WithMessage("Prefer injecting.");
-                var expected2 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 16, 26)
-                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { expected1, expected2 })
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -632,12 +537,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { BarCode, LocatorCode, FooBaseCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
             }
 
             [Test]
-            public async Task WhenUsingLocatorInStaticMethod()
+            public void WhenUsingLocatorInStaticMethod()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -647,9 +551,9 @@ namespace RoslynSandbox
         private readonly Bar bar;
 
         public Foo(ServiceLocator locator)
-            : base(locator.Bar)
+            : base(locator.↓Bar)
         {
-            this.bar = locator.Bar;
+            this.bar = locator.↓Bar;
         }
 
         public static void Meh(ServiceLocator locator)
@@ -658,15 +562,6 @@ namespace RoslynSandbox
         }
     }
 }";
-
-                var expected1 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 9, 28)
-                                    .WithMessage("Prefer injecting.");
-                var expected2 = this.CSharpDiagnostic()
-                                    .WithLocation("Foo.cs", 11, 32)
-                                    .WithMessage("Prefer injecting.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { expected1, expected2 })
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -687,8 +582,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, new[] { BarCode, LocatorCode, FooBaseCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
             }
         }
     }
