@@ -10,4 +10,4 @@ Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
 ```
  |                  Method |     Mean |     Error |    StdDev |  Gen 0 | Allocated |
  |------------------------ |---------:|----------:|----------:|-------:|----------:|
- | RunOnGuAnalyzersProject | 4.693 ms | 0.1203 ms | 0.3529 ms | 7.8125 | 103.06 KB |
+ | RunOnGuAnalyzersProject | 4.782 ms | 0.1458 ms | 0.4277 ms | 7.8125 | 103.06 KB |
