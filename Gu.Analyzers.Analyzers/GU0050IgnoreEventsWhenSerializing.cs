@@ -76,38 +76,31 @@
                 return;
             }
 
-            var field = (IFieldSymbol)context.ContainingSymbol;
-            if (!field.Type.Is(KnownSymbol.EventHandler))
+            if (context.Node is FieldDeclarationSyntax fieldDeclaration &&
+                context.ContainingSymbol is IFieldSymbol field &&
+                field.Type.Is(KnownSymbol.EventHandler) &&
+                HasSerializableAttribute(field.ContainingType))
             {
-                return;
-            }
-
-            var type = context.ContainingSymbol.ContainingType;
-            if (!HasSerializableAttribute(type))
-            {
-                return;
-            }
-
-            var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
-            foreach (var attributeList in fieldDeclaration.AttributeLists)
-            {
-                foreach (var attribute in attributeList.Attributes)
+                foreach (var attributeList in fieldDeclaration.AttributeLists)
                 {
-                    if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") == true)
+                    foreach (var attribute in attributeList.Attributes)
                     {
-                        var attributeType = context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
-                                                                ?.ContainingType;
-                        if (attributeType != KnownSymbol.NonSerializedAttribute)
+                        if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") == true)
                         {
-                            continue;
-                        }
+                            var attributeType = context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
+                                                       ?.ContainingType;
+                            if (attributeType != KnownSymbol.NonSerializedAttribute)
+                            {
+                                continue;
+                            }
 
-                        return;
+                            return;
+                        }
                     }
                 }
-            }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldDeclaration.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldDeclaration.GetLocation()));
+            }
         }
 
         private static bool HasSerializableAttribute(INamedTypeSymbol type)
