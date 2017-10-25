@@ -12,6 +12,9 @@ tags Roslyn Diagnostic Analyzer DotnetAnalyzers
 projectUrl https://github.com/JohanLarsson/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
 
+releasenotes
+  BREAKING: Moved dispoable analyzers to https://www.nuget.org/packages/IDisposableAnalyzers/
+
 files
   ../Gu.Analyzers.Analyzers/bin/Release/Gu.Analyzers.Analyzers.dll ==> analyzers/dotnet/cs
   ../Gu.Analyzers.CodeFixes/bin/Release/Gu.Analyzers.CodeFixes.dll ==> analyzers/dotnet/cs
