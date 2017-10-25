@@ -1,5 +1,5 @@
 ﻿type file
-version 1.0.0.0-dev
+version 1.0.0.1-dev
 title Gu.Analyzers
 id Gu.Analyzers
 authors Johan Larsson, milleniumbug
@@ -16,7 +16,7 @@ releasenotes
   BREAKING: Moved dispoable analyzers to https://www.nuget.org/packages/IDisposableAnalyzers/
 
 files
-  ../Gu.Analyzers.Analyzers/bin/Release/Gu.Analyzers.Analyzers.dll ==> analyzers/dotnet/cs
-  ../Gu.Analyzers.CodeFixes/bin/Release/Gu.Analyzers.CodeFixes.dll ==> analyzers/dotnet/cs
+  bin/Release/netstandard1.3/Gu.Analyzers.Analyzers.dll ==> analyzers/dotnet/cs
+  bin/Release/netstandard1.3/Gu.Analyzers.CodeFixes.dll ==> analyzers/dotnet/cs
   ../.paket/tools/*.ps1 ==> tools
 
