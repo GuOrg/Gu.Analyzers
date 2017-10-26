@@ -70,6 +70,8 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType DependencyPropertyChangedEventArgs = Create("System.Windows.DependencyPropertyChangedEventArgs");
 
         internal static readonly NUnitAssertType NUnitAssert = new NUnitAssertType();
+        internal static readonly QualifiedType NUnitTestAttribute = new QualifiedType("NUnit.Framework.TestAttribute");
+        internal static readonly QualifiedType NUnitTestCaseAttribute = new QualifiedType("NUnit.Framework.TestCaseAttribute");
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
 
         private static QualifiedType Create(string qualifiedName)

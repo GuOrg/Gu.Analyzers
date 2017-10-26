@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using Gu.Analyzers.Helpers;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +15,7 @@ namespace Gu.Analyzers
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Test can be parallelized.",
-            messageFormat: "Enum member value conflicts with another.",
+            messageFormat: "Test can be parallelized.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
@@ -35,10 +36,7 @@ namespace Gu.Analyzers
         private void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.Node is MethodDeclarationSyntax methodDeclaration &&
-                methodDeclaration.AttributeLists.FirstOrDefault() is AttributeListSyntax attributeList &&
-                attributeList.Attributes.FirstOrDefault() is AttributeSyntax attribute &&
-                attribute.Name is IdentifierNameSyntax identifier &&
-                identifier.Identifier.ValueText == "Test")
+                methodDeclaration.IsTestMethod(context.SemanticModel, context.CancellationToken))
             {
                 using (var walker = IdentifierNameWalker.Borrow(methodDeclaration))
                 {
