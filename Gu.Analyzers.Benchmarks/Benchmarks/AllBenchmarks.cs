@@ -1,3 +1,5 @@
+// ReSharper disable InconsistentNaming
+// ReSharper disable RedundantNameQualifier
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks

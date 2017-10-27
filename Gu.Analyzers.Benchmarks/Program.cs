@@ -1,5 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable HeuristicUnreachableCode
+// ReSharper disable RedundantNameQualifier
 #pragma warning disable CS0162 // Unreachable code detected
 #pragma warning disable GU0011 // Don't ignore the returnvalue.
 namespace Gu.Analyzers.Benchmarks

@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Benchmarks
+﻿// ReSharper disable RedundantNameQualifier
+namespace Gu.Analyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;

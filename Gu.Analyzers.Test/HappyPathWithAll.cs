@@ -15,13 +15,13 @@ namespace Gu.Analyzers.Test
                                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                .ToImmutableArray();
 
-        private static readonly Solution Solution = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
-            Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
+        private static readonly Solution Solution = CodeFactory.CreateSolution(
+            CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
-        private static readonly Solution PropertyChangedAnalyzersProjectSln = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
-            Gu.Roslyn.Asserts.CodeFactory.FindProjectFile("Gu.Analyzers.Analyzers.csproj"),
+        private static readonly Solution PropertyChangedAnalyzersProjectSln = CodeFactory.CreateSolution(
+            CodeFactory.FindProjectFile("Gu.Analyzers.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
