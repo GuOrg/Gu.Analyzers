@@ -207,7 +207,7 @@
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
+            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscore(editor.SemanticModel, CancellationToken.None);
             var name = usesUnderscoreNames
                            ? "_" + parameter.Identifier.ValueText
                            : parameter.Identifier.ValueText;

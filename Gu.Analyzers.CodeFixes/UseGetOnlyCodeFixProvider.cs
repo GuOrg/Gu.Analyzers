@@ -107,7 +107,7 @@
             PropertyDeclarationSyntax property,
             ObjectCreationExpressionSyntax objectCreation)
         {
-            var member = ctor.UsesUnderscoreNames(semanticModel, context.CancellationToken)
+            var member = ctor.UsesUnderscore(semanticModel, context.CancellationToken)
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
