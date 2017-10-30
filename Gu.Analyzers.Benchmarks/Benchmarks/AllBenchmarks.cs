@@ -38,6 +38,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0060 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0070 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0001NameArguments()
         {
@@ -138,6 +140,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0060EnumMemberValueConflictsWithAnother()
         {
             GU0060.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0070DefaultConstructedValueTypeWithNoUsefulDefault()
+        {
+            GU0070.Run();
         }
     }
 }
