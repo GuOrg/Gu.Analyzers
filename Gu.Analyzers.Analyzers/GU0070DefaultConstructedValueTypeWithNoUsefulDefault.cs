@@ -41,12 +41,12 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if(context.IsExcludedFromAnalysis())
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            if(context.Node is ObjectCreationExpressionSyntax objectCreation &&
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 IsTheCreatedTypeKnownForHavingNoUsefulDefault(context, objectCreation, out var ctor) &&
                 ctor.Parameters.Length == 0)
             {
@@ -57,9 +57,9 @@
         private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, out IMethodSymbol ctor)
         {
             // TODO: Stop using linear search if the number of types becomes large
-            foreach(var qualifiedType in knownTypes)
+            foreach (var qualifiedType in knownTypes)
             {
-                if(objectCreation.TryGetConstructor(qualifiedType, context.SemanticModel, context.CancellationToken, out ctor))
+                if (objectCreation.TryGetConstructor(qualifiedType, context.SemanticModel, context.CancellationToken, out ctor))
                 {
                     return true;
                 }
