@@ -23,5 +23,24 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics<Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault>(testCode);
         }
+
+        [Test]
+        public void UselessDefaultDateTime()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class A
+    {
+        public void F()
+        {
+            var g = ↓new System.DateTime();
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics<Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault>(testCode);
+        }
     }
 }
