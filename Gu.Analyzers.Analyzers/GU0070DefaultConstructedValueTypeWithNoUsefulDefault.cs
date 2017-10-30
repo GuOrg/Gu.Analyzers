@@ -22,7 +22,7 @@
             description: "Types declared with struct must have a default constructor, even if there is no semantically sensible default value for that type. Examples include System.Guid and System.DateTime.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 
-        private static readonly List<QualifiedType> knownTypes = new List<QualifiedType>
+        private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
         {
             KnownSymbol.Guid,
             KnownSymbol.DateTime
@@ -57,7 +57,7 @@
         private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, out IMethodSymbol ctor)
         {
             // TODO: Stop using linear search if the number of types becomes large
-            foreach (var qualifiedType in knownTypes)
+            foreach (var qualifiedType in KnownTypes)
             {
                 if (objectCreation.TryGetConstructor(qualifiedType, context.SemanticModel, context.CancellationToken, out ctor))
                 {
