@@ -62,6 +62,27 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCaseSource(nameof(TestCases))]
+        public void UpdatingOtherInstanceInCtor(TestCase data)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(Foo previous, int a)
+        {
+            previous.A = a;
+        }
+
+        public int A { get; private set; }
+    }
+}";
+            testCode = testCode.AssertReplace("A = a;", data.Update)
+                               .AssertReplace("int", data.Type);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [Test]
         public void UpdatedInLambdaInCtor()
         {
@@ -137,24 +158,60 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, interfaceCode, testCode);
         }
 
-        [TestCaseSource(nameof(TestCases))]
-        public void UpdatingOtherInstanceInCtor(TestCase data)
+        [Test]
+        public void OtherInstanceObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public sealed class Foo
     {
-        public Foo(Foo previous, int a)
-        {
-            previous.A = a;
-        }
+        public int Value { get; private set; }
 
-        public int A { get; private set; }
+        public static Foo Create(int value)
+        {
+            return new Foo { Value = value };
+        }
     }
 }";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void SideEffectStaticMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public int Value { get; private set; }
+
+        public static void Update(Foo foo)
+        {
+            foo.Value = 2;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void SideEffectStaticMethodPrivateProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        private int Value { get; set; }
+
+        public static void Update(Foo foo)
+        {
+            foo.Value = 2;
+        }
+    }
+}";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
