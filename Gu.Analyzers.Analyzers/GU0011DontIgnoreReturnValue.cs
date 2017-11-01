@@ -92,10 +92,12 @@
                     return true;
                 }
 
-                if (method.ContainingType == KnownSymbol.StringBuilder &&
-                    method.ReturnType == KnownSymbol.StringBuilder)
+                if (ReferenceEquals(method.ContainingType, method.ReturnType))
                 {
-                    return true;
+                    if (method.ContainingType == KnownSymbol.StringBuilder)
+                    {
+                        return true;
+                    }
                 }
 
                 if (method == KnownSymbol.IList.Add ||
