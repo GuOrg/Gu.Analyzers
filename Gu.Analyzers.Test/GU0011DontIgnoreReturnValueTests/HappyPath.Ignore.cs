@@ -8,8 +8,10 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
     {
         internal class Ignore
         {
-            [Test]
-            public void StringBuilderAppendLine()
+            [TestCase("stringBuilder.AppendLine(\"test\");")]
+            [TestCase("stringBuilder.Append(\"test\");")]
+            [TestCase("stringBuilder.Clear();")]
+            public void StringBuilder(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -20,31 +22,12 @@ namespace RoslynSandbox
     {
         public void Bar()
         {
-            var sb = new StringBuilder();
-            sb.AppendLine(""test"");
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(""test"");
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
-
-            [Test]
-            public void StringBuilderAppend()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System.Text;
-
-    public class Foo
-    {
-        public void Bar()
-        {
-            var sb = new StringBuilder();
-            sb.Append(""test"");
-        }
-    }
-}";
+                testCode = testCode.AssertReplace("stringBuilder.AppendLine(\"test\");", code);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 

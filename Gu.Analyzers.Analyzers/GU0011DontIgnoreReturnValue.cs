@@ -92,10 +92,13 @@
                     return true;
                 }
 
-                if (method == KnownSymbol.StringBuilder.Append ||
-                    method == KnownSymbol.StringBuilder.AppendLine ||
-                    method == KnownSymbol.StringBuilder.AppendFormat ||
-                    method == KnownSymbol.IList.Add ||
+                if (method.ContainingType == KnownSymbol.StringBuilder &&
+                    method.ReturnType == KnownSymbol.StringBuilder)
+                {
+                    return true;
+                }
+
+                if (method == KnownSymbol.IList.Add ||
                     method == KnownSymbol.IList.Remove)
                 {
                     return true;
