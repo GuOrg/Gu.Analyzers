@@ -5,10 +5,10 @@
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MoveArgumentCodeFixProvider))]
     [Shared]
@@ -20,15 +20,13 @@
             GU0005ExceptionArgumentsPositions.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                             .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
@@ -45,31 +43,29 @@
                         continue;
                     }
 
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
+                    context.RegisterDocumentEditorFix(
                             "Move arguments to match parameter positions.",
-                            cancellationToken => ApplyFixGU0002Async(cancellationToken, context, semanticModel, arguments),
-                            nameof(NameArgumentsCodeFixProvider)),
+                            (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
+                            this.GetType(),
                         diagnostic);
                 }
 
                 if (diagnostic.Id == GU0005ExceptionArgumentsPositions.DiagnosticId)
                 {
                     var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
+                    context.RegisterDocumentEditorFix(
                             "Move name argument to match parameter positions.",
-                            cancellationToken => ApplyFixGU0005Async(cancellationToken, context, semanticModel, argument),
-                            nameof(NameArgumentsCodeFixProvider)),
+                            (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
+                            this.GetType(),
                         diagnostic);
                 }
             }
         }
 
-        private static Task<Document> ApplyFixGU0002Async(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentListSyntax argumentListSyntax)
+        private static void ApplyFixGU0002(DocumentEditor editor, ArgumentListSyntax argumentListSyntax, CancellationToken cancellationToken)
         {
             var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = semanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
+            var method = editor.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
             foreach (var argument in argumentListSyntax.Arguments)
             {
                 var index = ParameterIndex(method, argument);
@@ -79,14 +75,14 @@
             }
 
             var updated = argumentListSyntax.WithArguments(SyntaxFactory.SeparatedList(arguments, argumentListSyntax.Arguments.GetSeparators()));
-            return Task.FromResult(context.Document.WithSyntaxRoot(semanticModel.SyntaxTree.GetRoot().ReplaceNode(argumentListSyntax, updated)));
+            editor.ReplaceNode(argumentListSyntax, updated);
         }
 
-        private static Task<Document> ApplyFixGU0005Async(CancellationToken cancellationToken, CodeFixContext context, SemanticModel semanticModel, ArgumentSyntax nameArgument)
+        private static void ApplyFixGU0005(DocumentEditor editor, ArgumentSyntax nameArgument, CancellationToken cancellationToken)
         {
             var argumentListSyntax = nameArgument.FirstAncestorOrSelf<ArgumentListSyntax>();
             var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = semanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
+            var method = editor.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
             var messageIndex = ParameterIndex(method, "message");
             var nameIndex = ParameterIndex(method, "paramName");
             for (var i = 0; i < argumentListSyntax.Arguments.Count; i++)
@@ -107,7 +103,7 @@
             }
 
             var updated = argumentListSyntax.WithArguments(SyntaxFactory.SeparatedList(arguments, argumentListSyntax.Arguments.GetSeparators()));
-            return Task.FromResult(context.Document.WithSyntaxRoot(semanticModel.SyntaxTree.GetRoot().ReplaceNode(argumentListSyntax, updated)));
+            editor.ReplaceNode(argumentListSyntax, updated);
         }
 
         private static int ParameterIndex(IMethodSymbol method, ArgumentSyntax argument)
