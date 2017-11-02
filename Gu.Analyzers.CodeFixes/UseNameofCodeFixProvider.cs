@@ -19,7 +19,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0006UseNameof.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -38,20 +38,17 @@
                 var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (argument.Expression is LiteralExpressionSyntax literal)
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
+                    context.RegisterDocumentEditorFix(
                             "Use nameof",
-                            cancellationToken => ApplyFixAsync(context.Document, argument, literal.Token.ValueText, cancellationToken),
-                            nameof(UseNameofCodeFixProvider)),
+                           (editor, cancellationToken) => ApplyFix(editor, argument, literal.Token.ValueText, cancellationToken),
+                            this.GetType(),
                         diagnostic);
                 }
             }
         }
 
-        private static async Task<Document> ApplyFixAsync(Document document, ArgumentSyntax argument, string name, CancellationToken cancellationToken)
+        private static void ApplyFix(DocumentEditor editor, ArgumentSyntax argument, string name, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken)
-                                             .ConfigureAwait(false);
             if (!IsStaticContext(argument, editor.SemanticModel, cancellationToken) &&
                 editor.SemanticModel.LookupSymbols(argument.SpanStart, name: name).TryGetSingle(out var member) &&
                 (member is IFieldSymbol || member is IPropertySymbol || member is IMethodSymbol) &&
@@ -70,8 +67,6 @@
                     (x, _) => SyntaxFactory.ParseExpression($"nameof({name})")
                                            .WithTriviaFrom(x));
             }
-
-            return editor.GetChangedDocument();
         }
 
         private static bool IsStaticContext(SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
