@@ -9,6 +9,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NameArgumentsCodeFixProvider))]
     [Shared]
@@ -20,7 +21,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0001NameArguments.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -49,16 +50,15 @@
                     continue;
                 }
 
-                context.RegisterCodeFix(
-                    CodeAction.Create(
+                context.RegisterDocumentEditorFix(
                         "Name arguments",
-                        _ => ApplyFixAsync(context, syntaxRoot, method, arguments),
-                        nameof(NameArgumentsCodeFixProvider)),
+                        (editor, _) => ApplyFix(editor, method, arguments),
+                        this.GetType(),
                     diagnostic);
             }
         }
 
-        private static Task<Document> ApplyFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, IMethodSymbol method, ArgumentListSyntax arguments)
+        private static void ApplyFix(DocumentEditor editor, IMethodSymbol method, ArgumentListSyntax arguments)
         {
             var withNames = arguments;
             for (int i = 0; i < arguments.Arguments.Count; i++)
@@ -69,7 +69,7 @@
                 withNames = withNames.ReplaceNode(argument, withNameColon);
             }
 
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(arguments, withNames)));
+            editor.ReplaceNode(arguments, withNames);
         }
 
         private static bool HasAnyNamedArgument(ArgumentListSyntax argumentList)
