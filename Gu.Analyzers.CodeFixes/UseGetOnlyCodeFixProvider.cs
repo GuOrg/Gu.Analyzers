@@ -9,6 +9,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseGetOnlyCodeFixProvider))]
     [Shared]
@@ -28,7 +29,7 @@
             GU0022UseGetOnly.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -58,11 +59,10 @@
                         var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
                         if (TryGetConstructor(property, out ConstructorDeclarationSyntax ctor))
                         {
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
+                            context.RegisterDocumentEditorFix(
                                     "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                    _ => ApplyInitializeInCtorFixAsync(context, syntaxRoot, semanticModel, ctor, property, objectCreation),
-                                    nameof(UseGetOnlyCodeFixProvider) + "UNSAFE"),
+                                    (editor, cancellationToken) => ApplyInitializeInCtorFix(editor, ctor, property, objectCreation, cancellationToken),
+                                   this.GetType().FullName + "UNSAFE",
                                 diagnostic);
                         }
                     }
@@ -72,42 +72,29 @@
                     var setter = syntaxNode.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter != null)
                     {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Use get-only",
-                                _ => ApplyRemoveSetterFixAsync(context, syntaxRoot, setter),
-                                nameof(UseGetOnlyCodeFixProvider)),
+                        context.RegisterDocumentEditorFix(
+                            "Use get-only",
+                            (editor, _) => ApplyRemoveSetterFix(editor, setter),
+                            this.GetType(),
                             diagnostic);
                     }
                 }
             }
         }
 
-        private static Task<Document> ApplyRemoveSetterFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, AccessorDeclarationSyntax setter)
+        private static void ApplyRemoveSetterFix(DocumentEditor editor, AccessorDeclarationSyntax setter)
         {
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.RemoveNodes(new[] { setter }, SyntaxRemoveOptions.AddElasticMarker)));
+            editor.RemoveNode(setter, SyntaxRemoveOptions.AddElasticMarker);
         }
 
-        private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
-        {
-            if (node is ArrowExpressionClauseSyntax arrow)
-            {
-                return arrow.Expression as ObjectCreationExpressionSyntax;
-            }
-
-            var returnStatement = node as ReturnStatementSyntax;
-            return returnStatement?.Expression as ObjectCreationExpressionSyntax;
-        }
-
-        private static Task<Document> ApplyInitializeInCtorFixAsync(
-            CodeFixContext context,
-            SyntaxNode syntaxRoot,
-            SemanticModel semanticModel,
+        private static void ApplyInitializeInCtorFix(
+            DocumentEditor editor,
             ConstructorDeclarationSyntax ctor,
             PropertyDeclarationSyntax property,
-            ObjectCreationExpressionSyntax objectCreation)
+            ObjectCreationExpressionSyntax objectCreation,
+            CancellationToken cancellationToken)
         {
-            var member = ctor.UsesUnderscore(semanticModel, context.CancellationToken)
+            var member = ctor.UsesUnderscore(editor.SemanticModel, cancellationToken)
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
@@ -120,15 +107,24 @@
                                      SyntaxKind.SimpleAssignmentExpression,
                                      member,
                                      objectCreation));
-            syntaxRoot = syntaxRoot.TrackNodes(ctor.Body, property);
-            var updatedBody = ctor.Body.AddStatements(assignment);
-            syntaxRoot = syntaxRoot.ReplaceNode(syntaxRoot.GetCurrentNode(ctor.Body), updatedBody);
-            var trackedProperty = syntaxRoot.GetCurrentNode(property);
-            var updatedProperty = trackedProperty.WithExpressionBody(null)
-                                                 .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
-                                                 .WithAccessorList(GetOnlyAccessorList);
-            syntaxRoot = syntaxRoot.ReplaceNode(trackedProperty, updatedProperty);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot));
+
+            editor.ReplaceNode(ctor.Body, (x, _) => ((BlockSyntax)x).AddStatements(assignment));
+            editor.ReplaceNode(
+                property,
+                (x, _) => ((PropertyDeclarationSyntax)x).WithExpressionBody(null)
+                                                        .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                                                        .WithAccessorList(GetOnlyAccessorList));
+        }
+
+        private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
+        {
+            if (node is ArrowExpressionClauseSyntax arrow)
+            {
+                return arrow.Expression as ObjectCreationExpressionSyntax;
+            }
+
+            var returnStatement = node as ReturnStatementSyntax;
+            return returnStatement?.Expression as ObjectCreationExpressionSyntax;
         }
 
         private static bool IsAnyInitializerMutable(SemanticModel semanticModel, CancellationToken cancellationToken, InitializerExpressionSyntax initializer)
