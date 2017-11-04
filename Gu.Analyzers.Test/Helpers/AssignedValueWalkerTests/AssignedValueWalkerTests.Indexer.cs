@@ -28,7 +28,7 @@ internal class Foo
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -54,7 +54,7 @@ internal class Foo
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -85,7 +85,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -116,7 +116,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -151,7 +151,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -186,7 +186,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -221,7 +221,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
-                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);

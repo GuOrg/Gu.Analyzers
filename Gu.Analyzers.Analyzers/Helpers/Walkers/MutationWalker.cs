@@ -8,7 +8,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
+    internal sealed class MutationWalker : PooledWalker<MutationWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
@@ -18,7 +18,7 @@
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
-        private AssignedValueWalker()
+        private MutationWalker()
         {
             this.memberWalker = new MemberWalker(this);
         }
@@ -64,7 +64,7 @@
             else
             {
                 var ctor = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out IMethodSymbol baseCtor))
+                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out var baseCtor))
                 {
                     this.HandleInvoke(baseCtor, null);
                 }
@@ -169,7 +169,7 @@
                         foreach (var reference in method.DeclaringSyntaxReferences)
                         {
                             var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                            if (methodDeclaration.TryGetMatchingParameter(node, out ParameterSyntax parameterSyntax))
+                            if (methodDeclaration.TryGetMatchingParameter(node, out var parameterSyntax))
                             {
                                 var parameterSymbol = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken);
                                 if (parameterSymbol != null)
@@ -193,17 +193,17 @@
             base.VisitArgument(node);
         }
 
-        internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MutationWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return Borrow(property, null, semanticModel, cancellationToken);
         }
 
-        internal static AssignedValueWalker Borrow(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MutationWalker Borrow(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return Borrow(field, null, semanticModel, cancellationToken);
         }
 
-        internal static AssignedValueWalker Borrow(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MutationWalker Borrow(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (value is ElementAccessExpressionSyntax elementAccess)
             {
@@ -219,10 +219,10 @@
                 return Borrow(symbol, value, semanticModel, cancellationToken);
             }
 
-            return Borrow(() => new AssignedValueWalker());
+            return Borrow(() => new MutationWalker());
         }
 
-        internal static AssignedValueWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MutationWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
                 symbol is IPropertySymbol ||
@@ -232,17 +232,17 @@
                 return Borrow(symbol, null, semanticModel, cancellationToken);
             }
 
-            return Borrow(() => new AssignedValueWalker());
+            return Borrow(() => new MutationWalker());
         }
 
-        internal static AssignedValueWalker Borrow(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MutationWalker Borrow(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
             {
-                return Borrow(() => new AssignedValueWalker());
+                return Borrow(() => new MutationWalker());
             }
 
-            var pooled = Borrow(() => new AssignedValueWalker());
+            var pooled = Borrow(() => new MutationWalker());
             pooled.CurrentSymbol = symbol;
             pooled.Context = context;
             pooled.semanticModel = semanticModel;
@@ -289,7 +289,7 @@
                         if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
                             parameter.RefKind != RefKind.Out)
                         {
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out ExpressionSyntax arg))
+                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
                             {
                                 this.values[i] = arg;
                             }
@@ -506,7 +506,7 @@
                 foreach (var reference in property.DeclaringSyntaxReferences)
                 {
                     var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
+                    if (declaration.TryGetSetAccessorDeclaration(out var setter))
                     {
                         this.Visit(setter);
                     }
@@ -566,9 +566,9 @@
 
         private class MemberWalker : CSharpSyntaxWalker
         {
-            private readonly AssignedValueWalker inner;
+            private readonly MutationWalker inner;
 
-            public MemberWalker(AssignedValueWalker inner)
+            public MemberWalker(MutationWalker inner)
             {
                 this.inner = inner;
             }

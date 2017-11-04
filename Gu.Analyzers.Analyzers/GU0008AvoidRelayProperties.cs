@@ -115,7 +115,7 @@
         {
             if (member is IFieldSymbol field)
             {
-                using (var walker = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
+                using (var walker = MutationWalker.Borrow(field, semanticModel, cancellationToken))
                 {
                     foreach (var assignedValue in walker)
                     {
@@ -134,7 +134,7 @@
 
             if (member is IPropertySymbol property)
             {
-                using (var walker = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
+                using (var walker = MutationWalker.Borrow(property, semanticModel, cancellationToken))
                 {
                     foreach (var assignedValue in walker)
                     {

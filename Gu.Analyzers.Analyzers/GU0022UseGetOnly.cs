@@ -53,7 +53,7 @@
                 return;
             }
 
-            using (var walker = AssignedValueWalker.Borrow(propertySymbol, context.SemanticModel, context.CancellationToken))
+            using (var walker = MutationWalker.Borrow(propertySymbol, context.SemanticModel, context.CancellationToken))
             {
                 foreach (var value in walker)
                 {
