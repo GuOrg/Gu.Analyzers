@@ -9,6 +9,7 @@ namespace Gu.Analyzers.Benchmarks
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
     using Gu.Analyzers.Benchmarks.Benchmarks;
@@ -19,8 +20,6 @@ namespace Gu.Analyzers.Benchmarks
         public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
 
         public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
-
-        private static string ArtifactsDirectory { get; } = Path.Combine(ProjectDirectory, "BenchmarkDotNet.Artifacts", "results");
 
         public static void Main()
         {
@@ -40,14 +39,14 @@ namespace Gu.Analyzers.Benchmarks
             {
                 foreach (var summary in RunSingle<AllBenchmarks>())
                 {
-                    CopyResult(summary.Title);
+                    CopyResult(summary);
                 }
             }
             else
             {
                 foreach (var summary in RunAll())
                 {
-                    CopyResult(summary.Title);
+                    CopyResult(summary);
                 }
             }
         }
@@ -65,13 +64,14 @@ namespace Gu.Analyzers.Benchmarks
             return summaries;
         }
 
-        private static void CopyResult(string name)
+        private static void CopyResult(Summary summary)
         {
             Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
             if (Directory.Exists(BenchmarksDirectory))
             {
-                var sourceFileName = Path.Combine(ArtifactsDirectory, name + "-report-github.md");
-                var destinationFileName = Path.Combine(BenchmarksDirectory, name + ".md");
+                var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath)
+                                              .Single(x => x.EndsWith(summary.Title + "-report-github.md"));
+                var destinationFileName = Path.Combine(BenchmarksDirectory, summary.Title + ".md");
                 Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
                 File.Copy(sourceFileName, destinationFileName, overwrite: true);
             }
