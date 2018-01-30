@@ -52,12 +52,23 @@
             var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
             var enumerableType =
                 context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
-            if (enumerableType.Type.TryGetMethod("GetEnumerator", out var getEnumeratorMethod) &&
+            var elementType = GetElementType(context, enumerableType.ConvertedType);
+            if (elementType == null)
+            {
+                return null;
+            }
+
+            return variableType.IsSameType(elementType);
+        }
+
+        private static ITypeSymbol GetElementType(SyntaxNodeAnalysisContext context, ITypeSymbol enumerableType)
+        {
+            if (enumerableType.TryGetMethod("GetEnumerator", out var getEnumeratorMethod) &&
                getEnumeratorMethod.ReturnType is var enumeratorType &&
                enumeratorType.TryGetProperty("Current", out var currentProperty) &&
                currentProperty.Type is var elementType)
             {
-                return elementType.IsSameType(variableType);
+                return elementType;
             }
 
             return null;
