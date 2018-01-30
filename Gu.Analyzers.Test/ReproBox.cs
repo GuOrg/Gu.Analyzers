@@ -414,6 +414,7 @@ namespace Gu.Analyzers
         }
     }
     }";
+
             AnalyzerAssert.Valid(analyzer, testCode);
         }
     }
