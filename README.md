@@ -79,6 +79,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0070.md">GU0070</a></td>
   <td>Default-constructed value type with no no useful default</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0071.md">GU0071</a></td>
+  <td>Implicit casting done by the foreach</td>
+</tr>
 <table>
 <!-- end generated table -->
 

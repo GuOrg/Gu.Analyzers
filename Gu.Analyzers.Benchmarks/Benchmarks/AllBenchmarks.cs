@@ -40,6 +40,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0070 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0071 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0071ForeachImplicitCast());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0001NameArguments()
         {
@@ -146,6 +148,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0070DefaultConstructedValueTypeWithNoUsefulDefault()
         {
             GU0070.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0071ForeachImplicitCast()
+        {
+            GU0071.Run();
         }
     }
 }
