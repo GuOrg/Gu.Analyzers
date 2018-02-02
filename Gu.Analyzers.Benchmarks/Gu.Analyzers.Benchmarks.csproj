@@ -7,35 +7,19 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
-  
   <PropertyGroup>
-    <SignAssembly>true</SignAssembly>  
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  
   <ItemGroup>
     <Compile Remove="BenchmarkDotNet.Artifacts\**" />
     <EmbeddedResource Remove="BenchmarkDotNet.Artifacts\**" />
     <None Remove="BenchmarkDotNet.Artifacts\**" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="TraceEvent.ReadMe.txt">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="TraceEvent.ReleaseNotes.txt">
-      <Paket>True</Paket>
-    </Content>
-    <Content Include="_TraceEventProgrammersGuide.docx">
-      <Paket>True</Paket>
-    </Content>
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj" />
     <ProjectReference Include="..\Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Benchmarks\" />
   </ItemGroup>

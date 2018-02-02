@@ -3,7 +3,7 @@
 // ReSharper disable HeuristicUnreachableCode
 // ReSharper disable RedundantNameQualifier
 #pragma warning disable CS0162 // Unreachable code detected
-#pragma warning disable GU0011 // Don't ignore the returnvalue.
+#pragma warning disable GU0011 // Don't ignore the return value.
 namespace Gu.Analyzers.Benchmarks
 {
     using System;

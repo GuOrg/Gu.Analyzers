@@ -27,7 +27,7 @@ namespace RoslynSandbox
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
                 diagnosticId: "GU0011",
-                message: "Don't ignore the returnvalue.",
+                message: "Don't ignore the return value.",
                 code: testCode,
                 cleanedSources: out testCode);
             AnalyzerAssert.Diagnostics<GU0011DontIgnoreReturnValue>(expectedDiagnostic, testCode);

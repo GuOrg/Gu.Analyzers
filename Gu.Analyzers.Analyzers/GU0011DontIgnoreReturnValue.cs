@@ -14,12 +14,12 @@
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Don't ignore the returnvalue.",
-            messageFormat: "Don't ignore the returnvalue.",
+            title: "Don't ignore the return value.",
+            messageFormat: "Don't ignore the return value.",
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Don't ignore the returnvalue.",
+            description: "Don't ignore the return value.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
