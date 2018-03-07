@@ -57,7 +57,7 @@ namespace Gu.Analyzers
                 if (node is IdentifierNameSyntax identifier)
                 {
                     bool isEnumMember = sema.GetSymbolSafe(identifier, cancellationToken)
-                                            .TryGetSingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
+                                            .TrySingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
                     if (!isEnumMember)
                     {
                         return false;
@@ -71,7 +71,7 @@ namespace Gu.Analyzers
         private static bool HasFlagsAttribute(INamedTypeSymbol enumType)
         {
             return enumType.GetAttributes()
-                  .TryGetFirst(attr => attr.AttributeClass == KnownSymbol.FlagsAttribute, out AttributeData _);
+                  .TryFirst(attr => attr.AttributeClass == KnownSymbol.FlagsAttribute, out AttributeData _);
         }
 
         // unboxes a boxed integral value to ulong, regardless of the original boxed type

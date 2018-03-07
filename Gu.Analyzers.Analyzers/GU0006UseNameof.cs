@@ -46,7 +46,7 @@
                 SyntaxFacts.IsValidIdentifier(literal.Token.ValueText))
             {
                 var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart, name: literal.Token.ValueText);
-                if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out var symbol))
+                if (symbols.TrySingle(x => x.Name == literal.Token.ValueText, out var symbol))
                 {
                     if (symbol is IParameterSymbol ||
                         symbol is ILocalSymbol ||
@@ -57,7 +57,7 @@
                     {
                         if (symbol is ILocalSymbol local)
                         {
-                            if (local.DeclaringSyntaxReferences.TryGetSingle(out var reference))
+                            if (local.DeclaringSyntaxReferences.TrySingle(out var reference))
                             {
                                 var statement = argument.FirstAncestor<StatementSyntax>();
                                 if (statement.Span.Start < reference.Span.Start)

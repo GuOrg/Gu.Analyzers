@@ -41,7 +41,7 @@
 
             if (context.Node is ArgumentListSyntax argumentList)
             {
-                if (!argumentList.Arguments.TryGetFirst(x => x.NameColon != null, out _))
+                if (!argumentList.Arguments.TryFirst(x => x.NameColon != null, out _))
                 {
                     return;
                 }

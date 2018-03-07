@@ -82,7 +82,7 @@
                     return Injectable.No;
                 }
 
-                if (!TryGetSingleConstructor(expression, out var ctor))
+                if (!TrySingleConstructor(expression, out var ctor))
                 {
                     return Injectable.No;
                 }
@@ -176,7 +176,7 @@
             return null;
         }
 
-        internal static bool TryGetSingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
+        internal static bool TrySingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
         {
             ctor = null;
             var classDeclaration = node.FirstAncestor<ClassDeclarationSyntax>();
@@ -185,7 +185,7 @@
                 return false;
             }
 
-            if (classDeclaration.Members.TryGetSingle(x => x is ConstructorDeclarationSyntax, out var single))
+            if (classDeclaration.Members.TrySingle(x => x is ConstructorDeclarationSyntax, out var single))
             {
                 ctor = (ConstructorDeclarationSyntax)single;
                 return true;
@@ -241,7 +241,7 @@
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 !context.ContainingSymbol.IsStatic &&
-                TryGetSingleConstructor(objectCreation, out var contextCtor) &&
+                TrySingleConstructor(objectCreation, out var contextCtor) &&
                 !contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
                 context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) is IMethodSymbol ctor &&
@@ -261,7 +261,7 @@
 
             if (context.Node is MemberAccessExpressionSyntax memberAccess &&
                 !context.ContainingSymbol.IsStatic &&
-                TryGetSingleConstructor(memberAccess, out var contextCtor) &&
+                TrySingleConstructor(memberAccess, out var contextCtor) &&
                 !contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
             {
                 if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
@@ -313,7 +313,7 @@
                     var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
                     if (ctor != null &&
                         ctor.ParameterList != null &&
-                        ctor.ParameterList.Parameters.TryGetFirst(
+                        ctor.ParameterList.Parameters.TryFirst(
                             p => p.Identifier.ValueText == identifier.Identifier.ValueText,
                             out var parameter))
                     {

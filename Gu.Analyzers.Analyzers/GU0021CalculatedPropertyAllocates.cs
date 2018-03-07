@@ -76,7 +76,7 @@
                 return;
             }
 
-            if (!getter.Body.Statements.TryGetSingle(out StatementSyntax single))
+            if (!getter.Body.Statements.TrySingle(out StatementSyntax single))
             {
                 return;
             }

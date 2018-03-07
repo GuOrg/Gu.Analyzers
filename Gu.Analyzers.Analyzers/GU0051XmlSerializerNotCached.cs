@@ -51,7 +51,7 @@ namespace Gu.Analyzers
                         context.CancellationToken);
                     if (assignmentSymbol != null &&
                         assignmentSymbol.CanBeReferencedByName &&
-                        assignmentSymbol.DeclaringSyntaxReferences.TryGetSingle(out var assignedToDeclaration))
+                        assignmentSymbol.DeclaringSyntaxReferences.TrySingle(out var assignedToDeclaration))
                     {
                         var assignedToDeclarator =
                             assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;

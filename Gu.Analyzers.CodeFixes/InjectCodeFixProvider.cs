@@ -101,7 +101,7 @@
 
         private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
         {
-            if (GU0007PreferInjecting.TryGetSingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
+            if (GU0007PreferInjecting.TrySingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
             {
                 var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                                  .ConfigureAwait(false);
@@ -148,7 +148,7 @@
                 }
                 else
                 {
-                    if (ctor.ParameterList.Parameters.TryGetFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
+                    if (ctor.ParameterList.Parameters.TryFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
                     {
                         editor.InsertBefore(existing, parameterSyntax);
                     }
@@ -224,11 +224,11 @@
                   modifiers: DeclarationModifiers.ReadOnly,
                   type: parameter.Type);
             var members = containingType.Members;
-            if (members.TryGetFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
+            if (members.TryFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
             {
                 editor.InsertBefore(field, new[] { newField });
             }
-            else if (members.TryGetFirst(out field))
+            else if (members.TryFirst(out field))
             {
                 editor.InsertBefore(field, new[] { newField });
             }

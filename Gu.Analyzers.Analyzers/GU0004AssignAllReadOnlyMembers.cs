@@ -105,7 +105,7 @@
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
                 var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (ctor.TryGetSingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
+                if (ctor.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
                 {
                     this.Visit(declaration);
                 }
@@ -130,7 +130,7 @@
                         fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword))
                     {
                         var declaration = fieldDeclaration.Declaration;
-                        if (declaration.Variables.TryGetSingle(out var variable))
+                        if (declaration.Variables.TrySingle(out var variable))
                         {
                             var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
                             if (field.IsReadOnly &&

@@ -12,20 +12,20 @@
     {
         internal static bool TryGetField(this ITypeSymbol type, string name, out IFieldSymbol field)
         {
-            return type.TryGetSingleMember(name, out field);
+            return type.TrySingleMember(name, out field);
         }
 
         internal static bool TryGetProperty(this ITypeSymbol type, string name, out IPropertySymbol property)
         {
-            return type.TryGetSingleMember(name, out property);
+            return type.TrySingleMember(name, out property);
         }
 
         internal static bool TryGetMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
         {
-            return type.TryGetSingleMember(name, out property);
+            return type.TrySingleMember(name, out property);
         }
 
-        internal static bool TryGetSingleMember<TMember>(this ITypeSymbol type, string name, out TMember member)
+        internal static bool TrySingleMember<TMember>(this ITypeSymbol type, string name, out TMember member)
             where TMember : class, ISymbol
         {
             member = null;

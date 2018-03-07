@@ -120,7 +120,7 @@
                             (left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
                             (left as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
                         {
-                            if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out ParameterSyntax match))
+                            if (this.constructor.ParameterList.Parameters.TrySingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out ParameterSyntax match))
                             {
                                 var symbol = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
                                 if (this.ParameterNameMap.ContainsKey(match))
@@ -147,7 +147,7 @@
                     for (var i = 0; i < node.ArgumentList.Arguments.Count; i++)
                     {
                         var arg = node.ArgumentList.Arguments[i].Expression as IdentifierNameSyntax;
-                        if (this.constructor.ParameterList.Parameters.TryGetSingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out ParameterSyntax match))
+                        if (this.constructor.ParameterList.Parameters.TrySingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out ParameterSyntax match))
                         {
                             if (this.ParameterNameMap.ContainsKey(match))
                             {

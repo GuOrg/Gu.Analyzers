@@ -109,7 +109,7 @@
                     return true;
                 }
 
-                if (method.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
+                if (method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
                 {
                     using (var walker = ReturnValueWalker.Borrow(declaration, Search.Recursive, semanticModel, cancellationToken))
                     {

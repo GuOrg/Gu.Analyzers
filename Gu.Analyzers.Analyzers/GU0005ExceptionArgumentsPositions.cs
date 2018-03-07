@@ -86,7 +86,7 @@
                 argument = arguments.Arguments[i];
                 if (argument.Expression is LiteralExpressionSyntax literal)
                 {
-                    if (symbols.TryGetSingle(x => x.Name == literal.Token.ValueText, out ISymbol _))
+                    if (symbols.TrySingle(x => x.Name == literal.Token.ValueText, out ISymbol _))
                     {
                         index = i;
                         return true;
@@ -102,7 +102,7 @@
                         continue;
                     }
 
-                    if (symbols.TryGetSingle(x => x.Name == identifierName.Identifier.ValueText, out ISymbol _))
+                    if (symbols.TrySingle(x => x.Name == identifierName.Identifier.ValueText, out ISymbol _))
                     {
                         index = i;
                         return true;

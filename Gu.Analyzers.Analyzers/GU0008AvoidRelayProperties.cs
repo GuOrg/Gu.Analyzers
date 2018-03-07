@@ -70,7 +70,7 @@
                     return false;
                 }
 
-                if (getter.Body.Statements.TryGetSingle(out var statement))
+                if (getter.Body.Statements.TrySingle(out var statement))
                 {
                     return IsRelayReturn((statement as ReturnStatementSyntax)?.Expression as MemberAccessExpressionSyntax, semanticModel, cancellationToken);
                 }
