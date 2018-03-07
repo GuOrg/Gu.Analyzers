@@ -95,7 +95,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [Explicit("Fix later")]
         [Test]
         public void ExplicitTypeWhenLoopingRegexMatches()
         {

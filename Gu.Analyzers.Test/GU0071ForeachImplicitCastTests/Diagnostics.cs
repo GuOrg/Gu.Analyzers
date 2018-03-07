@@ -9,7 +9,7 @@
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0071");
 
         [Test]
-        public void ArrayOfInts()
+        public void ArrayOfIntsExplicitDouble()
         {
             var testCode = @"
 namespace RoslynSandbox

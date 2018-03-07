@@ -25,6 +25,11 @@
             return type.TrySingleMemberRecursive(name, out property);
         }
 
+        internal static bool TryFirstMethod(this ITypeSymbol type, string name, out IMethodSymbol result)
+        {
+            return type.TryFirstMember(name, out result);
+        }
+
         internal static bool TryFirstMethodRecursive(this ITypeSymbol type, string name, out IMethodSymbol result)
         {
             return type.TryFirstMemberRecursive(name, out result);
@@ -204,6 +209,27 @@
                 }
 
                 type = type.BaseType;
+            }
+
+            return false;
+        }
+
+        internal static bool TryFirstMember<TMember>(this ITypeSymbol type, string name, out TMember member)
+            where TMember : class, ISymbol
+        {
+            member = null;
+            if (type == null)
+            {
+                return false;
+            }
+
+            foreach (var symbol in type.GetMembers(name))
+            {
+                if (symbol is TMember candidate)
+                {
+                    member = candidate;
+                    return true;
+                }
             }
 
             return false;

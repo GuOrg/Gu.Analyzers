@@ -50,24 +50,23 @@
         private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
         {
             var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
-            var elementType = GetElementType(enumerableType.ConvertedType);
-            if (elementType == null)
+            if (enumerableType.Type.Is(KnownSymbol.IEnumerable))
             {
-                return null;
+                if (enumerableType.ConvertedType is INamedTypeSymbol namedType &&
+                    namedType.TypeArguments.TrySingle(out var typeArg))
+                {
+                    var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
+                    return SymbolComparer.Equals(variableType, typeArg);
+                }
+
+                return enumerableType.ConvertedType != KnownSymbol.IEnumerable;
             }
-
-            var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-            return SymbolComparer.Equals(variableType, elementType);
-        }
-
-        private static ITypeSymbol GetElementType(ITypeSymbol enumerableType)
-        {
-            if (enumerableType.TryFirstMethodRecursive("GetEnumerator", out var getEnumeratorMethod) &&
-               getEnumeratorMethod.ReturnType is var enumeratorType &&
-               enumeratorType.TryGetPropertyRecursive("Current", out var currentProperty) &&
-               currentProperty.Type is var elementType)
+            else if (enumerableType.ConvertedType.TryFirstMethod("GetEnumerator", out var method) &&
+                     method.ReturnType is INamedTypeSymbol returnType &&
+                     returnType.TypeArguments.TrySingle(out var typeArg))
             {
-                return elementType;
+                var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
+                return SymbolComparer.Equals(variableType, typeArg);
             }
 
             return null;
