@@ -63,37 +63,30 @@
             if (statement == null ||
                 otherStatement == null)
             {
-                return Result.Maybe;
-            }
-
-            if (statement.SpanStart >= otherStatement.SpanStart)
-            {
                 return Result.No;
             }
 
             var block = statement.Parent as BlockSyntax;
-            var otherblock = otherStatement.Parent as BlockSyntax;
-            if (block == null || otherblock == null)
-            {
-                if (SharesAncestor<IfStatementSyntax>(statement, otherStatement) ||
-                    SharesAncestor<SwitchStatementSyntax>(statement, otherStatement))
-                {
-                    return Result.No;
-                }
-            }
-
-            block = statement.FirstAncestor<BlockSyntax>();
-            otherblock = otherStatement.FirstAncestor<BlockSyntax>();
-            if (block == null || otherblock == null)
+            var otherBlock = otherStatement.Parent as BlockSyntax;
+            if (block == null && otherBlock == null)
             {
                 return Result.No;
             }
 
-            if (ReferenceEquals(block, otherblock) ||
-                otherblock.Span.Contains(block.Span) ||
-                block.Span.Contains(otherblock.Span))
+            if (ReferenceEquals(block, otherBlock) ||
+                otherBlock?.Contains(node) == true ||
+                block?.Contains(other) == true)
             {
-                return Result.Yes;
+                var firstAnon = node.FirstAncestor<AnonymousFunctionExpressionSyntax>();
+                var otherAnon = other.FirstAncestor<AnonymousFunctionExpressionSyntax>();
+                if (!ReferenceEquals(firstAnon, otherAnon))
+                {
+                    return Result.Yes;
+                }
+
+                return statement.SpanStart < otherStatement.SpanStart
+                    ? Result.Yes
+                    : Result.No;
             }
 
             return Result.No;

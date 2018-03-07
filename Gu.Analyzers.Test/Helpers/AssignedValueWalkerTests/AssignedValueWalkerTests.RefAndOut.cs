@@ -30,7 +30,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
 #pragma warning disable GU0006 // Use nameof.
@@ -72,7 +72,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -100,7 +100,7 @@ internal class Foo<T>
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
 #pragma warning disable GU0006 // Use nameof.
@@ -140,7 +140,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -175,7 +175,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -205,7 +205,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -248,7 +248,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -291,7 +291,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -334,7 +334,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);

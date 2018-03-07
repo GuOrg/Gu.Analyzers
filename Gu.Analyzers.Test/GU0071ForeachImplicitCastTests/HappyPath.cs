@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 
     internal class HappyPath
     {
-        private static readonly Analyzers.GU0071ForeachImplicitCast Analyzer = new Analyzers.GU0071ForeachImplicitCast();
+        private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
 
         [Test]
         public void VarInAForeach()

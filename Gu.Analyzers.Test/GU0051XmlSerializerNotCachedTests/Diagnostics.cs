@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
@@ -82,7 +82,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
@@ -109,7 +109,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

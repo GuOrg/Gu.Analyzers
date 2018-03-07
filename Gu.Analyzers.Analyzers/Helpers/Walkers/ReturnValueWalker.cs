@@ -178,7 +178,7 @@
                 else if (this.recursionLoop.Add(value) &&
                          this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(value, this.cancellationToken))
                 {
-                    using (var assignedValues = MutationWalker.Borrow(value, this.semanticModel, this.cancellationToken))
+                    using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
                     {
                         if (assignedValues.Count == 0)
                         {

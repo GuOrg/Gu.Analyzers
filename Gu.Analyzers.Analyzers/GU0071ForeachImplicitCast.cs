@@ -49,23 +49,22 @@
 
         private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
         {
-            var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-            var enumerableType =
-                context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
-            var elementType = GetElementType(context, enumerableType.ConvertedType);
+            var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
+            var elementType = GetElementType(enumerableType.ConvertedType);
             if (elementType == null)
             {
                 return null;
             }
 
-            return variableType.IsSameType(elementType);
+            var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
+            return SymbolComparer.Equals(variableType, elementType);
         }
 
-        private static ITypeSymbol GetElementType(SyntaxNodeAnalysisContext context, ITypeSymbol enumerableType)
+        private static ITypeSymbol GetElementType(ITypeSymbol enumerableType)
         {
-            if (enumerableType.TryGetMethod("GetEnumerator", out var getEnumeratorMethod) &&
+            if (enumerableType.TryFirstMethodRecursive("GetEnumerator", out var getEnumeratorMethod) &&
                getEnumeratorMethod.ReturnType is var enumeratorType &&
-               enumeratorType.TryGetProperty("Current", out var currentProperty) &&
+               enumeratorType.TryGetPropertyRecursive("Current", out var currentProperty) &&
                currentProperty.Type is var elementType)
             {
                 return elementType;

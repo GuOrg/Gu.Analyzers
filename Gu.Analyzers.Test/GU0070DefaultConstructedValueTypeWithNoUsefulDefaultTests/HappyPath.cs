@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
 
     internal class HappyPath
     {
-        private static readonly Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
+        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
 
         [Test]
         public void DefaultValueForGuidCreatedWithDefaultValueExpression()

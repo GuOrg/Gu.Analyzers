@@ -55,6 +55,56 @@
             return IsRunBefore(first, other, semanticModel, cancellationToken);
         }
 
+        internal static bool IsRunBefore(IMethodSymbol first, IMethodSymbol other, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (first == null ||
+                other == null)
+            {
+                return false;
+            }
+
+            if (TryGetInitializer(other, cancellationToken, out ConstructorInitializerSyntax initializer))
+            {
+                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
+                    !initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
+                {
+                    return false;
+                }
+
+                if (!other.ContainingType.Is(first.ContainingType) &&
+                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.BaseKeyword))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) ||
+                    !other.ContainingType.Is(first.ContainingType))
+                {
+                    return false;
+                }
+            }
+
+            var next = semanticModel.GetSymbolSafe(initializer, cancellationToken);
+            if (SymbolComparer.Equals(first, next))
+            {
+                return true;
+            }
+
+            if (next == null)
+            {
+                if (TryGetDefault(other.ContainingType?.BaseType, out next))
+                {
+                    return SymbolComparer.Equals(first, next);
+                }
+
+                return false;
+            }
+
+            return IsRunBefore(first, next, semanticModel, cancellationToken);
+        }
+
         internal static bool TryGetDefault(INamedTypeSymbol type, out IMethodSymbol result)
         {
             result = null;
@@ -163,56 +213,6 @@
                     }
                 }
             }
-        }
-
-        private static bool IsRunBefore(IMethodSymbol first, IMethodSymbol other, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (first == null ||
-                other == null)
-            {
-                return false;
-            }
-
-            if (TryGetInitializer(other, cancellationToken, out ConstructorInitializerSyntax initializer))
-            {
-                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
-                   !initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
-                {
-                    return false;
-                }
-
-                if (!other.ContainingType.Is(first.ContainingType) &&
-                    initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.BaseKeyword))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) ||
-                    !other.ContainingType.Is(first.ContainingType))
-                {
-                    return false;
-                }
-            }
-
-            var next = semanticModel.GetSymbolSafe(initializer, cancellationToken);
-            if (SymbolComparer.Equals(first, next))
-            {
-                return true;
-            }
-
-            if (next == null)
-            {
-                if (TryGetDefault(other.ContainingType?.BaseType, out next))
-                {
-                    return SymbolComparer.Equals(first, next);
-                }
-
-                return false;
-            }
-
-            return IsRunBefore(first, next, semanticModel, cancellationToken);
         }
 
         private static bool TryGetInitializer(IMethodSymbol ctor, CancellationToken cancellationToken, out ConstructorInitializerSyntax initializer)

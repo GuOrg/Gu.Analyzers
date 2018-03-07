@@ -3,7 +3,6 @@ namespace Gu.Analyzers.Test.Helpers.AssignedValueWalkerTests
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-
     using NUnit.Framework;
 
     internal partial class AssignedValueWalkerTests
@@ -43,7 +42,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -83,7 +82,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);
@@ -123,7 +122,7 @@ internal class Foo
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var pooled = MutationWalker.Borrow(value, semanticModel, CancellationToken.None))
+                using (var pooled = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", pooled);
                     Assert.AreEqual(expected, actual);

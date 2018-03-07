@@ -8,47 +8,29 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    internal static class TypeSymbolExt
+    internal static partial class TypeSymbolExt
     {
-        internal static bool TryGetField(this ITypeSymbol type, string name, out IFieldSymbol field)
-        {
-            return type.TrySingleMember(name, out field);
-        }
-
-        internal static bool TryGetProperty(this ITypeSymbol type, string name, out IPropertySymbol property)
-        {
-            return type.TrySingleMember(name, out property);
-        }
-
-        internal static bool TryGetMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
-        {
-            return type.TrySingleMember(name, out property);
-        }
-
-        internal static bool TrySingleMember<TMember>(this ITypeSymbol type, string name, out TMember member)
-            where TMember : class, ISymbol
-        {
-            member = null;
-            if (type == null || string.IsNullOrEmpty(name))
-            {
-                return false;
-            }
-
-            foreach (var symbol in type.GetMembers(name))
-            {
-                if (member != null)
-                {
-                    member = null;
-                    return false;
-                }
-
-                member = symbol as TMember;
-            }
-
-            return member != null;
-        }
-
         internal static bool IsSameType(this ITypeSymbol first, ITypeSymbol other)
+        {
+            if (ReferenceEquals(first, other) ||
+                first?.Equals(other) == true)
+            {
+                return true;
+            }
+
+            if (first is ITypeParameterSymbol firstParameter &&
+                other is ITypeParameterSymbol otherParameter)
+            {
+                return firstParameter.MetadataName == otherParameter.MetadataName &&
+                       firstParameter.ContainingSymbol.Equals(otherParameter.ContainingSymbol);
+            }
+
+            return first is INamedTypeSymbol firstNamed &&
+                   other is INamedTypeSymbol otherNamed &&
+                   IsSameType(firstNamed, otherNamed);
+        }
+
+        internal static bool IsSameType(this INamedTypeSymbol first, INamedTypeSymbol other)
         {
             if (first == null ||
                 other == null)
@@ -61,7 +43,8 @@
                 return IsSameType(first.OriginalDefinition, other.OriginalDefinition);
             }
 
-            return first.Equals(other);
+            return first.Equals(other) ||
+                   AreEquivalent(first, other);
         }
 
         internal static bool IsRepresentationPreservingConversion(
@@ -88,7 +71,8 @@
                 return true;
             }
 
-            if (conversion.IsNullable && conversion.IsNullLiteral)
+            if (conversion.IsNullable &&
+                conversion.IsNullLiteral)
             {
                 return true;
             }
@@ -107,10 +91,17 @@
             return false;
         }
 
-        internal static bool IsNullable(this ITypeSymbol nullableType, ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsNullable(
+            this ITypeSymbol nullableType,
+            ExpressionSyntax value,
+            SemanticModel semanticModel,
+            CancellationToken cancellationToken)
         {
             var namedTypeSymbol = nullableType as INamedTypeSymbol;
-            if (namedTypeSymbol == null || !namedTypeSymbol.IsGenericType || namedTypeSymbol.Name != "Nullable" || namedTypeSymbol.TypeParameters.Length != 1)
+            if (namedTypeSymbol == null ||
+                !namedTypeSymbol.IsGenericType ||
+                namedTypeSymbol.Name != "Nullable" ||
+                namedTypeSymbol.TypeParameters.Length != 1)
             {
                 return false;
             }
@@ -126,24 +117,19 @@
 
         internal static bool Is(this ITypeSymbol type, QualifiedType qualifiedType)
         {
-            if (type == null)
-            {
-                return false;
-            }
-
-            foreach (var @interface in type.AllInterfaces)
-            {
-                if (@interface == qualifiedType)
-                {
-                    return true;
-                }
-            }
-
             while (type != null)
             {
                 if (type == qualifiedType)
                 {
                     return true;
+                }
+
+                foreach (var @interface in type.AllInterfaces)
+                {
+                    if (@interface == qualifiedType)
+                    {
+                        return true;
+                    }
                 }
 
                 type = type.BaseType;
@@ -188,6 +174,37 @@
             }
 
             return type != KnownSymbol.Object && type.BaseType == null;
+        }
+
+        internal static bool AreEquivalent(this INamedTypeSymbol first, INamedTypeSymbol other)
+        {
+            if (ReferenceEquals(first, other))
+            {
+                return true;
+            }
+
+            if (first == null ||
+                other == null)
+            {
+                return false;
+            }
+
+            if (first.MetadataName != other.MetadataName ||
+                first.ContainingModule.MetadataName != other.ContainingModule.MetadataName ||
+                first.Arity != other.Arity)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < first.Arity; i++)
+            {
+                if (!IsSameType(first.TypeArguments[i], other.TypeArguments[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
