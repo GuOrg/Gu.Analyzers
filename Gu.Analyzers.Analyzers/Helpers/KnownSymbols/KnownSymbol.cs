@@ -53,6 +53,7 @@ namespace Gu.Analyzers
         internal static readonly FileType File = new FileType();
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
+        internal static readonly QualifiedType IEnumeratorOfT = new QualifiedType("System.Collections.Generic.IEnumerator`1");
         internal static readonly QualifiedType IEnumerator = new QualifiedType("System.Collections.IEnumerator");
         internal static readonly IListType IList = new IListType();
         internal static readonly EnumerableType Enumerable = new EnumerableType();

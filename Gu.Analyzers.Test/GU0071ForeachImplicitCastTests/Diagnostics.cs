@@ -14,14 +14,11 @@
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
-    using System.Collections.Generic;
-
     public class A
     {
         public void F()
         {
-            foreach(↓int a in new[]{ 1, 2, 3 })
+            foreach(↓double a in new[]{ 1, 2, 3 })
             {
             }
         }

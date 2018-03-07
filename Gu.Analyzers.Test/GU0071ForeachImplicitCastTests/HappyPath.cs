@@ -94,5 +94,57 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Explicit("Fix later")]
+        [Test]
+        public void ExplicitTypeWhenLoopingRegexMatches()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Text.RegularExpressions;
+
+    class Foo
+    {
+        public Foo()
+        {
+            foreach (Match match in Regex.Matches(string.Empty, string.Empty))
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void DuckTypedEnumerable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    class Lol
+    {
+        IEnumerator<int> GetEnumerator()
+        {
+            yield return 1;
+        }
+    }
+
+    public class A
+    {
+        public void F()
+        {
+            foreach(int a in new Lol())
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
