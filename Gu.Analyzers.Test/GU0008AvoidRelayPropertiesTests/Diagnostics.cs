@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal class Diagnostics
     {
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]

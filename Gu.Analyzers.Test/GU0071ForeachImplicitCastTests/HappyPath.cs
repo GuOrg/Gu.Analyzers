@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0071ForeachImplicitCast
+namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
