@@ -11,6 +11,10 @@
 
     public class CodeGen
     {
+        public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
+
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
+
         private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
                                                                                                     .GetTypes()
                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
@@ -22,7 +26,7 @@
         {
             var id = analyzer.SupportedDiagnostics.Single().Id;
             var expectedName = id + (id.Contains("_") ? "_" : string.Empty) + "Benchmarks";
-            var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
+            var fileName = Path.Combine(BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine("// ReSharper disable InconsistentNaming")
                                           .AppendLine($"namespace {this.GetType().Namespace}")
@@ -50,7 +54,7 @@
         [Test]
         public void AllBenchmarks()
         {
-            var fileName = Path.Combine(Program.BenchmarksDirectory, "AllBenchmarks.cs");
+            var fileName = Path.Combine(BenchmarksDirectory, "AllBenchmarks.cs");
             var builder = new StringBuilder();
             builder.AppendLine("// ReSharper disable InconsistentNaming")
                    .AppendLine("// ReSharper disable RedundantNameQualifier")
@@ -88,6 +92,12 @@
                 File.WriteAllText(fileName, code);
                 Assert.Fail();
             }
+        }
+
+        [Test]
+        public void BenchmarksDirectoryExists()
+        {
+            Assert.AreEqual(true, Directory.Exists(BenchmarksDirectory), BenchmarksDirectory);
         }
     }
 }

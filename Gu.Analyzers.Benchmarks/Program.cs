@@ -13,14 +13,9 @@ namespace Gu.Analyzers.Benchmarks
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
     using Gu.Analyzers.Benchmarks.Benchmarks;
-    using Gu.Roslyn.Asserts;
 
     public class Program
     {
-        public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
-
-        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
-
         public static void Main()
         {
             if (false)
@@ -66,15 +61,13 @@ namespace Gu.Analyzers.Benchmarks
 
         private static void CopyResult(Summary summary)
         {
-            Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
-            if (Directory.Exists(BenchmarksDirectory))
-            {
-                var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath)
-                                              .Single(x => x.EndsWith(summary.Title + "-report-github.md"));
-                var destinationFileName = Path.Combine(BenchmarksDirectory, summary.Title + ".md");
-                Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
-                File.Copy(sourceFileName, destinationFileName, overwrite: true);
-            }
+            var fileName = $"{summary.Title}-report-github.md";
+            Console.WriteLine(fileName);
+            var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, fileName)
+                                          .Single();
+            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath, "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
+            Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
+            File.Copy(sourceFileName, destinationFileName, overwrite: true);
         }
     }
 }

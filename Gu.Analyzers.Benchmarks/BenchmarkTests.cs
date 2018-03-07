@@ -35,11 +35,5 @@ namespace Gu.Analyzers.Benchmarks
         {
             benchmark.Run();
         }
-
-        [Test]
-        public void BenchmarksDirectoryExists()
-        {
-            Assert.AreEqual(true, Directory.Exists(Program.BenchmarksDirectory), Program.BenchmarksDirectory);
-        }
     }
 }
