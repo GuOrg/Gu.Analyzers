@@ -43,7 +43,7 @@ namespace Gu.Analyzers
 
         internal static bool IsSameType(this ExpressionSyntax expression, QualifiedType metadataName, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var type = semanticModel?.Compilation.GetTypeByMetadataName(metadataName.FullName);
+            var type = semanticModel?.Compilation.GetTypeByMetadataName(metadataName.QualifiedName);
             return expression.IsSameType(type, semanticModel, cancellationToken);
         }
 

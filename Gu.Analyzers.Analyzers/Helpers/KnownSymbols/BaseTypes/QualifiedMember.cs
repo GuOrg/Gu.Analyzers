@@ -5,7 +5,7 @@ namespace Gu.Analyzers
 
     using Microsoft.CodeAnalysis;
 
-    [DebuggerDisplay("{ContainingType.FullName,nq}.{Name,nq}")]
+    [DebuggerDisplay("{ContainingType.QualifiedName,nq}.{Name,nq}")]
     internal class QualifiedMember<T>
         where T : ISymbol
     {
@@ -48,7 +48,7 @@ namespace Gu.Analyzers
                 }
             }
 
-            return left.Name.IsParts(right.ContainingType.FullName, ".", right.Name);
+            return left.Name.IsParts(right.ContainingType.QualifiedName, ".", right.Name);
         }
 
         public static bool operator !=(T left, QualifiedMember<T> right) => !(left == right);

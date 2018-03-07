@@ -4,10 +4,10 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [System.Diagnostics.DebuggerDisplay("{this.FullName}")]
+    [System.Diagnostics.DebuggerDisplay("{this.QualifiedName}")]
     internal class QualifiedType
     {
-        internal readonly string FullName;
+        internal readonly string QualifiedName;
         internal readonly NamespaceParts Namespace;
         internal readonly string Type;
         private readonly string @alias;
@@ -17,9 +17,9 @@ namespace Gu.Analyzers
         {
         }
 
-        private QualifiedType(string fullName, NamespaceParts @namespace, string type, string alias = null)
+        private QualifiedType(string qualifiedName, NamespaceParts @namespace, string type, string alias = null)
         {
-            this.FullName = fullName;
+            this.QualifiedName = qualifiedName;
             this.Namespace = @namespace;
             this.Type = type;
             this.alias = alias;
