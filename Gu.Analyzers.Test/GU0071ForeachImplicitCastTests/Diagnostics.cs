@@ -9,6 +9,28 @@
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0071");
 
         [Test]
+        public void ArrayOfInts()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class A
+    {
+        public void F()
+        {
+            foreach(↓int a in new[]{ 1, 2, 3 })
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
         public void GenericCollectionWithACast()
         {
             var testCode = @"
