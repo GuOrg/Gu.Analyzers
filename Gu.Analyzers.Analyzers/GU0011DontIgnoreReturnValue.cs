@@ -100,8 +100,11 @@
                     }
                 }
 
-                if (method == KnownSymbol.IList.Add ||
-                    method == KnownSymbol.IList.Remove)
+                if ((method.Name == "Add" ||
+                     method.Name == "Remove" ||
+                     method.Name == "TryAdd" ||
+                     method.Name == "TryRemove") &&
+                    method.ReturnType.IsValueType)
                 {
                     return true;
                 }
