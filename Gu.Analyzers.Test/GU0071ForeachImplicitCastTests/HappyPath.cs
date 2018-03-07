@@ -13,14 +13,13 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.Collections.Generic;
 
     public class A
     {
         public void F()
         {
-            IEnumerable<IEnumerable<char>> b = new[]{""lol"", ""asdf"", ""test""};
+            IEnumerable<IEnumerable<char>> b = new string[0];
             foreach(var a in b)
             {
             }
@@ -36,15 +35,14 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.Collections.Generic;
 
     public class A
     {
         public void F()
         {
-            IEnumerable<IEnumerable<char>> b = new[]{""lol"", ""asdf"", ""test""};
-            foreach(IEnumerable<char> a in b)
+            IEnumerable<IEnumerable<char>> b = new string[0];
+            foreach (IEnumerable<char> a in b)
             {
             }
         }
@@ -59,7 +57,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
+    using System.Collections;
     using System.Collections.Generic;
 
     class Lol : IEnumerable<IEnumerable<char>>, IEnumerable<int>
@@ -75,7 +73,7 @@ namespace RoslynSandbox
 
         IEnumerator<IEnumerable<char>> IEnumerable<IEnumerable<char>>.GetEnumerator()
         {
-            yield return ""lol"";
+            yield return string.Empty;
         }
 
         IEnumerator IEnumerable.GetEnumerator()

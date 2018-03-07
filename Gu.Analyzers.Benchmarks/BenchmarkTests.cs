@@ -3,7 +3,6 @@ namespace Gu.Analyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using Gu.Analyzers.Benchmarks.Benchmarks;
     using Microsoft.CodeAnalysis.Diagnostics;

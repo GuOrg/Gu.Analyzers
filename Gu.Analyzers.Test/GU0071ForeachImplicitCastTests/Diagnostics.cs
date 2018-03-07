@@ -36,14 +36,13 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.Collections.Generic;
 
     public class A
     {
         public void F()
         {
-            IEnumerable<IEnumerable<char>> b = new[]{""lol"", ""asdf"", ""test""};
+            IEnumerable<IEnumerable<char>> b = new string[0];
             foreach(↓List<char> a in b)
             {
             }
@@ -59,7 +58,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
+    using System.Collections;
     using System.Collections.Generic;
 
     class Lol : IEnumerable<IEnumerable<char>>
@@ -67,7 +66,7 @@ namespace RoslynSandbox
         /// <inheritdoc />
         IEnumerator<IEnumerable<char>> IEnumerable<IEnumerable<char>>.GetEnumerator()
         {
-            yield return ""lol"";
+            yield return string.Empty;
         }
 
         /// <inheritdoc />
@@ -125,7 +124,7 @@ namespace RoslynSandbox
     {
         IEnumerator<IEnumerable<char>> GetEnumerator()
         {
-            yield return ""lol"";
+            yield return string.Empty;
         }
     }
 
