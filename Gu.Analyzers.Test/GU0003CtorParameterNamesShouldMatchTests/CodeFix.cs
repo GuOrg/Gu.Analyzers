@@ -3,10 +3,10 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Codefix
+    internal class CodeFix
     {
         private static readonly GU0003CtorParameterNamesShouldMatch Analyzer = new GU0003CtorParameterNamesShouldMatch();
-        private static readonly RenameConstructorArgumentsCodeFixProvider CodeFix = new RenameConstructorArgumentsCodeFixProvider();
+        private static readonly RenameConstructorArgumentsCodeFixProvider Fix = new RenameConstructorArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0003");
 
         [Test]
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -199,7 +199,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
         }
 
         [Test]
@@ -244,7 +244,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -289,7 +289,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -334,7 +334,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
         }
     }
 }

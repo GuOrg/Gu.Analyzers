@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly GU0005ExceptionArgumentsPositions Analyzer = new GU0005ExceptionArgumentsPositions();
+        private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0005");
+
         [TestCase(@"throw new ArgumentException(↓nameof(o), ""message"");", @"throw new ArgumentException(""message"", nameof(o));")]
         [TestCase(@"throw new System.ArgumentException(↓nameof(o), ""message"");", @"throw new System.ArgumentException(""message"", nameof(o));")]
         [TestCase(@"throw new ArgumentException(↓""o"", ""message"");", @"throw new ArgumentException(""message"", ""o"");")]
@@ -42,7 +46,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
             fixedCode = fixedCode.AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
-            AnalyzerAssert.CodeFix<GU0005ExceptionArgumentsPositions, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -75,7 +79,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0005ExceptionArgumentsPositions, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -106,7 +110,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0005ExceptionArgumentsPositions, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

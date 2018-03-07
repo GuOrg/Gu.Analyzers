@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
+        private static readonly UseNameofCodeFixProvider Fix = new UseNameofCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0006");
+
         [Test]
         public void WhenThrowingArgumentException()
         {
@@ -41,7 +45,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -82,7 +86,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -169,7 +173,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -240,7 +244,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -337,7 +341,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -378,7 +382,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -409,7 +413,7 @@ namespace RoslynSandbox
         public static string Bar(string meh) => meh;
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -448,7 +452,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -535,7 +539,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode, allowCompilationErrors: AllowCompilationErrors.Yes);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -584,7 +588,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0006UseNameof, UseNameofCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

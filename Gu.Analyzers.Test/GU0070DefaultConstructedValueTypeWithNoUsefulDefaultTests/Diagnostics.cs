@@ -1,10 +1,13 @@
-﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
+﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal class Diagnostics
     {
+        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0070");
+
         [Test]
         public void UselessDefaultGuid()
         {
@@ -21,7 +24,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -40,7 +43,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

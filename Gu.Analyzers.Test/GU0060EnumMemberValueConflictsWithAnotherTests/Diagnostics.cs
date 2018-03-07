@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0060");
+
         [Test]
         public void ImplicitValueSharing()
         {
@@ -28,7 +31,7 @@ namespace RoslynSandbox
                 message: "Enum member value conflicts with another.",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -47,7 +50,7 @@ namespace RoslynSandbox
         ↓Bad = 2
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -66,7 +69,7 @@ namespace RoslynSandbox
         ↓Bad = 3
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -89,7 +92,7 @@ namespace RoslynSandbox
         ↓Bad = 0x0F
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -109,7 +112,7 @@ namespace RoslynSandbox
         ↓Bad = 1 << 2
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -128,7 +131,7 @@ namespace RoslynSandbox
         ↓Bad = 2
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -147,7 +150,7 @@ namespace RoslynSandbox
         ↓Bad = A | 2
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0060EnumMemberValueConflictsWithAnother>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0051");
+
         [Test]
         public void TrivialConstructionUnsaved()
         {
@@ -31,7 +34,7 @@ namespace RoslynSandbox
                 message: "The serializer is not cached.",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -54,7 +57,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
@@ -79,7 +82,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
@@ -106,7 +109,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("default(XmlSerializer)", code);
-            AnalyzerAssert.Diagnostics<GU0051XmlSerializerNotCached>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
     }
 }

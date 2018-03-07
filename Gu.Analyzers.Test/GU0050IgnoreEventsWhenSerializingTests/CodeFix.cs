@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
+        private static readonly AddNonSerializedFixProvider Fix = new AddNonSerializedFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0050");
+
         [Test]
         public void Message()
         {
@@ -39,7 +43,7 @@ namespace RoslynSandbox
 }";
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0050", "Ignore events when serializing.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics<GU0050IgnoreEventsWhenSerializing>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -105,7 +109,7 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -182,7 +186,7 @@ namespace RoslynSandbox
         public int E => A;
     }
 }";
-            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(new[] { attributeCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -224,7 +228,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0050IgnoreEventsWhenSerializing, AddNonSerializedFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

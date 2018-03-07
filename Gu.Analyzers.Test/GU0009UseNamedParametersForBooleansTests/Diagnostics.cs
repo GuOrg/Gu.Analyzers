@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0009");
+
         [Test]
         public void UnnamedBooleanParameters()
         {
@@ -33,7 +36,7 @@ namespace RoslynSandbox
                 message: "The boolean parameter is not named.",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -61,7 +64,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -87,7 +90,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0009UseNamedParametersForBooleans>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

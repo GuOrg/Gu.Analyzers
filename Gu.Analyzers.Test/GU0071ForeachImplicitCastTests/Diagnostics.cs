@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0071");
+
         [Test]
         public void GenericCollectionWithACast()
         {
@@ -25,7 +28,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0071ForeachImplicitCast>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
 
         [Test]
@@ -62,7 +65,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0071ForeachImplicitCast>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
 
         [Test]
@@ -84,7 +87,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0071ForeachImplicitCast>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
 
         [Test]
@@ -114,7 +117,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<Analyzers.GU0071ForeachImplicitCast>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic,testCode);
         }
     }
 }

@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
+        private static readonly SortPropertiesCodeFixProvider Fix = new SortPropertiesCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
+
         [Test]
         public void ExplicitImplementation()
         {
@@ -38,7 +42,7 @@ namespace RoslynSandbox
         private int Value { get; } = 5;
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(new[] { interfaceCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { interfaceCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -89,7 +93,7 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -144,7 +148,7 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -195,7 +199,7 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -288,7 +292,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -339,7 +343,7 @@ namespace RoslynSandbox
         public int A { get; set; } = 1;
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -402,7 +406,7 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -439,7 +443,7 @@ namespace RoslynSandbox
         public int A => B;
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -488,7 +492,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -569,7 +573,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -608,7 +612,7 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -662,7 +666,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll<GU0020SortProperties, SortPropertiesCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

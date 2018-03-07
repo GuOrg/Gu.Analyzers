@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0011DontIgnoreReturnValue Analyzer = new GU0011DontIgnoreReturnValue();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0011");
+
         [TestCase("ints.Select(x => x);")]
         [TestCase("ints.Select(x => x).Where(x => x > 1);")]
         [TestCase("ints.Where(x => x > 1);")]
@@ -30,7 +33,7 @@ namespace RoslynSandbox
                 message: "Don't ignore the return value.",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics<GU0011DontIgnoreReturnValue>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -51,7 +54,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0011DontIgnoreReturnValue>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

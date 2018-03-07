@@ -3,8 +3,12 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal class Codefix
     {
+        private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
+        private static readonly UseGetOnlyCodeFixProvider CodeFix = new UseGetOnlyCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0022");
+
         [Test]
         public void InitializedInCtor()
         {
@@ -53,7 +57,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0022UseGetOnly, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -104,7 +108,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0022UseGetOnly, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0010DoNotAssignSameValue Analyzer = new GU0010DoNotAssignSameValue();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0010");
+
         [TestCase("this.A = this.A;", "this.A = this.A;")]
         [TestCase("this.A = this.A;", "this.A = A;")]
         [TestCase("this.A = this.A;", "A = A;")]
@@ -30,7 +33,7 @@ namespace RoslynSandbox
                 message: "Assigning made to same, did you mean to assign something else?",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics<GU0010DoNotAssignSameValue>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -50,7 +53,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0010DoNotAssignSameValue>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

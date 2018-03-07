@@ -3,10 +3,10 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Codefix
+    internal class CodeFix
     {
         private static readonly GU0001NameArguments Analyzer = new GU0001NameArguments();
-        private static readonly NameArgumentsCodeFixProvider CodeFix = new NameArgumentsCodeFixProvider();
+        private static readonly NameArgumentsCodeFixProvider Fix = new NameArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0001");
 
         [Test]
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -265,7 +265,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -302,7 +302,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
     }
 }

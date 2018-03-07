@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly GU0021CalculatedPropertyAllocates Analyzer = new GU0021CalculatedPropertyAllocates();
+        private static readonly UseGetOnlyCodeFixProvider Fix = new UseGetOnlyCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0021");
+
         [Test]
         public void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
@@ -58,7 +62,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -114,7 +118,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -173,7 +177,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -229,7 +233,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -279,7 +283,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -329,7 +333,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -361,7 +365,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -403,7 +407,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -449,7 +453,7 @@ namespace RoslynSandbox
         private static int CreateNumber() => 2;
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -505,7 +509,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -561,7 +565,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -611,7 +615,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -661,7 +665,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -723,7 +727,7 @@ namespace RoslynSandbox
         public Foo Bar { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -785,7 +789,7 @@ namespace RoslynSandbox
         public Foo Bar2 { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -847,7 +851,7 @@ namespace RoslynSandbox
         public Foo Bar2 { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0021CalculatedPropertyAllocates, UseGetOnlyCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

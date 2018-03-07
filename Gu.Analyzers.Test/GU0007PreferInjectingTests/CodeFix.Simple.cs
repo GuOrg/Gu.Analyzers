@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, BarCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode }, fixedCode);
             }
 
             [Test]
@@ -91,7 +91,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, BarCode, mehCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, mehCode }, fixedCode);
             }
 
             [Test]
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, BarCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -167,7 +167,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -200,7 +200,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { BarCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -250,7 +250,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, barCode, mehCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, mehCode }, fixedCode);
             }
 
             [Test]
@@ -296,7 +296,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, moduleCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, moduleCode }, fixedCode);
             }
 
             [Test]
@@ -359,7 +359,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.FixAll<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, barCode, bazCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -424,7 +424,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, barCode, bazCode, mehCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, fixedCode);
             }
 
             [Test]
@@ -488,7 +488,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<GU0007PreferInjecting, InjectCodeFixProvider>(new[] { fooCode, barCode, bazCode, mehCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, fixedCode);
             }
         }
     }

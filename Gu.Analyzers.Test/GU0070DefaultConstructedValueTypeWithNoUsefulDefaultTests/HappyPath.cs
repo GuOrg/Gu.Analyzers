@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
+namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;

@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0008AvoidRelayProperties Analyzer = new GU0008AvoidRelayProperties();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0008");
+
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]
         public void WhenReturningPropertyOfInjectedField(string getter)
@@ -39,7 +42,7 @@ namespace RoslynSandbox
     }
 }";
             fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
-            AnalyzerAssert.Diagnostics<GU0008AvoidRelayProperties>(fooCode, barCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
 
         [TestCase("this.bar.Value;")]
@@ -70,7 +73,7 @@ namespace RoslynSandbox
     }
 }";
             fooCode = fooCode.AssertReplace("this.bar.Value;", body);
-            AnalyzerAssert.Diagnostics<GU0008AvoidRelayProperties>(fooCode, barCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
     }
 }
