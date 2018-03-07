@@ -3,6 +3,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [System.Diagnostics.DebuggerDisplay("{System.String.Join(\".\", parts)}")]
     internal class NamespaceParts
@@ -52,6 +53,37 @@ namespace Gu.Analyzers
             var parts = qualifiedName.Split('.').ToImmutableList();
             System.Diagnostics.Debug.Assert(parts.Count != 0, "parts.Length != 0");
             return new NamespaceParts(parts.RemoveAt(parts.Count - 1));
+        }
+
+        internal bool Matches(NameSyntax nameSyntax)
+        {
+            return this.Matches(nameSyntax, this.parts.Count - 1);
+        }
+
+        private bool Matches(NameSyntax nameSyntax, int index)
+        {
+            if (nameSyntax is IdentifierNameSyntax identifier)
+            {
+                return index == 0 &&
+                       identifier.Identifier.ValueText == this.parts[0];
+            }
+
+            if (nameSyntax is QualifiedNameSyntax qns)
+            {
+                if (index < 1)
+                {
+                    return false;
+                }
+
+                if (qns.Right.Identifier.ValueText != this.parts[index])
+                {
+                    return false;
+                }
+
+                return this.Matches(qns.Left, index - 1);
+            }
+
+            return false;
         }
     }
 }
