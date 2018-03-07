@@ -26,6 +26,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0012 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0012NullCheckParameter());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0020 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0021 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
@@ -106,6 +108,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0011DontIgnoreReturnValue()
         {
             GU0011.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0012NullCheckParameter()
+        {
+            GU0012.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

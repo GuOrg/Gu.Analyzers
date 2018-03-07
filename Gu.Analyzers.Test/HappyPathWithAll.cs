@@ -10,17 +10,19 @@ namespace Gu.Analyzers.Test
 
     public class HappyPathWithAll
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly.GetTypes()
-                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                               .ToImmutableArray();
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
+                                                                                                     .GetTypes()
+                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                                                                                                     .Where(x => x != typeof(GU0012NullCheckParameter))
+                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                                                     .ToImmutableArray();
 
-        private static readonly Solution Solution = CodeFactory.CreateSolution(
+        private static readonly Solution GuAnalyzersSln = CodeFactory.CreateSolution(
             CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
-        private static readonly Solution PropertyChangedAnalyzersProjectSln = CodeFactory.CreateSolution(
+        private static readonly Solution GuAnalyzersProjectSln = CodeFactory.CreateSolution(
             CodeFactory.FindProjectFile("Gu.Analyzers.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
@@ -33,15 +35,15 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void PropertyChangedAnalyzersSln(DiagnosticAnalyzer analyzer)
+        public void RunOnGuAnalyzersSln(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, Solution);
+            AnalyzerAssert.Valid(analyzer, GuAnalyzersSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void PropertyChangedAnalyzersProject(DiagnosticAnalyzer analyzer)
+        public void RunOnGuAnalyzersProjectSln(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, PropertyChangedAnalyzersProjectSln);
+            AnalyzerAssert.Valid(analyzer, GuAnalyzersProjectSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
