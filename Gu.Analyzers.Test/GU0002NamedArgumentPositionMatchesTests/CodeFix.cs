@@ -3,8 +3,12 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal class Codefix
     {
+        private static readonly GU0002NamedArgumentPositionMatches Analyzer = new GU0002NamedArgumentPositionMatches();
+        private static readonly MoveArgumentCodeFixProvider CodeFix = new MoveArgumentCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0002");
+
         [Test]
         public void Message()
         {
@@ -41,7 +45,7 @@ namespace RoslynSandbox
 }";
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0002", "The position of a named arguments and parameters should match.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics<GU0002NamedArgumentPositionMatches>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -110,7 +114,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -185,7 +189,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -258,7 +262,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -295,7 +299,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoFix<GU0002NamedArgumentPositionMatches, MoveArgumentCodeFixProvider>(testCode);
+            AnalyzerAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
         }
     }
 }

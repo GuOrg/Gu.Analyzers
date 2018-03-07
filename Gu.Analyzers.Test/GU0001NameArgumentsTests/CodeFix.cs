@@ -3,8 +3,12 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal class Codefix
     {
+        private static readonly GU0001NameArguments Analyzer = new GU0001NameArguments();
+        private static readonly NameArgumentsCodeFixProvider CodeFix = new NameArgumentsCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0001");
+
         [Test]
         public void Message()
         {
@@ -44,7 +48,7 @@ namespace RoslynSandbox
 }";
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0001", "Name the arguments.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics<GU0001NameArguments>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -113,7 +117,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -188,7 +192,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -261,7 +265,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -298,7 +302,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoFix<GU0001NameArguments, NameArgumentsCodeFixProvider>(testCode);
+            AnalyzerAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
         }
     }
 }

@@ -5,6 +5,9 @@
 
     internal class Diagnostics
     {
+        private static readonly GU0004AssignAllReadOnlyMembers Analyzer = new GU0004AssignAllReadOnlyMembers();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0004");
+
         [Test]
         public void Message()
         {
@@ -27,7 +30,7 @@ namespace RoslynSandbox
             var message = "The following readonly members are not assigned:\r\n" +
                           "RoslynSandbox.Foo.B";
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0004", message, testCode, out testCode);
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -49,7 +52,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -87,7 +90,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -108,7 +111,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -129,7 +132,7 @@ namespace RoslynSandbox
         public static int B { get; }
     }
 }";
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -151,7 +154,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<GU0004AssignAllReadOnlyMembers>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
 }

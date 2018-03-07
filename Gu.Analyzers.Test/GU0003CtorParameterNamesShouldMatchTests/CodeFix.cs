@@ -3,8 +3,12 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal class Codefix
     {
+        private static readonly GU0003CtorParameterNamesShouldMatch Analyzer = new GU0003CtorParameterNamesShouldMatch();
+        private static readonly RenameConstructorArgumentsCodeFixProvider CodeFix = new RenameConstructorArgumentsCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0003");
+
         [Test]
         public void Message()
         {
@@ -32,7 +36,7 @@ namespace RoslynSandbox
 }";
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0003", "Name the parameters to match the assigned members.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics<GU0003CtorParameterNamesShouldMatch>(expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
         }
 
         [Test]
@@ -83,7 +87,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -144,7 +148,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -195,7 +199,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(new[] { fooCode, barCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
         }
 
         [Test]
@@ -240,7 +244,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -285,7 +289,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -330,7 +334,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<GU0003CtorParameterNamesShouldMatch, RenameConstructorArgumentsCodeFixProvider>(new[] { fooCode, barCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
         }
     }
 }
