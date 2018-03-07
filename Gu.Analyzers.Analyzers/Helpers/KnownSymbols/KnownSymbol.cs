@@ -5,9 +5,10 @@ namespace Gu.Analyzers
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Void = Create("System.Void");
-        internal static readonly QualifiedType Object = Create("System.Object");
-        internal static readonly QualifiedType Boolean = Create("System.Boolean");
+        internal static readonly QualifiedType Object = Create("System.Object", "object");
+        internal static readonly QualifiedType Boolean = Create("System.Boolean", "bool");
         internal static readonly StringType String = new StringType();
+        internal static readonly QualifiedType NullableOfT = new QualifiedType("System.Nullable`1");
         internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly QualifiedType Func = Create("System.Func");
@@ -74,9 +75,9 @@ namespace Gu.Analyzers
         internal static readonly NUnitAssertType NUnitAssert = new NUnitAssertType();
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
 
-        private static QualifiedType Create(string qualifiedName)
+        private static QualifiedType Create(string qualifiedName, string alias = null)
         {
-            return new QualifiedType(qualifiedName);
+            return new QualifiedType(qualifiedName, alias);
         }
     }
 }
