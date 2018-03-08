@@ -39,7 +39,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0003CtorParameterNamesShouldMatch()
@@ -150,9 +150,9 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void ObjectCreationExpressionAnalyzer()
+        public void ObjectCreationAnalyzer()
         {
-            ObjectCreationExpressionAnalyzerBenchmark.Run();
+            ObjectCreationAnalyzerBenchmark.Run();
         }
     }
 }

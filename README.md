@@ -56,6 +56,10 @@
   <td>Check if parameter is null.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0013.md">GU0013</a></td>
+  <td>Use correct parameter name.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
   <td>Sort properties.</td>
 </tr>

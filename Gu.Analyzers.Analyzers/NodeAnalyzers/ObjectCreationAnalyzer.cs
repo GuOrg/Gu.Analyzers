@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -30,75 +32,68 @@
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                objectCreation.ArgumentList != null &&
-                objectCreation.ArgumentList.Arguments.Count > 0 &&
+                objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
+                argumentList.Arguments.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol method)
             {
                 if (objectCreation.TryGetConstructor(KnownSymbol.ArgumentException, context.SemanticModel, context.CancellationToken, out var ctor) ||
                     objectCreation.TryGetConstructor(KnownSymbol.ArgumentNullException, context.SemanticModel, context.CancellationToken, out ctor) ||
                     objectCreation.TryGetConstructor(KnownSymbol.ArgumentOutOfRangeException, context.SemanticModel, context.CancellationToken, out ctor))
                 {
-                    if (TryGetIndexOfParameter(ctor, "paramName", out var parameterIndex) &&
-                        TryGetIndexOfNameArgument(method.Parameters, objectCreation.ArgumentList, out var argument, out var argumentIndex) &&
-                        argumentIndex != parameterIndex)
+                    if (ctor.Parameters.TryFirst(x => x.Name == "paramName", out var parameterName))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0005ExceptionArgumentsPositions.Descriptor, argument.GetLocation()));
+                        if (TryGetWithParameterName(argumentList, method.Parameters, out var argument) &&
+                            argument.NameColon == null &&
+                            objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(parameterName))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(GU0005ExceptionArgumentsPositions.Descriptor, argument.GetLocation()));
+                        }
+                        else if (objectCreation.TryGetMatchingArgument(parameterName, out argument) &&
+                                 objectCreation.Parent is ThrowExpressionSyntax throwExpression &&
+                                 throwExpression.Parent is BinaryExpressionSyntax binary &&
+                                 binary.IsKind(SyntaxKind.CoalesceExpression) &&
+                                 argument.TryGetNameOf(out var name) &&
+                                 binary.Left is IdentifierNameSyntax identifierName &&
+                                 identifierName.Identifier.ValueText != name)
+                        {
+                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", identifierName.Identifier.ValueText) });
+                            context.ReportDiagnostic(Diagnostic.Create(GU0013CheckNameInThrow.Descriptor, argument.GetLocation(), properties));
+                        }
                     }
                 }
             }
         }
 
-        private static bool TryGetIndexOfParameter(IMethodSymbol method, string name, out int index)
+        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, out ArgumentSyntax argument)
         {
-            if (method == null)
-            {
-                index = -1;
-                return false;
-            }
-
-            for (var i = 0; i < method.Parameters.Length; i++)
-            {
-                if (method.Parameters[i].Name == name)
-                {
-                    index = i;
-                    return true;
-                }
-            }
-
-            index = -1;
-            return false;
-        }
-
-        private static bool TryGetIndexOfNameArgument(ImmutableArray<IParameterSymbol> parameters, ArgumentListSyntax arguments, out ArgumentSyntax argument, out int index)
-        {
-            for (var i = 0; i < arguments.Arguments.Count; i++)
-            {
-                argument = arguments.Arguments[i];
-                if (argument.Expression is LiteralExpressionSyntax literal)
-                {
-                    if (parameters.TrySingle(x => x.Name == literal.Token.ValueText, out ISymbol _))
-                    {
-                        index = i;
-                        return true;
-                    }
-                }
-
-                if (argument.Expression is InvocationExpressionSyntax invocation &&
-                    invocation.Expression is IdentifierNameSyntax methodName &&
-                    invocation.ArgumentList != null &&
-                    methodName.Identifier.ValueText == "nameof" &&
-                    invocation.ArgumentList.Arguments.TryFirst(out var nameofArgument) &&
-                    nameofArgument.Expression is IdentifierNameSyntax identifierName &&
-                    parameters.TrySingle(x => x.Name == identifierName.Identifier.ValueText, out ISymbol _))
-                {
-                    index = i;
-                    return true;
-                }
-            }
-
             argument = null;
-            index = -1;
-            return false;
+            foreach (var arg in argumentList.Arguments)
+            {
+                if (arg.Expression is LiteralExpressionSyntax literal &&
+                    literal.IsKind(SyntaxKind.StringLiteralExpression) &&
+                    parameters.TryFirst(x => x.Name == literal.Token.ValueText, out _))
+                {
+                    if (argument != null)
+                    {
+                        return false;
+                    }
+
+                    argument = arg;
+                }
+
+                if (arg.TryGetNameOf(out var name) &&
+                    parameters.TryFirst(x => x.Name == name, out _))
+                {
+                    if (argument != null)
+                    {
+                        return false;
+                    }
+
+                    argument = arg;
+                }
+            }
+
+            return argument != null;
         }
     }
 }
