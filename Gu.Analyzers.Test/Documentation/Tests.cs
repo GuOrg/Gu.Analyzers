@@ -14,44 +14,42 @@
     public class Tests
     {
         private static readonly IReadOnlyList<DescriptorInfo> Descriptors = typeof(AnalyzerCategory)
-            .Assembly
-            .GetTypes()
-            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-            .Select(DescriptorInfo.Create)
-            .ToArray();
+                                                                            .Assembly.GetTypes()
+                                                                            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                                                                            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                            .SelectMany(DescriptorInfo.Create)
+                                                                            .OrderBy(x => x.Descriptor.Id)
+                                                                            .ToArray();
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\");
+        private static string SolutionDirectory => CodeFactory.FindSolutionFile("Gu.Analyzers.sln").DirectoryName;
 
         private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
 
         [TestCaseSource(nameof(Descriptors))]
         public void MissingDocs(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.DocExists)
+            if (!descriptorInfo.DocExists)
             {
-                Assert.Pass();
+                var descriptor = descriptorInfo.Descriptor;
+                var id = descriptor.Id;
+                DumpIfDebug(CreateStub(descriptorInfo));
+                File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
+                Assert.Fail($"Documentation is missing for {id}");
             }
-
-            var descriptor = descriptorInfo.DiagnosticDescriptor;
-            var id = descriptor.Id;
-            DumpIfDebug(CreateStub(descriptorInfo));
-            File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
-            Assert.Fail($"Documentation is missing for {id}");
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void TitleId(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual($"# {descriptorInfo.DiagnosticDescriptor.Id}", File.ReadLines(descriptorInfo.DocFileName).First());
+            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", File.ReadLines(descriptorInfo.DocFileName).First());
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Title(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual(File.ReadLines(descriptorInfo.DocFileName).Skip(1).First(), $"## {descriptorInfo.DiagnosticDescriptor.Title}");
+            Assert.AreEqual(File.ReadLines(descriptorInfo.DocFileName).Skip(1).First(), $"## {descriptorInfo.Descriptor.Title}");
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -61,7 +59,7 @@
                                .SkipWhile(l => !l.StartsWith("## Description"))
                                .Skip(1)
                                .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l));
-            var actual = descriptorInfo.DiagnosticDescriptor.Description.ToString();
+            var actual = descriptorInfo.Descriptor.Description.ToString();
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -71,6 +69,12 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
+            ////switch (descriptorInfo.Descriptor.Id)
+            ////{
+            ////    case INPC004UseCallerMemberName.DiagnosticId when descriptorInfo.Analyzer is INPC004UseCallerMemberName:
+            ////        return;
+            ////}
+
             var expected = GetTable(CreateStub(descriptorInfo));
             DumpIfDebug(expected);
             var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
@@ -86,12 +90,10 @@
             CodeAssert.AreEqual(expected, actual);
         }
 
-        [Test]
-        public void UniqueIds()
+        [TestCaseSource(nameof(Descriptors))]
+        public void UniqueIds(DescriptorInfo descriptorInfo)
         {
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Id));
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Title));
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Description));
+            Assert.AreEqual(1, Descriptors.Select(x => x.Descriptor).Distinct().Count(d => d.Id == descriptorInfo.Descriptor.Id));
         }
 
         [Test]
@@ -100,11 +102,11 @@
             var builder = new StringBuilder();
             builder.AppendLine("<!-- start generated table -->")
                    .AppendLine("<table>");
-            foreach (var info in DescriptorsWithDocs.OrderBy(x => x.DiagnosticDescriptor.Id))
+            foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor).Distinct().OrderBy(x => x.Id))
             {
                 builder.AppendLine("<tr>");
-                builder.AppendLine($@"  <td><a href=""{info.DiagnosticDescriptor.HelpLinkUri}"">{info.DiagnosticDescriptor.Id}</a></td>");
-                builder.AppendLine($"  <td>{info.DiagnosticDescriptor.Title}</td>");
+                builder.AppendLine($@"  <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>");
+                builder.AppendLine($"  <td>{descriptor.Title}</td>");
                 builder.AppendLine("</tr>");
             }
 
@@ -118,16 +120,16 @@
 
         private static string CreateStub(DescriptorInfo descriptorInfo)
         {
-            var descriptor = descriptorInfo.DiagnosticDescriptor;
+            var descriptor = descriptorInfo.Descriptor;
             return CreateStub(
-                id: descriptor.Id,
-                title: descriptor.Title.ToString(),
-                severity: descriptor.DefaultSeverity,
-                enabled: descriptor.IsEnabledByDefault,
-                codeFileUrl: descriptorInfo.CodeFileUri,
-                category: descriptor.Category,
-                typeName: descriptorInfo.DiagnosticAnalyzer.GetType().Name,
-                description: descriptor.Description.ToString());
+                descriptor.Id,
+                descriptor.Title.ToString(),
+                descriptor.DefaultSeverity,
+                descriptor.IsEnabledByDefault,
+                descriptorInfo.CodeFileUri,
+                descriptor.Category,
+                descriptorInfo.Analyzer.GetType().Name,
+                descriptor.Description.ToString());
         }
 
         private static string CreateStub(
@@ -145,7 +147,7 @@
                              .Replace("{SEVERITY}", severity.ToString())
                              .Replace("{ENABLED}", enabled ? "true" : "false")
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/JohanLarsson/Gu.Analyzers/")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/PropertyChangedAnalyzers")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)
@@ -179,22 +181,23 @@
 
         public class DescriptorInfo
         {
-            public DescriptorInfo(DiagnosticAnalyzer diagnosticAnalyzer)
+            public DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
             {
-                this.DiagnosticAnalyzer = diagnosticAnalyzer;
-                this.DocFileName = Path.Combine(DocumentsDirectory, this.DiagnosticDescriptor.Id + ".md");
+                this.Analyzer = analyzer;
+                this.Descriptor = descriptor;
+                this.DocFileName = Path.Combine(DocumentsDirectory, this.Descriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory,
-                                                 diagnosticAnalyzer.GetType().Name + ".cs",
+                                                 analyzer.GetType().Name + ".cs",
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null
                     ? @"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/" +
-                      this.CodeFileName.Substring(SolutionDirectory.Length).Replace("\\", "/")
+                      this.CodeFileName.Substring(SolutionDirectory.Length + 1).Replace("\\", "/")
                     : "missing";
             }
 
-            public DiagnosticAnalyzer DiagnosticAnalyzer { get; }
+            public DiagnosticAnalyzer Analyzer { get; }
 
             public string DocFileName { get; }
 
@@ -202,13 +205,13 @@
 
             public string CodeFileUri { get; }
 
+            public DiagnosticDescriptor Descriptor { get; }
+
             public bool DocExists => File.Exists(this.DocFileName);
 
-            public DiagnosticDescriptor DiagnosticDescriptor => this.DiagnosticAnalyzer.SupportedDiagnostics.Single();
+            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer) => analyzer.SupportedDiagnostics.Select(d => new DescriptorInfo(analyzer, d));
 
-            public static DescriptorInfo Create(DiagnosticAnalyzer analyzer) => new DescriptorInfo(analyzer);
-
-            public override string ToString() => this.DiagnosticDescriptor.Id;
+            public override string ToString() => this.Descriptor.Id;
         }
     }
 }
