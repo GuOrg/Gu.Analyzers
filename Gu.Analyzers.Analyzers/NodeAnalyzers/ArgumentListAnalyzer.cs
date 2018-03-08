@@ -65,6 +65,20 @@
                     return false;
                 }
 
+                if (method.Parameters.TryFirst(x => x.IsParams, out _))
+                {
+                    return false;
+                }
+
+                foreach (var member in method.ContainingType.GetMembers(method.Name))
+                {
+                    if (member is IMethodSymbol overload &&
+                        overload.Parameters.TryFirst(x => x.IsParams, out _))
+                    {
+                        return false;
+                    }
+                }
+
                 if (!HasAdjacentParametersOfSameType(method.Parameters))
                 {
                     return false;

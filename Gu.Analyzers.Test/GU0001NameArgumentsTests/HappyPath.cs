@@ -222,6 +222,30 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void ImmutableArrayCreate()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Immutable;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            var ints = ImmutableArray.Create(
+                1,
+                2,
+                3,
+                4);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void IgnoresParams()
         {
             var testCode = @"
@@ -250,7 +274,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhendifferentTypes()
+        public void IgnoresWhenDifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
