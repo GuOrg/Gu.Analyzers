@@ -5,7 +5,7 @@
 
     internal class CodeFix
     {
-        private static readonly GU0001NameArguments Analyzer = new GU0001NameArguments();
+        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
         private static readonly NameArgumentsCodeFixProvider Fix = new NameArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0001");
 

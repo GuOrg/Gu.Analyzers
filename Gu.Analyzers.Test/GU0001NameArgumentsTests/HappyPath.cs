@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 
     internal class HappyPath
     {
-        private static readonly GU0001NameArguments Analyzer = new GU0001NameArguments();
+        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
