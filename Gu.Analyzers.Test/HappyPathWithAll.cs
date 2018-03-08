@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                     .Where(x => x != typeof(GU0012NullCheckParameter))
+                                                                                                     .Where(x => x != typeof(SimpleAssignmentAnalyzer))
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                      .ToImmutableArray();
 

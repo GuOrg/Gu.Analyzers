@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 
     internal class HappyPath
     {
-        private static readonly GU0012NullCheckParameter Analyzer = new GU0012NullCheckParameter();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
         [Test]
         public void WhenPrivate()

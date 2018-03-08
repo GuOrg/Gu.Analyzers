@@ -19,8 +19,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DontIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0012NullCheckParameterBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0012NullCheckParameter());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0020SortPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0021CalculatedPropertyAllocatesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
@@ -40,6 +38,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0003CtorParameterNamesShouldMatch()
@@ -87,12 +87,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0011DontIgnoreReturnValue()
         {
             GU0011DontIgnoreReturnValueBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0012NullCheckParameter()
-        {
-            GU0012NullCheckParameterBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -153,6 +147,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ObjectCreationAnalyzer()
         {
             ObjectCreationAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void SimpleAssignmentAnalyzer()
+        {
+            SimpleAssignmentAnalyzerBenchmark.Run();
         }
     }
 }

@@ -5,7 +5,7 @@
 
     internal class CodeFix
     {
-        private static readonly GU0012NullCheckParameter Analyzer = new GU0012NullCheckParameter();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
         private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
 
