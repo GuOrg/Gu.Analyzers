@@ -147,7 +147,7 @@
                              .Replace("{SEVERITY}", severity.ToString())
                              .Replace("{ENABLED}", enabled ? "true" : "false")
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/PropertyChangedAnalyzers")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/GuOrg/Gu.Analyzers/blob/master/Gu.Analyzers.Analyzers/")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)
@@ -192,7 +192,7 @@
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null
-                    ? @"https://github.com/JohanLarsson/Gu.Analyzers/blob/master/" +
+                    ? @"https://github.com/GuOrg/Gu.Analyzers/blob/master/" +
                       this.CodeFileName.Substring(SolutionDirectory.Length + 1).Replace("\\", "/")
                     : "missing";
             }
