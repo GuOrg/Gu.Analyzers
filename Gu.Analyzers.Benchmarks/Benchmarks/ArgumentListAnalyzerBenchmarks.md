@@ -12,4 +12,4 @@ Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
 | RunOnGuAnalyzersProject |   NA |    NA |       N/A |
 
 Benchmarks with issues:
-  GU0008AvoidRelayPropertiesBenchmarks.RunOnGuAnalyzersProject: DefaultJob
+  ArgumentListAnalyzerBenchmarks.RunOnGuAnalyzersProject: DefaultJob

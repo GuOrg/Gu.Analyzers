@@ -1,29 +1,30 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.9, OS=Windows 7 SP1 (6.1.7601)
-Processor=Intel Xeon CPU E5-2637 v4 3.50GHzIntel Xeon CPU E5-2637 v4 3.50GHz, ProcessorCount=16
+BenchmarkDotNet=v0.10.13, OS=Windows 7 SP1 (6.1.7601.0)
+Intel Xeon CPU E5-2637 v4 3.50GHz, 2 CPU, 16 logical cores and 8 physical cores
 Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
-  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
-  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2116.0
+  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
+  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
 
 
 ```
- |                                    Method |        Mean |       Error |       StdDev |      Median |   Gen 0 |  Gen 1 | Allocated |
- |------------------------------------------ |------------:|------------:|-------------:|------------:|--------:|-------:|----------:|
- |                       GU0001NameArguments | 1,812.74 us |  42.3929 us |   122.989 us | 1,803.85 us |       - |      - |   13076 B |
- |        GU0002NamedArgumentPositionMatches | 1,823.10 us |  46.0031 us |   134.193 us | 1,813.12 us |       - |      - |     912 B |
- |       GU0003CtorParameterNamesShouldMatch |   149.76 us |   7.8503 us |    23.147 us |   149.91 us |  0.8545 | 0.1221 |    5701 B |
- |            GU0004AssignAllReadOnlyMembers | 4,827.96 us | 164.4667 us |   482.352 us | 4,788.67 us | 31.2500 |      - |  239492 B |
- |         GU0005ExceptionArgumentsPositions |   476.67 us |  11.6285 us |    33.551 us |   472.63 us |  6.8359 | 0.9766 |   48937 B |
- |                           GU0006UseNameof | 2,636.39 us |  72.2371 us |   208.421 us | 2,602.59 us | 31.2500 |      - |  212351 B |
- |                     GU0007PreferInjecting | 9,013.11 us | 423.3321 us | 1,248.204 us | 9,863.43 us |       - |      - |   29754 B |
- |                GU0008AvoidRelayProperties | 4,879.62 us | 146.6065 us |   432.273 us | 4,856.19 us |  7.8125 |      - |  104256 B |
- |       GU0009UseNamedParametersForBooleans | 2,297.13 us |  78.1819 us |   223.057 us | 2,248.63 us |       - |      - |     160 B |
- |                GU0010DoNotAssignSameValue |   522.02 us |  10.4265 us |    20.823 us |   520.05 us |       - |      - |    1004 B |
- |               GU0011DontIgnoreReturnValue | 2,323.98 us |  51.5901 us |   148.849 us | 2,319.95 us |  3.9063 |      - |   45952 B |
- |                      GU0020SortProperties |    84.28 us |   2.0833 us |     6.044 us |    83.47 us |  0.6104 |      - |    4392 B |
- |         GU0021CalculatedPropertyAllocates |    62.49 us |   1.2374 us |     2.965 us |    62.50 us |       - |      - |      41 B |
- |                          GU0022UseGetOnly | 6,145.66 us | 146.4460 us |   429.501 us | 6,057.26 us | 15.6250 |      - |  148609 B |
- |         GU0050IgnoreEventsWhenSerializing |   304.72 us |   8.0486 us |    23.732 us |   300.88 us |  2.4414 |      - |   16944 B |
- |              GU0051XmlSerializerNotCached |   329.76 us |   8.3656 us |    24.535 us |   332.59 us |  2.9297 | 0.4883 |   21540 B |
- | GU0060EnumMemberValueConflictsWithAnother |    22.85 us |   0.5669 us |     1.654 us |    22.95 us |  0.1221 | 0.0305 |     950 B |
+|                                               Method |        Mean |       Error |     StdDev |      Median |   Gen 0 |  Gen 1 | Allocated |
+|----------------------------------------------------- |------------:|------------:|-----------:|------------:|--------:|-------:|----------:|
+|                  GU0003CtorParameterNamesShouldMatch |   134.38 us |   4.7350 us |  13.961 us |   130.94 us |  0.7324 |      - |    6494 B |
+|                       GU0004AssignAllReadOnlyMembers | 5,776.48 us | 195.5185 us | 576.491 us | 5,807.08 us | 39.0625 |      - |  294967 B |
+|                                      GU0006UseNameof | 3,182.99 us | 101.7849 us | 295.296 us | 3,119.21 us | 35.1563 |      - |  244115 B |
+|                                GU0007PreferInjecting | 6,716.12 us | 147.7002 us | 433.179 us | 6,719.78 us |       - |      - |   25676 B |
+|                           GU0008AvoidRelayProperties |   832.69 us |  24.2274 us |  71.435 us |   835.68 us |       - |      - |    7011 B |
+|                  GU0009UseNamedParametersForBooleans | 2,673.04 us |  85.8559 us | 250.446 us | 2,635.28 us |       - |      - |     544 B |
+|                          GU0011DontIgnoreReturnValue | 2,676.20 us |  75.3900 us | 219.916 us | 2,648.44 us |  3.9063 |      - |   47866 B |
+|                                 GU0020SortProperties |    81.48 us |   1.9146 us |   5.524 us |    81.47 us |  0.7324 |      - |    4921 B |
+|                    GU0021CalculatedPropertyAllocates |    68.36 us |   1.3583 us |   3.602 us |    68.04 us |       - |      - |     441 B |
+|                                     GU0022UseGetOnly | 3,314.39 us | 143.7837 us | 423.949 us | 3,185.89 us | 11.7188 |      - |   99738 B |
+|                    GU0050IgnoreEventsWhenSerializing |   400.00 us |  11.7736 us |  34.715 us |   392.16 us |  2.4414 |      - |   19051 B |
+|                         GU0051XmlSerializerNotCached |   376.78 us |  10.9225 us |  31.339 us |   375.41 us |  3.9063 | 0.4883 |   26576 B |
+|            GU0060EnumMemberValueConflictsWithAnother |    22.10 us |   0.7050 us |   2.068 us |    22.34 us |  0.1831 | 0.0305 |    1350 B |
+| GU0070DefaultConstructedValueTypeWithNoUsefulDefault |   537.51 us |  16.1837 us |  46.434 us |   527.50 us |  7.8125 | 0.9766 |   52711 B |
+|                            GU0071ForeachImplicitCast |   111.05 us |   2.9413 us |   8.486 us |   109.12 us |       - |      - |     441 B |
+|                                 ArgumentListAnalyzer | 2,393.02 us |  70.9957 us | 205.971 us | 2,380.82 us |       - |      - |   17216 B |
+|                               ObjectCreationAnalyzer |   441.57 us |  12.0281 us |  34.896 us |   436.60 us |  6.3477 | 0.9766 |   40908 B |
+|                             SimpleAssignmentAnalyzer |   607.06 us |  15.5954 us |  45.739 us |   609.61 us |  2.9297 | 0.9766 |   21039 B |
