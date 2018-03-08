@@ -55,7 +55,7 @@
                         return;
                     }
 
-                    context.ReportDiagnostic(Diagnostic.Create( GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
                 }
             }
         }
