@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 
     internal class HappyPath
     {
-        private static readonly GU0002NamedArgumentPositionMatches Analyzer = new GU0002NamedArgumentPositionMatches();
+        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]

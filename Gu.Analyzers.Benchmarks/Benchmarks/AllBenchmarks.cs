@@ -6,8 +6,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0001 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0001NameArguments());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0002 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0002NamedArgumentPositionMatches());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0003 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0003CtorParameterNamesShouldMatch());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0004 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0004AssignAllReadOnlyMembers());
@@ -44,16 +42,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0071 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0071ForeachImplicitCast());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0002 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0001NameArguments()
         {
             GU0001.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0002NamedArgumentPositionMatches()
-        {
-            GU0002.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -162,6 +156,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0071ForeachImplicitCast()
         {
             GU0071.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ArgumentListAnalyzer()
+        {
+            GU0002.Run();
         }
     }
 }
