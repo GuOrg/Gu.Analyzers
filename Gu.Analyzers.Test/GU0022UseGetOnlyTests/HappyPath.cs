@@ -215,6 +215,26 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [Test]
+        public void AssignedInSetOnlyWithTernary()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo<T>
+        where T : struct 
+    {
+        public T Value { get; private set; }
+
+        public T? Meh
+        {
+            set { Value = value.HasValue ? value.Value : default(T); }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         internal class TestCase
         {
             public TestCase(string type, string update)
