@@ -15,8 +15,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0009UseNamedParametersForBooleansBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0010DoNotAssignSameValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0010DoNotAssignSameValue());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DontIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0020SortPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
@@ -75,12 +73,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0009UseNamedParametersForBooleans()
         {
             GU0009UseNamedParametersForBooleansBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0010DoNotAssignSameValue()
-        {
-            GU0010DoNotAssignSameValueBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

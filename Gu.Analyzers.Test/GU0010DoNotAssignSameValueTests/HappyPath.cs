@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 
     internal class HappyPath
     {
-        private static readonly GU0010DoNotAssignSameValue Analyzer = new GU0010DoNotAssignSameValue();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
         [Test]
         public void ConstructorSettingProperties()

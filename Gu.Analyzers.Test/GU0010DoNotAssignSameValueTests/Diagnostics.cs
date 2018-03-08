@@ -5,7 +5,7 @@
 
     internal class Diagnostics
     {
-        private static readonly GU0010DoNotAssignSameValue Analyzer = new GU0010DoNotAssignSameValue();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0010");
 
         [TestCase("this.A = this.A;", "this.A = this.A;")]
