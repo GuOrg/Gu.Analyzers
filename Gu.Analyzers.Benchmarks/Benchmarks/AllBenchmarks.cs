@@ -39,7 +39,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationExpressionAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0003CtorParameterNamesShouldMatch()

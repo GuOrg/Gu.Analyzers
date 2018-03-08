@@ -7,10 +7,12 @@
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class ObjectCreationExpressionAnalyzer : DiagnosticAnalyzer
+    internal class ObjectCreationAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(GU0005ExceptionArgumentsPositions.Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            GU0005ExceptionArgumentsPositions.Descriptor,
+            GU0013CheckNameInThrow.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)

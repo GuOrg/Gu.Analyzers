@@ -5,7 +5,7 @@
 
     internal class CodeFix
     {
-        private static readonly ObjectCreationExpressionAnalyzer Analyzer = new ObjectCreationExpressionAnalyzer();
+        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0005");
 
