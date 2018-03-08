@@ -34,7 +34,7 @@ namespace Gu.Analyzers
             context.RegisterSyntaxNodeAction(this.HandleEnumMember, SyntaxKind.EnumDeclaration);
         }
 
-        private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel sema, CancellationToken cancellationToken)
+        private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (enumMember.EqualsValue == null)
             {
@@ -56,7 +56,7 @@ namespace Gu.Analyzers
 
                 if (node is IdentifierNameSyntax identifier)
                 {
-                    bool isEnumMember = sema.GetSymbolSafe(identifier, cancellationToken)
+                    bool isEnumMember = semanticModel.GetSymbolSafe(identifier, cancellationToken)
                                             .TrySingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
                     if (!isEnumMember)
                     {

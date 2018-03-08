@@ -1,3 +1,7 @@
+#### 1.2.1
+* BREAKING: Only VS2017+ from now on.
+* Bugfixes.
+
 #### 1.2.0
 * NEW ANALYZER: GU0071
 
