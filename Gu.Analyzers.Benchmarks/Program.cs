@@ -22,7 +22,7 @@ namespace Gu.Analyzers.Benchmarks
             {
                 var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(
                     Code.AnalyzersProject,
-                    new GU0001NameArguments());
+                    new ArgumentListAnalyzer());
 
                 // Warmup
                 benchmark.Run();

@@ -1,167 +1,158 @@
-// ReSharper disable InconsistentNaming
 // ReSharper disable RedundantNameQualifier
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0001 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0001NameArguments());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0003CtorParameterNamesShouldMatchBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0003CtorParameterNamesShouldMatch());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0003 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0003CtorParameterNamesShouldMatch());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0004AssignAllReadOnlyMembersBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0004AssignAllReadOnlyMembers());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0004 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0004AssignAllReadOnlyMembers());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0005ExceptionArgumentsPositionsBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0005ExceptionArgumentsPositions());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0005 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0005ExceptionArgumentsPositions());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0006UseNameofBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0006UseNameof());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0006 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0006UseNameof());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0007 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0008AvoidRelayPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0008AvoidRelayProperties());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0008 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0008AvoidRelayProperties());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0009UseNamedParametersForBooleansBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0009 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0010DoNotAssignSameValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0010DoNotAssignSameValue());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0010 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0010DoNotAssignSameValue());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DontIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0011 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0012NullCheckParameterBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0012NullCheckParameter());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0012 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0012NullCheckParameter());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0020SortPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0020 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0021CalculatedPropertyAllocatesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0021 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0022UseGetOnlyBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0022 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0050IgnoreEventsWhenSerializingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0050 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0051XmlSerializerNotCachedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0051XmlSerializerNotCached());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0051 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0051XmlSerializerNotCached());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0060EnumMemberValueConflictsWithAnotherBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0060 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0070 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0071ForeachImplicitCastBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0071ForeachImplicitCast());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0071 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0071ForeachImplicitCast());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0002 = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0001NameArguments()
-        {
-            GU0001.Run();
-        }
+        private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0003CtorParameterNamesShouldMatch()
         {
-            GU0003.Run();
+            GU0003CtorParameterNamesShouldMatchBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0004AssignAllReadOnlyMembers()
         {
-            GU0004.Run();
+            GU0004AssignAllReadOnlyMembersBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0005ExceptionArgumentsPositions()
         {
-            GU0005.Run();
+            GU0005ExceptionArgumentsPositionsBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0006UseNameof()
         {
-            GU0006.Run();
+            GU0006UseNameofBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0007PreferInjecting()
         {
-            GU0007.Run();
+            GU0007PreferInjectingBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0008AvoidRelayProperties()
         {
-            GU0008.Run();
+            GU0008AvoidRelayPropertiesBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0009UseNamedParametersForBooleans()
         {
-            GU0009.Run();
+            GU0009UseNamedParametersForBooleansBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0010DoNotAssignSameValue()
         {
-            GU0010.Run();
+            GU0010DoNotAssignSameValueBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0011DontIgnoreReturnValue()
         {
-            GU0011.Run();
+            GU0011DontIgnoreReturnValueBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0012NullCheckParameter()
         {
-            GU0012.Run();
+            GU0012NullCheckParameterBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0020SortProperties()
         {
-            GU0020.Run();
+            GU0020SortPropertiesBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0021CalculatedPropertyAllocates()
         {
-            GU0021.Run();
+            GU0021CalculatedPropertyAllocatesBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0022UseGetOnly()
         {
-            GU0022.Run();
+            GU0022UseGetOnlyBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0050IgnoreEventsWhenSerializing()
         {
-            GU0050.Run();
+            GU0050IgnoreEventsWhenSerializingBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0051XmlSerializerNotCached()
         {
-            GU0051.Run();
+            GU0051XmlSerializerNotCachedBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0060EnumMemberValueConflictsWithAnother()
         {
-            GU0060.Run();
+            GU0060EnumMemberValueConflictsWithAnotherBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0070DefaultConstructedValueTypeWithNoUsefulDefault()
         {
-            GU0070.Run();
+            GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0071ForeachImplicitCast()
         {
-            GU0071.Run();
+            GU0071ForeachImplicitCastBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void ArgumentListAnalyzer()
         {
-            GU0002.Run();
+            ArgumentListAnalyzerBenchmark.Run();
         }
     }
 }

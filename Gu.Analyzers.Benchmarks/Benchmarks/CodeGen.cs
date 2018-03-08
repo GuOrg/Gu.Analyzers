@@ -24,8 +24,7 @@
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {
-            var id = analyzer.SupportedDiagnostics.Single().Id;
-            var expectedName = id + (id.Contains("_") ? "_" : string.Empty) + "Benchmarks";
+            var expectedName = analyzer.GetType().Name + "Benchmarks";
             var fileName = Path.Combine(BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine("// ReSharper disable InconsistentNaming")
@@ -44,7 +43,7 @@
                                           .AppendLine("}")
                                           .ToString();
             if (!File.Exists(fileName) ||
-               !CodeComparer.Equals(File.ReadAllText(fileName), code))
+                !CodeComparer.Equals(File.ReadAllText(fileName), code))
             {
                 File.WriteAllText(fileName, code);
                 Assert.Fail();
@@ -56,8 +55,7 @@
         {
             var fileName = Path.Combine(BenchmarksDirectory, "AllBenchmarks.cs");
             var builder = new StringBuilder();
-            builder.AppendLine("// ReSharper disable InconsistentNaming")
-                   .AppendLine("// ReSharper disable RedundantNameQualifier")
+            builder.AppendLine("// ReSharper disable RedundantNameQualifier")
                    .AppendLine($"namespace {this.GetType().Namespace}")
                    .AppendLine("{")
                    .AppendLine("    public class AllBenchmarks")
@@ -65,7 +63,7 @@
             foreach (var analyzer in AllAnalyzers)
             {
                 builder.AppendLine(
-                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)} = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
+                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.GetType().Name}Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
                        .AppendLine();
             }
 
@@ -74,7 +72,7 @@
                 builder.AppendLine($"        [BenchmarkDotNet.Attributes.Benchmark]")
                        .AppendLine($"        public void {analyzer.GetType().Name}()")
                        .AppendLine("        {")
-                       .AppendLine($"            {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)}.Run();")
+                       .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
                        .AppendLine("        }");
                 if (!ReferenceEquals(analyzer, AllAnalyzers.Last()))
                 {
