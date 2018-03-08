@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 
     internal class HappyPath
     {
-        private static readonly GU0005ExceptionArgumentsPositions Analyzer = new GU0005ExceptionArgumentsPositions();
+        private static readonly ObjectCreationExpressionAnalyzer Analyzer = new ObjectCreationExpressionAnalyzer();
 
         [Test]
         public void ArgumentExceptionWithMessageAndNameof()

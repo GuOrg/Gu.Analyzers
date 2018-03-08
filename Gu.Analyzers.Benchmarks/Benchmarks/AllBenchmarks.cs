@@ -7,8 +7,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0004AssignAllReadOnlyMembersBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0004AssignAllReadOnlyMembers());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0005ExceptionArgumentsPositionsBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0005ExceptionArgumentsPositions());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0006UseNameofBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0006UseNameof());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
@@ -41,6 +39,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationExpressionAnalyzer());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0003CtorParameterNamesShouldMatch()
         {
@@ -51,12 +51,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0004AssignAllReadOnlyMembers()
         {
             GU0004AssignAllReadOnlyMembersBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0005ExceptionArgumentsPositions()
-        {
-            GU0005ExceptionArgumentsPositionsBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -153,6 +147,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ArgumentListAnalyzer()
         {
             ArgumentListAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ObjectCreationExpressionAnalyzer()
+        {
+            ObjectCreationExpressionAnalyzerBenchmark.Run();
         }
     }
 }
