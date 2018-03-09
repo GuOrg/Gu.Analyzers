@@ -7,6 +7,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NullCheckParameterCodeFixProvider))]
     [Shared]
@@ -31,7 +32,7 @@
                     "Throw if null.",
                     (editor, _) => editor.ReplaceNode(
                         identifier,
-                        SyntaxFactory.ParseExpression($"{identifier.Identifier.ValueText} ?? throw new ArgumentNullException(nameof({identifier.Identifier.ValueText}))")),
+                        SyntaxFactory.ParseExpression($"{identifier.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({identifier.Identifier.ValueText}))").WithSimplifiedNames()),
                     this.GetType(),
                     diagnostic);
             }
