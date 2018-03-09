@@ -2,7 +2,6 @@ namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
-    using System.Threading;
 
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -25,13 +24,12 @@ namespace Gu.Analyzers
         /// Figuring out if the code uses underscore prefix in field names.
         /// </summary>
         /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
         /// <returns>True if the code is found to prefix field names with underscore.</returns>
-        internal static bool UnderscoreFields(this SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool UnderscoreFields(this SemanticModel semanticModel)
         {
             using (var walker = FieldWalker.Borrow())
             {
-                switch (UnderscoreFields(semanticModel.SyntaxTree, cancellationToken, walker))
+                switch (UnderscoreFields(semanticModel.SyntaxTree, walker))
                 {
                     case Result.Unknown:
                     case Result.Maybe:
@@ -46,7 +44,7 @@ namespace Gu.Analyzers
 
                 foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
-                    switch (UnderscoreFields(tree, cancellationToken, walker))
+                    switch (UnderscoreFields(tree, walker))
                     {
                         case Result.Unknown:
                         case Result.Maybe:
@@ -68,13 +66,12 @@ namespace Gu.Analyzers
         /// Figuring out if the code uses using directives inside namespaces.
         /// </summary>
         /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
         /// <returns>True if the code is found to prefix field names with underscore.</returns>
-        internal static bool UsingDirectivesInsideNamespace(SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool UsingDirectivesInsideNamespace(SemanticModel semanticModel)
         {
             using (var walker = UsingDirectiveWalker.Borrow())
             {
-                switch (UsingDirectivesInsideNamespace(semanticModel.SyntaxTree, cancellationToken, walker))
+                switch (UsingDirectivesInsideNamespace(semanticModel.SyntaxTree, walker))
                 {
                     case Result.Unknown:
                     case Result.Maybe:
@@ -89,7 +86,7 @@ namespace Gu.Analyzers
 
                 foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
-                    switch (UsingDirectivesInsideNamespace(tree, cancellationToken, walker))
+                    switch (UsingDirectivesInsideNamespace(tree, walker))
                     {
                         case Result.Unknown:
                         case Result.Maybe:
@@ -107,37 +104,44 @@ namespace Gu.Analyzers
             return true;
         }
 
-        private static Result UnderscoreFields(this SyntaxTree tree, CancellationToken cancellationToken, FieldWalker walker)
+        private static Result UnderscoreFields(this SyntaxTree tree, FieldWalker walker)
         {
             if (IsExcluded(tree))
             {
                 return Result.Unknown;
             }
 
-            walker.Visit(tree.GetRoot(cancellationToken));
-            if (walker.UsesThis == Result.Yes ||
-                walker.UsesUnderScore == Result.No)
+            if (tree.TryGetRoot(out var root))
             {
-                return Result.No;
-            }
+                walker.Visit(root);
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
+                {
+                    return Result.No;
+                }
 
-            if (walker.UsesUnderScore == Result.Yes ||
-                walker.UsesThis == Result.No)
-            {
-                return Result.Yes;
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
+                {
+                    return Result.Yes;
+                }
             }
 
             return Result.Unknown;
         }
 
-        private static Result UsingDirectivesInsideNamespace(this SyntaxTree tree, CancellationToken cancellationToken, UsingDirectiveWalker walker)
+        private static Result UsingDirectivesInsideNamespace(this SyntaxTree tree, UsingDirectiveWalker walker)
         {
             if (IsExcluded(tree))
             {
                 return Result.Unknown;
             }
 
-            walker.Visit(tree.GetRoot(cancellationToken));
+            if (tree.TryGetRoot(out var root))
+            {
+                walker.Visit(root);
+            }
+
             return walker.UsingDirectivesInside();
         }
 

@@ -60,7 +60,7 @@
                         {
                             context.RegisterDocumentEditorFix(
                                     "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                    (editor, cancellationToken) => ApplyInitializeInCtorFix(editor, ctor, property, objectCreation, cancellationToken),
+                                    (editor, cancellationToken) => ApplyInitializeInCtorFix(editor, ctor, property, objectCreation),
                                    this.GetType().FullName + "UNSAFE",
                                 diagnostic);
                         }
@@ -90,10 +90,9 @@
             DocumentEditor editor,
             ConstructorDeclarationSyntax ctor,
             PropertyDeclarationSyntax property,
-            ObjectCreationExpressionSyntax objectCreation,
-            CancellationToken cancellationToken)
+            ObjectCreationExpressionSyntax objectCreation)
         {
-            var member = editor.SemanticModel.UnderscoreFields(cancellationToken)
+            var member = editor.SemanticModel.UnderscoreFields()
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,

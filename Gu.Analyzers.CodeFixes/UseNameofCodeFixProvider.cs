@@ -52,7 +52,7 @@
                 editor.SemanticModel.LookupSymbols(argument.SpanStart, name: name).TrySingle(out var member) &&
                 (member is IFieldSymbol || member is IPropertySymbol || member is IMethodSymbol) &&
                 !member.IsStatic &&
-                !editor.SemanticModel.UnderscoreFields(cancellationToken))
+                !editor.SemanticModel.UnderscoreFields())
             {
                 editor.ReplaceNode(
                     argument.Expression,

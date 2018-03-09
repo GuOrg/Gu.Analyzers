@@ -209,7 +209,7 @@
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            var underscoreFields = editor.SemanticModel.UnderscoreFields(CancellationToken.None);
+            var underscoreFields = editor.SemanticModel.UnderscoreFields();
             var name = underscoreFields
                            ? "_" + parameter.Identifier.ValueText
                            : parameter.Identifier.ValueText;
