@@ -3,16 +3,18 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal partial class CodeFix
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
-        private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
-
-        [Test]
-        public void PublicCtorFullyQualified()
+        internal class Parameter
         {
-            var testCode = @"
+            private static readonly ParameterAnalyzer Analyzer = new ParameterAnalyzer();
+            private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
+
+            [Test]
+            public void PublicCtorFullyQualified()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -26,7 +28,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -39,13 +41,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
 
-        [Test]
-        public void PublicCtor()
-        {
-            var testCode = @"
+            [Test]
+            public void PublicCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -61,7 +63,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -76,7 +78,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
         }
     }
 }

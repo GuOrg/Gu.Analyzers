@@ -14,7 +14,7 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterOperationAction(Handle, OperationKind.ParameterReferenceExpression);
+            context.RegisterOperationAction(Handle, OperationKind.AssignmentExpression);
         }
 
         private static void Handle(OperationAnalysisContext context)
