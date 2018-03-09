@@ -90,5 +90,55 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void WhenThrowingOnLineAbove()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text ?? throw new ArgumentNullException(nameof(text));
+            this.text = text;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("text == null")]
+        [TestCase("text is null")]
+        public void WhenOldStyleNullCheckAbove(string check)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            if (text == null)
+            {
+                throw new ArgumentNullException(nameof(text));
+            }
+
+            this.text = text;
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("text == null", check);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
