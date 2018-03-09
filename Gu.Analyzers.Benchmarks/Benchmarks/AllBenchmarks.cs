@@ -37,6 +37,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark ParameterAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ParameterAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -139,6 +141,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ObjectCreationAnalyzer()
         {
             ObjectCreationAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ParameterAnalyzer()
+        {
+            ParameterAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
