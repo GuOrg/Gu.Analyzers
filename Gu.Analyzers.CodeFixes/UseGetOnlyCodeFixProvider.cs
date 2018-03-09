@@ -56,7 +56,7 @@
                                          IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
 
                         var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                        if (TryGetConstructor(property, out ConstructorDeclarationSyntax ctor))
+                        if (TryGetConstructor(property, out var ctor))
                         {
                             context.RegisterDocumentEditorFix(
                                     "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
@@ -93,7 +93,7 @@
             ObjectCreationExpressionSyntax objectCreation,
             CancellationToken cancellationToken)
         {
-            var member = ctor.UsesUnderscore(editor.SemanticModel, cancellationToken)
+            var member = editor.SemanticModel.UnderscoreFields(cancellationToken)
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,

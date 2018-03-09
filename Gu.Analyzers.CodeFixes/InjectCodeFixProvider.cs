@@ -103,7 +103,7 @@
 
         private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
         {
-            if (GU0007PreferInjecting.TrySingleConstructor(expression, out ConstructorDeclarationSyntax ctor))
+            if (GU0007PreferInjecting.TrySingleConstructor(expression, out var ctor))
             {
                 var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                                  .ConfigureAwait(false);
@@ -150,7 +150,7 @@
                 }
                 else
                 {
-                    if (ctor.ParameterList.Parameters.TryFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out ParameterSyntax existing))
+                    if (ctor.ParameterList.Parameters.TryFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out var existing))
                     {
                         editor.InsertBefore(existing, parameterSyntax);
                     }
@@ -209,8 +209,8 @@
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscore(editor.SemanticModel, CancellationToken.None);
-            var name = usesUnderscoreNames
+            var underscoreFields = editor.SemanticModel.UnderscoreFields(CancellationToken.None);
+            var name = underscoreFields
                            ? "_" + parameter.Identifier.ValueText
                            : parameter.Identifier.ValueText;
             var containingType = ctor.FirstAncestor<TypeDeclarationSyntax>();
@@ -226,7 +226,7 @@
                   modifiers: DeclarationModifiers.ReadOnly,
                   type: parameter.Type);
             var members = containingType.Members;
-            if (members.TryFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
+            if (members.TryFirst(x => x is FieldDeclarationSyntax, out var field))
             {
                 editor.InsertBefore(field, new[] { newField });
             }
@@ -239,7 +239,7 @@
                 editor.AddMember(containingType, newField);
             }
 
-            var fieldAccess = usesUnderscoreNames
+            var fieldAccess = underscoreFields
                                        ? SyntaxFactory.IdentifierName(name)
                                        : SyntaxFactory.ParseExpression($"this.{name}");
 
@@ -304,7 +304,7 @@
 
             public override void VisitIdentifierName(IdentifierNameSyntax node)
             {
-                if (this.TryGetReplaceNode(node, this.identifierName, out SyntaxNode replaceNode))
+                if (this.TryGetReplaceNode(node, this.identifierName, out var replaceNode))
                 {
                     this.Nodes.Add(replaceNode);
                 }
