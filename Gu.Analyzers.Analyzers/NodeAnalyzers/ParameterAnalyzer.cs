@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -15,11 +14,12 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.Parameter);
+            context.RegisterOperationAction(Handle, OperationKind.ParameterReferenceExpression);
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext obj)
+        private static void Handle(OperationAnalysisContext context)
         {
+            var operation = context.Operation;
         }
     }
 }
