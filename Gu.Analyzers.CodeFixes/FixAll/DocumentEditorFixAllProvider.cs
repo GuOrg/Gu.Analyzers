@@ -10,7 +10,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Editing;
 
-    internal class DocumentEditorFixAllProvider : FixAllProvider
+    public class DocumentEditorFixAllProvider : FixAllProvider
     {
         public static readonly DocumentEditorFixAllProvider Default = new DocumentEditorFixAllProvider();
 

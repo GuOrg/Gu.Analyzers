@@ -4,14 +4,13 @@ namespace Gu.Analyzers
     using System.Composition;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddNonSerializedFixProvider))]
     [Shared]
-    internal class AddNonSerializedFixProvider : CodeFixProvider
+    internal class AddNonSerializedFixProvider : DocumentEditorCodeFixProvider
     {
         private static readonly AttributeTargetSpecifierSyntax FieldTargetSpecifier = SyntaxFactory.AttributeTargetSpecifier(SyntaxFactory.Token(SyntaxKind.FieldKeyword));
         private static readonly SeparatedSyntaxList<AttributeSyntax> NonSerializedList = SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Attribute(SyntaxFactory.ParseName(nameof(NonSerialized))));
@@ -28,10 +27,7 @@ namespace Gu.Analyzers
             ImmutableArray.Create(GU0050IgnoreEventsWhenSerializing.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -49,10 +45,9 @@ namespace Gu.Analyzers
                 if (eventField != null)
                 {
                     context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Add [field:NonSerialized].",
-                            _ => ApplyNonSerializedWithTargetFixAsync(context, syntaxRoot, eventField),
-                            nameof(AddNonSerializedFixProvider)),
+                        "Add [field:NonSerialized].",
+                        (editor, _) => editor.ReplaceNode(eventField, eventField.AddAttributeLists(NonSerializedWithTargetSpecifier)),
+                        nameof(AddNonSerializedFixProvider),
                         diagnostic);
                     continue;
                 }
@@ -61,25 +56,12 @@ namespace Gu.Analyzers
                 if (field != null)
                 {
                     context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Add [NonSerialized].",
-                            _ => ApplyNonSerializedFixAsync(context, syntaxRoot, field),
-                            nameof(AddNonSerializedFixProvider)),
+                        "Add [NonSerialized].",
+                        (editor, _) => editor.ReplaceNode(field, field.AddAttributeLists(NonSerialized)),
+                        nameof(AddNonSerializedFixProvider),
                         diagnostic);
                 }
             }
-        }
-
-        private static Task<Document> ApplyNonSerializedWithTargetFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, EventFieldDeclarationSyntax field)
-        {
-            var updated = field.AddAttributeLists(NonSerializedWithTargetSpecifier);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(field, updated)));
-        }
-
-        private static Task<Document> ApplyNonSerializedFixAsync(CodeFixContext context, SyntaxNode syntaxRoot, FieldDeclarationSyntax field)
-        {
-            var updated = field.AddAttributeLists(NonSerialized);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxRoot.ReplaceNode(field, updated)));
         }
     }
 }
