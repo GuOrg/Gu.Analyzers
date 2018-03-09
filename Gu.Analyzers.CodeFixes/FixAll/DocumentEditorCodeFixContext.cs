@@ -42,6 +42,7 @@ namespace Gu.Analyzers
             Type equivalenceKey,
             Diagnostic diagnostic)
         {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
             this.context.RegisterCodeFix(
                 new DocumentEditorAction(title, this.context.Document, action, equivalenceKey.FullName),
                 diagnostic);
@@ -53,6 +54,7 @@ namespace Gu.Analyzers
             string equivalenceKey,
             Diagnostic diagnostic)
         {
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
             this.context.RegisterCodeFix(
                 new DocumentEditorAction(title, this.context.Document, action, equivalenceKey),
                 diagnostic);

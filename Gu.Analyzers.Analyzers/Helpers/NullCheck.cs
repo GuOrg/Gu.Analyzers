@@ -128,7 +128,7 @@
                 {
                     return expression is IdentifierNameSyntax identifier &&
                            identifier.Identifier.ValueText == parameter.Name &&
-                           semanticModel.GetSymbolSafe(expression, cancellationToken) == parameter;
+                           Equals(semanticModel.GetSymbolSafe(expression, cancellationToken), parameter);
                 }
             }
 
