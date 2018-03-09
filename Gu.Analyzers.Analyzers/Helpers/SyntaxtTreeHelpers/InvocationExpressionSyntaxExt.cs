@@ -8,7 +8,7 @@
 
     internal static class InvocationExpressionSyntaxExt
     {
-        internal static bool TryGetInvokedMethodName(this InvocationExpressionSyntax invocation, out string name)
+        internal static bool TryGetMethodName(this InvocationExpressionSyntax invocation, out string name)
         {
             name = null;
             if (invocation == null)
@@ -49,7 +49,7 @@
 
         internal static bool IsNameOf(this InvocationExpressionSyntax invocation)
         {
-            return invocation.TryGetInvokedMethodName(out var name) &&
+            return invocation.TryGetMethodName(out var name) &&
                    name == "nameof";
         }
 

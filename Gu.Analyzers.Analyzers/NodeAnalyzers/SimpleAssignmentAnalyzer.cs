@@ -36,7 +36,8 @@
                     method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Public) &&
                     method.Parameters.TryFirst(x => x.Name == identifier.Identifier.ValueText, out var parameter) &&
                     parameter.Type.IsReferenceType &&
-                    !parameter.HasExplicitDefaultValue)
+                    !parameter.HasExplicitDefaultValue &&
+                    !NullCheck.IsChecked(parameter, assignment.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, assignment.Right.GetLocation()));
                 }
@@ -62,7 +63,7 @@
 
         private static bool AreSame(ExpressionSyntax left, ExpressionSyntax right)
         {
-            if (TryGetIdentifierName(left, out IdentifierNameSyntax leftName) ^ TryGetIdentifierName(right, out IdentifierNameSyntax rightName))
+            if (TryGetIdentifierName(left, out var leftName) ^ TryGetIdentifierName(right, out var rightName))
             {
                 return false;
             }

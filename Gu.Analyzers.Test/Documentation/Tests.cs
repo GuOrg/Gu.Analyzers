@@ -69,11 +69,11 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            ////switch (descriptorInfo.Descriptor.Id)
-            ////{
-            ////    case INPC004UseCallerMemberName.DiagnosticId when descriptorInfo.Analyzer is INPC004UseCallerMemberName:
-            ////        return;
-            ////}
+            switch (descriptorInfo.Descriptor.Id)
+            {
+                case GU0012NullCheckParameter.DiagnosticId when descriptorInfo.Analyzer is ParameterAnalyzer:
+                    return;
+            }
 
             var expected = GetTable(CreateStub(descriptorInfo));
             DumpIfDebug(expected);
