@@ -47,7 +47,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotIgnoredEvent()
+        public void Event()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -110,10 +110,11 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void NotIgnoredEventWithAttribute()
+        public void EventWithAttribute()
         {
             var attributeCode = @"
 namespace RoslynSandbox
@@ -187,10 +188,11 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, testCode }, fixedCode);
         }
 
         [Test]
-        public void NotIgnoredEventHandler()
+        public void EventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -229,6 +231,78 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void TwoEvents()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    [Serializable]
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        ↓public event EventHandler Event1;
+
+        ↓public event EventHandler Event2;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    [Serializable]
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        [field: NonSerialized]
+        public event EventHandler Event1;
+
+        [field: NonSerialized]
+        public event EventHandler Event2;
+
+        public int A { get; }
+
+        public int B { get; protected set;}
+
+        public int C { get; internal set; }
+
+        public int D { get; set; }
+
+        public int E => A;
+    }
+}";
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

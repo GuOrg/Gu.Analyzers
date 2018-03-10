@@ -12,15 +12,13 @@ namespace Gu.Analyzers
     [Shared]
     internal class AddNonSerializedFixProvider : DocumentEditorCodeFixProvider
     {
-        private static readonly AttributeTargetSpecifierSyntax FieldTargetSpecifier = SyntaxFactory.AttributeTargetSpecifier(SyntaxFactory.Token(SyntaxKind.FieldKeyword));
         private static readonly SeparatedSyntaxList<AttributeSyntax> NonSerializedList = SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Attribute(SyntaxFactory.ParseName(nameof(NonSerialized))));
 
         private static readonly AttributeListSyntax NonSerializedWithTargetSpecifier = SyntaxFactory.AttributeList(
-            FieldTargetSpecifier,
+            SyntaxFactory.AttributeTargetSpecifier(SyntaxFactory.Token(SyntaxKind.FieldKeyword)),
             NonSerializedList);
 
-        private static readonly AttributeListSyntax NonSerialized = SyntaxFactory.AttributeList(
-            NonSerializedList);
+        private static readonly AttributeListSyntax NonSerialized = SyntaxFactory.AttributeList(NonSerializedList);
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
@@ -46,7 +44,10 @@ namespace Gu.Analyzers
                 {
                     context.RegisterCodeFix(
                         "Add [field:NonSerialized].",
-                        (editor, _) => editor.ReplaceNode(eventField, eventField.AddAttributeLists(NonSerializedWithTargetSpecifier)),
+                        (editor, _) => editor.ReplaceNode(
+                            eventField,
+                            x => x.AddAttributeLists(NonSerializedWithTargetSpecifier)
+                                  .WithLeadingTriviaFrom(x)),
                         nameof(AddNonSerializedFixProvider),
                         diagnostic);
                     continue;
@@ -57,7 +58,10 @@ namespace Gu.Analyzers
                 {
                     context.RegisterCodeFix(
                         "Add [NonSerialized].",
-                        (editor, _) => editor.ReplaceNode(field, field.AddAttributeLists(NonSerialized)),
+                        (editor, _) => editor.ReplaceNode(
+                            field,
+                            x => x.AddAttributeLists(NonSerialized)
+                                  .WithLeadingTriviaFrom(x)),
                         nameof(AddNonSerializedFixProvider),
                         diagnostic);
                 }

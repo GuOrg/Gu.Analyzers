@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -7,6 +8,13 @@
 
     internal static class DocumentEditorExt
     {
+        internal static DocumentEditor ReplaceNode<T>(this DocumentEditor editor, T node, Func<T, SyntaxNode> replace)
+            where T : SyntaxNode
+        {
+            editor.ReplaceNode(node, (x, _) => replace((T)x));
+            return editor;
+        }
+
         internal static void AddField(this DocumentEditor editor, TypeDeclarationSyntax containingType, FieldDeclarationSyntax field)
         {
             FieldDeclarationSyntax existing = null;
