@@ -10,17 +10,14 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ThrowForCorrectParameterCodeFixProvider))]
     [Shared]
-    internal class ThrowForCorrectParameterCodeFixProvider : CodeFixProvider
+    internal class ThrowForCorrectParameterCodeFixProvider : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             GU0013CheckNameInThrow.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -31,7 +28,7 @@
                 if (argument != null &&
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Throw if null.",
                         (editor, _) => editor.ReplaceNode(
                             argument.Expression,

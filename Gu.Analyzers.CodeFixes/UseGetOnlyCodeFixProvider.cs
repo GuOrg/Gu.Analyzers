@@ -12,7 +12,7 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseGetOnlyCodeFixProvider))]
     [Shared]
-    internal class UseGetOnlyCodeFixProvider : CodeFixProvider
+    internal class UseGetOnlyCodeFixProvider : DocumentEditorCodeFixProvider
     {
         private static readonly AccessorListSyntax GetOnlyAccessorList =
             SyntaxFactory.AccessorList(
@@ -28,10 +28,7 @@
             GU0022UseGetOnly.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -58,7 +55,7 @@
                         var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
                         if (TryGetConstructor(property, out var ctor))
                         {
-                            context.RegisterDocumentEditorFix(
+                            context.RegisterCodeFix(
                                     "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
                                     (editor, cancellationToken) => ApplyInitializeInCtorFix(editor, ctor, property, objectCreation),
                                    this.GetType().FullName + "UNSAFE",
@@ -71,7 +68,7 @@
                     var setter = syntaxNode.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter != null)
                     {
-                        context.RegisterDocumentEditorFix(
+                        context.RegisterCodeFix(
                             "Use get-only",
                             (editor, _) => ApplyRemoveSetterFix(editor, setter),
                             this.GetType(),

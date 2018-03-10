@@ -12,16 +12,13 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseNameofCodeFixProvider))]
     [Shared]
-    internal class UseNameofCodeFixProvider : CodeFixProvider
+    internal class UseNameofCodeFixProvider : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0006UseNameof.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -37,7 +34,7 @@
                 var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (argument.Expression is LiteralExpressionSyntax literal)
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                             "Use nameof",
                            (editor, cancellationToken) => ApplyFix(editor, argument, literal.Token.ValueText, cancellationToken),
                             this.GetType(),

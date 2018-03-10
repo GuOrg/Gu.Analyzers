@@ -12,7 +12,7 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NameArgumentsCodeFixProvider))]
     [Shared]
-    internal class NameArgumentsCodeFixProvider : CodeFixProvider
+    internal class NameArgumentsCodeFixProvider : DocumentEditorCodeFixProvider
     {
         private static readonly SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
 
@@ -20,10 +20,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0001NameArguments.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -49,7 +46,7 @@
                     continue;
                 }
 
-                context.RegisterDocumentEditorFix(
+                context.RegisterCodeFix(
                         "Name arguments",
                         (editor, _) => ApplyFix(editor, method, arguments),
                         this.GetType(),

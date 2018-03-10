@@ -12,7 +12,7 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MoveArgumentCodeFixProvider))]
     [Shared]
-    internal class MoveArgumentCodeFixProvider : CodeFixProvider
+    internal class MoveArgumentCodeFixProvider : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -20,10 +20,7 @@
             GU0005ExceptionArgumentsPositions.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -43,7 +40,7 @@
                         continue;
                     }
 
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                             "Move arguments to match parameter positions.",
                             (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
                             this.GetType(),
@@ -53,7 +50,7 @@
                 if (diagnostic.Id == GU0005ExceptionArgumentsPositions.DiagnosticId)
                 {
                     var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                             "Move name argument to match parameter positions.",
                             (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
                             this.GetType(),

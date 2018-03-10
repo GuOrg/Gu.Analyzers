@@ -10,24 +10,21 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NullCheckParameterCodeFixProvider))]
     [Shared]
-    internal class NullCheckParameterCodeFixProvider : CodeFixProvider
+    internal class NullCheckParameterCodeFixProvider : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             GU0012NullCheckParameter.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 var identifier = (IdentifierNameSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                context.RegisterDocumentEditorFix(
+                context.RegisterCodeFix(
                     "Throw if null.",
                     (editor, _) => editor.ReplaceNode(
                         identifier,
