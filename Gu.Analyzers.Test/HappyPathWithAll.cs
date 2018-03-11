@@ -3,6 +3,7 @@ namespace Gu.Analyzers.Test
     using System;
     using System.Collections.Immutable;
     using System.Linq;
+    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -13,8 +14,6 @@ namespace Gu.Analyzers.Test
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                     .Where(x => x != typeof(SimpleAssignmentAnalyzer) &&
-                                                                                                                 x != typeof(ParameterAnalyzer))
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                      .ToImmutableArray();
 
@@ -36,15 +35,33 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void RunOnGuAnalyzersSln(DiagnosticAnalyzer analyzer)
+        public async Task RunOnGuAnalyzersSln(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, GuAnalyzersSln);
+            if (analyzer is SimpleAssignmentAnalyzer ||
+                analyzer is ParameterAnalyzer)
+            {
+                await Analyze.GetDiagnosticsAsync(GuAnalyzersSln, analyzer)
+                             .ConfigureAwait(false);
+            }
+            else
+            {
+                AnalyzerAssert.Valid(analyzer, GuAnalyzersSln);
+            }
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void RunOnGuAnalyzersProjectSln(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, GuAnalyzersProjectSln);
+            if (analyzer is SimpleAssignmentAnalyzer ||
+                analyzer is ParameterAnalyzer)
+            {
+                await Analyze.GetDiagnosticsAsync(GuAnalyzersProjectSln, analyzer)
+                             .ConfigureAwait(false);
+            }
+            else
+            {
+                AnalyzerAssert.Valid(analyzer, GuAnalyzersProjectSln);
+            }
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
