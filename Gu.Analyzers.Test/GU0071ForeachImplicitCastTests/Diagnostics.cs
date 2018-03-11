@@ -8,22 +8,25 @@
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0071");
 
-        [Test]
-        public void ArrayOfIntsExplicitDouble()
+        [TestCase("int[]")]
+        [TestCase("System.Collections.Generic.List<int>")]
+        [TestCase("System.Collections.Generic.IEnumerable<int>")]
+        public void ExplicitDouble(string type)
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     public class A
     {
-        public void F()
+        public void F(int[] values)
         {
-            foreach(↓double a in new[]{ 1, 2, 3 })
+            foreach(double d in values)
             {
             }
         }
     }
 }";
+            testCode = testCode.AssertReplace("int[]", type);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 

@@ -7,8 +7,11 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
     {
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
 
-        [Test]
-        public void VarInAForeach()
+        [TestCase("int[]")]
+        [TestCase("List<int>")]
+        [TestCase("IEnumerable<int>")]
+        [TestCase("IEnumerable<IEnumerable<char>>")]
+        public void VarInAForeach(string type)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -17,10 +20,9 @@ namespace RoslynSandbox
 
     public class A
     {
-        public void F()
+        public void F(int[] values)
         {
-            IEnumerable<IEnumerable<char>> b = new string[0];
-            foreach(var a in b)
+            foreach(var a in values)
             {
             }
         }
