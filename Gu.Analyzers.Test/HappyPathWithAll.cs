@@ -77,6 +77,7 @@ namespace RoslynSandbox
         public Disposable(string meh)
             : this()
         {
+            if (meh == null) throw new ArgumentNullException(nameof(meh));
         }
 
         public Disposable()
@@ -276,6 +277,7 @@ namespace RoslynSandbox
 
         public Foo(IDisposable disposable)
         {
+            if (disposable == null) throw new ArgumentNullException(nameof(disposable));
             this.disposable = Bar(disposable);
         }
 
@@ -311,6 +313,7 @@ namespace RoslynSandbox
 
         public RxFoo(IObservable<object> observable)
         {
+            if (observable == null) throw new ArgumentNullException(nameof(observable));
             this.subscription = observable.Subscribe(_ => { });
             this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });
         }
