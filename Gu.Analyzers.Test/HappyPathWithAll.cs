@@ -50,7 +50,7 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void RunOnGuAnalyzersProjectSln(DiagnosticAnalyzer analyzer)
+        public async Task RunOnGuAnalyzersProjectSln(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer)
