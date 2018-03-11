@@ -252,8 +252,8 @@ namespace RoslynSandbox
 
         object IFoo.Value
         {
-            get => this.Value;
-            set => this.Value = (T)value;
+            get { return this.Value; }
+            set { this.Value = (T) value; }
         }
     }
 }";

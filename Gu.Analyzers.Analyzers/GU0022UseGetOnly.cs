@@ -40,31 +40,25 @@
                 return;
             }
 
-            AccessorDeclarationSyntax setter = (AccessorDeclarationSyntax)context.Node;
-            if (setter.Body != null)
+            if (context.Node is AccessorDeclarationSyntax setter &&
+                setter.Body == null &&
+                context.ContainingSymbol.DeclaredAccessibility == Accessibility.Private &&
+                context.ContainingProperty() is IPropertySymbol property &&
+                !property.IsIndexer)
             {
-                return;
-            }
-
-            var propertySymbol = context.ContainingProperty();
-            if (propertySymbol.SetMethod?.DeclaredAccessibility != Accessibility.Private ||
-                propertySymbol.IsIndexer)
-            {
-                return;
-            }
-
-            using (var walker = AssignedValueWalker.Borrow(propertySymbol, context.SemanticModel, context.CancellationToken))
-            {
-                foreach (var value in walker)
+                using (var walker = AssignedValueWalker.Borrow(property, context.SemanticModel, context.CancellationToken))
                 {
-                    if (MeansPropertyIsMutable(value))
+                    foreach (var value in walker)
                     {
-                        return;
+                        if (MeansPropertyIsMutable(value))
+                        {
+                            return;
+                        }
                     }
                 }
-            }
 
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, setter.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, setter.GetLocation()));
+            }
         }
 
         private static bool MeansPropertyIsMutable(ExpressionSyntax assignedValue)
