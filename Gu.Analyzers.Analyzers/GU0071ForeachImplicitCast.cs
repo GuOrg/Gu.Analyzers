@@ -50,23 +50,30 @@
         private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
         {
             var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
+            if (enumerableType.Type == KnownSymbol.IEnumerable &&
+                enumerableType.ConvertedType == KnownSymbol.IEnumerable)
+            {
+                return true;
+            }
+
             if (enumerableType.Type.Is(KnownSymbol.IEnumerable))
             {
                 if (enumerableType.ConvertedType is INamedTypeSymbol namedType &&
-                    namedType.TypeArguments.TrySingle(out var typeArg))
+                    namedType.TypeArguments.TrySingle(out var enumerableTypeArg))
                 {
                     var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                    return SymbolComparer.Equals(variableType, typeArg);
+                    return SymbolComparer.Equals(variableType, enumerableTypeArg);
                 }
 
                 return enumerableType.ConvertedType != KnownSymbol.IEnumerable;
             }
-            else if (enumerableType.ConvertedType.TryFirstMethod("GetEnumerator", out var method) &&
-                     method.ReturnType is INamedTypeSymbol returnType &&
-                     returnType.TypeArguments.TrySingle(out var typeArg))
+
+            if (enumerableType.ConvertedType.TryFirstMethod("GetEnumerator", out var method) &&
+                method.ReturnType is INamedTypeSymbol returnType &&
+                returnType.TypeArguments.TrySingle(out var enumeratorTypeArg))
             {
                 var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                return SymbolComparer.Equals(variableType, typeArg);
+                return SymbolComparer.Equals(variableType, enumeratorTypeArg);
             }
 
             return null;

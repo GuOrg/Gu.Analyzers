@@ -147,5 +147,26 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void NonGenericIEnumerable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections;
+
+    class Foo<T>
+    {
+        private void Bar(IEnumerable enumerable)
+        {
+            foreach (T item in enumerable)
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
