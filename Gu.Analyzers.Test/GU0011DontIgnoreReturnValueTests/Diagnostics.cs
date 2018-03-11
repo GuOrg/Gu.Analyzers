@@ -56,5 +56,47 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [TestCase("Add(1)")]
+        [TestCase("Remove(1)")]
+        public void ImmutableArray(string call)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Immutable;
+
+    class Foo
+    {
+        public Foo(ImmutableArray<int> values)
+        {
+            values.Add(1);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("Add(1)", call);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [TestCase("Add(1)")]
+        [TestCase("Remove(1)")]
+        public void ImmutableList(string call)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Immutable;
+
+    class Foo
+    {
+        public Foo(ImmutableList<int> values)
+        {
+            values.Add(1);
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("Add(1)", call);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

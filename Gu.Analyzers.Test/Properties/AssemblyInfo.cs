@@ -30,4 +30,5 @@ using Gu.Roslyn.Asserts;
     typeof(System.Windows.Controls.Control),
     typeof(System.Windows.Media.Matrix),
     typeof(System.Xaml.XamlLanguage),
+    typeof(System.Collections.Immutable.ImmutableArray),
     typeof(NUnit.Framework.Assert))]
