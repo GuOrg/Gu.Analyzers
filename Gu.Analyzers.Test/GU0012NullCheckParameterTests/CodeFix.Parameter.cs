@@ -9,7 +9,7 @@
         {
             private static readonly ParameterAnalyzer Analyzer = new ParameterAnalyzer();
             private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
-            private static readonly Roslyn.Asserts.ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
 
             [TestCase("public")]
             [TestCase("internal")]
