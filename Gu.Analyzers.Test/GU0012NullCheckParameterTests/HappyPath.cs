@@ -1,11 +1,15 @@
 namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class HappyPath
+    [TestFixture(typeof(SimpleAssignmentAnalyzer))]
+    [TestFixture(typeof(ParameterAnalyzer))]
+    internal class HappyPath<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+        private static readonly T Analyzer = new T();
 
         [Test]
         public void WhenPrivate()
