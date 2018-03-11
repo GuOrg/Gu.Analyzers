@@ -102,7 +102,7 @@
                      method.Name == "Remove" ||
                      method.Name == "TryAdd" ||
                      method.Name == "TryRemove") &&
-                    method.ReturnType.IsValueType)
+                    method.ReturnType.IsEither(KnownSymbol.Boolean, KnownSymbol.Int32, KnownSymbol.Int64))
                 {
                     return true;
                 }
