@@ -25,7 +25,7 @@ namespace Gu.Analyzers
             ImmutableArray.Create(GU0050IgnoreEventsWhenSerializing.DiagnosticId);
 
         /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);

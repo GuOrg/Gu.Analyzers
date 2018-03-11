@@ -13,7 +13,8 @@ namespace Gu.Analyzers.Test
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                     .Where(x => x != typeof(SimpleAssignmentAnalyzer))
+                                                                                                     .Where(x => x != typeof(SimpleAssignmentAnalyzer) &&
+                                                                                                                 x != typeof(ParameterAnalyzer))
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                      .ToImmutableArray();
 
@@ -50,132 +51,143 @@ namespace Gu.Analyzers.Test
         public void SomewhatRealisticSample(DiagnosticAnalyzer analyzer)
         {
             var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public Disposable(string meh)
-        : this()
-    {
-    }
+    using System;
 
-    public Disposable()
+    public class Disposable : IDisposable
     {
-    }
+        public Disposable(string meh)
+            : this()
+        {
+        }
 
-    public void Dispose()
-    {
+        public Disposable()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
 
             var fooListCode = @"
-using System.Collections;
-using System.Collections.Generic;
-
-internal class FooList<T> : IReadOnlyList<T>
+namespace RoslynSandbox
 {
-    private readonly List<T> inner = new List<T>();
+    using System.Collections;
+    using System.Collections.Generic;
 
-    public int Count => this.inner.Count;
-
-    public T this[int index] => this.inner[index];
-
-    public IEnumerator<T> GetEnumerator()
+    internal class FooList<T> : IReadOnlyList<T>
     {
-        return this.inner.GetEnumerator();
-    }
+        private readonly List<T> inner = new List<T>();
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)this.inner).GetEnumerator();
+        public int Count => this.inner.Count;
+
+        public T this[int index] => this.inner[index];
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return this.inner.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)this.inner).GetEnumerator();
+        }
     }
 }";
 
             var fooCode = @"
-using System;
-using System.ComponentModel;
-using System.IO;
-using System.Reactive.Disposables;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
-    private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
+    using System;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    private IDisposable meh1;
-    private IDisposable meh2;
-    private bool isDirty;
-
-    public Foo()
+    public class Foo : IDisposable
     {
-        this.meh1 = this.RecursiveProperty;
-        this.meh2 = this.RecursiveMethod();
-        this.subscription.Disposable = File.OpenRead(string.Empty);
-    }
+        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+        private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
 
-    public event PropertyChangedEventHandler PropertyChanged
-    {
-        add { this.PropertyChangedCore += value; }
-        remove { this.PropertyChangedCore -= value; }
-    }
+        private IDisposable meh1;
+        private IDisposable meh2;
+        private bool isDirty;
 
-    private event PropertyChangedEventHandler PropertyChangedCore;
-
-    public Disposable RecursiveProperty => RecursiveProperty;
-
-    public IDisposable Disposable => subscription.Disposable;
-
-    public bool IsDirty
-    {
-        get
+        public Foo()
         {
-            return this.isDirty;
+            this.meh1 = this.RecursiveProperty;
+            this.meh2 = this.RecursiveMethod();
+            this.subscription.Disposable = File.OpenRead(string.Empty);
         }
 
-        private set
+        public event PropertyChangedEventHandler PropertyChanged
         {
-            if (value == this.isDirty)
+            add { this.PropertyChangedCore += value; }
+            remove { this.PropertyChangedCore -= value; }
+        }
+
+        private event PropertyChangedEventHandler PropertyChangedCore;
+
+        public Disposable RecursiveProperty => RecursiveProperty;
+
+        public IDisposable Disposable => subscription.Disposable;
+
+        public bool IsDirty
+        {
+            get
             {
-                return;
+                return this.isDirty;
             }
 
-            this.isDirty = value;
-            this.PropertyChangedCore?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+            private set
+            {
+                if (value == this.isDirty)
+                {
+                    return;
+                }
+
+                this.isDirty = value;
+                this.PropertyChangedCore?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+            }
         }
-    }
 
-    public Disposable RecursiveMethod() => RecursiveMethod();
+        public Disposable RecursiveMethod() => RecursiveMethod();
 
-    public void Meh()
-    {
-        using (var item = new Disposable())
+        public void Meh()
         {
+            using (var item = new Disposable())
+            {
+            }
+
+            using (var item = RecursiveProperty)
+            {
+            }
+
+            using (RecursiveProperty)
+            {
+            }
+
+            using (var item = RecursiveMethod())
+            {
+            }
+
+            using (RecursiveMethod())
+            {
+            }
         }
 
-        using (var item = RecursiveProperty)
+        public void Dispose()
         {
+            this.subscription.Dispose();
         }
-
-        using (RecursiveProperty)
-        {
-        }
-
-        using (var item = RecursiveMethod())
-        {
-        }
-
-        using (RecursiveMethod())
-        {
-        }
-    }
-
-    public void Dispose()
-    {
-        this.subscription.Dispose();
     }
 }";
 
             var fooBaseCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -203,9 +215,12 @@ public class Foo : IDisposable
                 this.stream.Dispose();
             }
         }
-    }";
+    }
+}";
 
             var fooImplCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -229,7 +244,8 @@ public class Foo : IDisposable
 
             base.Dispose(disposing);
         }
-    }";
+    }
+}";
 
             var withOptionalParameterCode = @"
 namespace RoslynSandbox
@@ -306,7 +322,6 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
@@ -322,6 +337,11 @@ namespace RoslynSandbox
 
         public RxFoo(IObservable<object> observable)
         {
+            if (observable == null)
+            {
+                throw new ArgumentNullException(nameof(observable));
+            }
+
             this.subscription = observable.Subscribe(_ => { });
             this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });
         }
@@ -336,7 +356,7 @@ namespace RoslynSandbox
         {
             return Observable.Empty<object>();
         }
-     }
+    }
 }";
             AnalyzerAssert.Valid(analyzer, testCode);
         }
