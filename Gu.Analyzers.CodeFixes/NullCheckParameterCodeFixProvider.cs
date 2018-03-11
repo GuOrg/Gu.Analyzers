@@ -23,14 +23,44 @@
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var identifier = (IdentifierNameSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                context.RegisterCodeFix(
-                    "Throw if null.",
-                    (editor, _) => editor.ReplaceNode(
-                        identifier,
-                        SyntaxFactory.ParseExpression($"{identifier.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({identifier.Identifier.ValueText}))").WithSimplifiedNames()),
-                    this.GetType(),
-                    diagnostic);
+                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                if (node is IdentifierNameSyntax identifierName)
+                {
+                    context.RegisterCodeFix(
+                        "Throw if null.",
+                        (editor, _) => editor.ReplaceNode(
+                            node,
+                            SyntaxFactory.ParseExpression($"{identifierName.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({identifierName.Identifier.ValueText}))").WithSimplifiedNames()),
+                        this.GetType(),
+                        diagnostic);
+                }
+                else if (node is ParameterSyntax parameterSyntax)
+                {
+                    var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                                     .ConfigureAwait(false);
+                    var method = parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>();
+                    if (method != null)
+                    {
+                        using (var walker = AssignmentWalker.Create(method, Search.TopLevel, semanticModel, context.CancellationToken))
+                        {
+                            foreach (var assinment in walker.Assignments)
+                            {
+                                if (assinment.Right is IdentifierNameSyntax assignedValue &&
+                                    assignedValue.Identifier.ValueText == parameterSyntax.Identifier.ValueText)
+                                {
+                                    context.RegisterCodeFix(
+                                        "Throw if null on first assignment..",
+                                        (editor, _) => editor.ReplaceNode(
+                                            assignedValue,
+                                            SyntaxFactory.ParseExpression($"{assignedValue.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({assignedValue.Identifier.ValueText}))").WithSimplifiedNames()),
+                                        this.GetType(),
+                                        diagnostic);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

@@ -3,13 +3,13 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal partial class CodeFix
     {
-        internal class SimpleAssignment
+        internal class Parameter
         {
-            private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+            private static readonly ParameterAnalyzer Analyzer = new ParameterAnalyzer();
             private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
+            private static readonly Roslyn.Asserts.ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
 
             [TestCase("public")]
             [TestCase("internal")]
@@ -23,9 +23,9 @@ namespace RoslynSandbox
     {
         private readonly string text;
 
-        public Foo(string text)
+        public Foo(string ↓text)
         {
-            this.text = ↓text;
+            this.text = text;
         }
     }
 }";
@@ -59,9 +59,9 @@ namespace RoslynSandbox
     {
         private readonly string text;
 
-        public Foo(string text)
+        public Foo(string ↓text)
         {
-            this.text = ↓text;
+            this.text = text;
         }
     }
 }";

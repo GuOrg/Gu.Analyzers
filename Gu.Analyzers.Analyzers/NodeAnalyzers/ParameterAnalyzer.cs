@@ -3,6 +3,7 @@
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -18,8 +19,18 @@
             context.RegisterSyntaxNodeAction(Handle, SyntaxKind.Parameter);
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext obj)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
+            if (context.Node is ParameterSyntax parameterSyntax &&
+                context.ContainingSymbol is IMethodSymbol method &&
+                method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
+                method.Parameters.TryFirst(x => x.Name == parameterSyntax.Identifier.ValueText, out var parameter) &&
+                parameter.Type.IsReferenceType &&
+                !parameter.HasExplicitDefaultValue &&
+                !NullCheck.IsChecked(parameter, parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, parameterSyntax.Identifier.GetLocation()));
+            }
         }
     }
 }
