@@ -33,7 +33,7 @@
             {
                 if (assignment.Right is IdentifierNameSyntax identifier &&
                     context.ContainingSymbol is IMethodSymbol method &&
-                    method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Public) &&
+                    method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
                     method.Parameters.TryFirst(x => x.Name == identifier.Identifier.ValueText, out var parameter) &&
                     parameter.Type.IsReferenceType &&
                     !parameter.HasExplicitDefaultValue &&

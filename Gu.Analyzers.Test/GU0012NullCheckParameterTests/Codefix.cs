@@ -5,14 +5,18 @@
 
     internal class CodeFix
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
-        private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
-
-        [Test]
-        public void PublicCtorFullyQualified()
+        internal class SimpleAssignment
         {
-            var testCode = @"
+            private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+            private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
+
+            [TestCase("public")]
+            [TestCase("internal")]
+            [TestCase("protected")]
+            public void ConstructorFullyQualified(string access)
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -25,8 +29,8 @@ namespace RoslynSandbox
         }
     }
 }";
-
-            var fixedCode = @"
+                testCode = testCode.AssertReplace("public Foo", $"{access} Foo");
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -39,13 +43,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
+                fixedCode = fixedCode.AssertReplace("public Foo", $"{access} Foo");
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
 
-        [Test]
-        public void PublicCtor()
-        {
-            var testCode = @"
+            [Test]
+            public void PublicCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -61,7 +66,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -76,7 +81,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
         }
     }
 }
