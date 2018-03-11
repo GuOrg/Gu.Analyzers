@@ -43,8 +43,7 @@
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                IsIgnored(objectCreation) &&
-                !CanIgnore(objectCreation))
+                IsIgnored(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -65,27 +64,9 @@
             }
         }
 
-        private static bool CanIgnore(ObjectCreationExpressionSyntax invocation)
-        {
-            if (invocation.Parent is ExpressionStatementSyntax &&
-                invocation.Parent.Parent is BlockSyntax)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!(invocation.Parent is StatementSyntax))
-            {
-                return true;
-            }
-
-            if (invocation.Parent is ExpressionStatementSyntax expressionStatement &&
-                expressionStatement.Parent is BlockSyntax &&
-                semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
                 if (method.ReturnsVoid)
                 {
@@ -131,14 +112,17 @@
                         }
                     }
                 }
+
+                return false;
             }
 
-            return false;
+            return true;
         }
 
         private static bool IsIgnored(SyntaxNode node)
         {
-            return node.Parent is ExpressionStatementSyntax;
+            return node.Parent is ExpressionStatementSyntax expressionStatement &&
+                   expressionStatement.Parent is BlockSyntax;
         }
     }
 }

@@ -123,7 +123,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public class Foo : IDisposable
+    public class Foo1 : IDisposable
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
@@ -132,7 +132,7 @@ namespace RoslynSandbox
         private IDisposable meh2;
         private bool isDirty;
 
-        public Foo()
+        public Foo1()
         {
             this.meh1 = this.RecursiveProperty;
             this.meh2 = this.RecursiveMethod();
