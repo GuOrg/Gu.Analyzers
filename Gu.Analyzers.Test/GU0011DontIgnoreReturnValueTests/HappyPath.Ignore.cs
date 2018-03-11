@@ -52,6 +52,61 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void WhenReturningSameInstance()
+            {
+                var ensureCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Diagnostics;
+    using System.Runtime.CompilerServices;
+
+    public static class Ensure
+    {
+        public static T NotNull<T>(T value, string parameter, [CallerMemberName] string caller = null)
+            where T : class
+        {
+            Debug.Assert(!string.IsNullOrEmpty(parameter), ""parameter cannot be null"");
+
+            if (value == null)
+            {
+                var message = $""Expected parameter {parameter} in member {caller} to not be null"";
+                throw new ArgumentNullException(parameter, message);
+            }
+
+            return value;
+        }
+
+        public static T NotNull<T>(T? value, string parameter, [CallerMemberName] string caller = null)
+            where T : struct
+        {
+            Debug.Assert(!string.IsNullOrEmpty(parameter), ""parameter cannot be null"");
+
+            if (value == null)
+            {
+                var message = $""Expected parameter {parameter} in member {caller} to not be null"";
+                throw new ArgumentNullException(parameter, message);
+            }
+
+            return value.Value;
+        }
+    }
+}";
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            Ensure.NotNull(text, nameof(text));
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, ensureCode, testCode);
+            }
+
+            [Test]
             public void WhenReturningThis()
             {
                 var testCode = @"

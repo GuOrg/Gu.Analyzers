@@ -83,8 +83,8 @@
                 return true;
             }
 
-            if (invocation.Parent is ExpressionStatementSyntax &&
-                invocation.Parent.Parent is BlockSyntax &&
+            if (invocation.Parent is ExpressionStatementSyntax expressionStatement &&
+                expressionStatement.Parent is BlockSyntax &&
                 semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
                 if (method.ReturnsVoid)
@@ -92,12 +92,10 @@
                     return true;
                 }
 
-                if (ReferenceEquals(method.ContainingType, method.ReturnType))
+                if (ReferenceEquals(method.ContainingType, method.ReturnType) &&
+                    method.ContainingType == KnownSymbol.StringBuilder)
                 {
-                    if (method.ContainingType == KnownSymbol.StringBuilder)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 if ((method.Name == "Add" ||
@@ -109,62 +107,38 @@
                     return true;
                 }
 
+                if (method.IsExtensionMethod)
+                {
+                    method = method.ReducedFrom;
+                }
+
                 if (method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
                 {
                     using (var walker = ReturnValueWalker.Borrow(declaration, Search.Recursive, semanticModel, cancellationToken))
                     {
-                        if (method.IsExtensionMethod)
-                        {
-                            var identifier = declaration.ParameterList.Parameters[0].Identifier;
-                            foreach (var returnValue in walker)
-                            {
-                                if ((returnValue as IdentifierNameSyntax)?.Identifier.ValueText != identifier.ValueText)
-                                {
-                                    return false;
-                                }
-                            }
-
-                            return true;
-                        }
-
                         foreach (var returnValue in walker)
                         {
-                            if (!returnValue.IsKind(SyntaxKind.ThisExpression))
+                            if (returnValue is IdentifierNameSyntax identifierName &&
+                                method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out _))
                             {
-                                return false;
+                                return true;
+                            }
+
+                            if (returnValue is InstanceExpressionSyntax)
+                            {
+                                return true;
                             }
                         }
-
-                        return true;
                     }
                 }
-
-                return method.ReturnsVoid;
             }
 
-            return true;
+            return false;
         }
 
         private static bool IsIgnored(SyntaxNode node)
         {
-            if (node.Parent is StatementSyntax)
-            {
-                return !(node.Parent is ReturnStatementSyntax);
-            }
-
-            var argument = node.FirstAncestorOrSelf<ArgumentSyntax>();
-            if (argument != null)
-            {
-                var objectCreation = argument.FirstAncestorOrSelf<ObjectCreationExpressionSyntax>();
-                if ((objectCreation?.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("Reader") == true)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-
-            return false;
+            return node.Parent is ExpressionStatementSyntax;
         }
     }
 }
