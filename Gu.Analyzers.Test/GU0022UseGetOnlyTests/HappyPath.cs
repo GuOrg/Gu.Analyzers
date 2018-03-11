@@ -235,6 +235,31 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [Test]
+        public void ExplicitImplementation()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    interface IFoo
+    {
+        object Value { get; set; }
+    }
+
+    class Foo<T> : IFoo
+    {
+        public T Value { get; private set; }
+
+        object IFoo.Value
+        {
+            get => this.Value;
+            set => this.Value = (T)value;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         internal class TestCase
         {
             public TestCase(string type, string update)
