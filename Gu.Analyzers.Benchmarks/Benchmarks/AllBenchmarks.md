@@ -10,21 +10,22 @@ Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
 ```
 |                                               Method |        Mean |       Error |     StdDev |      Median |   Gen 0 |  Gen 1 | Allocated |
 |----------------------------------------------------- |------------:|------------:|-----------:|------------:|--------:|-------:|----------:|
-|                  GU0003CtorParameterNamesShouldMatch |   134.38 us |   4.7350 us |  13.961 us |   130.94 us |  0.7324 |      - |    6494 B |
-|                       GU0004AssignAllReadOnlyMembers | 5,776.48 us | 195.5185 us | 576.491 us | 5,807.08 us | 39.0625 |      - |  294967 B |
-|                                      GU0006UseNameof | 3,182.99 us | 101.7849 us | 295.296 us | 3,119.21 us | 35.1563 |      - |  244115 B |
-|                                GU0007PreferInjecting | 6,716.12 us | 147.7002 us | 433.179 us | 6,719.78 us |       - |      - |   25676 B |
-|                           GU0008AvoidRelayProperties |   832.69 us |  24.2274 us |  71.435 us |   835.68 us |       - |      - |    7011 B |
-|                  GU0009UseNamedParametersForBooleans | 2,673.04 us |  85.8559 us | 250.446 us | 2,635.28 us |       - |      - |     544 B |
-|                          GU0011DontIgnoreReturnValue | 2,676.20 us |  75.3900 us | 219.916 us | 2,648.44 us |  3.9063 |      - |   47866 B |
-|                                 GU0020SortProperties |    81.48 us |   1.9146 us |   5.524 us |    81.47 us |  0.7324 |      - |    4921 B |
-|                    GU0021CalculatedPropertyAllocates |    68.36 us |   1.3583 us |   3.602 us |    68.04 us |       - |      - |     441 B |
-|                                     GU0022UseGetOnly | 3,314.39 us | 143.7837 us | 423.949 us | 3,185.89 us | 11.7188 |      - |   99738 B |
-|                    GU0050IgnoreEventsWhenSerializing |   400.00 us |  11.7736 us |  34.715 us |   392.16 us |  2.4414 |      - |   19051 B |
-|                         GU0051XmlSerializerNotCached |   376.78 us |  10.9225 us |  31.339 us |   375.41 us |  3.9063 | 0.4883 |   26576 B |
-|            GU0060EnumMemberValueConflictsWithAnother |    22.10 us |   0.7050 us |   2.068 us |    22.34 us |  0.1831 | 0.0305 |    1350 B |
-| GU0070DefaultConstructedValueTypeWithNoUsefulDefault |   537.51 us |  16.1837 us |  46.434 us |   527.50 us |  7.8125 | 0.9766 |   52711 B |
-|                            GU0071ForeachImplicitCast |   111.05 us |   2.9413 us |   8.486 us |   109.12 us |       - |      - |     441 B |
-|                                 ArgumentListAnalyzer | 2,393.02 us |  70.9957 us | 205.971 us | 2,380.82 us |       - |      - |   17216 B |
-|                               ObjectCreationAnalyzer |   441.57 us |  12.0281 us |  34.896 us |   436.60 us |  6.3477 | 0.9766 |   40908 B |
-|                             SimpleAssignmentAnalyzer |   607.06 us |  15.5954 us |  45.739 us |   609.61 us |  2.9297 | 0.9766 |   21039 B |
+|                  GU0003CtorParameterNamesShouldMatch |   144.41 us |   3.8912 us |  11.412 us |   145.05 us |  0.7324 |      - |    6494 B |
+|                       GU0004AssignAllReadOnlyMembers | 5,984.07 us | 168.6079 us | 491.837 us | 5,944.84 us | 46.8750 |      - |  313208 B |
+|                                      GU0006UseNameof | 3,346.88 us |  81.4745 us | 229.800 us | 3,344.42 us | 31.2500 |      - |  222162 B |
+|                                GU0007PreferInjecting | 5,451.94 us | 119.0403 us | 345.358 us | 5,392.00 us |       - |      - |   23076 B |
+|                           GU0008AvoidRelayProperties |   841.30 us |  20.1761 us |  59.173 us |   845.05 us |       - |      - |    7010 B |
+|                  GU0009UseNamedParametersForBooleans | 2,839.72 us |  70.1073 us | 200.020 us | 2,809.00 us |       - |      - |     544 B |
+|                          GU0011DontIgnoreReturnValue | 2,555.72 us |  56.4490 us | 166.441 us | 2,543.61 us |  3.9063 |      - |   49594 B |
+|                                 GU0020SortProperties |    91.75 us |   2.3415 us |   6.830 us |    91.31 us |  0.7324 |      - |    4921 B |
+|                    GU0021CalculatedPropertyAllocates |    84.38 us |   2.2878 us |   6.710 us |    83.70 us |       - |      - |     441 B |
+|                                     GU0022UseGetOnly | 2,811.45 us |  69.5654 us | 205.115 us | 2,814.36 us | 11.7188 |      - |   92442 B |
+|                    GU0050IgnoreEventsWhenSerializing |   395.05 us |  13.8487 us |  40.833 us |   384.86 us |  2.9297 |      - |   20015 B |
+|                         GU0051XmlSerializerNotCached |   416.52 us |   9.3123 us |  27.458 us |   414.33 us |  3.9063 | 0.4883 |   27135 B |
+|            GU0060EnumMemberValueConflictsWithAnother |    22.92 us |   0.6146 us |   1.812 us |    22.92 us |  0.1831 | 0.0305 |    1350 B |
+| GU0070DefaultConstructedValueTypeWithNoUsefulDefault |   561.98 us |  14.2613 us |  41.826 us |   558.57 us |  7.8125 | 0.9766 |   53831 B |
+|                            GU0071ForeachImplicitCast |   156.29 us |   8.3341 us |  24.573 us |   168.61 us |       - |      - |     442 B |
+|                                 ArgumentListAnalyzer | 2,798.48 us | 112.5444 us | 331.840 us | 2,745.30 us |       - |      - |   17824 B |
+|                               ObjectCreationAnalyzer |   445.62 us |  12.4806 us |  36.407 us |   437.49 us |  6.3477 | 0.9766 |   40908 B |
+|                                    ParameterAnalyzer | 6,121.88 us | 243.6130 us | 710.630 us | 6,016.49 us | 31.2500 | 7.8125 |  223734 B |
+|                             SimpleAssignmentAnalyzer |   811.40 us |  18.5872 us |  54.805 us |   806.80 us |  2.9297 | 0.9766 |   22455 B |
