@@ -20,7 +20,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0020SortProperties.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => BacthFixer.Default;
+        public override FixAllProvider GetFixAllProvider() => BatchFixer.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -234,12 +234,12 @@
             }
         }
 
-        private class BacthFixer : FixAllProvider
+        private class BatchFixer : FixAllProvider
         {
-            public static readonly BacthFixer Default = new BacthFixer();
+            public static readonly BatchFixer Default = new BatchFixer();
             private static readonly ImmutableArray<FixAllScope> SupportedFixAllScopes = ImmutableArray.Create(FixAllScope.Document);
 
-            private BacthFixer()
+            private BatchFixer()
             {
             }
 

@@ -35,9 +35,9 @@
                 if (argument.Expression is LiteralExpressionSyntax literal)
                 {
                     context.RegisterCodeFix(
-                            "Use nameof",
-                           (editor, cancellationToken) => ApplyFix(editor, argument, literal.Token.ValueText, cancellationToken),
-                            this.GetType(),
+                        "Use nameof",
+                        (editor, cancellationToken) => ApplyFix(editor, argument, literal.Token.ValueText, cancellationToken),
+                        this.GetType(),
                         diagnostic);
                 }
             }
