@@ -39,8 +39,7 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                var eventField = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<EventFieldDeclarationSyntax>();
-                if (eventField != null)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<EventFieldDeclarationSyntax>() is EventFieldDeclarationSyntax eventField)
                 {
                     context.RegisterCodeFix(
                         "Add [field:NonSerialized].",
@@ -53,8 +52,7 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                var field = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<FieldDeclarationSyntax>();
-                if (field != null)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<FieldDeclarationSyntax>() is FieldDeclarationSyntax field)
                 {
                     context.RegisterCodeFix(
                         "Add [NonSerialized].",
