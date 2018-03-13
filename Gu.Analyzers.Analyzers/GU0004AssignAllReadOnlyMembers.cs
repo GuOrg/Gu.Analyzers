@@ -71,6 +71,7 @@
         private class CtorWalker : PooledWalker<CtorWalker>
         {
             private readonly List<ISymbol> readonlies = new List<ISymbol>();
+            private readonly HashSet<ISymbol> visited = new HashSet<ISymbol>();
 
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
@@ -113,51 +114,55 @@
                 base.VisitConstructorInitializer(node);
             }
 
+            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+            {
+                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (this.visited.Add(method) &&
+                    method.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
+                {
+                    this.Visit(declaration);
+                }
+
+                base.VisitInvocationExpression(node);
+            }
+
             protected override void Clear()
             {
                 this.readonlies.Clear();
+                this.visited.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;
             }
 
             private static IEnumerable<ISymbol> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
+                    var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
                     if (member is FieldDeclarationSyntax fieldDeclaration &&
-                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword))
+                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                        fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
+                        last.Initializer == null &&
+                        isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
                     {
-                        var declaration = fieldDeclaration.Declaration;
-                        if (declaration.Variables.TrySingle(out var variable))
+                        foreach (var variable in fieldDeclaration.Declaration.Variables)
                         {
-                            var field = (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken);
-                            if (field.IsReadOnly &&
-                                field.IsStatic == isStatic &&
-                                variable.Initializer == null)
-                            {
-                                yield return field;
-                            }
+                            yield return (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(
+                                variable,
+                                cancellationToken);
                         }
-
-                        continue;
                     }
-
-                    if (member is PropertyDeclarationSyntax propertyDeclaration &&
-                        propertyDeclaration.ExpressionBody == null &&
-                        !propertyDeclaration.TryGetSetter(out _) &&
-                        propertyDeclaration.TryGetGetter(out var getter) &&
-                        getter.Body == null)
+                    else if (member is PropertyDeclarationSyntax propertyDeclaration &&
+                             propertyDeclaration.ExpressionBody == null &&
+                             !propertyDeclaration.TryGetSetter(out _) &&
+                             propertyDeclaration.TryGetGetter(out var getter) &&
+                             getter.Body == null &&
+                             propertyDeclaration.Initializer == null &&
+                             !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
+                             isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
                     {
-                        var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
-                        if (property.IsReadOnly &&
-                            property.IsStatic == isStatic &&
-                            !property.IsAbstract &&
-                            propertyDeclaration.Initializer == null)
-                        {
-                            yield return semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
-                        }
+                        yield return semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
                     }
                 }
             }
