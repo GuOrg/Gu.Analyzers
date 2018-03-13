@@ -38,7 +38,7 @@
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
                 var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
-                if (propertyDeclaration.TryGetSetAccessorDeclaration(out setter))
+                if (propertyDeclaration.TryGetSetter(out setter))
                 {
                     return true;
                 }
@@ -62,7 +62,7 @@
                     return false;
                 }
 
-                if (declaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
+                if (declaration.TryGetGetter(out AccessorDeclarationSyntax getter) &&
                     getter.Body == null)
                 {
                     return true;

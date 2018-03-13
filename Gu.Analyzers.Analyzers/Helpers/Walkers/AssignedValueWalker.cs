@@ -545,7 +545,7 @@
                 foreach (var reference in property.DeclaringSyntaxReferences)
                 {
                     var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    if (declaration.TryGetSetAccessorDeclaration(out var setter))
+                    if (declaration.TryGetSetter(out var setter))
                     {
                         this.Visit(setter);
                     }

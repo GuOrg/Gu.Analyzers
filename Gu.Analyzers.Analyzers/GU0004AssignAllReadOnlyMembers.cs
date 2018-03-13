@@ -146,8 +146,8 @@
 
                     if (member is PropertyDeclarationSyntax propertyDeclaration &&
                         propertyDeclaration.ExpressionBody == null &&
-                        !propertyDeclaration.TryGetSetAccessorDeclaration(out _) &&
-                        propertyDeclaration.TryGetGetAccessorDeclaration(out var getter) &&
+                        !propertyDeclaration.TryGetSetter(out _) &&
+                        propertyDeclaration.TryGetGetter(out var getter) &&
                         getter.Body == null)
                     {
                         var property = semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);

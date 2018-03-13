@@ -43,7 +43,7 @@
             }
 
             if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-                !propertyDeclaration.TryGetSetAccessorDeclaration(out _) &&
+                !propertyDeclaration.TryGetSetter(out _) &&
                 context.ContainingSymbol is IPropertySymbol propertySymbol &&
                 !propertySymbol.IsStatic &&
                 propertySymbol.DeclaredAccessibility != Accessibility.Protected &&
@@ -63,7 +63,7 @@
                 return IsRelayReturn(property.ExpressionBody.Expression as MemberAccessExpressionSyntax, semanticModel, cancellationToken);
             }
 
-            if (property.TryGetGetAccessorDeclaration(out var getter))
+            if (property.TryGetGetter(out var getter))
             {
                 if (getter.Body == null)
                 {

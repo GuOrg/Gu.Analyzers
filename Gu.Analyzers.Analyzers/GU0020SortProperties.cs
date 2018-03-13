@@ -333,12 +333,12 @@
 
             private static bool TryGetGetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax getter)
             {
-                return declaration.TryGetGetAccessorDeclaration(out getter);
+                return declaration.TryGetGetter(out getter);
             }
 
             private static bool TryGetSetter(BasePropertyDeclarationSyntax declaration, out AccessorDeclarationSyntax setter)
             {
-                return declaration.TryGetSetAccessorDeclaration(out setter);
+                return declaration.TryGetSetter(out setter);
             }
         }
     }
