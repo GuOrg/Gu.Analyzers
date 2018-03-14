@@ -70,7 +70,8 @@
 
         private class CtorWalker : PooledWalker<CtorWalker>
         {
-            private readonly List<ISymbol> readonlies = new List<ISymbol>();
+            private readonly List<ISymbol> unassigned = new List<ISymbol>();
+            private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
 
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
@@ -79,7 +80,9 @@
             {
             }
 
-            public IReadOnlyList<ISymbol> Unassigned => this.readonlies;
+            public IReadOnlyList<ISymbol> Unassigned => this.unassigned;
+
+            public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
 
             public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
@@ -95,7 +98,8 @@
             {
                 if (TryGetIdentifier(node.Left, out var identifierName))
                 {
-                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                    this.assignments.Add(node);
+                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
                 }
 
                 base.VisitAssignmentExpression(node);
@@ -106,7 +110,7 @@
                 if (TryGetIdentifier(node.Expression, out var identifierName) &&
                     node.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword))
                 {
-                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
                 }
 
                 base.VisitArgument(node);
@@ -125,40 +129,9 @@
 
             protected override void Clear()
             {
-                this.readonlies.Clear();
+                this.unassigned.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;
-            }
-
-            private void AddReadOnlies(ConstructorDeclarationSyntax ctor)
-            {
-                var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
-                foreach (var member in typeDeclarationSyntax.Members)
-                {
-                    var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
-                    if (member is FieldDeclarationSyntax fieldDeclaration &&
-                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                        fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
-                        last.Initializer == null &&
-                        isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
-                    {
-                        foreach (var variable in fieldDeclaration.Declaration.Variables)
-                        {
-                            this.readonlies.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
-                        }
-                    }
-                    else if (member is PropertyDeclarationSyntax propertyDeclaration &&
-                             propertyDeclaration.ExpressionBody == null &&
-                             !propertyDeclaration.TryGetSetter(out _) &&
-                             propertyDeclaration.TryGetGetter(out var getter) &&
-                             getter.Body == null &&
-                             propertyDeclaration.Initializer == null &&
-                             !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
-                             isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
-                    {
-                        this.readonlies.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
-                    }
-                }
             }
 
             private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
@@ -185,6 +158,37 @@
                 }
 
                 return false;
+            }
+
+            private void AddReadOnlies(ConstructorDeclarationSyntax ctor)
+            {
+                var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
+                foreach (var member in typeDeclarationSyntax.Members)
+                {
+                    var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
+                    if (member is FieldDeclarationSyntax fieldDeclaration &&
+                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                        fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
+                        last.Initializer == null &&
+                        isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                    {
+                        foreach (var variable in fieldDeclaration.Declaration.Variables)
+                        {
+                            this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
+                        }
+                    }
+                    else if (member is PropertyDeclarationSyntax propertyDeclaration &&
+                             propertyDeclaration.ExpressionBody == null &&
+                             !propertyDeclaration.TryGetSetter(out _) &&
+                             propertyDeclaration.TryGetGetter(out var getter) &&
+                             getter.Body == null &&
+                             propertyDeclaration.Initializer == null &&
+                             !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
+                             isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                    {
+                        this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
+                    }
+                }
             }
         }
     }

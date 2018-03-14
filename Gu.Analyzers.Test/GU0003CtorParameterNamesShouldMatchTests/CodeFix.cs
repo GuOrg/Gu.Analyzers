@@ -91,7 +91,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedConstructorSettingProperties()
+        public void ChainedConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox

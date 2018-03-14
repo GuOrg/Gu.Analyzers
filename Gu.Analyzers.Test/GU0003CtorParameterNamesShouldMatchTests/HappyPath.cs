@@ -208,6 +208,30 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void IgnoresWhenChainedAndSettingProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int a1)
+            :this(a1)
+        {
+            this.B = a1;
+        }
+
+        public Foo(int a, int b)
+        {
+        }
+
+        public int B { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void IgnoresWhenBaseIsParams()
         {
             var fooCode = @"

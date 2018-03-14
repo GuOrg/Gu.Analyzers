@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Threading;
@@ -29,156 +30,118 @@
                 return;
             }
 
-            if (context.Node is ConstructorDeclarationSyntax ctor)
+            if (context.Node is ConstructorDeclarationSyntax constructorDeclaration)
             {
-                if (ctor.ParameterList == null ||
-                    ctor.ParameterList.Parameters.Count == 0)
+                using (var pooled = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
                 {
-                    return;
-                }
-
-                using (var pooled = CtorWalker.Create(ctor, context.SemanticModel, context.CancellationToken))
-                {
-                    foreach (var kvp in pooled.ParameterNameMap)
+                    if (constructorDeclaration.ParameterList is ParameterListSyntax parameterList &&
+                        parameterList.Parameters.Count > 0)
                     {
-                        if (kvp.Value != null &&
-                            !IsMatch(kvp.Key.Identifier, kvp.Value))
+                        foreach (var assignment in pooled.Assignments)
                         {
-                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", kvp.Value), });
-                            context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, kvp.Key.Identifier.GetLocation(), properties));
+                            if (constructorDeclaration.Contains(assignment) &&
+                               TryGetIdentifier(assignment.Left, out var left) &&
+                               TryGetIdentifier(assignment.Right, out var right) &&
+                               parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
+                               !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
+                               !IsMatch(left, right, out var name) &&
+                                pooled.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
+                            {
+                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
+                                context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                            }
+                        }
+
+                        if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
+                            initializer.ArgumentList is ArgumentListSyntax argumentList &&
+                            argumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax, out _))
+                        {
+                            var chained = context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken);
+                            foreach (var arg in argumentList.Arguments)
+                            {
+                                if (TryGetIdentifier(arg.Expression, out var identifier) &&
+                                    parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == identifier.Identifier.ValueText, out var parameter) &&
+                                    chained.TryGetMatchingParameter(arg, out var parameterSymbol) &&
+                                    !parameterSymbol.IsParams &&
+                                    parameterSymbol.Name != parameter.Identifier.ValueText)
+                                {
+                                    var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameterSymbol.Name), });
+                                    context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                                }
+                            }
                         }
                     }
                 }
             }
         }
 
-        private static bool IsMatch(SyntaxToken identifier, string name)
+        private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
         {
-            if (identifier.ValueText == name)
+            result = expression as IdentifierNameSyntax;
+            if (result != null)
             {
                 return true;
+            }
+
+            if (expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                if (memberAccess.Expression is ThisExpressionSyntax)
+                {
+                    return TryGetIdentifier(memberAccess.Name, out result);
+                }
+
+                if (memberAccess.Expression is IdentifierNameSyntax candidate &&
+                    expression.FirstAncestor<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration &&
+                    candidate.Identifier.ValueText == typeDeclaration.Identifier.ValueText)
+                {
+                    return TryGetIdentifier(memberAccess.Name, out result);
+                }
             }
 
             return false;
         }
 
-        private sealed class CtorWalker : PooledWalker<CtorWalker>
+        private static bool IsMatch(IdentifierNameSyntax left, IdentifierNameSyntax right, out string name)
         {
-            internal readonly Dictionary<ParameterSyntax, string> ParameterNameMap = new Dictionary<ParameterSyntax, string>();
-
-            private ConstructorDeclarationSyntax constructor;
-            private SemanticModel semanticModel;
-            private CancellationToken cancellationToken;
-
-            private CtorWalker()
+            name = null;
+            if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
             {
+                return true;
             }
 
-            public static CtorWalker Create(
-                ConstructorDeclarationSyntax constructor,
-                SemanticModel semanticModel,
-                CancellationToken cancellationToken)
-            {
-                var pooled = Borrow(()=> new CtorWalker());
-                pooled.constructor = constructor;
-                pooled.semanticModel = semanticModel;
-                pooled.cancellationToken = cancellationToken;
-                pooled.Visit(constructor);
-                return pooled;
-            }
+            name = left.Identifier.ValueText;
+            name = IsAllCaps(name)
+                ? name.ToLowerInvariant()
+                : FirstCharLowercase(name.TrimStart('_'));
 
-            public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+            return false;
+
+            bool Equals(string memberName, string parameterName)
             {
-                if (node.Right is IdentifierNameSyntax right)
+                if (memberName.StartsWith("_"))
                 {
-                    var rightSymbol = this.semanticModel.GetSymbolSafe(right, this.cancellationToken);
-                    if (rightSymbol is IParameterSymbol)
+                    if (parameterName.Length != memberName.Length - 1)
                     {
-                        var left = node.Left;
-                        if (left is IdentifierNameSyntax ||
-                            (left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
-                            (left as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
+                        return false;
+                    }
+
+                    for (var i = 0; i < parameterName.Length; i++)
+                    {
+                        if (parameterName[i] != memberName[i + 1])
                         {
-                            if (this.constructor.ParameterList.Parameters.TrySingle(x => x.Identifier.ValueText == right.Identifier.ValueText, out ParameterSyntax match))
-                            {
-                                var symbol = this.semanticModel.GetSymbolSafe(node.Left, this.cancellationToken);
-                                if (this.ParameterNameMap.ContainsKey(match))
-                                {
-                                    this.ParameterNameMap[match] = null;
-                                }
-                                else
-                                {
-                                    this.ParameterNameMap.Add(match, ParameterName(symbol));
-                                }
-                            }
+                            return false;
                         }
                     }
+
+                    return true;
                 }
 
-                base.VisitAssignmentExpression(node);
+                return string.Equals(memberName, parameterName, StringComparison.OrdinalIgnoreCase);
             }
 
-            public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
+            bool IsAllCaps(string text)
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (ctor != null)
-                {
-                    for (var i = 0; i < node.ArgumentList.Arguments.Count; i++)
-                    {
-                        var arg = node.ArgumentList.Arguments[i].Expression as IdentifierNameSyntax;
-                        if (this.constructor.ParameterList.Parameters.TrySingle(x => x.Identifier.ValueText == arg?.Identifier.ValueText, out ParameterSyntax match))
-                        {
-                            if (this.ParameterNameMap.ContainsKey(match))
-                            {
-                                this.ParameterNameMap[match] = null;
-                            }
-                            else
-                            {
-                                if (ctor.Parameters.Length - 1 <= i &&
-                                    ctor.Parameters[ctor.Parameters.Length - 1].IsParams)
-                                {
-                                    this.ParameterNameMap.Add(match, null);
-                                }
-                                else
-                                {
-                                    this.ParameterNameMap.Add(match, ctor.Parameters[i].Name);
-                                }
-                            }
-                        }
-                    }
-                }
-
-                base.VisitConstructorInitializer(node);
-            }
-
-            private static string ParameterName(ISymbol symbol)
-            {
-                if (symbol is IFieldSymbol field)
-                {
-                    if (IsAllCaps(field.Name))
-                    {
-                        return field.Name.ToLowerInvariant();
-                    }
-
-                    return FirstCharLowercase(TrimLeadingUnderscore(field.Name));
-                }
-
-                if (symbol is IPropertySymbol property)
-                {
-                    if (IsAllCaps(property.Name))
-                    {
-                        return property.Name.ToLowerInvariant();
-                    }
-
-                    return FirstCharLowercase(property.Name);
-                }
-
-                return null;
-            }
-
-            private static bool IsAllCaps(string name)
-            {
-                foreach (var c in name)
+                foreach (var c in text)
                 {
                     if (char.IsLetter(c) && char.IsLower(c))
                     {
@@ -189,17 +152,7 @@
                 return true;
             }
 
-            private static string TrimLeadingUnderscore(string text)
-            {
-                if (text[0] != '_' || text.Length == 1)
-                {
-                    return text;
-                }
-
-                return text.Substring(1);
-            }
-
-            private static string FirstCharLowercase(string text)
+            string FirstCharLowercase(string text)
             {
                 if (char.IsLower(text[0]))
                 {
@@ -210,13 +163,107 @@
                 charArray[0] = char.ToLower(charArray[0]);
                 return new string(charArray);
             }
+        }
+
+        private class CtorWalker : PooledWalker<CtorWalker>
+        {
+            private readonly List<ISymbol> unassigned = new List<ISymbol>();
+            private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
+            private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
+
+            private SemanticModel semanticModel;
+            private CancellationToken cancellationToken;
+
+            private CtorWalker()
+            {
+            }
+
+            public IReadOnlyList<ISymbol> Unassigned => this.unassigned;
+
+            public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
+
+            public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                var walker = Borrow(() => new CtorWalker());
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
+                walker.AddReadOnlies(constructor);
+                walker.Visit(constructor);
+                return walker;
+            }
+
+            public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
+            {
+                if (TryGetIdentifier(node.Left, out var identifierName))
+                {
+                    this.assignments.Add(node);
+                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                }
+
+                base.VisitAssignmentExpression(node);
+            }
+
+            public override void VisitArgument(ArgumentSyntax node)
+            {
+                if (TryGetIdentifier(node.Expression, out var identifierName) &&
+                    node.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword))
+                {
+                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                }
+
+                base.VisitArgument(node);
+            }
+
+            public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
+            {
+                if (this.visited.Add(node) &&
+                    this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
+                    ctor.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
+                {
+                    this.Visit(declaration);
+                }
+
+                base.VisitConstructorInitializer(node);
+            }
 
             protected override void Clear()
             {
-                this.ParameterNameMap.Clear();
-                this.constructor = null;
+                this.unassigned.Clear();
+                this.assignments.Clear();
+                this.visited.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;
+            }
+
+            private void AddReadOnlies(ConstructorDeclarationSyntax ctor)
+            {
+                var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
+                foreach (var member in typeDeclarationSyntax.Members)
+                {
+                    var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
+                    if (member is FieldDeclarationSyntax fieldDeclaration &&
+                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                        fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
+                        last.Initializer == null &&
+                        isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                    {
+                        foreach (var variable in fieldDeclaration.Declaration.Variables)
+                        {
+                            this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
+                        }
+                    }
+                    else if (member is PropertyDeclarationSyntax propertyDeclaration &&
+                             propertyDeclaration.ExpressionBody == null &&
+                             !propertyDeclaration.TryGetSetter(out _) &&
+                             propertyDeclaration.TryGetGetter(out var getter) &&
+                             getter.Body == null &&
+                             propertyDeclaration.Initializer == null &&
+                             !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
+                             isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                    {
+                        this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
+                    }
+                }
             }
         }
     }
