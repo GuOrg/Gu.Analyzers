@@ -2,9 +2,9 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
-    public class GU0021CalculatedPropertyAllocatesBenchmarks
+    public class PropertyDeclarationAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.PropertyDeclarationAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnGuAnalyzersProject()

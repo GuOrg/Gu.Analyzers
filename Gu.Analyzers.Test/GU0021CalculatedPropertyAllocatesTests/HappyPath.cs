@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 
     internal class HappyPath
     {
-        private static readonly GU0021CalculatedPropertyAllocates Analyzer = new GU0021CalculatedPropertyAllocates();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
 
         [Test]
         public void ArrowAdd()

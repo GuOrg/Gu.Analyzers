@@ -45,8 +45,7 @@
                 var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == GU0021CalculatedPropertyAllocates.DiagnosticId)
                 {
-                    var objectCreation = GetObjectCreation(syntaxNode);
-                    if (objectCreation != null)
+                    if (TryGetObjectCreation(syntaxNode, out var objectCreation))
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
                         var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
@@ -111,15 +110,19 @@
                                                         .WithAccessorList(GetOnlyAccessorList));
         }
 
-        private static ObjectCreationExpressionSyntax GetObjectCreation(SyntaxNode node)
+        private static bool TryGetObjectCreation(SyntaxNode node, out ObjectCreationExpressionSyntax result)
         {
+            result = null;
             if (node is ArrowExpressionClauseSyntax arrow)
             {
-                return arrow.Expression as ObjectCreationExpressionSyntax;
+                result = arrow.Expression as ObjectCreationExpressionSyntax;
+            }
+            else if (node is ReturnStatementSyntax returnStatement)
+            {
+                result = returnStatement.Expression as ObjectCreationExpressionSyntax;
             }
 
-            var returnStatement = node as ReturnStatementSyntax;
-            return returnStatement?.Expression as ObjectCreationExpressionSyntax;
+            return result != null;
         }
 
         private static bool IsAnyInitializerMutable(SemanticModel semanticModel, CancellationToken cancellationToken, InitializerExpressionSyntax initializer)

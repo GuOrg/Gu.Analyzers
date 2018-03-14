@@ -15,8 +15,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0020SortPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0021CalculatedPropertyAllocatesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0021CalculatedPropertyAllocates());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0022UseGetOnlyBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0050IgnoreEventsWhenSerializingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
@@ -36,6 +34,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ParameterAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ParameterAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark PropertyDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.PropertyDeclarationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
 
@@ -73,12 +73,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0020SortProperties()
         {
             GU0020SortPropertiesBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0021CalculatedPropertyAllocates()
-        {
-            GU0021CalculatedPropertyAllocatesBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -139,6 +133,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ParameterAnalyzer()
         {
             ParameterAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void PropertyDeclarationAnalyzer()
+        {
+            PropertyDeclarationAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
