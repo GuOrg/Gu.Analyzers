@@ -13,7 +13,9 @@
     internal class ConstructorAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(GU0003CtorParameterNamesShouldMatch.Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            GU0003CtorParameterNamesShouldMatch.Descriptor,
+            GU0004AssignAllReadOnlyMembers.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -70,6 +72,11 @@
                                 }
                             }
                         }
+                    }
+
+                    if (pooled.Unassigned.Count > 0)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor, constructorDeclaration.Identifier.GetLocation(), string.Join(Environment.NewLine, pooled.Unassigned)));
                     }
                 }
             }

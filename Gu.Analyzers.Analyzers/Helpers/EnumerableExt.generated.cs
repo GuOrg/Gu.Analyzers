@@ -82,7 +82,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -261,7 +261,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Length; j++)
+                    for (var j = i + 1; j < source.Length; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -417,7 +417,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -575,7 +575,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -741,7 +741,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -901,7 +901,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -1053,7 +1053,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {
@@ -1205,7 +1205,7 @@
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.Count; j++)
+                    for (var j = i + 1; j < source.Count; j++)
                     {
                         if (predicate(source[j]))
                         {

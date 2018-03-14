@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 
     internal class HappyPath
     {
-        private static readonly GU0004AssignAllReadOnlyMembers Analyzer = new GU0004AssignAllReadOnlyMembers();
+        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
         public void ConstructorSettingProperties()

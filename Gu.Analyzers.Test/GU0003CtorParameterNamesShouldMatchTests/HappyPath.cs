@@ -223,6 +223,7 @@ namespace RoslynSandbox
 
         public Foo(int a, int b)
         {
+            this.B = 0;
         }
 
         public int B { get; }

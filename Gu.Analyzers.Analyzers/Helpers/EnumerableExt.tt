@@ -95,7 +95,7 @@ namespace Gu.Analyzers
                 if (predicate(item))
                 {
                     result = item;
-                    for (var j = i +1; j < source.<#= count #>; j++)
+                    for (var j = i + 1; j < source.<#= count #>; j++)
                     {
                         if (predicate(source[j]))
                         {

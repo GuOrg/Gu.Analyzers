@@ -5,7 +5,7 @@
 
     internal class Diagnostics
     {
-        private static readonly GU0004AssignAllReadOnlyMembers Analyzer = new GU0004AssignAllReadOnlyMembers();
+        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0004");
 
         [Test]
@@ -52,7 +52,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics(Analyzer, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Test]
