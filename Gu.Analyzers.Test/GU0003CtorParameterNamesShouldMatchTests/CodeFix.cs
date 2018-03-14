@@ -5,7 +5,7 @@
 
     internal class CodeFix
     {
-        private static readonly GU0003CtorParameterNamesShouldMatch Analyzer = new GU0003CtorParameterNamesShouldMatch();
+        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly RenameConstructorArgumentsCodeFixProvider Fix = new RenameConstructorArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0003");
 

@@ -5,7 +5,7 @@
 
     internal class HappyPath
     {
-        private static readonly GU0003CtorParameterNamesShouldMatch Analyzer = new GU0003CtorParameterNamesShouldMatch();
+        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
         public void ConstructorSettingProperties()
