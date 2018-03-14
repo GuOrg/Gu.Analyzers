@@ -47,8 +47,9 @@
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                IsTheCreatedTypeKnownForHavingNoUsefulDefault(context, objectCreation, out var ctor) &&
-                ctor.Parameters.Length == 0)
+                objectCreation.ArgumentList != null &&
+                objectCreation.ArgumentList.Arguments.Count == 0 &&
+                IsTheCreatedTypeKnownForHavingNoUsefulDefault(context, objectCreation, out _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
             }
