@@ -64,11 +64,18 @@
             }
         }
 
+        private static bool IsIgnored(SyntaxNode node)
+        {
+            return node.Parent is ExpressionStatementSyntax expressionStatement &&
+                   expressionStatement.Parent is BlockSyntax;
+        }
+
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
-                if (method.ReturnsVoid)
+                if (method.ReturnsVoid ||
+                    method.ReturnType == KnownSymbol.MoqIReturnsResult)
                 {
                     return true;
                 }
@@ -119,10 +126,5 @@
             return true;
         }
 
-        private static bool IsIgnored(SyntaxNode node)
-        {
-            return node.Parent is ExpressionStatementSyntax expressionStatement &&
-                   expressionStatement.Parent is BlockSyntax;
-        }
     }
 }

@@ -77,6 +77,7 @@ namespace Gu.Analyzers
 
         internal static readonly NUnitAssertType NUnitAssert = new NUnitAssertType();
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
+        internal static readonly QualifiedType MoqIReturnsResult = new QualifiedType("Moq.Language.Flow.IReturnsResult`1");
 
         private static QualifiedType Create(string qualifiedName, string alias = null)
         {

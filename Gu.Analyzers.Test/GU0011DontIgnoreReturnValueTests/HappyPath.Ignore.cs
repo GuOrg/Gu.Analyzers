@@ -206,6 +206,29 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void MoqSetupReturns()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Moq;
+    using NUnit.Framework;
+
+    public class Foo
+    {
+        [Test]
+        public void Test()
+        {
+            var mock = new Mock<IFormatProvider>();
+            mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null);
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }

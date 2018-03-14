@@ -13,8 +13,8 @@ using Gu.Roslyn.Asserts;
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(false)]
 [assembly: ComVisible(false)]
-[assembly: AssemblyVersion("1.0.0.1")]
-[assembly: AssemblyFileVersion("1.0.0.1")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
 [assembly: TransitiveMetadataReferences(typeof(Microsoft.CodeAnalysis.CSharp.CSharpCompilation))]
@@ -31,4 +31,5 @@ using Gu.Roslyn.Asserts;
     typeof(System.Windows.Media.Matrix),
     typeof(System.Xaml.XamlLanguage),
     typeof(System.Collections.Immutable.ImmutableArray),
-    typeof(NUnit.Framework.Assert))]
+    typeof(NUnit.Framework.Assert),
+    typeof(Moq.Mock))]
