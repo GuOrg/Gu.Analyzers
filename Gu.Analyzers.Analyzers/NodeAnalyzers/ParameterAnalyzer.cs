@@ -21,6 +21,11 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             if (context.Node is ParameterSyntax parameterSyntax &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
