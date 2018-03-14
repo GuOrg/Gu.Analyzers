@@ -5,7 +5,7 @@
 
     internal class Diagnostics
     {
-        private static readonly GU0008AvoidRelayProperties Analyzer = new GU0008AvoidRelayProperties();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0008");
 
         [TestCase("return this.bar.Value;")]
@@ -24,11 +24,11 @@ namespace RoslynSandbox
             this.bar = bar;
         }
 
-        ↓public int Value
+        public int Value
         { 
             get
             {
-                return this.bar.Value;
+                ↓return this.bar.Value;
             }
         }
     }
@@ -61,7 +61,7 @@ namespace RoslynSandbox
             this.bar = bar;
         }
 
-        ↓public int Value => this.bar.Value;
+        public int Value => ↓this.bar.Value;
     }
 }";
             var barCode = @"

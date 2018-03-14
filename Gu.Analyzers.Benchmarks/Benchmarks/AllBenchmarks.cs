@@ -7,8 +7,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0008AvoidRelayPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0008AvoidRelayProperties());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0009UseNamedParametersForBooleansBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DontIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
@@ -49,12 +47,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0007PreferInjecting()
         {
             GU0007PreferInjectingBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0008AvoidRelayProperties()
-        {
-            GU0008AvoidRelayPropertiesBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

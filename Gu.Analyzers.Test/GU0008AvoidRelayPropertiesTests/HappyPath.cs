@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
 
     internal class HappyPath
     {
-        private static readonly GU0008AvoidRelayProperties Analyzer = new GU0008AvoidRelayProperties();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
 
         [TestCase("public int Value { get; set; }")]
         [TestCase("public int Value { get; } = 1;")]
