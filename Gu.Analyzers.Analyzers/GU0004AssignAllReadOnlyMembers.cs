@@ -71,7 +71,6 @@
         private class CtorWalker : PooledWalker<CtorWalker>
         {
             private readonly List<ISymbol> readonlies = new List<ISymbol>();
-            private readonly HashSet<ISymbol> visited = new HashSet<ISymbol>();
 
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
@@ -124,22 +123,9 @@
                 base.VisitConstructorInitializer(node);
             }
 
-            public override void VisitInvocationExpression(InvocationExpressionSyntax node)
-            {
-                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (this.visited.Add(method) &&
-                    method.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
-                {
-                    this.Visit(declaration);
-                }
-
-                base.VisitInvocationExpression(node);
-            }
-
             protected override void Clear()
             {
                 this.readonlies.Clear();
-                this.visited.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;
             }

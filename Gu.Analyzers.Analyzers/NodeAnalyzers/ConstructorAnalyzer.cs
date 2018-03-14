@@ -29,17 +29,17 @@
                 return;
             }
 
-            if (context.Node is ConstructorDeclarationSyntax constructorDeclaration)
+            if (context.Node is ConstructorDeclarationSyntax ctor)
             {
-                if (constructorDeclaration.ParameterList == null ||
-                    constructorDeclaration.ParameterList.Parameters.Count == 0)
+                if (ctor.ParameterList == null ||
+                    ctor.ParameterList.Parameters.Count == 0)
                 {
                     return;
                 }
 
-                using (var pooled = ConstructorAssignmentsWalker.Create(constructorDeclaration, context.SemanticModel, context.CancellationToken))
+                using (var pooled = CtorWalker.Create(ctor, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var kvp in pooled.Item.ParameterNameMap)
+                    foreach (var kvp in pooled.ParameterNameMap)
                     {
                         if (kvp.Value != null &&
                             !IsMatch(kvp.Key.Identifier, kvp.Value))
@@ -62,38 +62,28 @@
             return false;
         }
 
-        internal sealed class ConstructorAssignmentsWalker : CSharpSyntaxWalker
+        private sealed class CtorWalker : PooledWalker<CtorWalker>
         {
             internal readonly Dictionary<ParameterSyntax, string> ParameterNameMap = new Dictionary<ParameterSyntax, string>();
-
-            private static readonly Pool<ConstructorAssignmentsWalker> Cache = new Pool<ConstructorAssignmentsWalker>(
-                () => new ConstructorAssignmentsWalker(),
-                x =>
-                {
-                    x.ParameterNameMap.Clear();
-                    x.constructor = null;
-                    x.semanticModel = null;
-                    x.cancellationToken = CancellationToken.None;
-                });
 
             private ConstructorDeclarationSyntax constructor;
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
 
-            private ConstructorAssignmentsWalker()
+            private CtorWalker()
             {
             }
 
-            public static Pool<ConstructorAssignmentsWalker>.Pooled Create(
+            public static CtorWalker Create(
                 ConstructorDeclarationSyntax constructor,
                 SemanticModel semanticModel,
                 CancellationToken cancellationToken)
             {
-                var pooled = Cache.GetOrCreate();
-                pooled.Item.constructor = constructor;
-                pooled.Item.semanticModel = semanticModel;
-                pooled.Item.cancellationToken = cancellationToken;
-                pooled.Item.Visit(constructor);
+                var pooled = Borrow(()=> new CtorWalker());
+                pooled.constructor = constructor;
+                pooled.semanticModel = semanticModel;
+                pooled.cancellationToken = cancellationToken;
+                pooled.Visit(constructor);
                 return pooled;
             }
 
@@ -219,6 +209,14 @@
                 var charArray = text.ToCharArray();
                 charArray[0] = char.ToLower(charArray[0]);
                 return new string(charArray);
+            }
+
+            protected override void Clear()
+            {
+                this.ParameterNameMap.Clear();
+                this.constructor = null;
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
             }
         }
     }
