@@ -95,6 +95,54 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void ConstructorSettingFieldRef()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int a;
+
+        public Foo()
+        {
+            Meh(ref this.a);
+        }
+
+        private static void Meh(ref int i)
+        {
+            i = 1;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ConstructorSettingFieldOut()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int a;
+
+        public Foo()
+        {
+            Meh(out this.a);
+        }
+
+        private static void Meh(out int i)
+        {
+            i = 1;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void ChainedConstructorSettingAllFields()
         {
             var testCode = @"
@@ -156,6 +204,28 @@ namespace RoslynSandbox
         {
             A = 1;
             B = 2;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void StaticConstructorSettingQualifiedFields()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static readonly int A;
+
+        public static readonly int B;
+
+        static Foo()
+        {
+            Foo.A = 1;
+            Foo.B = 2;
         }
     }
 }";

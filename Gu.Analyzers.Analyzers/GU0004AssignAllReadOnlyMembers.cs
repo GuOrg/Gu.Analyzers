@@ -94,13 +94,23 @@
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
-                if (TryGetIdentifier(node.Left, out var left))
+                if (TryGetIdentifier(node.Left, out var identifierName))
                 {
-                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(left, this.cancellationToken))
-                        .IgnoreReturnValue();
+                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
                 }
 
                 base.VisitAssignmentExpression(node);
+            }
+
+            public override void VisitArgument(ArgumentSyntax node)
+            {
+                if (TryGetIdentifier(node.Expression, out var identifierName) &&
+                    node.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword))
+                {
+                    this.readonlies.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                }
+
+                base.VisitArgument(node);
             }
 
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
@@ -175,11 +185,21 @@
                     return true;
                 }
 
-                var member = expression as MemberAccessExpressionSyntax;
-                if (member?.Expression is ThisExpressionSyntax)
+                if (expression is MemberAccessExpressionSyntax memberAccess)
                 {
-                    return TryGetIdentifier(member.Name, out result);
+                    if (memberAccess.Expression is ThisExpressionSyntax)
+                    {
+                        return TryGetIdentifier(memberAccess.Name, out result);
+                    }
+
+                    if (memberAccess.Expression is IdentifierNameSyntax candidate &&
+                        expression.FirstAncestor<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration &&
+                        candidate.Identifier.ValueText == typeDeclaration.Identifier.ValueText)
+                    {
+                        return TryGetIdentifier(memberAccess.Name, out result);
+                    }
                 }
+
 
                 return false;
             }
