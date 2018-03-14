@@ -84,9 +84,9 @@
             public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var walker = Borrow(() => new CtorWalker());
-                walker.readonlies.AddRange(ReadOnlies(constructor, semanticModel, cancellationToken));
                 walker.semanticModel = semanticModel;
                 walker.cancellationToken = cancellationToken;
+                walker.AddReadOnlies(constructor);
                 walker.Visit(constructor);
                 return walker;
             }
@@ -130,7 +130,7 @@
                 this.cancellationToken = CancellationToken.None;
             }
 
-            private static IEnumerable<ISymbol> ReadOnlies(ConstructorDeclarationSyntax ctor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            private void AddReadOnlies(ConstructorDeclarationSyntax ctor)
             {
                 var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
                 foreach (var member in typeDeclarationSyntax.Members)
@@ -144,9 +144,7 @@
                     {
                         foreach (var variable in fieldDeclaration.Declaration.Variables)
                         {
-                            yield return (IFieldSymbol)semanticModel.GetDeclaredSymbolSafe(
-                                variable,
-                                cancellationToken);
+                            this.readonlies.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
                         }
                     }
                     else if (member is PropertyDeclarationSyntax propertyDeclaration &&
@@ -158,7 +156,7 @@
                              !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
                              isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
                     {
-                        yield return semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, cancellationToken);
+                        this.readonlies.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
                     }
                 }
             }
