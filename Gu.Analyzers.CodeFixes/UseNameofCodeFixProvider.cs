@@ -31,8 +31,8 @@
                     continue;
                 }
 
-                var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (argument.Expression is LiteralExpressionSyntax literal)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax argument &&
+                    argument.Expression is LiteralExpressionSyntax literal)
                 {
                     context.RegisterCodeFix(
                         "Use nameof",

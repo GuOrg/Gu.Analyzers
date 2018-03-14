@@ -15,7 +15,8 @@
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0003CtorParameterNamesShouldMatch.Descriptor,
-            GU0004AssignAllReadOnlyMembers.Descriptor);
+            GU0004AssignAllReadOnlyMembers.Descriptor,
+            GU0014PreferParameter.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -34,23 +35,41 @@
 
             if (context.Node is ConstructorDeclarationSyntax constructorDeclaration)
             {
-                using (var pooled = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
+                using (var walker = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
                 {
                     if (constructorDeclaration.ParameterList is ParameterListSyntax parameterList &&
                         parameterList.Parameters.Count > 0)
                     {
-                        foreach (var assignment in pooled.Assignments)
+                        foreach (var assignment in walker.Assignments)
                         {
                             if (constructorDeclaration.Contains(assignment) &&
                                TryGetIdentifier(assignment.Left, out var left) &&
                                TryGetIdentifier(assignment.Right, out var right) &&
                                parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
                                !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
-                               !IsMatch(left, right, out var name) &&
-                                pooled.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
+                                walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
                             {
-                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
-                                context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                                if (!IsMatch(left, right, out var name))
+                                {
+                                    var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
+                                    context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                                }
+
+                                foreach (var identifierName in walker.IdentifierNames)
+                                {
+                                    if (identifierName.Parent is MemberAccessExpressionSyntax memberAccess &&
+                                        !(memberAccess.Expression is ThisExpressionSyntax))
+                                    {
+                                        continue;
+                                    }
+
+                                    if (identifierName.Identifier.ValueText == left.Identifier.ValueText &&
+                                        !assignment.Contains(identifierName))
+                                    {
+                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, identifierName.GetLocation(), properties));
+                                    }
+                                }
                             }
                         }
 
@@ -74,9 +93,9 @@
                         }
                     }
 
-                    if (pooled.Unassigned.Count > 0)
+                    if (walker.Unassigned.Count > 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor, constructorDeclaration.Identifier.GetLocation(), string.Join(Environment.NewLine, pooled.Unassigned)));
+                        context.ReportDiagnostic(Diagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor, constructorDeclaration.Identifier.GetLocation(), string.Join(Environment.NewLine, walker.Unassigned)));
                     }
                 }
             }
@@ -176,6 +195,7 @@
         {
             private readonly List<ISymbol> unassigned = new List<ISymbol>();
             private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
+            private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
             private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
             private SemanticModel semanticModel;
@@ -188,6 +208,8 @@
             public IReadOnlyList<ISymbol> Unassigned => this.unassigned;
 
             public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
+
+            public IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
 
             public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
@@ -233,10 +255,17 @@
                 base.VisitConstructorInitializer(node);
             }
 
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                this.identifierNames.Add(node);
+                base.VisitIdentifierName(node);
+            }
+
             protected override void Clear()
             {
                 this.unassigned.Clear();
                 this.assignments.Clear();
+                this.identifierNames.Clear();
                 this.visited.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;

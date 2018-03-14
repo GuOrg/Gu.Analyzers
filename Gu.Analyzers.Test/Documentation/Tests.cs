@@ -185,7 +185,7 @@
             {
                 this.Analyzer = analyzer;
                 this.Descriptor = descriptor;
-                this.DocFileName = Path.Combine(DocumentsDirectory, this.Descriptor.Id + ".md");
+                this.DocFileName = Path.Combine(DocumentsDirectory, descriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory,
                                                  analyzer.GetType().Name + ".cs",
