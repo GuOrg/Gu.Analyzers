@@ -14,7 +14,7 @@
             [TestCase("public")]
             [TestCase("internal")]
             [TestCase("protected")]
-            public void ConstructorFullyQualified(string access)
+            public void SimpleAssignFullyQualified(string access)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PublicCtor()
+            public void SimpleAssignWhenUsingExists()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -79,6 +79,48 @@ namespace RoslynSandbox
         {
             this.text = text ?? throw new ArgumentNullException(nameof(text));
         }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public void PassAsArgument()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int bar;
+
+        public Foo(string ↓text)
+        {
+            this.bar = Bar(text);
+        }
+
+        private int Bar(string text) => text.Length;
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int bar;
+
+        public Foo(string text)
+        {
+            if (text == null)
+            {
+                throw new System.ArgumentNullException(nameof(text));
+            }
+
+            this.bar = Bar(text);
+        }
+
+        private int Bar(string text) => text.Length;
     }
 }";
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);

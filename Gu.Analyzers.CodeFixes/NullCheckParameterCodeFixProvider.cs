@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
@@ -7,6 +8,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NullCheckParameterCodeFixProvider))]
     [Shared]
@@ -34,34 +36,71 @@
                         this.GetType(),
                         diagnostic);
                 }
-                else if (node is ParameterSyntax parameterSyntax)
+                else if (node is ParameterSyntax parameter)
                 {
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
-                    var method = parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>();
+                    var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
                     if (method != null)
                     {
                         using (var walker = AssignmentWalker.Create(method, Search.TopLevel, semanticModel, context.CancellationToken))
                         {
-                            foreach (var assinment in walker.Assignments)
+                            if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
                             {
-                                if (assinment.Right is IdentifierNameSyntax assignedValue &&
-                                    assignedValue.Identifier.ValueText == parameterSyntax.Identifier.ValueText)
-                                {
-                                    context.RegisterCodeFix(
-                                        "Throw if null on first assignment..",
-                                        (editor, _) => editor.ReplaceNode(
-                                            assignedValue,
-                                            SyntaxFactory.ParseExpression($"{assignedValue.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({assignedValue.Identifier.ValueText}))").WithSimplifiedNames()),
-                                        this.GetType(),
-                                        diagnostic);
-                                    break;
-                                }
+                                context.RegisterCodeFix(
+                                    "Throw if null on first assignment.",
+                                    (editor, _) => editor.ReplaceNode(
+                                        assignedValue,
+                                        SyntaxFactory.ParseExpression($"{assignedValue.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({assignedValue.Identifier.ValueText}))").WithSimplifiedNames()),
+                                    this.GetType(),
+                                    diagnostic);
+                            }
+                            else if (method.Body != null)
+                            {
+                                context.RegisterCodeFix(
+                                    "Add null check.",
+                                    (editor, _) => editor.ReplaceNode(
+                                        method.Body,
+                                        method.Body.InsertNodesBefore(
+                                            method.Body.Statements[0],
+                                            new[] { IfNullThrow(parameter.Identifier.ValueText) })),
+                                    this.GetType(),
+                                    diagnostic);
                             }
                         }
                     }
                 }
             }
+        }
+
+        private static bool TryFirstAssignedWith(ParameterSyntax parameter, IReadOnlyList<AssignmentExpressionSyntax> assignments, out IdentifierNameSyntax assignedValue)
+        {
+            foreach (var assignment in assignments)
+            {
+                if (assignment.Right is IdentifierNameSyntax candidate &&
+                    candidate.Identifier.ValueText == parameter.Identifier.ValueText)
+                {
+                    assignedValue = candidate;
+                    return true;
+                }
+            }
+
+            assignedValue = null;
+            return false;
+        }
+
+        private static StatementSyntax IfNullThrow(string name)
+        {
+            var code = StringBuilderPool.Borrow()
+                                        .AppendLine($"if ({name} == null)")
+                                        .AppendLine("{")
+                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({name}));")
+                                        .AppendLine("}")
+                                        .Return();
+            return SyntaxFactory.ParseStatement(code)
+                                .WithSimplifiedNames()
+                                .WithAdditionalAnnotations(Formatter.Annotation)
+                                .WithTrailingElasticLineFeed();
         }
     }
 }
