@@ -49,7 +49,7 @@
                                !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
                                 walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
                             {
-                                if (!IsMatch(left, right, out var name))
+                                if (!IsMatch(left, parameter, out var name))
                                 {
                                     var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
                                     context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
@@ -153,7 +153,7 @@
             return false;
         }
 
-        private static bool IsMatch(IdentifierNameSyntax left, IdentifierNameSyntax right, out string name)
+        private static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string name)
         {
             name = null;
             if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))

@@ -25,7 +25,7 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Properties.TryGetValue("Name", out var name) &&
-                    syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is IdentifierNameSyntax identiferName)
+                    syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identiferName)
                 {
                     if (identiferName.Parent is MemberAccessExpressionSyntax memberAccess)
                     {
