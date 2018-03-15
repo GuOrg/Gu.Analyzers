@@ -57,12 +57,9 @@
 
                                 foreach (var identifierName in walker.IdentifierNames)
                                 {
-                                    if (identifierName.Identifier.ValueText == left.Identifier.ValueText)
+                                    if (TryGetAssigned(left, identifierName, out var assigned))
                                     {
-                                        var parent = identifierName.Parent is MemberAccessExpressionSyntax memberAccess &&
-                                                     memberAccess.Expression is ThisExpressionSyntax
-                                                        ? memberAccess.Parent
-                                                        : identifierName.Parent;
+                                        var parent = assigned.Parent;
                                         if (parent != null)
                                         {
                                             switch (parent.Kind())
@@ -107,6 +104,27 @@
                     }
                 }
             }
+        }
+
+        private static bool TryGetAssigned(IdentifierNameSyntax member, IdentifierNameSyntax identifierName, out SyntaxNode node)
+        {
+            node = null;
+            if (identifierName.Identifier.ValueText == member.Identifier.ValueText)
+            {
+                if (identifierName.Parent is MemberAccessExpressionSyntax memberAccess)
+                {
+                    if (memberAccess.Expression is ThisExpressionSyntax)
+                    {
+                        node = memberAccess;
+                    }
+                }
+                else
+                {
+                    node = identifierName;
+                }
+            }
+
+            return node != null;
         }
 
         private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
