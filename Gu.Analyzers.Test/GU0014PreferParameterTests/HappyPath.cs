@@ -76,5 +76,28 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void IgnoreNameof()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            var name = Id(nameof(this.Text));
+        }
+
+        public string Text { get; }
+
+        private static string Id(string text) => text;
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
