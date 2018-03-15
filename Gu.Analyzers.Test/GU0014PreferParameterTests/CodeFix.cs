@@ -45,6 +45,41 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void WhenAccessingFieldElvisProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = this.↓text?.Length;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = text?.Length;
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void WhenAccessingFieldMethod()
         {
             var testCode = @"

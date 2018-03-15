@@ -63,14 +63,18 @@
                                                      memberAccess.Expression is ThisExpressionSyntax
                                                         ? memberAccess.Parent
                                                         : identifierName.Parent;
-                                        switch (parent.Kind())
+                                        if (parent != null)
                                         {
-                                            case SyntaxKind.Argument:
-                                            case SyntaxKind.InvocationExpression:
-                                            case SyntaxKind.SimpleMemberAccessExpression:
-                                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                                context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, identifierName.GetLocation(), properties));
-                                                break;
+                                            switch (parent.Kind())
+                                            {
+                                                case SyntaxKind.Argument:
+                                                case SyntaxKind.InvocationExpression:
+                                                case SyntaxKind.SimpleMemberAccessExpression:
+                                                case SyntaxKind.ConditionalAccessExpression:
+                                                    var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                                    context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, identifierName.GetLocation(), properties));
+                                                    break;
+                                            }
                                         }
                                     }
                                 }
