@@ -57,17 +57,21 @@
 
                                 foreach (var identifierName in walker.IdentifierNames)
                                 {
-                                    if (identifierName.Parent is MemberAccessExpressionSyntax memberAccess &&
-                                        !(memberAccess.Expression is ThisExpressionSyntax))
+                                    if (identifierName.Identifier.ValueText == left.Identifier.ValueText)
                                     {
-                                        continue;
-                                    }
-
-                                    if (identifierName.Identifier.ValueText == left.Identifier.ValueText &&
-                                        !assignment.Contains(identifierName))
-                                    {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, identifierName.GetLocation(), properties));
+                                        var parent = identifierName.Parent is MemberAccessExpressionSyntax memberAccess &&
+                                                     memberAccess.Expression is ThisExpressionSyntax
+                                                        ? memberAccess.Parent
+                                                        : identifierName.Parent;
+                                        switch (parent.Kind())
+                                        {
+                                            case SyntaxKind.Argument:
+                                            case SyntaxKind.InvocationExpression:
+                                            case SyntaxKind.SimpleMemberAccessExpression:
+                                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                                context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, identifierName.GetLocation(), properties));
+                                                break;
+                                        }
                                     }
                                 }
                             }

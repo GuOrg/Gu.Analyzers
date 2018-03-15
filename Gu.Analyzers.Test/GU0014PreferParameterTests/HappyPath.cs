@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
-        public void WhenDefaultValue()
+        public void SimpleAssign()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -22,6 +22,32 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.text = text;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void AssignInIfElse()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            if (text == null)
+            {
+                this.text = string.Empty;
+            }
+            else
+            {
+                this.text = text;
+            }
         }
     }
 }";

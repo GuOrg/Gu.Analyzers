@@ -10,7 +10,7 @@
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0014");
 
         [Test]
-        public void WhenUsingField()
+        public void WhenAccessingFieldProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -45,7 +45,42 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingProperty()
+        public void WhenAccessingFieldMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = this.↓text.ToString();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = text.ToString();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void WhenUsingPropertyProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -74,6 +109,80 @@ namespace RoslynSandbox
         }
 
         public string Text { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void WhenUsingPropertyMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            var length = this.↓Text.ToString();
+        }
+
+        public string Text { get; }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            var length = text.ToString();
+        }
+
+        public string Text { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void WhenPassingFieldAsArgument()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = Meh(this.↓text);
+        }
+
+        private int Meh(string text) => text.Length;
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = Meh(text);
+        }
+
+        private int Meh(string text) => text.Length;
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
