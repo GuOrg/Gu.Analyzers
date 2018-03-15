@@ -24,10 +24,9 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (diagnostic.Properties.TryGetValue("Name", out var name) &&
-                    syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identiferName)
+                if (diagnostic.Properties.TryGetValue("Name", out var name))
                 {
-                    if (identiferName.Parent is MemberAccessExpressionSyntax memberAccess)
+                    if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is MemberAccessExpressionSyntax memberAccess)
                     {
                         context.RegisterCodeFix(
                             "Prefer parameter.",
@@ -37,7 +36,7 @@ namespace Gu.Analyzers
                             "Prefer parameter.",
                             diagnostic);
                     }
-                    else
+                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identiferName)
                     {
                         context.RegisterCodeFix(
                             "Prefer parameter.",

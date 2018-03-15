@@ -22,7 +22,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.text = text;
-            var length = this.↓text.Length;
+            var length = ↓this.text.Length;
         }
     }
 }";
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.text = text;
-            var length = this.↓text?.Length;
+            var length = ↓this.text?.Length;
         }
     }
 }";
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.text = text;
-            var length = this.↓text.ToString();
+            var length = ↓this.text.ToString();
         }
     }
 }";
@@ -125,7 +125,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.Text = text;
-            var length = this.↓Text.Length;
+            var length = ↓this.Text.Length;
         }
 
         public string Text { get; }
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.Text = text;
-            var length = this.↓Text.ToString();
+            var length = ↓this.Text.ToString();
         }
 
         public string Text { get; }
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         public Foo(string text)
         {
             this.text = text;
-            var length = Meh(this.↓text);
+            var length = Meh(↓this.text);
         }
 
         private int Meh(string text) => text.Length;

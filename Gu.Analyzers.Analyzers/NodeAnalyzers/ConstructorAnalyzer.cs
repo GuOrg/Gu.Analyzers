@@ -68,7 +68,7 @@
                                     if (IsAssigned(context, left, argument.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.GetLocation(), properties));
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
                                     }
                                 }
 
@@ -79,7 +79,7 @@
                                         IsAssigned(context, left, invocation.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.GetLocation(), properties));
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
                                     }
                                 }
 
@@ -88,7 +88,7 @@
                                     if (IsAssigned(context, left, memberAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.GetLocation(), properties));
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
                                     }
                                 }
 
@@ -97,7 +97,7 @@
                                     if (IsAssigned(context, left, conditionalAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.GetLocation(), properties));
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
                                     }
                                 }
                             }
