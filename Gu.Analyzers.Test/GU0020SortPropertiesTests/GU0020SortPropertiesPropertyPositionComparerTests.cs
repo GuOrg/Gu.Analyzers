@@ -1,71 +1,16 @@
 ﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal class GU0020SortPropertiesPropertyPositionComparerTests
     {
-        [TestCase("A", "A", 0)]
-        [TestCase("A", "B", -1)]
-        [TestCase("A", "D", -1)]
-        [TestCase("A", "E", -1)]
-        [TestCase("A", "F", -1)]
-        [TestCase("A", "G", -1)]
-        [TestCase("A", "H", -1)]
-        [TestCase("A", "I", -1)]
-        [TestCase("A", "J", -1)]
-        [TestCase("A", "K", -1)]
-        [TestCase("A", "this[int index]", -1)]
-        [TestCase("B", "int C", 0)]
-        [TestCase("B", "D", -1)]
-        [TestCase("B", "E", -1)]
-        [TestCase("B", "F", -1)]
-        [TestCase("B", "G", -1)]
-        [TestCase("B", "H", -1)]
-        [TestCase("B", "I", -1)]
-        [TestCase("B", "J", -1)]
-        [TestCase("B", "K", -1)]
-        [TestCase("B", "this[int index]", -1)]
-        [TestCase("D", "E", -1)]
-        [TestCase("D", "F", -1)]
-        [TestCase("D", "G", -1)]
-        [TestCase("D", "H", -1)]
-        [TestCase("D", "I", -1)]
-        [TestCase("D", "J", -1)]
-        [TestCase("D", "K", -1)]
-        [TestCase("D", "this[int index]", -1)]
-        [TestCase("E", "F", -1)]
-        [TestCase("E", "G", -1)]
-        [TestCase("E", "H", -1)]
-        [TestCase("E", "I", -1)]
-        [TestCase("E", "J", -1)]
-        [TestCase("E", "K", -1)]
-        [TestCase("E", "this[int index]", -1)]
-        [TestCase("F", "G", -1)]
-        [TestCase("F", "H", -1)]
-        [TestCase("F", "I", -1)]
-        [TestCase("F", "J", -1)]
-        [TestCase("F", "K", -1)]
-        [TestCase("F", "this[int index]", -1)]
-        [TestCase("G", "H", -1)]
-        [TestCase("G", "I", -1)]
-        [TestCase("G", "J", -1)]
-        [TestCase("G", "K", -1)]
-        [TestCase("G", "this[int index]", -1)]
-        [TestCase("H", "I", -1)]
-        [TestCase("H", "J", -1)]
-        [TestCase("H", "K", -1)]
-        [TestCase("H", "this[int index]", -1)]
-        [TestCase("I", "J", -1)]
-        [TestCase("I", "K", -1)]
-        [TestCase("I", "this[int index]", -1)]
-        [TestCase("J", "K", -1)]
-        [TestCase("J", "this[int index]", -1)]
-        public void Compare(string x, string y, int expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        private static SyntaxTree SyntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
     public class Foo
@@ -99,10 +44,17 @@ namespace RoslynSandbox
         }
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>(x);
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>(y);
-            Assert.AreEqual(expected, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
-            Assert.AreEqual(-1 * expected, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
+
+        private static readonly IReadOnlyList<TestCaseData> TestCaseSource = CreateTestCases().ToArray();
+
+        [TestCaseSource(nameof(TestCaseSource))]
+        public void Compare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y)
+        {
+            var comparer = GU0020SortProperties.PropertyPositionComparer.Default;
+            Assert.AreEqual(-1, comparer.Compare(x, y));
+            Assert.AreEqual(1, comparer.Compare(y, x));
+            Assert.AreEqual(0, comparer.Compare(x, x));
+            Assert.AreEqual(0, comparer.Compare(y, y));
         }
 
         [Test]
@@ -262,8 +214,23 @@ namespace RoslynSandbox
 }");
             var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int IValue.this[int index]");
             var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("public int this[int index]");
-            Assert.AreEqual(0, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
-            Assert.AreEqual(0, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
+            Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
+            Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
+        }
+
+        private static IEnumerable<TestCaseData> CreateTestCases()
+        {
+            var foo = SyntaxTree.FindClassDeclaration("Foo");
+            foreach (var member1 in foo.Members)
+            {
+                foreach (var member2 in foo.Members)
+                {
+                    if (member1.SpanStart < member2.SpanStart)
+                    {
+                        yield return new TestCaseData(member1, member2);
+                    }
+                }
+            }
         }
     }
 }

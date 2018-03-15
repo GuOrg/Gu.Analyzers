@@ -134,6 +134,21 @@
 
             public int Compare(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y)
             {
+                if (ReferenceEquals(x, y))
+                {
+                    return 0;
+                }
+
+                if (x == null)
+                {
+                    return -1;
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
+
                 if (IsInitializedWithOther(x, y, out var result) ||
                     TryCompare(x, y, IsNotIndexer, out result) ||
                     TryCompareAccessibility(x, y, out result) ||
@@ -145,7 +160,7 @@
                     return result;
                 }
 
-                return 0;
+                return x.SpanStart.CompareTo(y.SpanStart);
             }
 
             private static bool IsInitializedWithOther(BasePropertyDeclarationSyntax x, BasePropertyDeclarationSyntax y, out int result)
