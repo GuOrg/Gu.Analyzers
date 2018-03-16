@@ -224,6 +224,88 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void WhenPassingFieldAsArgumentWhitespace()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = Meh(
+                ↓this.text);
+        }
+
+        private int Meh(string text) => text.Length;
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            var length = Meh(
+                text);
+        }
+
+        private int Meh(string text) => text.Length;
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void WhenPassingUnderscoreFieldAsArgumentWhitespace()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string _text;
+
+        public Foo(string text)
+        {
+            _text = text;
+            var length = Meh(
+                ↓_text);
+        }
+
+        private int Meh(string text) => text.Length;
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string _text;
+
+        public Foo(string text)
+        {
+            _text = text;
+            var length = Meh(
+                text);
+        }
+
+        private int Meh(string text) => text.Length;
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void WhenPassingUnderscoreFieldAsArgument()
         {
             var testCode = @"

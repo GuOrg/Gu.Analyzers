@@ -32,17 +32,19 @@ namespace Gu.Analyzers
                             "Prefer parameter.",
                             (editor, _) => editor.ReplaceNode(
                                 memberAccess,
-                                SyntaxFactory.IdentifierName(name)),
+                                SyntaxFactory.IdentifierName(name)
+                                             .WithLeadingTriviaFrom(memberAccess)),
                             "Prefer parameter.",
                             diagnostic);
                     }
-                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identiferName)
+                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identifierName)
                     {
                         context.RegisterCodeFix(
                             "Prefer parameter.",
                             (editor, _) => editor.ReplaceNode(
-                                identiferName,
-                                identiferName.WithIdentifier(SyntaxFactory.Identifier(name))),
+                                identifierName,
+                                identifierName.WithIdentifier(SyntaxFactory.Identifier(name))
+                                             .WithLeadingTriviaFrom(identifierName)),
                             "Prefer parameter.",
                             diagnostic);
                     }
