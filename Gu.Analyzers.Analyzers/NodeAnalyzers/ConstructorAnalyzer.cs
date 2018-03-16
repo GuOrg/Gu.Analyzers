@@ -65,7 +65,7 @@
                                         continue;
                                     }
 
-                                    if (IsAssigned(context, left, argument.Expression))
+                                    if (ShouldUseParameter(context, left, argument.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
@@ -74,7 +74,7 @@
 
                                 foreach (var invocation in walker.Invocations)
                                 {
-                                    if (IsAssigned(context, left, invocation.Expression))
+                                    if (ShouldUseParameter(context, left, invocation.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
@@ -83,7 +83,7 @@
 
                                 foreach (var memberAccess in walker.MemberAccesses)
                                 {
-                                    if (IsAssigned(context, left, memberAccess.Expression))
+                                    if (ShouldUseParameter(context, left, memberAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
@@ -92,7 +92,7 @@
 
                                 foreach (var conditionalAccess in walker.ConditionalAccesses)
                                 {
-                                    if (IsAssigned(context, left, conditionalAccess.Expression))
+                                    if (ShouldUseParameter(context, left, conditionalAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
@@ -129,8 +129,24 @@
             }
         }
 
-        private static bool IsAssigned(SyntaxNodeAnalysisContext context, IdentifierNameSyntax left, ExpressionSyntax expression)
+        private static bool ShouldUseParameter(SyntaxNodeAnalysisContext context, IdentifierNameSyntax left, ExpressionSyntax expression)
         {
+            if (expression.FirstAncestor<AnonymousFunctionExpressionSyntax>() != null)
+            {
+                var symbol = context.SemanticModel.GetSymbolSafe(left, context.CancellationToken);
+                if (symbol is IFieldSymbol field &&
+                    !field.IsReadOnly)
+                {
+                    return false;
+                }
+
+                if (symbol is IPropertySymbol property &&
+                    property.TryGetSetter(context.CancellationToken, out _))
+                {
+                    return false;
+                }
+            }
+
             return TryGetIdentifier(expression, out var identifierName) &&
                    identifierName.Identifier.ValueText == left.Identifier.ValueText &&
                    Equals(

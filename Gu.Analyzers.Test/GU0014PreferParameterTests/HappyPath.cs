@@ -99,5 +99,28 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void IgnoreMutableInLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            System.Console.CancelKeyPress += (_, __) => Console.WriteLine(this.Text);
+        }
+
+        public string Text { get; set; }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
