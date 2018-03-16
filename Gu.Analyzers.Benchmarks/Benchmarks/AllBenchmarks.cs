@@ -37,6 +37,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark TestMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.TestMethodAnalyzer());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0006UseNameof()
         {
@@ -137,6 +139,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void SimpleAssignmentAnalyzer()
         {
             SimpleAssignmentAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void TestMethodAnalyzer()
+        {
+            TestMethodAnalyzerBenchmark.Run();
         }
     }
 }

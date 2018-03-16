@@ -49,6 +49,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0060.md = documentation\GU0060.md
 		documentation\GU0070.md = documentation\GU0070.md
 		documentation\GU0071.md = documentation\GU0071.md
+		documentation\GU0080.md = documentation\GU0080.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.Analyzers", "Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"

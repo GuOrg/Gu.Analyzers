@@ -95,6 +95,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0071.md">GU0071</a></td>
   <td>Implicit casting done by the foreach</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0080.md">GU0080</a></td>
+  <td>Parameter count does not match attribute.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
