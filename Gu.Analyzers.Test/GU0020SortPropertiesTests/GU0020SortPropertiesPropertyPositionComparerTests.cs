@@ -10,7 +10,7 @@
 
     internal class GU0020SortPropertiesPropertyPositionComparerTests
     {
-        private static SyntaxTree SyntaxTree = CSharpSyntaxTree.ParseText(@"
+        private static readonly SyntaxTree SyntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
     public class Foo

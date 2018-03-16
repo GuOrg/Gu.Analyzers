@@ -343,5 +343,44 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
+
+        [Test]
+        public void GetOnlyInLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            System.Console.CancelKeyPress += (_, __) => Console.WriteLine(↓this.Text);
+        }
+
+        public string Text { get; }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text;
+            System.Console.CancelKeyPress += (_, __) => Console.WriteLine(text);
+        }
+
+        public string Text { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
     }
 }

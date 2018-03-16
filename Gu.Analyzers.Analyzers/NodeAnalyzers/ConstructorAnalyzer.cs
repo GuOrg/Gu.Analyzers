@@ -74,9 +74,7 @@
 
                                 foreach (var invocation in walker.Invocations)
                                 {
-                                    if (invocation.TryGetMethodName(out var methodName) &&
-                                        methodName != "nameof" &&
-                                        IsAssigned(context, left, invocation.Expression))
+                                    if (IsAssigned(context, left, invocation.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));

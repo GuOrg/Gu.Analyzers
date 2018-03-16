@@ -44,7 +44,7 @@ namespace Gu.Analyzers
                             (editor, _) => editor.ReplaceNode(
                                 identifierName,
                                 identifierName.WithIdentifier(SyntaxFactory.Identifier(name))
-                                             .WithLeadingTriviaFrom(identifierName)),
+                                              .WithLeadingTriviaFrom(identifierName)),
                             "Prefer parameter.",
                             diagnostic);
                     }
