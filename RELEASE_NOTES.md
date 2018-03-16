@@ -1,3 +1,6 @@
+#### 1.2.5
+* FEATURE: New analyzers for checking NUnit attribute usage.
+
 #### 1.2.1
 * BREAKING: Only VS2017+ from now on.
 * Bugfixes.
