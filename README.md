@@ -101,7 +101,7 @@
 </tr>
 <tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0081.md">GU0081</a></td>
-  <td>TestCases does not match.</td>
+  <td>TestCase does not match parameters.</td>
 </tr>
 <table>
 <!-- end generated table -->

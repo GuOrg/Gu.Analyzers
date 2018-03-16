@@ -19,8 +19,8 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        [TestCase(1, 2)]
-        public void ↓Test(int i)
+        [↓TestCase(1, 2)]
+        public void Test(int i)
         {
         }
     }
@@ -39,7 +39,7 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1, Author = ""Author"")]
-        [TestCase(1, 2, Author = ""Author"")]
+        [↓TestCase(1, 2, Author = ""Author"")]
         public void Test(int i)
         {
         }

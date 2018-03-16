@@ -47,9 +47,16 @@
                         context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
                     }
 
-                    if (!AllTestCasesMatches(methodDeclaration, attribute, context.SemanticModel, context.CancellationToken))
+                    foreach (var attributeList in methodDeclaration.AttributeLists)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
+                        foreach (var candidate in attributeList.Attributes)
+                        {
+                            if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken) &&
+                                parameterList.Parameters.Count != CountArgs(candidate))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
+                            }
+                        }
                     }
                 }
             }
@@ -77,25 +84,6 @@
             }
 
             return count == 1 && attribute != null;
-        }
-
-        private static bool AllTestCasesMatches(MethodDeclarationSyntax method, AttributeSyntax attribute, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var count = CountArgs(attribute);
-            foreach (var attributeList in method.AttributeLists)
-            {
-                foreach (var candidate in attributeList.Attributes)
-                {
-                    if (!ReferenceEquals(candidate, attribute) &&
-                        Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) &&
-                        count != CountArgs(candidate))
-                    {
-                        return false;
-                    }
-                }
-            }
-
-            return true;
         }
 
         private static bool TryFirstTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)

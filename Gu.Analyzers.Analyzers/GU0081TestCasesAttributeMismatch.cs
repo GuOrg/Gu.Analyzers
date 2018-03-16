@@ -8,12 +8,12 @@
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "TestCases does not match.",
-            messageFormat: "TestCases does not match.",
+            title: "TestCase does not match parameters.",
+            messageFormat: "TestCase {0} does not match parameters {1}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "TestCases does not match.",
+            description: "TestCase does not match parameters.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }
