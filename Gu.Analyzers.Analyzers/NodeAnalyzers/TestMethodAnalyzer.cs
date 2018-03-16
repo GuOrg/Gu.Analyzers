@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Threading;
     using Microsoft.CodeAnalysis;
@@ -13,7 +14,8 @@
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0080TestAttributeCountMismatch.Descriptor,
-            GU0081TestCasesAttributeMismatch.Descriptor);
+            GU0081TestCasesAttributeMismatch.Descriptor,
+            GU0082IdenticalTestCase.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -55,6 +57,11 @@
                                 parameterList.Parameters.Count != CountArgs(candidate))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
+                            }
+
+                            if (TryFindIdentical(methodDeclaration, candidate, out _))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(GU0082IdenticalTestCase.Descriptor, candidate.GetLocation(), candidate));
                             }
                         }
                     }
@@ -102,6 +109,59 @@
             }
 
             return false;
+        }
+
+        private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, out AttributeSyntax identical)
+        {
+            if (Attribute.TryGetTypeName(attribute, out var name))
+            {
+                foreach (var attributeList in method.AttributeLists)
+                {
+                    foreach (var candidate in attributeList.Attributes)
+                    {
+                        if (Attribute.TryGetTypeName(candidate, out var candidateName) &&
+                            name == candidateName &&
+                            !ReferenceEquals(candidate, attribute) &&
+                            IsIdentical(attribute, candidate))
+                        {
+                            identical = candidate;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            identical = null;
+            return false;
+
+            bool IsIdentical(AttributeSyntax x, AttributeSyntax y)
+            {
+                for (var i = 0; i < Math.Min(x.ArgumentList.Arguments.Count, y.ArgumentList.Arguments.Count); i++)
+                {
+                    var xa = x.ArgumentList.Arguments[i];
+                    var ya = y.ArgumentList.Arguments[i];
+                    if (xa.NameEquals != null ||
+                        ya.NameEquals != null)
+                    {
+                        return xa.NameEquals != null && ya.NameEquals != null;
+                    }
+
+                    if (xa.Expression is LiteralExpressionSyntax xl &&
+                        ya.Expression is LiteralExpressionSyntax yl)
+                    {
+                        if (xl.Token.ValueText != yl.Token.ValueText)
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
         }
 
         private static int CountArgs(AttributeSyntax attribute)

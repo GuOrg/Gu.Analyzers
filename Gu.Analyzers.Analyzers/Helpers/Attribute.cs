@@ -63,5 +63,29 @@
                        qt.Type.IsParts(sn.Identifier.ValueText, "Attribute");
             }
         }
+
+        internal static bool TryGetTypeName(AttributeSyntax attribute, out string name)
+        {
+            name = null;
+            if (attribute == null)
+            {
+                return false;
+            }
+
+            if (attribute.Name is SimpleNameSyntax simpleName)
+            {
+                name = simpleName.Identifier.ValueText;
+                return true;
+            }
+
+            if (attribute.Name is QualifiedNameSyntax qualifiedName &&
+                qualifiedName.Right is SimpleNameSyntax typeName)
+            {
+                name = typeName.Identifier.ValueText;
+                return true;
+            }
+
+            return false;
+        }
     }
 }

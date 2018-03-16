@@ -103,6 +103,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0081.md">GU0081</a></td>
   <td>TestCase does not match parameters.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0082.md">GU0082</a></td>
+  <td>TestCase is identical.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
