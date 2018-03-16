@@ -99,6 +99,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0080.md">GU0080</a></td>
   <td>Parameter count does not match attribute.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0081.md">GU0081</a></td>
+  <td>TestCases does not match.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

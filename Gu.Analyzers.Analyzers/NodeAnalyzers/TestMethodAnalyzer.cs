@@ -12,7 +12,8 @@
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0080TestAttributeCountMismatch.Descriptor);
+            GU0080TestAttributeCountMismatch.Descriptor,
+            GU0081TestCasesAttributeMismatch.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -39,10 +40,17 @@
                     context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
                 }
 
-                if (TryFirstTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute) &&
-                    parameterList.Parameters.Count != CountArgs(attribute))
+                if (TryFirstTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
+                    if (parameterList.Parameters.Count != CountArgs(attribute))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
+                    }
+
+                    if (!AllTestCasesMatches(methodDeclaration, attribute, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, methodDeclaration.Identifier.GetLocation(), parameterList, attribute));
+                    }
                 }
             }
         }
@@ -71,6 +79,25 @@
             return count == 1 && attribute != null;
         }
 
+        private static bool AllTestCasesMatches(MethodDeclarationSyntax method, AttributeSyntax attribute, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var count = CountArgs(attribute);
+            foreach (var attributeList in method.AttributeLists)
+            {
+                foreach (var candidate in attributeList.Attributes)
+                {
+                    if (!ReferenceEquals(candidate, attribute) &&
+                        Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) &&
+                        count != CountArgs(candidate))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
         private static bool TryFirstTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
         {
             attribute = null;
@@ -96,7 +123,7 @@
             {
                 foreach (var argument in argumentList.Arguments)
                 {
-                    if (argument.NameColon == null)
+                    if (argument.NameEquals == null)
                     {
                         count++;
                     }
