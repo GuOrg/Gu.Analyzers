@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/Gu.Analyzers.svg)](https://www.nuget.org/packages/Gu.Analyzers/)
-[![Build status](https://ci.appveyor.com/api/projects/status/nplt8lc7rhmgdi17/branch/master?svg=true)](https://ci.appveyor.com/project/GuOrg/gu-analyzers-qh7oa/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/nplt8lc7rhmgdi17/branch/master?svg=true)](https://ci.appveyor.com/project/JohanLarsson/gu-analyzers-qh7oa/branch/master)
 [![Join the chat at https://gitter.im/JohanLarsson/Gu.Analyzers](https://badges.gitter.im/JohanLarsson/Gu.Analyzers.svg)](https://gitter.im/JohanLarsson/Gu.Analyzers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <!-- start generated table -->
