@@ -6,7 +6,7 @@
     internal class Diagnostics
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0081");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0082");
 
         [Test]
         public void TestCaseAttributeAndParameter()
@@ -20,6 +20,26 @@ namespace RoslynSandbox
     {
         [↓TestCase(1, 2)]
         [↓TestCase(1, 2)]
+        public void Test(int i, int j)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void WithAndWithoutAuthor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [↓TestCase(1, 2)]
+        [↓TestCase(1, 2, Author = ""Author"")]
         public void Test(int i)
         {
         }
@@ -29,7 +49,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttributeWithAuthor()
+        public void WithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
