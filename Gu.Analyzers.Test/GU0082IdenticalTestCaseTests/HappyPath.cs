@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
         [Test]
-        public void TestCaseAttribute()
+        public void SingleArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,7 +28,27 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttributeWithAuthor()
+        public void SingleArgumentWithAndWithoutAuthor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1)]
+        [TestCase(2, Author = ""Author"")]
+        public void Test(int i)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void SingleArgumentWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -40,6 +60,26 @@ namespace RoslynSandbox
         [TestCase(1, Author = ""Author"")]
         [TestCase(2, Author = ""Author"")]
         public void Test(int i)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void Arrays()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new[] { 1, 2 })]
+        [TestCase(new[] { 3, 4 })]
+        public void Test(int[] xs)
         {
         }
     }

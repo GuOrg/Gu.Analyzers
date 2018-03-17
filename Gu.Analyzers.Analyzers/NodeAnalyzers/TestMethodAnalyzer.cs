@@ -22,10 +22,10 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.MethodDeclaration);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.MethodDeclaration);
         }
 
-        private static void HandleAssignment(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -154,6 +154,28 @@
                             return false;
                         }
                     }
+                    else if (TryGetArrayExpressions(xa.Expression, out var xExpressions) &&
+                             TryGetArrayExpressions(ya.Expression, out var yExpressions))
+                    {
+                        {
+                            if (xExpressions.Count != yExpressions.Count)
+                            {
+                                return false;
+                            }
+
+                            for (var j = 0; j < xExpressions.Count; j++)
+                            {
+                                if (xExpressions[j] is LiteralExpressionSyntax xLiteral &&
+                                    yExpressions[j] is LiteralExpressionSyntax yLiteral &&
+                                    xLiteral.Token.ValueText != yLiteral.Token.ValueText)
+                                {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        }
+                    }
                     else
                     {
                         return false;
@@ -179,6 +201,26 @@
             }
 
             return count;
+        }
+
+        private static bool TryGetArrayExpressions(ExpressionSyntax expression, out SeparatedSyntaxList<ExpressionSyntax> expressions)
+        {
+            expressions = default(SeparatedSyntaxList<ExpressionSyntax>);
+            if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreation &&
+                implicitArrayCreation.Initializer != null)
+            {
+                expressions = implicitArrayCreation.Initializer.Expressions;
+                return true;
+            }
+
+            if (expression is ArrayCreationExpressionSyntax arrayCreation &&
+                arrayCreation.Initializer != null)
+            {
+                expressions = arrayCreation.Initializer.Expressions;
+                return true;
+            }
+
+            return false;
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
 {
+    using System;
+    using System.Collections.Generic;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
@@ -61,6 +63,87 @@ namespace RoslynSandbox
         [↓TestCase(1, 2, Author = ""Author"")]
         [↓TestCase(1, 2, Author = ""Author"")]
         public void Test(int i)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void Arrays()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new[] { 1, 2 })]
+        [TestCase(new[] { 1, 2 })]
+        public void Test(int[] xs)
+        {
+        }
+    }
+}";
+            Console.WriteLine(new Dictionary<string, object>().ToString());
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void ArraysWithAndWithoutExplicitTypeSpecification()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new int[] { 1, 2 })]
+        [TestCase(new[] { 1, 2 })]
+        public void Test(int[] xs)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void ArraysWithAndWithoutAuthor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new[] { 1, 2 })]
+        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        public void Test(int[] xs)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void ArraysWithAuthor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        public void Test(int[] xs)
         {
         }
     }
