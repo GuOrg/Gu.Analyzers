@@ -1,3 +1,6 @@
+#### 1.2.6
+* FEATURE: New analyzer: check testcase attribute arguments & parameter types.
+
 #### 1.2.5
 * FEATURE: New analyzers for checking NUnit attribute usage.
 
