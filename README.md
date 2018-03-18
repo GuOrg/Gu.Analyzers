@@ -96,6 +96,10 @@
   <td>Implicit casting done by the foreach</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0072.md">GU0072</a></td>
+  <td>All types should be internal.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0080.md">GU0080</a></td>
   <td>Parameter count does not match attribute.</td>
 </tr>
