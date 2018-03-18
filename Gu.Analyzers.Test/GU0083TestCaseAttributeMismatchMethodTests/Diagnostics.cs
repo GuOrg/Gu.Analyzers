@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -100,6 +100,25 @@ namespace RoslynSandbox
     {
         [TestCase(↓new double[] {3, 5})]
         public void Test(int[] array)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void DoubleToInt()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(↓1.0)]
+        public void Test(int i)
         {
         }
     }

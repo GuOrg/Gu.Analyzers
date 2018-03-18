@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -117,7 +117,8 @@
                     }
 
                     var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
-                    if (!argumentType.Type.Is(parameter.Type))
+                    if (!argumentType.Type.Is(parameter.Type) &&
+                        !context.SemanticModel.ClassifyConversion(argument.Expression, parameter.Type).IsImplicit)
                     {
                         attributeArgument = argument;
                         return false;
