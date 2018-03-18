@@ -183,5 +183,45 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void StringComparison()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(StringComparison.CurrentCulture)]
+        public void Test(StringComparison stringComparison)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void StringAndStringComparison()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(""abc"", StringComparison.CurrentCulture)]
+        public void Test(string text, StringComparison stringComparison)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

@@ -35,7 +35,8 @@
 
             if (context.Node is MethodDeclarationSyntax methodDeclaration &&
                 methodDeclaration.ParameterList is ParameterListSyntax parameterList &&
-                methodDeclaration.AttributeLists.Count > 0)
+                methodDeclaration.AttributeLists.Count > 0 &&
+                context.ContainingSymbol is IMethodSymbol testMethod)
             {
                 if (TrySingleTestAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out var attribute) &&
                     parameterList.Parameters.Count > 0)
@@ -61,7 +62,7 @@
                                     context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
                                 }
 
-                                if (!AreTypesMatching((IMethodSymbol)context.ContainingSymbol, candidate, context, out var argument))
+                                if (!AreTypesMatching(testMethod, candidate, context, out var argument))
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
                                 }

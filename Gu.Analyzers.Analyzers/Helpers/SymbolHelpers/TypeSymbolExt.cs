@@ -172,7 +172,8 @@
 
         internal static bool IsInterface(this ITypeSymbol type)
         {
-            if (type == null)
+            if (type == null ||
+                type.TypeKind == TypeKind.Error)
             {
                 return false;
             }
