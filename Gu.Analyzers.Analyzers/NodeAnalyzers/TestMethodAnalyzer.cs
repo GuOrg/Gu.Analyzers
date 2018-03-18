@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +16,8 @@
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0080TestAttributeCountMismatch.Descriptor,
             GU0081TestCasesAttributeMismatch.Descriptor,
-            GU0082IdenticalTestCase.Descriptor);
+            GU0082IdenticalTestCase.Descriptor,
+            GU0083TestCaseAttributeMismatchMethod.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -53,6 +55,19 @@
                     {
                         foreach (var candidate in attributeList.Attributes)
                         {
+                            if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
+                            {
+                                if (parameterList.Parameters.Count != CountArgs(candidate))
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
+                                }
+
+                                if (!AreTypesMatching((IMethodSymbol)context.ContainingSymbol, candidate, context, out var argument))
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
+                                }
+                            }
+
                             if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken) &&
                                 parameterList.Parameters.Count != CountArgs(candidate))
                             {
@@ -67,6 +82,57 @@
                     }
                 }
             }
+        }
+
+        private static bool AreTypesMatching(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgumentSyntax)
+        {
+            if (methodSymbol.Parameters.Length > 0 && CountArgs(attributeSyntax) == methodSymbol.Parameters.Length)
+            {
+                var methodParameters = methodSymbol.Parameters;
+                var attributeArgumentList = attributeSyntax.ArgumentList;
+
+                if (methodParameters != null && attributeArgumentList != null)
+                {
+                    for (int index = 0; index < methodParameters.Length; index++)
+                    {
+                        var currentAttributeArgument = attributeArgumentList.Arguments[index];
+                        var currentMethodParameter = methodParameters[index];
+
+                        if (currentAttributeArgument is null || currentAttributeArgument.NameEquals != null || currentMethodParameter is null)
+                        {
+                            attributeArgumentSyntax = currentAttributeArgument;
+                            return false;
+                        }
+
+                        if (currentAttributeArgument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                        {
+                            attributeArgumentSyntax = currentAttributeArgument;
+                            return false;
+                        }
+
+                        var attributeTypeFromModel = context.SemanticModel.GetTypeInfoSafe(currentAttributeArgument.Expression, context.CancellationToken);
+                        var parameterType = currentMethodParameter.Type;
+
+                        if (attributeTypeFromModel.Type is null || parameterType is null)
+                        {
+                            attributeArgumentSyntax = currentAttributeArgument;
+                            return false;
+                        }
+
+                        if (parameterType.Name != attributeTypeFromModel.Type.Name)
+                        {
+                            if (parameterType != KnownSymbol.Object)
+                            {
+                                attributeArgumentSyntax = currentAttributeArgument;
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            attributeArgumentSyntax = null;
+            return true;
         }
 
         private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
