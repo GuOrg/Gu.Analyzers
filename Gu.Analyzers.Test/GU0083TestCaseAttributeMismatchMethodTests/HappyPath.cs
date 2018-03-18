@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
         [Test]
-        public void TestCaseAttribute_IfParametersAreCorrect_NoAuthor()
+        public void NoAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -26,8 +26,50 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCase("[TestCase(\"a\", \"b\", null)]")]
+        [TestCase("[TestCase(null, \"a\", \"b\")]")]
+        [TestCase("[TestCase(\"a\", null, \"b\")]")]
+        [TestCase("[TestCase(null, null, null)]")]
+        public void NullArgument(string testCase)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(""x"", ""y"", null)]
+        public void Test(string x, string y, string z)
+        {
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [Test]
-        public void TestCaseAttribute_IfParametersAreCorrect_WithAuthor()
+        public void ArgumentIsNullAndParameterIsNullableInt()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(null)]
+        public void Test(int? obj)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +88,26 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttribute_IfParametersAreCorrect_AndIsArray()
+        public void NullArgumentWithAuthor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1, 2, null, Author=""Author"")]
+        public void Test(int x, int y, string str)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ArrayOfInts()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +126,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttribute_IfParametersAreCorrect_AndIsArrayMultiple()
+        public void ArraysOfDifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -84,7 +145,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttribute_IfParametersAreCorrect_AndObjectTypeUsed()
+        public void ParameterOfTypeObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,6 +156,27 @@ namespace RoslynSandbox
     {
         [TestCase(1)]
         public void Test(object obj)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ParameterOfInterfaceType()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1)]
+        [TestCase(1.0)]
+        public void Test(IFormattable obj)
         {
         }
     }

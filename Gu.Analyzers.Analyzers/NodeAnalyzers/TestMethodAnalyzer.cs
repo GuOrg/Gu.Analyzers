@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Immutable;
-    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -68,12 +67,6 @@
                                 }
                             }
 
-                            if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken) &&
-                                parameterList.Parameters.Count != CountArgs(candidate))
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
-                            }
-
                             if (TryFindIdentical(methodDeclaration, candidate, out _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(GU0082IdenticalTestCase.Descriptor, candidate.GetLocation(), candidate));
@@ -84,54 +77,54 @@
             }
         }
 
-        private static bool AreTypesMatching(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgumentSyntax)
+        private static bool AreTypesMatching(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
         {
-            if (methodSymbol.Parameters.Length > 0 && CountArgs(attributeSyntax) == methodSymbol.Parameters.Length)
+            if (methodSymbol.Parameters.Length > 0 &&
+                methodSymbol.Parameters != null &&
+                attributeSyntax.ArgumentList is AttributeArgumentListSyntax argumentList &&
+                argumentList.Arguments.Count > 0 &&
+                CountArgs(attributeSyntax) == methodSymbol.Parameters.Length)
             {
-                var methodParameters = methodSymbol.Parameters;
-                var attributeArgumentList = attributeSyntax.ArgumentList;
-
-                if (methodParameters != null && attributeArgumentList != null)
+                for (var index = 0; index < methodSymbol.Parameters.Length; index++)
                 {
-                    for (int index = 0; index < methodParameters.Length; index++)
+                    var argument = argumentList.Arguments[index];
+                    var parameter = methodSymbol.Parameters[index];
+
+                    if (argument is null ||
+                        argument.NameEquals != null ||
+                        parameter is null)
                     {
-                        var currentAttributeArgument = attributeArgumentList.Arguments[index];
-                        var currentMethodParameter = methodParameters[index];
+                        attributeArgument = argument;
+                        return false;
+                    }
 
-                        if (currentAttributeArgument is null || currentAttributeArgument.NameEquals != null || currentMethodParameter is null)
+                    if (parameter.Type == KnownSymbol.Object)
+                    {
+                        continue;
+                    }
+
+                    if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                    {
+                        if (parameter.Type.IsValueType &&
+                            !parameter.Type.Is(KnownSymbol.NullableOfT))
                         {
-                            attributeArgumentSyntax = currentAttributeArgument;
+                            attributeArgument = argument;
                             return false;
                         }
 
-                        if (currentAttributeArgument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
-                        {
-                            attributeArgumentSyntax = currentAttributeArgument;
-                            return false;
-                        }
+                        continue;
+                    }
 
-                        var attributeTypeFromModel = context.SemanticModel.GetTypeInfoSafe(currentAttributeArgument.Expression, context.CancellationToken);
-                        var parameterType = currentMethodParameter.Type;
-
-                        if (attributeTypeFromModel.Type is null || parameterType is null)
-                        {
-                            attributeArgumentSyntax = currentAttributeArgument;
-                            return false;
-                        }
-
-                        if (parameterType.Name != attributeTypeFromModel.Type.Name)
-                        {
-                            if (parameterType != KnownSymbol.Object)
-                            {
-                                attributeArgumentSyntax = currentAttributeArgument;
-                                return false;
-                            }
-                        }
+                    var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
+                    if (!argumentType.Type.Is(parameter.Type))
+                    {
+                        attributeArgument = argument;
+                        return false;
                     }
                 }
             }
 
-            attributeArgumentSyntax = null;
+            attributeArgument = null;
             return true;
         }
 
@@ -215,7 +208,7 @@
                     if (xa.Expression is LiteralExpressionSyntax xl &&
                         ya.Expression is LiteralExpressionSyntax yl)
                     {
-                        if (xl.Token.ValueText != yl.Token.ValueText)
+                        if (xl.Token.Text != yl.Token.Text)
                         {
                             return false;
                         }
@@ -233,7 +226,7 @@
                             {
                                 if (xExpressions[j] is LiteralExpressionSyntax xLiteral &&
                                     yExpressions[j] is LiteralExpressionSyntax yLiteral &&
-                                    xLiteral.Token.ValueText != yLiteral.Token.ValueText)
+                                    xLiteral.Token.Text != yLiteral.Token.Text)
                                 {
                                     return false;
                                 }

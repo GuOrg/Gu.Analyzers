@@ -9,7 +9,7 @@
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0083");
 
         [Test]
-        public void TestCaseAttribute_IfSingleParameterIsWrong()
+        public void SingleArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -24,6 +24,29 @@ namespace RoslynSandbox
         }
     }
 }";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [TestCase("[TestCase(\"a\", ↓1, null)]")]
+        [TestCase("[TestCase(null, \"a\", ↓1)]")]
+        [TestCase("[TestCase(↓1, null, \"b\")]")]
+        [TestCase("[TestCase(null, null, ↓1)]")]
+        public void NullArgument(string testCase)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(""x"", ""y"", null)]
+        public void Test(string x, string y, string z)
+        {
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
@@ -47,7 +70,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttribute_IfTestCaseArgumentIsNull()
+        public void ArgumentIsNullAndParameterIsInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,8 +79,27 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(null)]
-        public void Test(object obj)
+        [TestCase(↓null)]
+        public void Test(int obj)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void WrongArrayType()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(↓new double[] {3, 5})]
+        public void Test(int[] array)
         {
         }
     }

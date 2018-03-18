@@ -9,7 +9,7 @@
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "TestCase Arguments Mismatch Method Parameters",
-            messageFormat: "TestCase Arguments Mismatch Method Parameters {0}.",
+            messageFormat: "TestCase arguments {0} does not match method parameters {1}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,

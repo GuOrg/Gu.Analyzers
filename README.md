@@ -107,6 +107,10 @@
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0082.md">GU0082</a></td>
   <td>TestCase is identical.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0083.md">GU0083</a></td>
+  <td>TestCase Arguments Mismatch Method Parameters</td>
+</tr>
 <table>
 <!-- end generated table -->
 
