@@ -1,7 +1,6 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -41,11 +40,11 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is TypeDeclarationSyntax typeDeclaration &&
-                context.ContainingSymbol is ITypeSymbol typeSymbol)
+                context.ContainingSymbol is ITypeSymbol)
             {
-                if (typeDeclaration.Modifiers.Any(SyntaxKind.PublicKeyword))
+                if (typeDeclaration.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PublicKeyword), out var modifier))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, typeDeclaration.Identifier.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, modifier.GetLocation()));
                 }
             }
         }

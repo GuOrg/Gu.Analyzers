@@ -7,48 +7,24 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
 
-        [Test]
-        public void AllTypesInternal_InternalClass()
+        [TestCase("internal class Foo")]
+        [TestCase("protected class Foo")]
+        [TestCase("private class Foo")]
+        [TestCase("internal struct Foo")]
+        [TestCase("protected struct Foo")]
+        [TestCase("private struct Foo")]
+        public void SimpleType(string signature)
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class A
+    internal class Foo
     {
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
-
-        [Test]
-        public void AllTypesInternal_PrivateClass()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System.Collections.Generic;
-
-    private class A
-    {
-    }
-}";
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
-
-        [Test]
-        public void AllTypesInternal_ProtectedClass()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System.Collections.Generic;
-
-    protected class A
-    {
-    }
-}";
+            testCode = testCode.AssertReplace("internal class Foo", signature);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
