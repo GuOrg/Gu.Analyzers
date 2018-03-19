@@ -1,4 +1,5 @@
-﻿#pragma warning disable GU0008 // Avoid relay properties.
+#pragma warning disable GU0008 // Avoid relay properties.
+#pragma warning disable GU0072 // Avoid internal check
 namespace Gu.Analyzers
 {
     using System;
@@ -9,7 +10,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Text;
 
-    public struct DocumentEditorCodeFixContext
+    internal class DocumentEditorCodeFixContext
     {
         private readonly CodeFixContext context;
 

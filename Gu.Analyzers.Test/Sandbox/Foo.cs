@@ -1,9 +1,9 @@
-﻿// ReSharper disable All
+// ReSharper disable All
 namespace Gu.Analyzers.Test.Sandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    internal sealed class Foo
     {
         private static readonly Stream StaticStream = File.OpenRead(string.Empty);
         private Stream stream;

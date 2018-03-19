@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public class AsyncAwaitTests
+    internal class AsyncAwaitTests
     {
         [TestCase("Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", false, null)]
         [TestCase("Task.FromResult(new string(' ', 1))", true, "new string(' ', 1)")]

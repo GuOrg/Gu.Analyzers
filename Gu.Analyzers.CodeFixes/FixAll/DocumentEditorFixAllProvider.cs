@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Editing;
 
-    public class DocumentEditorFixAllProvider : FixAllProvider
+    internal class DocumentEditorFixAllProvider : FixAllProvider
     {
         public static readonly DocumentEditorFixAllProvider Default = new DocumentEditorFixAllProvider();
 

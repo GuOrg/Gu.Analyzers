@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Test.Helpers
+#pragma warning disable GU0072
+namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
