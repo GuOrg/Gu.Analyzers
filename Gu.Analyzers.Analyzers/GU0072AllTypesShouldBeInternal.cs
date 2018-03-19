@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,6 +43,21 @@ namespace Gu.Analyzers
             if (context.Node is TypeDeclarationSyntax typeDeclaration &&
                 context.ContainingSymbol is ITypeSymbol typeSymbol)
             {
+                if (typeDeclaration.AttributeLists.Count > 0)
+                {
+                    foreach (AttributeSyntax attributeSyntax in typeDeclaration.AttributeLists.Cast<AttributeSyntax>())
+                    {
+                        if (Attribute.IsType(
+                            attributeSyntax,
+                            IgnorePublicClassAttribute.GetQualifiedType(),
+                            context.SemanticModel,
+                            context.CancellationToken))
+                        {
+                            return;
+                        }
+                    }
+                }
+
                 if (typeDeclaration.Modifiers.Any(SyntaxKind.PublicKeyword))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, typeDeclaration.Identifier.GetLocation()));
