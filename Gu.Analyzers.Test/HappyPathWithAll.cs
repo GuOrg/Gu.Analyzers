@@ -72,7 +72,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Disposable : IDisposable
+    internal class Disposable : IDisposable
     {
         public Disposable(string meh)
             : this()
@@ -124,7 +124,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public class Foo1 : IDisposable
+    internal class Foo1 : IDisposable
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
@@ -209,7 +209,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public abstract class FooBase : IDisposable
+    internal abstract class FooBase : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed = false;
@@ -242,7 +242,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class FooImpl : FooBase
+    internal class FooImpl : FooBase
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -271,7 +271,7 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    internal class Foo
     {
         private IDisposable disposable;
 
@@ -301,7 +301,7 @@ namespace RoslynSandbox
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public abstract class RxFoo : IDisposable
+    internal abstract class RxFoo : IDisposable
     {
         private readonly IDisposable subscription;
         private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
@@ -345,7 +345,7 @@ namespace RoslynSandbox
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public abstract class RxFoo : IDisposable
+    internal abstract class RxFoo : IDisposable
     {
         private readonly IDisposable subscription;
         private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
@@ -389,7 +389,7 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    public abstract class Foo
+    internal abstract class Foo
     {
         public Foo()
             : this()
@@ -462,7 +462,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : SyntaxError
+    internal class Foo : SyntaxError
     {
         private readonly Stream stream = File.SyntaxError(string.Empty);
         private bool disposed;
