@@ -18,5 +18,11 @@
   <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="MakeInternalFixProvider.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
