@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -33,7 +34,19 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            // add check here
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            if (context.Node is TypeDeclarationSyntax typeDeclaration &&
+                context.ContainingSymbol is ITypeSymbol typeSymbol)
+            {
+                if (typeDeclaration.Modifiers.Any(SyntaxKind.PublicKeyword))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, typeDeclaration.Identifier.GetLocation()));
+                }
+            }
         }
     }
 }
