@@ -1,9 +1,9 @@
-﻿namespace Gu.Analyzers.Test.Helpers
+namespace Gu.Analyzers.Test.Helpers
 {
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public class RecursionLoopTests
+    internal class RecursionLoopTests
     {
         [Test]
         public void OneItem()

@@ -1,4 +1,5 @@
-﻿namespace Gu.Analyzers.Test.Documentation
+#pragma warning disable GU0072
+namespace Gu.Analyzers.Test.Documentation
 {
     using System;
     using System.Collections.Generic;
@@ -11,7 +12,7 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Tests
+    internal class Tests
     {
         private static readonly IReadOnlyList<DescriptorInfo> Descriptors = typeof(AnalyzerCategory)
                                                                             .Assembly.GetTypes()

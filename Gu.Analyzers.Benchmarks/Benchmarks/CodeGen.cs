@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
+namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -9,7 +9,7 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeGen
+    internal class CodeGen
     {
         public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
 

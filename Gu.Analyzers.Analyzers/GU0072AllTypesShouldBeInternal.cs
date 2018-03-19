@@ -43,15 +43,6 @@ namespace Gu.Analyzers
             if (context.Node is TypeDeclarationSyntax typeDeclaration &&
                 context.ContainingSymbol is ITypeSymbol typeSymbol)
             {
-                if (typeDeclaration.AttributeLists.Count > 0)
-                {
-                    var attributeSyntaxList = context.Node.DescendantNodes().OfType<AttributeSyntax>();
-                    if (attributeSyntaxList.Any(syntax => Attribute.IsType(syntax, KnownSymbol.IgnorePublicClassAttribute, context.SemanticModel, context.CancellationToken)))
-                    {
-                        return;
-                    }
-                }
-
                 if (typeDeclaration.Modifiers.Any(SyntaxKind.PublicKeyword))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, typeDeclaration.Identifier.GetLocation()));

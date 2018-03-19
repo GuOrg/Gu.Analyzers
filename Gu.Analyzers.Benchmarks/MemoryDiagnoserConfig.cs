@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Benchmarks
     using BenchmarkDotNet.Configs;
     using BenchmarkDotNet.Diagnosers;
 
-    public class MemoryDiagnoserConfig : ManualConfig
+    internal class MemoryDiagnoserConfig : ManualConfig
     {
         public MemoryDiagnoserConfig()
         {

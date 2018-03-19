@@ -1,3 +1,5 @@
+#pragma warning disable GU0072
+
 namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;

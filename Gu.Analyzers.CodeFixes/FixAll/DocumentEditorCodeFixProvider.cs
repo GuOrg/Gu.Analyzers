@@ -1,9 +1,9 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis.CodeFixes;
 
-    public abstract class DocumentEditorCodeFixProvider : CodeFixProvider
+    internal abstract class DocumentEditorCodeFixProvider : CodeFixProvider
     {
         public sealed override FixAllProvider GetFixAllProvider() => this.FixAllProvider();
 

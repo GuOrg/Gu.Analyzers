@@ -1,4 +1,4 @@
-﻿// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable HeuristicUnreachableCode
 // ReSharper disable RedundantNameQualifier
@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Benchmarks
     using BenchmarkDotNet.Running;
     using Gu.Analyzers.Benchmarks.Benchmarks;
 
-    public class Program
+    internal class Program
     {
         public static void Main()
         {

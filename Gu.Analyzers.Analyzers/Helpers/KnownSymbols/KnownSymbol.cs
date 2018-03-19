@@ -86,8 +86,6 @@ namespace Gu.Analyzers
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
         internal static readonly QualifiedType MoqIReturnsResult = new QualifiedType("Moq.Language.Flow.IReturnsResult`1");
 
-        internal static readonly QualifiedType IgnorePublicClassAttribute = Create("Gu.Analyzers.Helpers.Attributes.IgnorePublicClassAttribute");
-
         private static QualifiedType Create(string qualifiedName, string alias = null)
         {
             return new QualifiedType(qualifiedName, alias);

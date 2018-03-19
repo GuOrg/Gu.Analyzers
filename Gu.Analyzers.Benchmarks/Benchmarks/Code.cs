@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
+namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -10,7 +10,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Diagnostics;
 
-    public static class Code
+    internal static class Code
     {
         private static readonly IReadOnlyList<MetadataReference> MetadataReferences = new[]
         {

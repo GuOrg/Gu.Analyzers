@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal partial class HappyPath
     {
-        public class Recursion
+        internal class Recursion
         {
             [Test]
             public void IgnoresRecursiveProperty()
