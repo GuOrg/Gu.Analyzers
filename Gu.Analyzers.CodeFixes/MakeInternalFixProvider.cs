@@ -43,28 +43,25 @@ namespace Gu.Analyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (node.FirstAncestorOrSelf<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration)
                 {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Make internal.",
-                        _ => MakeInternalAsync(node, context.Document, typeDeclaration),
-                        nameof(MakeInternalFixProvider)),
-                        diagnostic);
+                    foreach (var modifier in typeDeclaration.Modifiers)
+                    {
+                        if (modifier.Kind() == SyntaxKind.PublicKeyword)
+                        {
+                            context.RegisterCodeFix(
+                                CodeAction.Create(
+                                    "Make internal.",
+                                _ => MakeInternalAsync(syntaxRoot, context.Document, modifier),
+                                nameof(MakeInternalFixProvider)),
+                                diagnostic);
+                        }
+                    }
                 }
             }
         }
 
-        private static Task<Document> MakeInternalAsync(SyntaxNode root, Document document, TypeDeclarationSyntax typeDeclaration)
+        private static Task<Document> MakeInternalAsync(SyntaxNode root, Document document, SyntaxToken token)
         {
-            foreach (var modifier in typeDeclaration.Modifiers)
-            {
-                if (modifier.Kind() == SyntaxKind.PublicKeyword)
-                {
-                    var syntaxToken = SyntaxFactory.Token(SyntaxKind.InternalKeyword);
-                    return Task.FromResult(document.WithSyntaxRoot(root.ReplaceToken(modifier, syntaxToken)));
-                }
-            }
-
-            return null;
+            return Task.FromResult(document.WithSyntaxRoot(root.ReplaceToken(token, SyntaxFactory.Token(SyntaxKind.InternalKeyword))));
         }
     }
 }

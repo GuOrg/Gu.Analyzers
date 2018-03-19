@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 {
+    using System.Collections.Generic;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
@@ -7,18 +8,20 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
         private static readonly MakeInternalFixProvider Fix = new MakeInternalFixProvider();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0072");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0072AllTypesShouldBeInternal.DiagnosticId);
 
         [Test]
         public void InternalTypeCodeFixTest()
         {
-            var badCode = @"
+            var badCode = new List<string>()
+            {
+                @"
 namespace RoslynSandbox
 {
     public class ↓Hello
     {
     }
-}";
+}" };
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -27,8 +30,7 @@ namespace RoslynSandbox
     {
     }
 }";
-
-            AnalyzerAssert.CodeFix<GU0072AllTypesShouldBeInternal, MakeInternalFixProvider>(badCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, badCode, fixedCode);
         }
     }
 }
