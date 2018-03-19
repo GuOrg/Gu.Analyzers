@@ -45,16 +45,10 @@ namespace Gu.Analyzers
             {
                 if (typeDeclaration.AttributeLists.Count > 0)
                 {
-                    foreach (AttributeSyntax attributeSyntax in typeDeclaration.AttributeLists.Cast<AttributeSyntax>())
+                    var attributeSyntaxList = context.Node.DescendantNodes().OfType<AttributeSyntax>();
+                    if (attributeSyntaxList.Any(syntax => Attribute.IsType(syntax, KnownSymbol.IgnorePublicClassAttribute, context.SemanticModel, context.CancellationToken)))
                     {
-                        if (Attribute.IsType(
-                            attributeSyntax,
-                            IgnorePublicClassAttribute.GetQualifiedType(),
-                            context.SemanticModel,
-                            context.CancellationToken))
-                        {
-                            return;
-                        }
+                        return;
                     }
                 }
 
