@@ -63,7 +63,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("Test(int i)", signature);
+            testCode = testCode.AssertReplace("Test↓(int i)", signature);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
