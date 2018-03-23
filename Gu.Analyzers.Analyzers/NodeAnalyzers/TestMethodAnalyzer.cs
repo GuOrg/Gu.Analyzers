@@ -41,20 +41,14 @@ namespace Gu.Analyzers
                 if (TrySingleTestAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out var attribute) &&
                     parameterList.Parameters.Count > 0)
                 {
-                    foreach (var parameter in parameterList.Parameters)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameter.GetLocation(), parameterList, attribute));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                 }
 
                 if (TryFirstTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute))
                 {
                     if (parameterList.Parameters.Count != CountArgs(attribute))
                     {
-                        foreach (var parameter in parameterList.Parameters)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameter.GetLocation(), parameterList, attribute));
-                        }
+                        context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                     }
 
                     foreach (var attributeList in methodDeclaration.AttributeLists)

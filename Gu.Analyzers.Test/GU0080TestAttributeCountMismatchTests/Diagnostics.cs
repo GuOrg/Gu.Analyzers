@@ -19,7 +19,7 @@ namespace RoslynSandbox
     public class FooTests
     {
         [Test]
-        public void Test(↓string text)
+        public void Test↓(string text)
         {
         }
     }
@@ -38,7 +38,7 @@ namespace RoslynSandbox
     public class FooTests
     {
         [Test]
-        public void Test(↓string text, ↓int index, ↓bool value)
+        public void Test↓(string text, int index, bool value)
         {
         }
     }
@@ -46,9 +46,8 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        // fix this
-        [TestCase("Test()")]
-        [TestCase("Test(1, 2)")]
+        [TestCase("Test↓()")]
+        [TestCase("Test↓(1, 2)")]
         public void TestCaseAttributeAndParameter(string signature)
         {
             var testCode = @"
@@ -59,7 +58,7 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        public void ↓Test(int i)
+        public void Test↓(int i)
         {
         }
     }
@@ -68,9 +67,8 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        // and also fix this.
-        [TestCase("Test()")]
-        [TestCase("Test(1, 2)")]
+        [TestCase("Test↓()")]
+        [TestCase("Test↓(1, 2)")]
         public void TestAndTestCaseAttributeAndParameter(string signature)
         {
             var testCode = @"
@@ -81,12 +79,12 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        public void ↓Test(int i)
+        public void Test↓(int i)
         {
         }
     }
 }";
-            testCode = testCode.AssertReplace("Test(int i)", signature);
+            testCode = testCode.AssertReplace("Test↓(int i)", signature);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
