@@ -61,7 +61,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("stream");
+                var value = syntaxTree.FindParameter("stream");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(Stream stream)");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, AssignmentWalker.FirstWith(symbol, ctor, search, semanticModel, CancellationToken.None, out var result));
@@ -94,7 +94,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("arg");
+                var value = syntaxTree.FindParameter("arg");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
@@ -135,7 +135,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("arg");
+                var value = syntaxTree.FindParameter("arg");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);

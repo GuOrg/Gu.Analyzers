@@ -1,8 +1,7 @@
-﻿namespace Gu.Analyzers.Test.Helpers.SyntaxtTreeHelpersTests
+namespace Gu.Analyzers.Test.Helpers.SyntaxtTreeHelpersTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -36,7 +35,7 @@ namespace RoslynSandbox
 }");
                 var argument = syntaxTree.FindInvocation("Meh(1, 2, 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
@@ -73,7 +72,7 @@ namespace RoslynSandbox
 }");
                 var argument = syntaxTree.FindInvocation("Meh(v1: 1, v2: 2, v3: 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
@@ -110,7 +109,7 @@ namespace RoslynSandbox
 }");
                 var argument = syntaxTree.FindInvocation("Meh(v2: 2, v1: 1, v3: 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
+                var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
                 Assert.AreEqual(
                     true,
@@ -147,7 +146,7 @@ namespace RoslynSandbox
 }");
                 var argument = syntaxTree.FindInvocation("Meh(1, 2, 3)")
                                          .ArgumentList.Arguments[index];
-                var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(params int[] values)");
+                var method = syntaxTree.FindMethodDeclaration("internal void Meh(params int[] values)");
 
                 Assert.AreEqual(
                     true,

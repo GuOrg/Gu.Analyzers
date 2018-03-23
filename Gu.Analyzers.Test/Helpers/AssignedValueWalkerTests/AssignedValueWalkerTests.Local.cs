@@ -121,7 +121,7 @@ internal class Foo
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class Foo
 {
-    internal Foo<T>(T meh)
+    internal void Bar<T>(T meh)
     {
         var temp = meh;
         var value = temp;

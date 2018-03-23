@@ -4,7 +4,6 @@ namespace Gu.Analyzers.Test.Helpers
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal class MemberPathTests
@@ -128,7 +127,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var invocation = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.Value");
+                var invocation = syntaxTree.FindMemberAccessExpression("this.Value");
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out var member));
                 Assert.AreEqual("this.Value", member.ToString());
             }

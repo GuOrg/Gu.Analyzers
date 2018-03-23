@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -70,8 +70,8 @@ namespace RoslynSandbox
         public static int B { get; } = A;
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int A");
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int B");
+            var first = syntaxTree.FindBasePropertyDeclaration("int A");
+            var other = syntaxTree.FindBasePropertyDeclaration("int B");
             Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
@@ -89,8 +89,8 @@ namespace RoslynSandbox
         public static int B { get; } = Foo.A;
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int A");
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int B");
+            var first = syntaxTree.FindBasePropertyDeclaration("int A");
+            var other = syntaxTree.FindBasePropertyDeclaration("int B");
             Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
@@ -113,8 +113,8 @@ namespace RoslynSandbox
         private static int B { get; }
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("public static int A { get; }");
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("private static int B { get; }");
+            var first = syntaxTree.FindBasePropertyDeclaration("public static int A { get; }");
+            var other = syntaxTree.FindBasePropertyDeclaration("private static int B { get; }");
             Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
@@ -142,8 +142,8 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>(x);
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>(y);
+            var first = syntaxTree.FindBasePropertyDeclaration(x);
+            var other = syntaxTree.FindBasePropertyDeclaration(y);
             Assert.AreEqual(expected, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(-1 * expected, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
@@ -177,8 +177,8 @@ namespace RoslynSandbox
         }
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int IValue.this[int index]");
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("private int this[int index]");
+            var first = syntaxTree.FindBasePropertyDeclaration("int IValue.this[int index]");
+            var other = syntaxTree.FindBasePropertyDeclaration("private int this[int index]");
             Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
@@ -212,8 +212,8 @@ namespace RoslynSandbox
         }
     }
 }");
-            var first = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("int IValue.this[int index]");
-            var other = syntaxTree.FindBestMatch<BasePropertyDeclarationSyntax>("public int this[int index]");
+            var first = syntaxTree.FindBasePropertyDeclaration("int IValue.this[int index]");
+            var other = syntaxTree.FindBasePropertyDeclaration("public int this[int index]");
             Assert.AreEqual(-1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(first, other));
             Assert.AreEqual(1, GU0020SortProperties.PropertyPositionComparer.Default.Compare(other, first));
         }
