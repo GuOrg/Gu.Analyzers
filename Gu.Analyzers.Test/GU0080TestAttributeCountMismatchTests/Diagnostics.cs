@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
+namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -19,7 +19,7 @@ namespace RoslynSandbox
     public class FooTests
     {
         [Test]
-        public void ↓Test(string text)
+        public void Test(↓string text)
         {
         }
     }
@@ -27,6 +27,26 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
+        [Test]
+        public void TestAttributeAndParameter_Multiple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [Test]
+        public void Test(↓string text, ↓int index, ↓bool value)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        // fix this
         [TestCase("Test()")]
         [TestCase("Test(1, 2)")]
         public void TestCaseAttributeAndParameter(string signature)
@@ -48,6 +68,7 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
+        // and also fix this.
         [TestCase("Test()")]
         [TestCase("Test(1, 2)")]
         public void TestAndTestCaseAttributeAndParameter(string signature)
