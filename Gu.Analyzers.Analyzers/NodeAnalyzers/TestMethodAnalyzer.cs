@@ -62,7 +62,7 @@ namespace Gu.Analyzers
                                     context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
                                 }
 
-                                if (!AreTypesMatching(testMethod, candidate, context, out var argument))
+                                if (TryGetFirstMismatch(testMethod, candidate, context, out var argument))
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
                                 }
@@ -78,7 +78,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool AreTypesMatching(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
+        private static bool TryGetFirstMismatch(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
         {
             if (methodSymbol.Parameters.Length > 0 &&
                 methodSymbol.Parameters != null &&
@@ -96,7 +96,7 @@ namespace Gu.Analyzers
                         parameter is null)
                     {
                         attributeArgument = argument;
-                        return false;
+                        return true;
                     }
 
                     if (parameter.Type == KnownSymbol.Object)
@@ -110,7 +110,7 @@ namespace Gu.Analyzers
                             !parameter.Type.Is(KnownSymbol.NullableOfT))
                         {
                             attributeArgument = argument;
-                            return false;
+                            return true;
                         }
 
                         continue;
@@ -121,13 +121,13 @@ namespace Gu.Analyzers
                         !context.SemanticModel.ClassifyConversion(argument.Expression, parameter.Type).IsImplicit)
                     {
                         attributeArgument = argument;
-                        return false;
+                        return true;
                     }
                 }
             }
 
             attributeArgument = null;
-            return true;
+            return false;
         }
 
         private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
