@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class HandlesRecursion
+    internal class HandlesRecursion
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(AnalyzerConstants)
                                                                                  .Assembly
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    public abstract class Foo
+    internal abstract class Foo
     {
         public Foo()
             : this()
@@ -97,16 +97,17 @@ namespace RoslynSandbox
             var converterCode = @"
 namespace RoslynSandbox
 {
-     using System;
+    using System;
     using System.Globalization;
     using System.Windows.Controls;
     using System.Windows.Data;
 
-    public class ValidationErrorToStringConverter : IValueConverter
+    internal class ValidationErrorToStringConverter : IValueConverter
     {
         /// <summary> Gets the default instance </summary>
         public static readonly ValidationErrorToStringConverter Default = new ValidationErrorToStringConverter();
 
+#pragma warning disable GU0012
         /// <inheritdoc />
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -133,6 +134,7 @@ namespace RoslynSandbox
         {
             throw new NotSupportedException($""{this.GetType().Name} only supports one-way conversion."");
         }
+#pragma warning restore GU0012
     }
 }";
             AnalyzerAssert.Valid(analyzer, testCode, converterCode);
