@@ -2,8 +2,10 @@ namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     using NUnit.Framework;
@@ -17,6 +19,17 @@ namespace Gu.Analyzers.Test
                                .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
                                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                .ToArray();
+
+        private static readonly Solution Solution = CodeFactory.CreateSolution(
+            new FileInfo("C:\\Git\\PropertyChangedAnalyzers\\PropertyChangedAnalyzers.sln"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void SolutionRepro(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, Solution);
+        }
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
