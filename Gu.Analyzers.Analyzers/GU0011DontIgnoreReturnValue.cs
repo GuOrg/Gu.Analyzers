@@ -119,12 +119,12 @@ namespace Gu.Analyzers
                             }
                         }
                     }
-
-                    return false;
                 }
+
+                return false;
             }
 
-            return false;
+            return true;
         }
     }
 }

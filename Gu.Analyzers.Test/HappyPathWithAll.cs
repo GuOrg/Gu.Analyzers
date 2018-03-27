@@ -38,7 +38,8 @@ namespace Gu.Analyzers.Test
         public async Task RunOnGuAnalyzersSln(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
-                analyzer is ParameterAnalyzer)
+                analyzer is ParameterAnalyzer ||
+                analyzer is GU0007PreferInjecting)
             {
                 await Analyze.GetDiagnosticsAsync(GuAnalyzersSln, analyzer)
                              .ConfigureAwait(false);
