@@ -271,6 +271,44 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void DocumentEditorExtensionMethod()
+            {
+                var extCode = @"
+namespace RoslynSandbox
+{
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
+
+    public static class DocumentEditorExt
+    {
+        internal static DocumentEditor AddUsing(this DocumentEditor editor, UsingDirectiveSyntax usingDirective)
+        {
+            editor.ReplaceNode(
+                editor.OriginalRoot,
+                (root, _) => editor.OriginalRoot);
+
+            return editor;
+        }
+    }
+}";
+                var testCode = @"
+namespace Gu.Analyzers.Test.Sandbox
+{
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
+
+    internal sealed class Foo
+    {
+        public void Foo(DocumentEditor editor, UsingDirectiveSyntax directive)
+        {
+            editor.AddUsing(directive);
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, extCode, testCode);
+            }
         }
     }
 }

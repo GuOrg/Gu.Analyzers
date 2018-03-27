@@ -108,7 +108,8 @@ namespace Gu.Analyzers
                         foreach (var returnValue in walker)
                         {
                             if (returnValue is IdentifierNameSyntax identifierName &&
-                                method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out _))
+                                method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter) &&
+                                parameter.Equals(semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
                             {
                                 return true;
                             }
@@ -119,9 +120,9 @@ namespace Gu.Analyzers
                             }
                         }
                     }
-                }
 
-                return false;
+                    return false;
+                }
             }
 
             return true;
