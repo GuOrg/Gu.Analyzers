@@ -294,14 +294,14 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace Gu.Analyzers.Test.Sandbox
+namespace RoslynSandbox
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
     internal sealed class Foo
     {
-        public void Foo(DocumentEditor editor, UsingDirectiveSyntax directive)
+        public void Bar(DocumentEditor editor, UsingDirectiveSyntax directive)
         {
             editor.AddUsing(directive);
         }
