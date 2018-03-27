@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -88,6 +88,7 @@
 
                 if ((method.Name == "Add" ||
                      method.Name == "Remove" ||
+                     method.Name == "RemoveAll" ||
                      method.Name == "TryAdd" ||
                      method.Name == "TryRemove") &&
                     method.ReturnType.IsEither(KnownSymbol.Boolean, KnownSymbol.Int32, KnownSymbol.Int64))

@@ -207,6 +207,48 @@ namespace RoslynSandbox
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
+            [TestCase("ints.Add(1);")]
+            [TestCase("ints.Remove(1);")]
+            [TestCase("ints.RemoveAll(x => x > 2);")]
+            public void ListOfInt(string operation)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public class Foo
+    {
+        public Foo(List<int> ints)
+        {
+            ints.RemoveAll(x => x > 2);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("ints.RemoveAll(x => x > 2);", operation);
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [TestCase("map.TryAdd(1, 1);")]
+            public void ConcurrentDictionary(string operation)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Concurrent;
+
+    public class Foo
+    {
+        public Foo(ConcurrentDictionary<int, int> map)
+        {
+            map.TryAdd(1, 1);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("map.TryAdd(1, 1);", operation);
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
             [Test]
             public void MoqSetupReturns()
             {
