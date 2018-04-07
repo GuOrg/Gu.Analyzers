@@ -1,10 +1,5 @@
 namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
@@ -32,13 +27,54 @@ public class Foo
             var testCode = @"
 namespace RoslynSandbox
 {
-using System;
+    using System;
 
-[Serializable]
-public class FooException : Exception
+    [Serializable]
+    public class FooException : Exception
+    {
+        public FooException()
+            : base(string.Empty)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenSerializableAndObsoleteSameList()
+        {
+            var testCode = @"
+namespace RoslynSandbox
 {
-    public FooException()
-        : base(string.Empty)
+    using System;
+
+    [Serializable, Obsolete]
+    public class FooException : Exception
+    {
+        public FooException()
+            : base(string.Empty)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenSerializableAndObsoleteDifferentLists()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    [Serializable]
+    [Obsolete]
+    public class FooException : Exception
+    {
+        public FooException()
+            : base(string.Empty)
         {
         }
     }

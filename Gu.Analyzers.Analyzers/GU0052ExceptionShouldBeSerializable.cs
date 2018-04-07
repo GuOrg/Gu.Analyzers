@@ -1,10 +1,6 @@
 namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
-    using System.Linq;
-    using System.Text;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -45,34 +41,11 @@ namespace Gu.Analyzers
 
             if (context.Node is ClassDeclarationSyntax classDeclaration &&
                 context.ContainingSymbol is INamedTypeSymbol type &&
-                IsOfType(type, "Exception"))
+                type.Is(KnownSymbol.Exception) &&
+                !Attribute.TryGetAttribute(classDeclaration.AttributeLists, KnownSymbol.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                System.Diagnostics.Debug.WriteLine($"has SerilizableAttribute:{type.GetAttributes().TryFirst(attr => attr.AttributeClass == KnownSymbol.SerializableAttribute, out _)}");
-                if (!type.GetAttributes().Any(attr => attr.AttributeClass == KnownSymbol.SerializableAttribute))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, classDeclaration.Identifier.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, classDeclaration.Identifier.GetLocation()));
             }
-        }
-
-        private static bool IsOfType(ITypeSymbol type, string typeName)
-        {
-            if (type == null)
-            {
-                return false;
-            }
-
-            if (type.Name == typeName)
-            {
-                return true;
-            }
-
-            if (type.Name == "Object")
-            {
-                return false;
-            }
-
-            return IsOfType(type.BaseType, typeName);
         }
     }
 }

@@ -1,10 +1,5 @@
 namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;

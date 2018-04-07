@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Threading;
     using Microsoft.CodeAnalysis;
@@ -8,13 +8,24 @@
     {
         internal static bool TryGetAttribute(MethodDeclarationSyntax methodDeclaration, QualifiedType attributeType, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax result)
         {
-            result = null;
-            if (methodDeclaration == null)
+            if (methodDeclaration != null)
             {
-                return false;
+                return TryGetAttribute(
+                    methodDeclaration.AttributeLists,
+                    attributeType,
+                    semanticModel,
+                    cancellationToken,
+                    out result);
             }
 
-            foreach (var attributeList in methodDeclaration.AttributeLists)
+            result = null;
+            return false;
+        }
+
+        internal static bool TryGetAttribute(SyntaxList<AttributeListSyntax> attributeLists, QualifiedType attributeType, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax result)
+        {
+            result = null;
+            foreach (var attributeList in attributeLists)
             {
                 foreach (var attribute in attributeList.Attributes)
                 {
