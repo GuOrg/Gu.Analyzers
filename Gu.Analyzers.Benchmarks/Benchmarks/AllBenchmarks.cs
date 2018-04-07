@@ -19,6 +19,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0051XmlSerializerNotCachedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0051XmlSerializerNotCached());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0052ExceptionShouldBeSerializableBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0052ExceptionShouldBeSerializable());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0060EnumMemberValueConflictsWithAnotherBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
@@ -87,6 +89,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0051XmlSerializerNotCached()
         {
             GU0051XmlSerializerNotCachedBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0052ExceptionShouldBeSerializable()
+        {
+            GU0052ExceptionShouldBeSerializableBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

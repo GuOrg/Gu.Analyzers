@@ -84,6 +84,10 @@
   <td>Cache the XmlSerializer.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0052.md">GU0052</a></td>
+  <td>Mark exception with [Serializable].</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0060.md">GU0060</a></td>
   <td>Enum member value conflict.</td>
 </tr>
