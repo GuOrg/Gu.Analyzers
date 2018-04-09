@@ -215,6 +215,14 @@ namespace Gu.Analyzers
                             return false;
                         }
                     }
+                    else if (xa.Expression is MemberAccessExpressionSyntax xma &&
+                             ya.Expression is MemberAccessExpressionSyntax yma)
+                    {
+                        if (xma.Name.Identifier.ValueText != yma.Name.Identifier.ValueText)
+                        {
+                            return false;
+                        }
+                    }
                     else if (TryGetArrayExpressions(xa.Expression, out var xExpressions) &&
                              TryGetArrayExpressions(ya.Expression, out var yExpressions))
                     {

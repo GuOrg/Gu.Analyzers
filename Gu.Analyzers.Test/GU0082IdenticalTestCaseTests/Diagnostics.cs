@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
+namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
 {
     using System;
     using System.Collections.Generic;
@@ -71,6 +71,48 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void Enum()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    internal class Foo
+    {
+        [↓TestCase(StringComparison.Ordinal)]
+        [↓TestCase(StringComparison.Ordinal)]
+        public void Test(StringComparison stringComparison)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void StringAndEnum()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    internal class Foo
+    {
+        [↓TestCase(""1"", StringComparison.Ordinal)]
+        [↓TestCase(""1"", StringComparison.Ordinal)]
+        public void Test(string text, StringComparison stringComparison)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
         public void Arrays()
         {
             var testCode = @"
@@ -80,8 +122,8 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(new[] { 1, 2 })]
-        [TestCase(new[] { 1, 2 })]
+        [↓TestCase(new[] { 1, 2 })]
+        [↓TestCase(new[] { 1, 2 })]
         public void Test(int[] xs)
         {
         }
@@ -101,8 +143,8 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(new int[] { 1, 2 })]
-        [TestCase(new[] { 1, 2 })]
+        [↓TestCase(new int[] { 1, 2 })]
+        [↓TestCase(new[] { 1, 2 })]
         public void Test(int[] xs)
         {
         }
@@ -121,8 +163,8 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(new[] { 1, 2 })]
-        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        [↓TestCase(new[] { 1, 2 })]
+        [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
         public void Test(int[] xs)
         {
         }
@@ -141,8 +183,8 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
-        [TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
+        [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
         public void Test(int[] xs)
         {
         }
