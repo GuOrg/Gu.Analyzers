@@ -156,7 +156,6 @@ namespace RoslynSandbox
 
             [Explicit("Not sure here.")]
             [TestCase("a = 1;", "a = 2;", Result.Yes)]
-            [TestCase("a = 1;", "a = 2;", Result.Yes)]
             [TestCase("a = 2;", "a = 3;", Result.Yes)]
             [TestCase("a = 3;", "a = 2;", Result.Yes)]
             public void Lambda(string firstStatement, string otherStatement, Result expected)

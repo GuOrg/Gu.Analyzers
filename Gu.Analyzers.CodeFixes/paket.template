@@ -1,5 +1,5 @@
 ﻿type file
-version 1.2.8.0-dev
+version 1.2.9.0-dev
 title Gu.Analyzers
 id Gu.Analyzers
 authors Johan Larsson, milleniumbug
@@ -13,7 +13,8 @@ projectUrl https://github.com/JohanLarsson/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releasenotes
-  FEATURE: New analyzer: check testcase attribute arguments & parameter types.
+  FEATURE: New analyzer: check that exceptions are [Serializable].
+  BUGFIX: GU0082 handle enums.
 
 files
   bin/Release/netstandard1.3/Gu.Analyzers.Analyzers.dll ==> analyzers/dotnet/cs

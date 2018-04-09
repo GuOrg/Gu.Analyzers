@@ -1,3 +1,7 @@
+#### 1.2.9
+* FEATURE: New analyzer: check that exceptions are [Serializable].
+* BUGFIX: GU0082 handle enums.
+
 #### 1.2.6
 * FEATURE: New analyzer: check testcase attribute arguments & parameter types.
 
