@@ -1,8 +1,6 @@
 namespace Gu.Analyzers
 {
-    using System.Threading;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class SymbolExt
     {
