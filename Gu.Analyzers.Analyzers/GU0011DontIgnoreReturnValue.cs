@@ -101,23 +101,18 @@ namespace Gu.Analyzers
                     method = method.ReducedFrom;
                 }
 
-                if (method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
+                if (method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration) &&
+                    ReturnValueWalker.TrySingle(declaration, out var returnValue))
                 {
-                    using (var walker = ReturnValueWalker.Borrow(declaration, Search.Recursive, semanticModel, cancellationToken))
+                    if (returnValue is IdentifierNameSyntax identifierName &&
+                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out _))
                     {
-                        foreach (var returnValue in walker)
-                        {
-                            if (returnValue is IdentifierNameSyntax identifierName &&
-                                method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out _))
-                            {
-                                return true;
-                            }
+                        return true;
+                    }
 
-                            if (returnValue is InstanceExpressionSyntax)
-                            {
-                                return true;
-                            }
-                        }
+                    if (returnValue is InstanceExpressionSyntax)
+                    {
+                        return true;
                     }
                 }
 

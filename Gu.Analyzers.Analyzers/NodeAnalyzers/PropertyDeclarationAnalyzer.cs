@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -31,57 +31,20 @@
             }
 
             if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-                context.ContainingSymbol is IPropertySymbol property)
+                context.ContainingSymbol is IPropertySymbol property &&
+                property.GetMethod != null &&
+                ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
             {
+                if (property.Type.IsReferenceType &&
+                    property.SetMethod == null &&
+                    returnValue is ObjectCreationExpressionSyntax)
                 {
-                    if (propertyDeclaration.ExpressionBody is ArrowExpressionClauseSyntax expressionBody)
-                    {
-                        if (property.Type.IsReferenceType &&
-                            expressionBody.Expression is ObjectCreationExpressionSyntax)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor, expressionBody.GetLocation()));
-                        }
-                        else if (expressionBody.Expression is MemberAccessExpressionSyntax memberAccess &&
-                                 IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GU0008AvoidRelayProperties.Descriptor, memberAccess.GetLocation()));
-                        }
-                    }
-                    else if (propertyDeclaration.TryGetGetter(out var getter))
-                    {
-                        using (var walker = ReturnValueWalker.Borrow(getter, Search.Recursive, context.SemanticModel, context.CancellationToken))
-                        {
-                            if (walker.TrySingle(out var returnValue))
-                            {
-                                if (property.Type.IsReferenceType &&
-                                    returnValue is ObjectCreationExpressionSyntax)
-                                {
-                                    if (getter.Contains(returnValue) &&
-                                        returnValue.FirstAncestor<ReturnStatementSyntax>() is ReturnStatementSyntax returnStatement)
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor, returnStatement.GetLocation()));
-                                    }
-                                    else
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor, getter.GetLocation()));
-                                    }
-                                }
-                                else if (returnValue is MemberAccessExpressionSyntax memberAccess &&
-                                         IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
-                                {
-                                    if (getter.Contains(returnValue) &&
-                                        returnValue.FirstAncestor<ReturnStatementSyntax>() is ReturnStatementSyntax returnStatement)
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0008AvoidRelayProperties.Descriptor, returnStatement.GetLocation()));
-                                    }
-                                    else
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0008AvoidRelayProperties.Descriptor, getter.GetLocation()));
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor, returnValue.GetLocation()));
+                }
+                else if (returnValue is MemberAccessExpressionSyntax memberAccess &&
+                         IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(GU0008AvoidRelayProperties.Descriptor, memberAccess.GetLocation()));
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
+namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 
         public int D { get; }
 
-        public Foo Bar ↓=> new Foo(this.A, this.B, this.C, this.D);
+        public Foo Bar => ↓new Foo(this.A, this.B, this.C, this.D);
     }
 }";
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
 
         public int D { get; }
 
-        public Foo Bar ↓=> new Foo(A, B, C, D);
+        public Foo Bar => ↓new Foo(A, B, C, D);
     }
 }";
 
@@ -147,7 +147,7 @@ namespace RoslynSandbox
 
         public Foo Bar
         { 
-            get { ↓return new Foo(this.A, this.B, this.C, this.D); }
+            get { return ↓new Foo(this.A, this.B, this.C, this.D); }
         }
     }
 }";
@@ -204,7 +204,7 @@ namespace RoslynSandbox
 
         public int D { get; }
 
-        public Foo Bar ↓=> new Foo(A, B, C, D);
+        public Foo Bar => ↓new Foo(A, B, C, D);
     }
 }";
 
@@ -257,7 +257,7 @@ namespace RoslynSandbox
             this.d = d;
         }
 
-        public Foo Bar ↓=> new Foo(this.a, this.b, this.c, this.d);
+        public Foo Bar => ↓new Foo(this.a, this.b, this.c, this.d);
     }
 }";
 
@@ -307,7 +307,7 @@ namespace RoslynSandbox
             _d = d;
         }
 
-        public Foo Bar ↓=> new Foo(_a, _b, _c, _d);
+        public Foo Bar => ↓new Foo(_a, _b, _c, _d);
     }
 }";
 
@@ -348,7 +348,7 @@ namespace RoslynSandbox
         {
         }
 
-        public Foo Bar ↓=> new Foo();
+        public Foo Bar => ↓new Foo();
     }
 }";
 
@@ -385,7 +385,7 @@ namespace RoslynSandbox
         
         public int Value { get; set; }
 
-        public Foo Bar ↓=> new Foo(() => this.Value);
+        public Foo Bar => ↓new Foo(() => this.Value);
     }
 }";
 
@@ -427,7 +427,7 @@ namespace RoslynSandbox
         
         public int Value { get; set; }
 
-        public Foo Bar ↓=> new Foo(CreateNumber);
+        public Foo Bar => ↓new Foo(CreateNumber);
 
         private static int CreateNumber() => 2;
     }
@@ -480,7 +480,7 @@ namespace RoslynSandbox
 
         public int D { get; set; }
 
-        public Foo Bar ↓=> new Foo(this.A, this.B, this.C, this.D);
+        public Foo Bar => ↓new Foo(this.A, this.B, this.C, this.D);
     }
 }";
 
@@ -536,7 +536,7 @@ namespace RoslynSandbox
 
         public int D { get; set; }
 
-        public Foo Bar ↓=> new Foo(A, B, C, D);
+        public Foo Bar => ↓new Foo(A, B, C, D);
     }
 }";
 
@@ -589,7 +589,7 @@ namespace RoslynSandbox
             this.d = d;
         }
 
-        public Foo Bar ↓=> new Foo(this.a, this.b, this.c, this.d);
+        public Foo Bar => ↓new Foo(this.a, this.b, this.c, this.d);
     }
 }";
 
@@ -639,7 +639,7 @@ namespace RoslynSandbox
             _d = d;
         }
 
-        public Foo Bar ↓=> new Foo(_a, _b, _c, _d);
+        public Foo Bar => ↓new Foo(_a, _b, _c, _d);
     }
 }";
 
@@ -692,7 +692,7 @@ namespace RoslynSandbox
 
         public int D { get; set; }
 
-        public Foo Bar ↓=> new Foo(this.A, this.B, this.C, 0)
+        public Foo Bar => ↓new Foo(this.A, this.B, this.C, 0)
             {
                 D = this.D
             };
@@ -757,7 +757,7 @@ namespace RoslynSandbox
 
         public Foo Bar1 { get; }
     
-        public Foo Bar2 ↓=> new Foo(this.A, this.B, this.C, this.Bar1.D);
+        public Foo Bar2 => ↓new Foo(this.A, this.B, this.C, this.Bar1.D);
     }
 }";
 
@@ -819,7 +819,7 @@ namespace RoslynSandbox
 
         public Foo Bar1 { get; set; }
     
-        public Foo Bar2 ↓=> new Foo(this.A, this.B, this.C, this.Bar1.D);
+        public Foo Bar2 => ↓new Foo(this.A, this.B, this.C, this.Bar1.D);
     }
 }";
 

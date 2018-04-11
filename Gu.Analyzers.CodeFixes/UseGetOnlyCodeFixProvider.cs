@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -45,7 +45,7 @@
                 var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == GU0021CalculatedPropertyAllocates.DiagnosticId)
                 {
-                    if (TryGetObjectCreation(syntaxNode, out var objectCreation))
+                    if (syntaxNode is ObjectCreationExpressionSyntax objectCreation)
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
                         var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
@@ -108,21 +108,6 @@
                 (x, _) => ((PropertyDeclarationSyntax)x).WithExpressionBody(null)
                                                         .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                                                         .WithAccessorList(GetOnlyAccessorList));
-        }
-
-        private static bool TryGetObjectCreation(SyntaxNode node, out ObjectCreationExpressionSyntax result)
-        {
-            result = null;
-            if (node is ArrowExpressionClauseSyntax arrow)
-            {
-                result = arrow.Expression as ObjectCreationExpressionSyntax;
-            }
-            else if (node is ReturnStatementSyntax returnStatement)
-            {
-                result = returnStatement.Expression as ObjectCreationExpressionSyntax;
-            }
-
-            return result != null;
         }
 
         private static bool IsAnyInitializerMutable(SemanticModel semanticModel, CancellationToken cancellationToken, InitializerExpressionSyntax initializer)
