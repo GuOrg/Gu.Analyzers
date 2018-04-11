@@ -33,7 +33,7 @@
             using (var walker = NullCheckWalker.Borrow(scope.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
                 return walker.TryGetFirst(parameter, semanticModel, cancellationToken, out var check) &&
-                       check.IsBeforeInScope(scope) == Result.Yes;
+                       check.IsExecutedBefore(scope) == Result.Yes;
             }
         }
 

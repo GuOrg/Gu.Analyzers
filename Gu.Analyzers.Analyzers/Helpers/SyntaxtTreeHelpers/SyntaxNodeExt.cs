@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Threading;
 
@@ -56,14 +56,31 @@
             return false;
         }
 
-        internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
+        internal static Result IsExecutedBefore(this SyntaxNode node, SyntaxNode other)
         {
-            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
-            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
+            if (node is null ||
+                other is null)
+            {
+                return Result.No;
+            }
+
+            if (node.Contains(other) &&
+                node.SpanStart < other.SpanStart)
+            {
+                return Result.Yes;
+            }
+
+            if (!node.SharesAncestor<MemberDeclarationSyntax>(other))
+            {
+                return Result.Unknown;
+            }
+
+            var statement = node.FirstAncestorOrSelf<StatementSyntax>();
+            var otherStatement = other.FirstAncestorOrSelf<StatementSyntax>();
             if (statement == null ||
                 otherStatement == null)
             {
-                return Result.No;
+                return Result.Unknown;
             }
 
             var block = statement.Parent as BlockSyntax;

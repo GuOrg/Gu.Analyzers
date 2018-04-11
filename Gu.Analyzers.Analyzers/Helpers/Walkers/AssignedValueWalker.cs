@@ -578,7 +578,7 @@
                     this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
                     node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                 {
-                    return node.IsBeforeInScope(this.context);
+                    return node.IsExecutedBefore(this.context);
                 }
 
                 return Result.Yes;
@@ -591,7 +591,7 @@
                     node.SharesAncestor<MemberDeclarationSyntax>(this.context) &&
                     lambda == null)
                 {
-                    return node.IsBeforeInScope(this.context);
+                    return node.IsExecutedBefore(this.context);
                 }
 
                 if (lambda != null &&
@@ -600,7 +600,7 @@
                     lambda.Contains(declarator) &&
                     IsInSameLambda(this.context, node))
                 {
-                    return node.IsBeforeInScope(this.context);
+                    return node.IsExecutedBefore(this.context);
                 }
 
                 return Result.Yes;
