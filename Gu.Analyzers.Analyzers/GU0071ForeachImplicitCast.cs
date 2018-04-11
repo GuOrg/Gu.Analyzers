@@ -68,7 +68,7 @@ namespace Gu.Analyzers
                 return enumerableType.ConvertedType != KnownSymbol.IEnumerable;
             }
 
-            if (enumerableType.ConvertedType.TryFirstMethod("GetEnumerator", out var method) &&
+            if (enumerableType.ConvertedType.TryFindFirstMethodRecursive("GetEnumerator", out var method) &&
                 method.ReturnType is INamedTypeSymbol returnType &&
                 returnType.TypeArguments.TrySingle(out var enumeratorTypeArg))
             {

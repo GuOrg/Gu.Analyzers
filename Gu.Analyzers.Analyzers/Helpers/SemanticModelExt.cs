@@ -19,7 +19,7 @@ namespace Gu.Analyzers
                    semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
         }
 
-        public static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
+        internal static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
             where TSymbol : class, ISymbol
         {
             symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol ??
