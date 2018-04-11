@@ -5,6 +5,7 @@ namespace Gu.Analyzers
         Unknown,
         Yes,
         No,
-        Maybe
+        AssumeNo,
+        Maybe,
     }
 }
