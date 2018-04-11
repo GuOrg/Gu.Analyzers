@@ -19,6 +19,14 @@ namespace Gu.Analyzers
                    semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
         }
 
+        public static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
+            where TSymbol : class, ISymbol
+        {
+            symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol ??
+                     GetDeclaredSymbolSafe(semanticModel, node, cancellationToken) as TSymbol;
+            return symbol != null;
+        }
+
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
         {
             return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
@@ -87,23 +95,28 @@ namespace Gu.Analyzers
                 return semanticModel;
             }
 
-            if (semanticModel.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
-            {
-                return semanticModel.Compilation.GetSemanticModel(expression.SyntaxTree);
-            }
+            return Cache.GetOrAdd(expression.SyntaxTree, GetSemanticModel);
 
-            foreach (var metadataReference in semanticModel.Compilation.References)
+            SemanticModel GetSemanticModel(SyntaxTree syntaxTree)
             {
-                if (metadataReference is CompilationReference compilationReference)
+                if (semanticModel.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
                 {
-                    if (compilationReference.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
+                    return semanticModel.Compilation.GetSemanticModel(expression.SyntaxTree);
+                }
+
+                foreach (var metadataReference in semanticModel.Compilation.References)
+                {
+                    if (metadataReference is CompilationReference compilationReference)
                     {
-                        return compilationReference.Compilation.GetSemanticModel(expression.SyntaxTree);
+                        if (compilationReference.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
+                        {
+                            return compilationReference.Compilation.GetSemanticModel(expression.SyntaxTree);
+                        }
                     }
                 }
-            }
 
-            return null;
+                return null;
+            }
         }
     }
 }
