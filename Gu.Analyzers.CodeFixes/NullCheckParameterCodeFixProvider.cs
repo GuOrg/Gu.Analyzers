@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -43,7 +43,7 @@
                     var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
                     if (method != null)
                     {
-                        using (var walker = AssignmentWalker.Create(method, Search.TopLevel, semanticModel, context.CancellationToken))
+                        using (var walker = AssignmentExecutionWalker.Borrow(method, Search.TopLevel, semanticModel, context.CancellationToken))
                         {
                             if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
                             {

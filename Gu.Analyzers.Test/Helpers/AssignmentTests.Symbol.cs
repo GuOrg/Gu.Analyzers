@@ -36,7 +36,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindMemberAccessExpression("this.value");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, AssignmentWalker.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out var result));
+                Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out var result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
@@ -71,12 +71,12 @@ namespace RoslynSandbox
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
 
@@ -112,12 +112,12 @@ namespace RoslynSandbox
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = value", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
 
@@ -149,12 +149,12 @@ namespace RoslynSandbox
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = 3", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

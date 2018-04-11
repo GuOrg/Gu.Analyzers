@@ -14,7 +14,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            return AssignmentWalker.FirstWith(symbol, body, Search.TopLevel, semanticModel, cancellationToken, out result);
+            return AssignmentExecutionWalker.FirstWith(symbol, body, Search.TopLevel, semanticModel, cancellationToken, out result);
         }
     }
 }
