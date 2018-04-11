@@ -11,9 +11,11 @@
     internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
+        private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
+        private readonly MemberWalkers memberWalkers = new MemberWalkers();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
-        private readonly MemberWalker memberWalker;
+        private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
+        private readonly PublicMemberWalker publicMemberWalker;
 
         private SyntaxNode context;
         private SemanticModel semanticModel;
@@ -21,7 +23,7 @@
 
         private AssignedValueWalker()
         {
-            this.memberWalker = new MemberWalker(this);
+            this.publicMemberWalker = new PublicMemberWalker(this);
         }
 
         public int Count => this.values.Count;
@@ -36,7 +38,7 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.ShouldVisit(node) != Result.Yes)
+            if (this.ShouldVisit(node).IsEither(Result.AssumeNo, Result.No))
             {
                 return;
             }
@@ -54,11 +56,8 @@
         {
             if (node.Initializer != null)
             {
-                if (this.visitedLocations.Add(node.Initializer))
-                {
-                    var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
-                    this.HandleInvoke(ctor, node.Initializer.ArgumentList);
-                }
+                var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
+                this.HandleInvoke(ctor, node.Initializer.ArgumentList);
             }
             else
             {
@@ -112,30 +111,22 @@
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (this.visitedLocations.Add(node))
+            if (this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol method)
             {
                 base.VisitInvocationExpression(node);
-                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (method == null)
-                {
-                    return;
-                }
-
                 if (this.context is ElementAccessExpressionSyntax &&
                     node.Expression is MemberAccessExpressionSyntax memberAccess &&
+                    method.Name == "Add" &&
                     SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(memberAccess.Expression, this.cancellationToken)))
                 {
-                    if (method.Name == "Add")
+                    if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
+                        node.ArgumentList?.Arguments.Count == 2)
                     {
-                        if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
-                            node.ArgumentList?.Arguments.Count == 2)
-                        {
-                            this.values.Add(node.ArgumentList.Arguments[1].Expression);
-                        }
-                        else if (node.ArgumentList?.Arguments.Count == 1)
-                        {
-                            this.values.Add(node.ArgumentList.Arguments[0].Expression);
-                        }
+                        this.values.Add(node.ArgumentList.Arguments[1].Expression);
+                    }
+                    else if (node.ArgumentList?.Arguments.Count == 1)
+                    {
+                        this.values.Add(node.ArgumentList.Arguments[0].Expression);
                     }
                 }
 
@@ -146,7 +137,6 @@
         public override void VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
-                this.visitedLocations.Add(node) &&
                 this.context is ElementAccessExpressionSyntax &&
                 SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
             {
@@ -155,47 +145,21 @@
             }
         }
 
-        public override void VisitArgument(ArgumentSyntax node)
+        public override void VisitIsPatternExpression(IsPatternExpressionSyntax node)
         {
-            if (this.visitedLocations.Add(node) &&
-                (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) ||
-                 node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword)))
-            {
-                var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
-                var argSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
-                if (invocation != null &&
-                    (SymbolComparer.Equals(this.CurrentSymbol, argSymbol) ||
-                     this.refParameters.Contains(argSymbol as IParameterSymbol)))
-                {
-                    var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                    if (method != null &&
-                        method.DeclaringSyntaxReferences.Length > 0)
-                    {
-                        foreach (var reference in method.DeclaringSyntaxReferences)
-                        {
-                            var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                            if (methodDeclaration.TryGetMatchingParameter(node, out var parameterSyntax))
-                            {
-                                var parameterSymbol = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken);
-                                if (parameterSymbol != null)
-                                {
-                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
-                                    {
-                                        this.refParameters.Add(parameterSymbol).IgnoreReturnValue();
-                                    }
+            this.HandleAssignedValue(node.Pattern, node.Expression);
+            base.VisitIsPatternExpression(node);
+        }
 
-                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
-                                    {
-                                        this.values.Add(node.Expression);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        public override void VisitCasePatternSwitchLabel(CasePatternSwitchLabelSyntax node)
+        {
+            if (node.Parent is SwitchSectionSyntax switchSection &&
+                switchSection.Parent is SwitchStatementSyntax switchStatement)
+            {
+                this.HandleAssignedValue(node.Pattern, switchStatement.Expression);
             }
 
-            base.VisitArgument(node);
+            base.VisitCasePatternSwitchLabel(node);
         }
 
         internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -273,47 +237,128 @@
             return pooled;
         }
 
-        internal void HandleInvoke(ISymbol method, ArgumentListSyntax argumentList)
+        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
         {
-            if (method != null)
+            if (method != null &&
+                (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
+                 this.CurrentSymbol.ContainingType.Is(method.ContainingType)))
             {
-                var before = this.values.Count;
-                if (method.ContainingType.Is(this.CurrentSymbol.ContainingType) ||
-                    this.CurrentSymbol.ContainingType.Is(method.ContainingType))
+                if (TryGetWalker(out var walker))
                 {
-                    foreach (var reference in method.DeclaringSyntaxReferences)
+                    foreach (var value in walker.values)
                     {
-                        base.Visit(reference.GetSyntax(this.cancellationToken));
+                        this.values.Add(GetArgumentValue(value));
+                    }
+
+                    foreach (var outValue in walker.outValues)
+                    {
+                        this.values.Add(GetArgumentValue(outValue));
+                    }
+                }
+            }
+
+            bool TryGetWalker(out AssignedValueWalker result)
+            {
+                result = null;
+                if (TryGetKey(out var key))
+                {
+                    if (this.memberWalkers.TryGetValue(key, out result))
+                    {
+                        return false;
+                    }
+
+                    if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                    {
+                        result = Borrow(() => new AssignedValueWalker());
+                        this.memberWalkers.Add(key, result);
+                        result.CurrentSymbol = this.CurrentSymbol;
+                        result.semanticModel = this.semanticModel;
+                        result.cancellationToken = this.cancellationToken;
+                        result.context = this.context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null ? this.context : declaration;
+                        result.memberWalkers.Parent = this.memberWalkers;
+                        if (argumentList != null)
+                        {
+                            foreach (var argument in argumentList.Arguments)
+                            {
+                                if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
+                                    TryGetMatchingParameter(argument, out var parameter))
+                                {
+                                    result.refParameters.Add(parameter);
+                                }
+                                else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
+                                         TryGetMatchingParameter(argument, out parameter))
+                                {
+                                    result.outParameters.Add(parameter);
+                                }
+                            }
+                        }
+
+                        result.Visit(declaration);
                     }
                 }
 
-                if (before != this.values.Count &&
-                    argumentList != null)
+                return result != null;
+
+                bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol parameter)
                 {
-                    for (var i = before; i < this.values.Count; i++)
+                    parameter = null;
+                    if (this.semanticModel.GetSymbolSafe(argument.Expression, this.cancellationToken) is ISymbol symbol)
                     {
-                        if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
-                            parameter.RefKind != RefKind.Out)
+                        if (SymbolComparer.Equals(this.CurrentSymbol, symbol) ||
+                            this.refParameters.Contains(symbol as IParameterSymbol) ||
+                            this.outParameters.Contains(symbol as IParameterSymbol))
                         {
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
-                            {
-                                this.values[i] = arg;
-                            }
+                            return method.TryGetMatchingParameter(argument, out parameter);
                         }
                     }
+
+                    return false;
                 }
+
+                bool TryGetKey(out SyntaxNode node)
+                {
+                    if (argumentList != null)
+                    {
+                        node = argumentList;
+                        return true;
+                    }
+
+                    return method.TrySingleDeclaration(this.cancellationToken, out node);
+                }
+            }
+
+            ExpressionSyntax GetArgumentValue(ExpressionSyntax value)
+            {
+                if (value is IdentifierNameSyntax identifierName &&
+                    method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                {
+                    if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                    {
+                        return argument.Expression;
+                    }
+
+                    if (parameter.HasExplicitDefaultValue &&
+                        parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                    {
+                        return parameterDeclaration.Default?.Value;
+                    }
+                }
+
+                return value;
             }
         }
 
         protected override void Clear()
         {
             this.values.Clear();
-            this.visitedLocations.Clear();
+            this.outValues.Clear();
             this.refParameters.Clear();
+            this.outParameters.Clear();
             this.CurrentSymbol = null;
             this.context = null;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
+            this.memberWalkers.Clear();
         }
 
         private void Run()
@@ -323,16 +368,14 @@
                 return;
             }
 
-            if (this.CurrentSymbol is ILocalSymbol local)
+            if (this.CurrentSymbol is ILocalSymbol local &&
+                local.TrySingleDeclaration(this.cancellationToken, out var declaration))
             {
-                if (local.TrySingleDeclaration(this.cancellationToken, out SyntaxNode declaration))
+                var scope = (SyntaxNode)declaration.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                        declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (scope != null)
                 {
-                    var scope = (SyntaxNode)declaration.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                    if (scope != null)
-                    {
-                        this.Visit(scope);
-                    }
+                    this.Visit(scope);
                 }
 
                 return;
@@ -378,15 +421,12 @@
                     {
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
-                            if (this.visitedLocations.Add(creation))
+                            if (contextCtor == null ||
+                                creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
                             {
-                                if (contextCtor == null ||
-                                    creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
-                                {
-                                    this.VisitObjectCreationExpression(creation);
-                                    var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                    this.HandleInvoke(method, creation.ArgumentList);
-                                }
+                                this.VisitObjectCreationExpression(creation);
+                                var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
+                                this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
                             }
                         }
 
@@ -436,7 +476,7 @@
                             foreach (var reference in type.DeclaringSyntaxReferences)
                             {
                                 var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                                this.memberWalker.Visit(typeDeclaration);
+                                this.publicMemberWalker.Visit(typeDeclaration);
                             }
 
                             type = type.BaseType;
@@ -446,21 +486,30 @@
             }
         }
 
-        private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
+        private void HandleAssignedValue(SyntaxNode assigned, ExpressionSyntax value)
         {
             if (value == null)
             {
                 return;
             }
 
-            if (assignee is VariableDeclaratorSyntax declarator &&
+            if (assigned is VariableDeclaratorSyntax declarator &&
                 declarator.Identifier.ValueText != this.CurrentSymbol.Name)
             {
                 return;
             }
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
-                assignee is MemberAccessExpressionSyntax)
+                assigned is DeclarationPatternSyntax declarationPattern &&
+                declarationPattern.Designation is SingleVariableDesignationSyntax singleVariableDesignation &&
+                singleVariableDesignation.Identifier.ValueText == this.CurrentSymbol.Name)
+            {
+                this.values.Add(value);
+                return;
+            }
+
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
+                assigned is MemberAccessExpressionSyntax)
             {
                 return;
             }
@@ -529,43 +578,92 @@
                 return;
             }
 
-            var assignedSymbol = this.semanticModel.GetSymbolSafe(assignee, this.cancellationToken) ??
-                                 this.semanticModel.GetDeclaredSymbolSafe(assignee, this.cancellationToken);
+            if (TryGetSetterWalker(out var setterWalker))
+            {
+                foreach (var nested in setterWalker.values)
+                {
+                    if (nested is IdentifierNameSyntax identifierName &&
+                        identifierName.Identifier.ValueText == "value")
+                    {
+                        this.values.Add(value);
+                    }
+                    else
+                    {
+                        this.values.Add(nested);
+                    }
+                }
+
+                return;
+            }
+
+            var assignedSymbol = this.semanticModel.GetSymbolSafe(assigned, this.cancellationToken) ??
+                                 this.semanticModel.GetDeclaredSymbolSafe(assigned, this.cancellationToken);
             if (assignedSymbol == null)
             {
                 return;
             }
 
-            if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>() &&
-                assignedSymbol is IPropertySymbol property &&
-                !SymbolComparer.Equals(this.CurrentSymbol, property) &&
-                Property.AssignsSymbolInSetter(property, this.CurrentSymbol, this.semanticModel, this.cancellationToken))
+            if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
+                this.refParameters.Contains(assignedSymbol as IParameterSymbol))
             {
-                var before = this.values.Count;
-                foreach (var reference in property.DeclaringSyntaxReferences)
+                this.values.Add(value);
+            }
+
+            if (this.outParameters.Contains(assignedSymbol as IParameterSymbol))
+            {
+                this.outValues.Add(value);
+            }
+
+            bool TryGetSetterWalker(out AssignedValueWalker walker)
+            {
+                walker = null;
+                if (!this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
                 {
-                    var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    if (declaration.TryGetSetter(out var setter))
+                    return false;
+                }
+
+                if (TryGetProperty(out var property) &&
+                    !SymbolComparer.Equals(this.CurrentSymbol, property) &&
+                    property.ContainingType.Is(this.CurrentSymbol.ContainingType))
+                {
+                    if (this.memberWalkers.TryGetValue(value, out walker))
                     {
-                        this.Visit(setter);
+                        return false;
+                    }
+
+                    if (property.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                        declaration.TryGetSetter(out var setter))
+                    {
+                        walker = Borrow(() => new AssignedValueWalker());
+                        this.memberWalkers.Add(value, walker);
+                        walker.CurrentSymbol = this.CurrentSymbol;
+                        walker.semanticModel = this.semanticModel;
+                        walker.cancellationToken = this.cancellationToken;
+                        walker.context = setter;
+                        walker.memberWalkers.Parent = this.memberWalkers;
+                        walker.Visit(setter);
                     }
                 }
 
-                for (var i = before; i < this.values.Count; i++)
+                return walker != null;
+
+                bool TryGetProperty(out IPropertySymbol result)
                 {
-                    var parameter = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) as IParameterSymbol;
-                    if (Equals(parameter?.ContainingSymbol, property.SetMethod))
+                    if (assigned is IdentifierNameSyntax identifierName &&
+                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(identifierName.Identifier.ValueText, out result))
                     {
-                        this.values[i] = value;
+                        return true;
                     }
-                }
-            }
-            else
-            {
-                if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
-                    this.refParameters.Contains(assignedSymbol as IParameterSymbol))
-                {
-                    this.values.Add(value);
+
+                    if (assigned is MemberAccessExpressionSyntax memberAccess &&
+                        memberAccess.Expression is InstanceExpressionSyntax &&
+                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(memberAccess.Name.Identifier.ValueText, out result))
+                    {
+                        return true;
+                    }
+
+                    result = null;
+                    return false;
                 }
             }
         }
@@ -586,24 +684,19 @@
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
             {
-                var lambda = node.FirstAncestor<AnonymousFunctionExpressionSyntax>();
-                if (node is ExpressionStatementSyntax &&
-                    node.SharesAncestor<MemberDeclarationSyntax>(this.context) &&
-                    lambda == null)
+                if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
                 {
-                    return node.IsExecutedBefore(this.context);
+                    if (this.CurrentSymbol is ILocalSymbol local &&
+                        local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                        lambda.Contains(declaration))
+                    {
+                        return node.IsExecutedBefore(this.context);
+                    }
+
+                    return Result.Yes;
                 }
 
-                if (lambda != null &&
-                    this.CurrentSymbol is ILocalSymbol local &&
-                    local.TrySingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declarator) &&
-                    lambda.Contains(declarator) &&
-                    IsInSameLambda(this.context, node))
-                {
-                    return node.IsExecutedBefore(this.context);
-                }
-
-                return Result.Yes;
+                return node.IsExecutedBefore(this.context);
             }
 
             if (this.context is InvocationExpressionSyntax &&
@@ -613,20 +706,13 @@
             }
 
             return Result.Yes;
-
-            bool IsInSameLambda(SyntaxNode node1, SyntaxNode node2)
-            {
-                var lambda1 = node1.FirstAncestor<AnonymousFunctionExpressionSyntax>();
-                return lambda1 != null &&
-                       ReferenceEquals(lambda1, node2.FirstAncestor<AnonymousFunctionExpressionSyntax>());
-            }
         }
 
-        private class MemberWalker : CSharpSyntaxWalker
+        private class PublicMemberWalker : CSharpSyntaxWalker
         {
             private readonly AssignedValueWalker inner;
 
-            public MemberWalker(AssignedValueWalker inner)
+            public PublicMemberWalker(AssignedValueWalker inner)
             {
                 this.inner = inner;
             }
@@ -663,6 +749,41 @@
             public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
             {
                 this.inner.VisitArrowExpressionClause(node);
+            }
+        }
+
+        private class MemberWalkers
+        {
+            private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new Dictionary<SyntaxNode, AssignedValueWalker>();
+
+            public MemberWalkers Parent { get; set; }
+
+            private Dictionary<SyntaxNode, AssignedValueWalker> Current => this.Parent?.Current ??
+                                                                        this.map;
+
+            public void Add(SyntaxNode location, AssignedValueWalker walker)
+            {
+                this.Current.Add(location, walker);
+            }
+
+            public bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
+            {
+                return this.Current.TryGetValue(location, out walker);
+            }
+
+            public void Clear()
+            {
+                if (this.map != null)
+                {
+                    foreach (var walker in this.map.Values)
+                    {
+                        walker?.Dispose();
+                    }
+
+                    this.map.Clear();
+                }
+
+                this.Parent = null;
             }
         }
     }

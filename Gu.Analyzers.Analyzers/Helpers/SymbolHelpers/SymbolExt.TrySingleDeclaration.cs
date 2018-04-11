@@ -7,7 +7,6 @@ namespace Gu.Analyzers
 
     internal static partial class SymbolExt
     {
-        
         internal static bool TrySingleDeclaration(this IFieldSymbol field, CancellationToken cancellationToken, out FieldDeclarationSyntax declaration)
         {
             declaration = null;
