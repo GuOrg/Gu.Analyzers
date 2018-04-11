@@ -1,19 +1,23 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Threading;
 
-    internal sealed class PooledHashSet<T> : IDisposable, IReadOnlyCollection<T>
+    [DebuggerTypeProxy(typeof(PooledSetDebugView<>))]
+    [DebuggerDisplay("Count = {this.Count}, refCount = {this.refCount}")]
+    internal sealed class PooledSet<T> : IDisposable, IReadOnlyCollection<T>
     {
-        private static readonly ConcurrentQueue<PooledHashSet<T>> Cache = new ConcurrentQueue<PooledHashSet<T>>();
+        private static readonly ConcurrentQueue<PooledSet<T>> Cache = new ConcurrentQueue<PooledSet<T>>();
         private readonly HashSet<T> inner = new HashSet<T>();
 
         private int refCount;
 
-        private PooledHashSet()
+        private PooledSet()
         {
         }
 
@@ -25,42 +29,53 @@
             return this.inner.Add(item);
         }
 
-        public bool Contains(T item) => this.inner.Contains(item);
+        public bool Contains(T item)
+        {
+            this.ThrowIfDisposed();
+            return this.inner.Contains(item);
+        }
 
         public IEnumerator<T> GetEnumerator() => this.inner.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.inner).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
-            this.refCount--;
-            Debug.Assert(this.refCount >= 0, "refCount>= 0");
-            if (this.refCount == 0)
+            if (Interlocked.Decrement(ref this.refCount) == 0)
             {
+                Debug.Assert(!Cache.Contains(this), "!Cache.Contains(this)");
                 this.inner.Clear();
                 Cache.Enqueue(this);
             }
         }
 
-        internal static PooledHashSet<T> Borrow()
+        /// <summary>
+        /// The result from this call is meant to be used in a using.
+        /// </summary>
+        internal static PooledSet<T> Borrow()
         {
-            if (!Cache.TryDequeue(out var set))
+            if (Cache.TryDequeue(out var set))
             {
-                set = new PooledHashSet<T>();
+                Debug.Assert(set.refCount == 0, $"{nameof(Borrow)} set.refCount == {set.refCount}");
+                set.refCount = 1;
+                return set;
             }
 
-            set.refCount = 1;
-            return set;
+            return new PooledSet<T> { refCount = 1 };
         }
 
-        internal static PooledHashSet<T> Borrow(PooledHashSet<T> set)
+        /// <summary>
+        /// The result from this call is meant to be used in a using.
+        /// </summary>
+        internal static PooledSet<T> BorrowOrIncrementUsage(PooledSet<T> set)
         {
             if (set == null)
             {
                 return Borrow();
             }
 
-            set.refCount++;
+            var current = Interlocked.Increment(ref set.refCount);
+            Debug.Assert(current >= 1, $"{nameof(BorrowOrIncrementUsage)} set.refCount == {current}");
             return set;
         }
 
@@ -69,6 +84,7 @@
         {
             if (this.refCount <= 0)
             {
+                Debug.Assert(this.refCount == 0, $"{nameof(this.ThrowIfDisposed)} set.refCount == {this.refCount}");
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
         }

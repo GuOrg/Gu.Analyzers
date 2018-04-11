@@ -110,7 +110,7 @@ namespace Gu.Analyzers
 
         private void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
         {
-            using (var enumValuesSet = PooledHashSet<ulong>.Borrow())
+            using (var enumValuesSet = PooledSet<ulong>.Borrow())
             {
                 foreach (var enumMember in enumDeclaration.Members)
                 {
