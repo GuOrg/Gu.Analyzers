@@ -30,6 +30,7 @@ namespace Gu.Analyzers.Test
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.Collections.Generic;
 
     internal abstract class Foo
@@ -81,6 +82,18 @@ namespace RoslynSandbox
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
             // value = value;
+        }
+
+        private static IReadOnlyList<IDisposable> Flatten(IReadOnlyList<IDisposable> source, List<IDisposable> result = null)
+        {
+            result = result ?? new List<IDisposable>();
+            result.AddRange(source);
+            foreach (var condition in source)
+            {
+                Flatten(new[] { condition }, result);
+            }
+
+            return result;
         }
 
         private static int RecursiveStatementBodyMethodWithOptionalParameter(int value, IEnumerable<int> values = null)
