@@ -75,7 +75,8 @@ namespace Gu.Analyzers
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
                 if (method.ReturnsVoid ||
-                    method.ReturnType == KnownSymbol.MoqIReturnsResult)
+                    method.ContainingType.Is(KnownSymbol.MoqMockOfT) ||
+                    method.ContainingType.Is(KnownSymbol.MoqIFluentInterface))
                 {
                     return true;
                 }

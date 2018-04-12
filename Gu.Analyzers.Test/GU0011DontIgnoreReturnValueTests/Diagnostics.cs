@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -70,7 +70,7 @@ namespace RoslynSandbox
     {
         public Foo(ImmutableArray<int> values)
         {
-            values.Add(1);
+            ↓values.Add(1);
         }
     }
 }";
@@ -91,12 +91,35 @@ namespace RoslynSandbox
     {
         public Foo(ImmutableList<int> values)
         {
-            values.Add(1);
+            ↓values.Add(1);
         }
     }
 }";
             testCode = testCode.AssertReplace("Add(1)", call);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void MoqSetupNonVoidNoReturn()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Moq;
+    using NUnit.Framework;
+
+    public class Foo
+    {
+        [Test]
+        public void Test()
+        {
+            var mock = new Mock<IFormatProvider>();
+            ↓mock.Setup(x => x.GetFormat(It.IsAny<Type>()));
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

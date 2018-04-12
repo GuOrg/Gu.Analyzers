@@ -249,8 +249,8 @@ namespace RoslynSandbox
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
-            [Test]
-            public void MoqSetupReturns()
+            [TestCase("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)")]
+            public void MoqSetupReturns(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -267,6 +267,32 @@ namespace RoslynSandbox
             var mock = new Mock<IFormatProvider>();
             mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null);
         }
+    }
+}";
+                testCode = testCode.AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", code);
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void MoqSetupVoid()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using Moq;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            var mock = new Mock<IFoo>();
+            mock.Setup(x => x.Bar());
+        }
+    }
+
+    public interface IFoo
+    {
+        void Bar();
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
