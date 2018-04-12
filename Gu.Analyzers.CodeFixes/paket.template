@@ -1,5 +1,5 @@
 ﻿type file
-version 1.2.9.1-dev
+version 1.2.10.0-dev
 title Gu.Analyzers
 id Gu.Analyzers
 authors Johan Larsson, milleniumbug
@@ -13,8 +13,7 @@ projectUrl https://github.com/JohanLarsson/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releasenotes
-  FEATURE: New analyzer: check that exceptions are [Serializable].
-  BUGFIX: GU0082 handle enums.
+  BUGFIXES: Don't nag on fluent moq.
 
 files
   bin/Release/netstandard1.3/Gu.Analyzers.Analyzers.dll ==> analyzers/dotnet/cs

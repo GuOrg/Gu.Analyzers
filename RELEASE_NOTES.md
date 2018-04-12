@@ -1,3 +1,6 @@
+#### 1.2.10
+* BUGFIXES: Don't nag on fluent moq.
+
 #### 1.2.9
 * FEATURE: New analyzer: check that exceptions are [Serializable].
 * BUGFIX: GU0082 handle enums.
