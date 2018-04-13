@@ -31,5 +31,6 @@ using Gu.Roslyn.Asserts;
     typeof(System.Windows.Media.Matrix),
     typeof(System.Xaml.XamlLanguage),
     typeof(System.Collections.Immutable.ImmutableArray),
+    typeof(Ninject.StandardKernel),
     typeof(NUnit.Framework.Assert),
     typeof(Moq.Mock))]

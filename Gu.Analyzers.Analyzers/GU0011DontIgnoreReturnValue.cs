@@ -76,7 +76,8 @@ namespace Gu.Analyzers
             {
                 if (method.ReturnsVoid ||
                     method.ContainingType.Is(KnownSymbol.MoqMockOfT) ||
-                    method.ContainingType.Is(KnownSymbol.MoqIFluentInterface))
+                    method.ContainingType.Is(KnownSymbol.MoqIFluentInterface) ||
+                    method.ContainingType.Is(KnownSymbol.NinjectIFluentSyntax))
                 {
                     return true;
                 }

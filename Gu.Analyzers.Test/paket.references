@@ -6,6 +6,7 @@ group Test
   System.Reactive
   System.Reactive.Linq
   System.Reactive.PlatformServices
+  Ninject
 
 group Analyzers
   AsyncUsageAnalyzers

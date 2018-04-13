@@ -273,8 +273,8 @@ namespace RoslynSandbox
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
-            [Test]
-            public void MoqSetupVoid()
+            [TestCase("mock.Setup(x => x.Bar())")]
+            public void MoqSetupVoid(string setup)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -295,6 +295,28 @@ namespace RoslynSandbox
         void Bar();
     }
 }";
+                testCode = testCode.AssertReplace("mock.Setup(x => x.Bar())", setup);
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [TestCase("this.Bind<Foo>().To<Foo>()")]
+            [TestCase("this.Bind<Foo>().To<Foo>().InSingletonScope()")]
+            public void Ninject(string bind)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using Ninject.Modules;
+
+    public sealed class Foo : NinjectModule
+    {
+        public override void Load()
+        {
+            this.Bind<Foo>().To<Foo>();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("this.Bind<Foo>().To<Foo>()", bind);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
