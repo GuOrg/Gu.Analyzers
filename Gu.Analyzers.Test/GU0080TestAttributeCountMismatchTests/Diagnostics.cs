@@ -87,5 +87,24 @@ namespace RoslynSandbox
             testCode = testCode.AssertReplace("Test↓(int i)", signature);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [Test]
+        public void TestCaseParams()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    class Foo
+    {
+        [TestCase(1)]
+        public void Test↓(int i, int j, params int[] ints)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

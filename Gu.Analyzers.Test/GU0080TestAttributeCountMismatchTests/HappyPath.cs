@@ -91,5 +91,46 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void TestAndTestCaseParams()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    class Foo
+    {
+        [Test]
+        [TestCase(1, 2)]
+        [TestCase(1, 2, 3)]
+        public void Test(int i, params int[] ints)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void TestCaseParams()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    class Foo
+    {
+        [TestCase(1, 2)]
+        [TestCase(1, 2, 3)]
+        public void Test(int i, params int[] ints)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

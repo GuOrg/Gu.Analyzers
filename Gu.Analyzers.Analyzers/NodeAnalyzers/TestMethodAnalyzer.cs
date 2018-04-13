@@ -39,14 +39,22 @@ namespace Gu.Analyzers
                 context.ContainingSymbol is IMethodSymbol testMethod)
             {
                 if (TrySingleTestAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out var attribute) &&
-                    parameterList.Parameters.Count > 0)
+                    testMethod.Parameters.Length > 0)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                 }
 
                 if (TryFirstTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute))
                 {
-                    if (parameterList.Parameters.Count != CountArgs(attribute))
+                    if (testMethod.Parameters.TryLast(out var lastParameter) &&
+                        !lastParameter.IsParams)
+                    {
+                        if (CountArgs(attribute) < parameterList.Parameters.Count)
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
+                        }
+                    }
+                    else if (testMethod.Parameters.Length != CountArgs(attribute))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                     }
@@ -57,9 +65,17 @@ namespace Gu.Analyzers
                         {
                             if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
                             {
-                                if (parameterList.Parameters.Count != CountArgs(candidate))
+                                if (testMethod.Parameters.TryLast(out lastParameter) &&
+                                    !lastParameter.IsParams)
                                 {
-                                    context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), candidate, parameterList));
+                                    if (CountArgs(attribute) < parameterList.Parameters.Count)
+                                    {
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
+                                    }
+                                }
+                                else if (testMethod.Parameters.Length != CountArgs(attribute))
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                                 }
 
                                 if (TryGetFirstMismatch(testMethod, candidate, context, out var argument))
@@ -80,16 +96,16 @@ namespace Gu.Analyzers
 
         private static bool TryGetFirstMismatch(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
         {
+            attributeArgument = null;
             if (methodSymbol.Parameters.Length > 0 &&
                 methodSymbol.Parameters != null &&
                 attributeSyntax.ArgumentList is AttributeArgumentListSyntax argumentList &&
-                argumentList.Arguments.Count > 0 &&
-                CountArgs(attributeSyntax) == methodSymbol.Parameters.Length)
+                argumentList.Arguments.Count > 0)
             {
-                for (var index = 0; index < methodSymbol.Parameters.Length; index++)
+                for (var i = 0; i < Math.Min(CountArgs(attributeSyntax), methodSymbol.Parameters.Length); i++)
                 {
-                    var argument = argumentList.Arguments[index];
-                    var parameter = methodSymbol.Parameters[index];
+                    var argument = argumentList.Arguments[i];
+                    var parameter = methodSymbol.Parameters[i];
 
                     if (argument is null ||
                         argument.NameEquals != null ||
@@ -99,26 +115,22 @@ namespace Gu.Analyzers
                         return true;
                     }
 
-                    if (parameter.Type == KnownSymbol.Object)
+                    if (parameter.IsParams &&
+                        parameter.Type is IArrayTypeSymbol arrayType)
                     {
-                        continue;
-                    }
-
-                    if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
-                    {
-                        if (parameter.Type.IsValueType &&
-                            !parameter.Type.Is(KnownSymbol.NullableOfT))
+                        for (var j = i; j < CountArgs(attributeSyntax); j++)
                         {
-                            attributeArgument = argument;
-                            return true;
+                            if (!IsTypeMatch(arrayType.ElementType, argument))
+                            {
+                                attributeArgument = argument;
+                                return true;
+                            }
                         }
 
-                        continue;
+                        return false;
                     }
 
-                    var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
-                    if (!argumentType.Type.Is(parameter.Type) &&
-                        !context.SemanticModel.ClassifyConversion(argument.Expression, parameter.Type).IsImplicit)
+                    if (!IsTypeMatch(parameter.Type, argument))
                     {
                         attributeArgument = argument;
                         return true;
@@ -126,8 +138,35 @@ namespace Gu.Analyzers
                 }
             }
 
-            attributeArgument = null;
             return false;
+
+            bool IsTypeMatch(ITypeSymbol parameterType, AttributeArgumentSyntax argument)
+            {
+                if (parameterType == KnownSymbol.Object)
+                {
+                    return true;
+                }
+
+                if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                {
+                    if (parameterType.IsValueType &&
+                        !parameterType.Is(KnownSymbol.NullableOfT))
+                    {
+                        return false;
+                    }
+
+                    return true;
+                }
+
+                var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
+                if (!argumentType.Type.Is(parameterType) &&
+                    !context.SemanticModel.ClassifyConversion(argument.Expression, parameterType).IsImplicit)
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
@@ -197,6 +236,24 @@ namespace Gu.Analyzers
 
             bool IsIdentical(AttributeSyntax x, AttributeSyntax y)
             {
+                if (x.ArgumentList == null &&
+                    y.ArgumentList == null)
+                {
+                    return true;
+                }
+
+                if (x.ArgumentList == null ||
+                    y.ArgumentList == null)
+                {
+                    return false;
+                }
+
+                if (x.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals == null) !=
+                    y.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals == null))
+                {
+                    return false;
+                }
+
                 for (var i = 0; i < Math.Min(x.ArgumentList.Arguments.Count, y.ArgumentList.Arguments.Count); i++)
                 {
                     var xa = x.ArgumentList.Arguments[i];
