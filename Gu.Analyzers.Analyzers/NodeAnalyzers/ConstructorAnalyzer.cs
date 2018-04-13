@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
@@ -96,6 +96,21 @@
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
+                                    }
+                                }
+
+                                foreach (var binaryExpression in walker.BinaryExpressionSyntaxes)
+                                {
+                                    if (ShouldUseParameter(context, left, binaryExpression.Left))
+                                    {
+                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Left.GetLocation(), properties));
+                                    }
+
+                                    if (ShouldUseParameter(context, left, binaryExpression.Right))
+                                    {
+                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
                                     }
                                 }
                             }
@@ -252,6 +267,7 @@
             private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
             private readonly List<MemberAccessExpressionSyntax> memberAccesses = new List<MemberAccessExpressionSyntax>();
             private readonly List<ConditionalAccessExpressionSyntax> conditionalAccesses = new List<ConditionalAccessExpressionSyntax>();
+            private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new List<BinaryExpressionSyntax>();
             private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
             private SemanticModel semanticModel;
@@ -272,6 +288,8 @@
             public IReadOnlyList<MemberAccessExpressionSyntax> MemberAccesses => this.memberAccesses;
 
             public IReadOnlyList<ConditionalAccessExpressionSyntax> ConditionalAccesses => this.conditionalAccesses;
+
+            public IReadOnlyList<BinaryExpressionSyntax> BinaryExpressionSyntaxes => this.binaryExpressionSyntaxes;
 
             public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
@@ -336,6 +354,12 @@
                 base.VisitConditionalAccessExpression(node);
             }
 
+            public override void VisitBinaryExpression(BinaryExpressionSyntax node)
+            {
+                this.binaryExpressionSyntaxes.Add(node);
+                base.VisitBinaryExpression(node);
+            }
+
             protected override void Clear()
             {
                 this.unassigned.Clear();
@@ -344,6 +368,7 @@
                 this.invocations.Clear();
                 this.memberAccesses.Clear();
                 this.conditionalAccesses.Clear();
+                this.binaryExpressionSyntaxes.Clear();
                 this.visited.Clear();
                 this.semanticModel = null;
                 this.cancellationToken = CancellationToken.None;

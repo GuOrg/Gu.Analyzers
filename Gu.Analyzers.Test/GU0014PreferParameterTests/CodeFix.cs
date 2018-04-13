@@ -1,12 +1,14 @@
-﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests
+namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly UseParameterCodeFixProvider Fix = new UseParameterCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly CodeFixProvider Fix = new UseParameterCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0014");
 
         [Test]
@@ -378,6 +380,76 @@ namespace RoslynSandbox
         }
 
         public string Text { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void LeftFieldInMultiplication()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int n;
+
+        public Foo(int n)
+        {
+            this.n = n;
+            var square = ↓this.n * n;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int n;
+
+        public Foo(int n)
+        {
+            this.n = n;
+            var square = n * n;
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void RightFieldInMultiplication()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int n;
+
+        public Foo(int n)
+        {
+            this.n = n;
+            var square = n * ↓this.n;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly int n;
+
+        public Foo(int n)
+        {
+            this.n = n;
+            var square = n * n;
+        }
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
