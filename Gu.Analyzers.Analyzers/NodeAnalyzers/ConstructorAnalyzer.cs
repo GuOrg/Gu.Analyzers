@@ -376,31 +376,33 @@ namespace Gu.Analyzers
 
             private void AddReadOnlies(ConstructorDeclarationSyntax ctor)
             {
-                var typeDeclarationSyntax = (TypeDeclarationSyntax)ctor.Parent;
-                foreach (var member in typeDeclarationSyntax.Members)
+                if (ctor.Parent is TypeDeclarationSyntax typeDeclarationSyntax)
                 {
-                    var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
-                    if (member is FieldDeclarationSyntax fieldDeclaration &&
-                        fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                        fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
-                        last.Initializer == null &&
-                        isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                    foreach (var member in typeDeclarationSyntax.Members)
                     {
-                        foreach (var variable in fieldDeclaration.Declaration.Variables)
+                        var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
+                        if (member is FieldDeclarationSyntax fieldDeclaration &&
+                            fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                            fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
+                            last.Initializer == null &&
+                            isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
                         {
-                            this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
+                            foreach (var variable in fieldDeclaration.Declaration.Variables)
+                            {
+                                this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
+                            }
                         }
-                    }
-                    else if (member is PropertyDeclarationSyntax propertyDeclaration &&
-                             propertyDeclaration.ExpressionBody == null &&
-                             !propertyDeclaration.TryGetSetter(out _) &&
-                             propertyDeclaration.TryGetGetter(out var getter) &&
-                             getter.Body == null &&
-                             propertyDeclaration.Initializer == null &&
-                             !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
-                             isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
-                    {
-                        this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
+                        else if (member is PropertyDeclarationSyntax propertyDeclaration &&
+                                 propertyDeclaration.ExpressionBody == null &&
+                                 !propertyDeclaration.TryGetSetter(out _) &&
+                                 propertyDeclaration.TryGetGetter(out var getter) &&
+                                 getter.Body == null &&
+                                 propertyDeclaration.Initializer == null &&
+                                 !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
+                                 isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                        {
+                            this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
+                        }
                     }
                 }
             }
