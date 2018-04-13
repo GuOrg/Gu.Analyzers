@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -330,6 +330,32 @@ namespace RoslynSandbox
         public Foo(StringBuilder builder)
         {
             this.wr.Target = builder;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenUsingParameterAsTwoArguments()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        private readonly int a;
+        private readonly int b;
+
+        public Foo(int x)
+            : this(x, x)
+        {
+        }
+
+        public Foo(int a, int b)
+        {
+            this.a = a;
+            this.b = b;
         }
     }
 }";

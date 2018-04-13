@@ -117,13 +117,13 @@ namespace Gu.Analyzers
                         }
 
                         if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
-                            initializer.ArgumentList is ArgumentListSyntax argumentList &&
-                            argumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax, out _))
+                            initializer.ArgumentList is ArgumentListSyntax argumentList)
                         {
                             var chained = context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken);
                             foreach (var arg in argumentList.Arguments)
                             {
-                                if (TryGetIdentifier(arg.Expression, out var identifier) &&
+                                if (arg.Expression is IdentifierNameSyntax identifier &&
+                                    argumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax candidate && candidate.Identifier.ValueText == identifier.Identifier.ValueText, out _) &&
                                     parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == identifier.Identifier.ValueText, out var parameter) &&
                                     chained.TryGetMatchingParameter(arg, out var parameterSymbol) &&
                                     !parameterSymbol.IsParams &&

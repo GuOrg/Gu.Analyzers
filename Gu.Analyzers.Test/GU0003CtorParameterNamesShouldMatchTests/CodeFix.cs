@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -293,7 +293,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenBaseIsParams()
+        public void WhenBaseIsParams()
         {
             var fooCode = @"
 namespace RoslynSandbox
