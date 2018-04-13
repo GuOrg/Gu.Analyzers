@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
+namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -41,6 +41,26 @@ namespace RoslynSandbox
         [TestCase(1, Author = ""Author"")]
         [↓TestCase(1, 2, Author = ""Author"")]
         public void Test(int i)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void TestCaseParams()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    class Foo
+    {
+        [TestCase(1, 2, 3)]
+        [↓TestCase(1)]
+        public void Test(int i, int j, params int[] ints)
         {
         }
     }

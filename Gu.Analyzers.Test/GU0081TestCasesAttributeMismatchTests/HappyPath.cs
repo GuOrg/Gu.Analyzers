@@ -47,8 +47,10 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [Test]
-        public void TestCaseParams()
+        [TestCase("[TestCase(1)]")]
+        [TestCase("[TestCase(1, 2)]")]
+        [TestCase("[TestCase(1, 2, 3)]")]
+        public void TestCaseParams(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,12 +60,12 @@ namespace RoslynSandbox
     class Foo
     {
         [TestCase(1, 2)]
-        [TestCase(1, 2, 3)]
         public void Test(int i, params int[] ints)
         {
         }
     }
 }";
+            testCode = testCode.AssertReplace("[TestCase(1, 2)]", testCase);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

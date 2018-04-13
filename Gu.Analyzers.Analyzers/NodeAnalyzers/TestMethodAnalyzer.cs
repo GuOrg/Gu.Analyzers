@@ -44,54 +44,93 @@ namespace Gu.Analyzers
                     context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
                 }
 
-                if (TryFirstTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute))
+                if (TrySingleTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute) &&
+                    !CountMatches(testMethod, attribute))
                 {
-                    if (testMethod.Parameters.TryLast(out var lastParameter) &&
-                        !lastParameter.IsParams)
-                    {
-                        if (CountArgs(attribute) < parameterList.Parameters.Count)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
-                        }
-                    }
-                    else if (testMethod.Parameters.Length != CountArgs(attribute))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
+                }
 
-                    foreach (var attributeList in methodDeclaration.AttributeLists)
+                foreach (var attributeList in methodDeclaration.AttributeLists)
+                {
+                    foreach (var candidate in attributeList.Attributes)
                     {
-                        foreach (var candidate in attributeList.Attributes)
+                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
                         {
-                            if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
+                            if (!CountMatches(testMethod, candidate))
                             {
-                                if (testMethod.Parameters.TryLast(out lastParameter) &&
-                                    !lastParameter.IsParams)
-                                {
-                                    if (CountArgs(attribute) < parameterList.Parameters.Count)
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
-                                    }
-                                }
-                                else if (testMethod.Parameters.Length != CountArgs(attribute))
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
-                                }
-
-                                if (TryGetFirstMismatch(testMethod, candidate, context, out var argument))
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
-                                }
+                                context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), parameterList, attribute));
                             }
 
                             if (TryFindIdentical(methodDeclaration, candidate, out _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(GU0082IdenticalTestCase.Descriptor, candidate.GetLocation(), candidate));
                             }
+
+                            if (TryGetFirstMismatch(testMethod, candidate, context, out var argument))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
+                            }
                         }
                     }
                 }
             }
+        }
+
+        private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        {
+            attribute = null;
+            var count = 0;
+            foreach (var attributeList in method.AttributeLists)
+            {
+                foreach (var candidate in attributeList.Attributes)
+                {
+                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
+                    {
+                        attribute = candidate;
+                        count++;
+                    }
+                    else if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) ||
+                             Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, semanticModel, cancellationToken))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count == 1 && attribute != null;
+        }
+
+        private static bool TrySingleTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        {
+            attribute = null;
+            foreach (var attributeList in method.AttributeLists)
+            {
+                foreach (var candidate in attributeList.Attributes)
+                {
+                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
+                    {
+                        if (attribute != null)
+                        {
+                            return false;
+                        }
+
+                        attribute = candidate;
+                    }
+                }
+            }
+
+            return attribute != null;
+        }
+
+        private static bool CountMatches(IMethodSymbol method, AttributeSyntax attribute)
+        {
+            if (method.Parameters.TryLast(out var lastParameter) &&
+                lastParameter.IsParams)
+            {
+                return CountArgs(attribute) >= method.Parameters.Length - 1;
+            }
+
+            return CountArgs(attribute) == method.Parameters.Length;
         }
 
         private static bool TryGetFirstMismatch(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
@@ -167,48 +206,6 @@ namespace Gu.Analyzers
 
                 return true;
             }
-        }
-
-        private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
-        {
-            attribute = null;
-            var count = 0;
-            foreach (var attributeList in method.AttributeLists)
-            {
-                foreach (var candidate in attributeList.Attributes)
-                {
-                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
-                    {
-                        attribute = candidate;
-                        count++;
-                    }
-                    else if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) ||
-                           Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, semanticModel, cancellationToken))
-                    {
-                        count++;
-                    }
-                }
-            }
-
-            return count == 1 && attribute != null;
-        }
-
-        private static bool TryFirstTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
-        {
-            attribute = null;
-            foreach (var attributeList in method.AttributeLists)
-            {
-                foreach (var candidate in attributeList.Attributes)
-                {
-                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
-                    {
-                        attribute = candidate;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, out AttributeSyntax identical)
