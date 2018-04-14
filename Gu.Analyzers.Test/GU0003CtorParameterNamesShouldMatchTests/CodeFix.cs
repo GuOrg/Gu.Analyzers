@@ -336,5 +336,95 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
         }
+
+        [Test]
+        public void WhenSettingPropertyAndChained()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int ↓a1)
+            :this(a1, 1)
+        {
+            this.B = a1;
+        }
+
+        public Foo(int a, int b)
+        {
+            this.B = 0;
+        }
+
+        public int B { get; }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int b)
+            :this(b, 1)
+        {
+            this.B = b;
+        }
+
+        public Foo(int a, int b)
+        {
+            this.B = 0;
+        }
+
+        public int B { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void WhenAssignAndBaseCall()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Bar : Foo
+    {
+        public Bar(int ↓x)
+            : base(x)
+        {
+            this.A = x;
+        }
+
+        public int A { get; }
+    }
+}";
+            var barCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int b)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Bar : Foo
+    {
+        public Bar(int a)
+            : base(a)
+        {
+            this.A = a;
+        }
+
+        public int A { get; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, fixedCode);
+        }
     }
 }

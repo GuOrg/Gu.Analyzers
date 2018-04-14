@@ -40,6 +40,15 @@ namespace Gu.Analyzers
                     if (constructorDeclaration.ParameterList is ParameterListSyntax parameterList &&
                         parameterList.Parameters.Count > 0)
                     {
+                        foreach (var parameter in parameterList.Parameters)
+                        {
+                            if (ShouldRename(parameter, walker, context, out var name))
+                            {
+                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
+                                context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                            }
+                        }
+
                         foreach (var assignment in walker.Assignments)
                         {
                             if (constructorDeclaration.Contains(assignment) &&
@@ -49,12 +58,6 @@ namespace Gu.Analyzers
                                !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
                                 walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
                             {
-                                if (!IsMatch(left, parameter, out var name))
-                                {
-                                    var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
-                                    context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
-                                }
-
                                 foreach (var argument in walker.Arguments)
                                 {
                                     if (argument.Parent is ArgumentListSyntax al &&
@@ -115,25 +118,6 @@ namespace Gu.Analyzers
                                 }
                             }
                         }
-
-                        if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
-                            initializer.ArgumentList is ArgumentListSyntax argumentList)
-                        {
-                            var chained = context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken);
-                            foreach (var arg in argumentList.Arguments)
-                            {
-                                if (arg.Expression is IdentifierNameSyntax identifier &&
-                                    argumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax candidate && candidate.Identifier.ValueText == identifier.Identifier.ValueText, out _) &&
-                                    parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == identifier.Identifier.ValueText, out var parameter) &&
-                                    chained.TryGetMatchingParameter(arg, out var parameterSymbol) &&
-                                    !parameterSymbol.IsParams &&
-                                    parameterSymbol.Name != parameter.Identifier.ValueText)
-                                {
-                                    var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameterSymbol.Name), });
-                                    context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
-                                }
-                            }
-                        }
                     }
 
                     if (walker.Unassigned.Count > 0)
@@ -141,6 +125,125 @@ namespace Gu.Analyzers
                         context.ReportDiagnostic(Diagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor, constructorDeclaration.Identifier.GetLocation(), string.Join(Environment.NewLine, walker.Unassigned)));
                     }
                 }
+            }
+        }
+
+        private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, out string name)
+        {
+            name = null;
+            if (parameter.Parent is ParameterListSyntax parameterList &&
+                parameterList.Parent is ConstructorDeclarationSyntax constructorDeclaration)
+            {
+                foreach (var assignment in walker.Assignments)
+                {
+                    if (constructorDeclaration.Contains(assignment) &&
+                        assignment.Right is IdentifierNameSyntax right &&
+                        right.Identifier.ValueText == parameter.Identifier.ValueText &&
+                        TryGetIdentifier(assignment.Left, out var left))
+                    {
+                        if (IsMatch(left, parameter, out var newName))
+                        {
+                            return false;
+                        }
+
+                        if (name != null &&
+                            name != newName)
+                        {
+                            return false;
+                        }
+
+                        name = newName;
+                    }
+                }
+
+                if (name != null)
+                {
+                    return true;
+                }
+
+                if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
+                    initializer.ArgumentList is ArgumentListSyntax argumentList &&
+                    argumentList.Arguments.TrySingle(IsParameter, out var argument) &&
+                    context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is IMethodSymbol chained &&
+                    chained.TryGetMatchingParameter(argument, out var parameterSymbol) &&
+                    parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
+                    parameterSymbol.Name != parameter.Identifier.ValueText)
+                {
+                    name = parameterSymbol.Name;
+                    return true;
+                }
+            }
+
+            return false;
+
+            bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string newName)
+            {
+                newName = null;
+                if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
+                {
+                    return true;
+                }
+
+                newName = left.Identifier.ValueText;
+                newName = IsAllCaps(newName)
+                    ? newName.ToLowerInvariant()
+                    : FirstCharLowercase(newName.TrimStart('_'));
+
+                return false;
+
+                bool Equals(string memberName, string parameterName)
+                {
+                    if (memberName.StartsWith("_"))
+                    {
+                        if (parameterName.Length != memberName.Length - 1)
+                        {
+                            return false;
+                        }
+
+                        for (var i = 0; i < parameterName.Length; i++)
+                        {
+                            if (parameterName[i] != memberName[i + 1])
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
+                    }
+
+                    return string.Equals(memberName, parameterName, StringComparison.OrdinalIgnoreCase);
+                }
+
+                bool IsAllCaps(string text)
+                {
+                    foreach (var c in text)
+                    {
+                        if (char.IsLetter(c) && char.IsLower(c))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
+                string FirstCharLowercase(string text)
+                {
+                    if (char.IsLower(text[0]))
+                    {
+                        return text;
+                    }
+
+                    var charArray = text.ToCharArray();
+                    charArray[0] = char.ToLower(charArray[0]);
+                    return new string(charArray);
+                }
+            }
+
+            bool IsParameter(ArgumentSyntax argument)
+            {
+                return argument.Expression is IdentifierNameSyntax identifierName &&
+                       identifierName.Identifier.ValueText == parameter.Identifier.ValueText;
             }
         }
 
@@ -193,70 +296,6 @@ namespace Gu.Analyzers
             }
 
             return false;
-        }
-
-        private static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string name)
-        {
-            name = null;
-            if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
-            {
-                return true;
-            }
-
-            name = left.Identifier.ValueText;
-            name = IsAllCaps(name)
-                ? name.ToLowerInvariant()
-                : FirstCharLowercase(name.TrimStart('_'));
-
-            return false;
-
-            bool Equals(string memberName, string parameterName)
-            {
-                if (memberName.StartsWith("_"))
-                {
-                    if (parameterName.Length != memberName.Length - 1)
-                    {
-                        return false;
-                    }
-
-                    for (var i = 0; i < parameterName.Length; i++)
-                    {
-                        if (parameterName[i] != memberName[i + 1])
-                        {
-                            return false;
-                        }
-                    }
-
-                    return true;
-                }
-
-                return string.Equals(memberName, parameterName, StringComparison.OrdinalIgnoreCase);
-            }
-
-            bool IsAllCaps(string text)
-            {
-                foreach (var c in text)
-                {
-                    if (char.IsLetter(c) && char.IsLower(c))
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
-            }
-
-            string FirstCharLowercase(string text)
-            {
-                if (char.IsLower(text[0]))
-                {
-                    return text;
-                }
-
-                var charArray = text.ToCharArray();
-                charArray[0] = char.ToLower(charArray[0]);
-                return new string(charArray);
-            }
         }
 
         private class CtorWalker : PooledWalker<CtorWalker>
