@@ -1,7 +1,8 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,64 +31,61 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleArguments, SyntaxKind.Argument);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.StringLiteralExpression);
         }
 
-        private static void HandleArguments(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
 
-            if (context.Node is ArgumentSyntax argument &&
-                argument.Expression is LiteralExpressionSyntax literal &&
-                literal.IsKind(SyntaxKind.StringLiteralExpression) &&
+            if (context.Node is LiteralExpressionSyntax literal &&
+                literal.Parent is ArgumentSyntax &&
                 SyntaxFacts.IsValidIdentifier(literal.Token.ValueText))
             {
-                var symbols = context.SemanticModel.LookupSymbols(argument.SpanStart, name: literal.Token.ValueText);
-                if (symbols.TrySingle(x => x.Name == literal.Token.ValueText, out var symbol))
+                foreach (var symbol in context.SemanticModel.LookupSymbols(literal.SpanStart, name: literal.Token.ValueText))
                 {
-                    if (symbol is IParameterSymbol ||
-                        symbol is ILocalSymbol ||
-                        symbol is IFieldSymbol ||
-                        symbol is IEventSymbol ||
-                        symbol is IPropertySymbol ||
-                        symbol is IMethodSymbol)
+                    switch (symbol)
                     {
-                        if (symbol is ILocalSymbol local)
-                        {
-                            if (local.DeclaringSyntaxReferences.TrySingle(out var reference))
+                        case IParameterSymbol _:
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
+                            break;
+                        case IFieldSymbol _:
+                        case IEventSymbol _:
+                        case IPropertySymbol _:
+                        case IMethodSymbol _:
+                            if (symbol.IsStatic)
                             {
-                                var statement = argument.FirstAncestor<StatementSyntax>();
-                                if (statement.Span.Start < reference.Span.Start)
-                                {
-                                    return;
-                                }
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
                             }
                             else
                             {
-                                return;
+                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation(), properties));
                             }
-                        }
 
-                        if (symbol is IParameterSymbol ||
-                            symbol is ILocalSymbol ||
-                            symbol.IsStatic ||
-                            context.ContainingSymbol.IsStatic)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
-                            return;
-                        }
-
-                        if (symbol.ContainingType == context.ContainingSymbol.ContainingType)
-                        {
-                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation(), properties));
-                        }
+                            break;
+                        case ILocalSymbol local when IsVisible(literal, local, context.CancellationToken):
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
+                            break;
                     }
                 }
             }
+        }
+
+        private static bool IsVisible(LiteralExpressionSyntax literal, ILocalSymbol local, CancellationToken cancellationToken)
+        {
+            if (local.DeclaringSyntaxReferences.Length == 1 &&
+                local.DeclaringSyntaxReferences[0].Span.Start < literal.SpanStart)
+            {
+                var declaration = local.DeclaringSyntaxReferences[0]
+                                       .GetSyntax(cancellationToken);
+                return !declaration.Contains(literal);
+            }
+
+            return false;
         }
     }
 }

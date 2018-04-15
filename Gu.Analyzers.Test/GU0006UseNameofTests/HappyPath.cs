@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresVariableDeclaredAfter()
+        public void IgnoresSameLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -101,14 +101,55 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        public void Bar()
+        public Foo()
         {
-            var text = this.Meh(""text"");
+            var text = ""text"";
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        public string Meh(string value)
+        [Test]
+        public void WhenUsedInDeclaration()
         {
-            throw new ArgumentException(nameof(value), value);
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            var text = Id(""text"");
+        }
+
+        private static string Id(string value) => value;
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenLocalsNotVisible()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            {
+                var text = string.Empty;
+            }
+
+            {
+                var text = ""text"";
+            }
+
+            {
+                var text = string.Empty;
+            }
         }
     }
 }";
