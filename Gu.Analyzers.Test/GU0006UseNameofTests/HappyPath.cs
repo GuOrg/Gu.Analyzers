@@ -144,13 +144,15 @@ namespace RoslynSandbox
             }
 
             {
-                var text = ""text"";
+                var text = Id(""text"");
             }
 
             {
                 var text = string.Empty;
             }
         }
+
+        private static string Id(string value) => value;
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
