@@ -18,12 +18,12 @@ namespace Gu.Analyzers.Test
                                                                                                      .ToImmutableArray();
 
         private static readonly Solution GuAnalyzersSln = CodeFactory.CreateSolution(
-            CodeFactory.FindSolutionFile("Gu.Analyzers.sln"),
+            SolutionFile.Find("Gu.Analyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
         private static readonly Solution GuAnalyzersProjectSln = CodeFactory.CreateSolution(
-            CodeFactory.FindProjectFile("Gu.Analyzers.Analyzers.csproj"),
+            ProjectFile.Find("Gu.Analyzers.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 

@@ -25,7 +25,7 @@ namespace Gu.Analyzers.Test.Documentation
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => CodeFactory.FindSolutionFile("Gu.Analyzers.sln").DirectoryName;
+        private static string SolutionDirectory => SolutionFile.Find("Gu.Analyzers.sln").DirectoryName;
 
         private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
 

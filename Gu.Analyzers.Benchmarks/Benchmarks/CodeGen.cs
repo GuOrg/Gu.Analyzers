@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
     internal class CodeGen
     {
-        public static string ProjectDirectory { get; } = CodeFactory.FindProjectFile("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
+        public static string ProjectDirectory { get; } = ProjectFile.Find("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
 
         public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
