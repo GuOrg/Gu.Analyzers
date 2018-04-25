@@ -8,7 +8,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    internal static partial class TypeSymbolExt
+    internal static class TypeSymbolExt
     {
         internal static bool IsEither(this ITypeSymbol symbol, QualifiedType t1, QualifiedType t2) => symbol == t1 || symbol == t2;
 
