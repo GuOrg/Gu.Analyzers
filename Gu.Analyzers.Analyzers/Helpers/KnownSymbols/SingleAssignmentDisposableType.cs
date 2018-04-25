@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class SingleAssignmentDisposableType : QualifiedType
     {
         internal readonly QualifiedProperty Disposable;

@@ -2,7 +2,7 @@ namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -301,21 +301,21 @@ namespace Gu.Analyzers
                 }
 
                 if (expression is IdentifierNameSyntax identifierName &&
-                    expression.FirstAncestor<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration)
+                    SyntaxNodeExt.FirstAncestor<TypeDeclarationSyntax>(expression) is TypeDeclarationSyntax typeDeclaration)
                 {
-                    if (typeDeclaration.TryFindField(identifierName.Identifier.ValueText, out var field) &&
+                    if (TypeSyntaxExt.TryFindField(typeDeclaration, identifierName.Identifier.ValueText, out var field) &&
                         (field.Modifiers.Any(SyntaxKind.StaticKeyword) || field.Modifiers.Any(SyntaxKind.ConstKeyword)))
                     {
                         return;
                     }
 
-                    if (typeDeclaration.TryFindProperty(identifierName.Identifier.ValueText, out var property) &&
+                    if (TypeSyntaxExt.TryFindProperty(typeDeclaration, identifierName.Identifier.ValueText, out var property) &&
                         property.Modifiers.Any(SyntaxKind.StaticKeyword))
                     {
                         return;
                     }
 
-                    if (typeDeclaration.TryFindMethod(identifierName.Identifier.ValueText, out var method) &&
+                    if (TypeSyntaxExt.TryFindMethod(typeDeclaration, identifierName.Identifier.ValueText, out var method) &&
                         method.Modifiers.Any(SyntaxKind.StaticKeyword))
                     {
                         return;
@@ -369,9 +369,9 @@ namespace Gu.Analyzers
                     return Result.Unknown;
                 }
 
-                if (this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() != null, out _))
+                if (EnumerableExt.TryFirst(this.usingDirectives, x => SyntaxNodeExt.FirstAncestor<NamespaceDeclarationSyntax>(x) != null, out _))
                 {
-                    return this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() == null, out _)
+                    return EnumerableExt.TryFirst(this.usingDirectives, x => SyntaxNodeExt.FirstAncestor<NamespaceDeclarationSyntax>(x) == null, out _)
                         ? Result.Maybe
                         : Result.Yes;
                 }

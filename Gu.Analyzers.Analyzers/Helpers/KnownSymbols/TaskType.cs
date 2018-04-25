@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class TaskType : QualifiedType
     {
         internal readonly QualifiedMethod FromResult;

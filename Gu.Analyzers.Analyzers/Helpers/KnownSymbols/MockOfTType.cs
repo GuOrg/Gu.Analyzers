@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class MockOfTType : QualifiedType
     {
         internal readonly QualifiedMethod Setup;

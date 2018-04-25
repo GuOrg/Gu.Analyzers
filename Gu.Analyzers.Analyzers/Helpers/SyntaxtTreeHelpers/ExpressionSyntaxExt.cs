@@ -1,7 +1,8 @@
-﻿// ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedMember.Global
 namespace Gu.Analyzers
 {
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -43,7 +44,7 @@ namespace Gu.Analyzers
 
         internal static bool IsSameType(this ExpressionSyntax expression, QualifiedType metadataName, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var type = semanticModel?.Compilation.GetTypeByMetadataName(metadataName.QualifiedName);
+            var type = semanticModel?.Compilation.GetTypeByMetadataName(metadataName.FullName);
             return expression.IsSameType(type, semanticModel, cancellationToken);
         }
 

@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class SerialDisposableType : QualifiedType
     {
         internal readonly QualifiedProperty Disposable;

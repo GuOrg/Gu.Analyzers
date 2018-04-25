@@ -2,13 +2,14 @@
 namespace Gu.Analyzers.Test.Helpers
 {
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
-    public partial class AssignmentTests
+    internal partial class AssignmentTests
     {
         internal class With
         {

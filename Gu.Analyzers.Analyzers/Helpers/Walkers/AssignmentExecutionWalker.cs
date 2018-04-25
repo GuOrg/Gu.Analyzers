@@ -2,7 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -133,7 +133,7 @@ namespace Gu.Analyzers
                 foreach (var declaration in walker.localDeclarations)
                 {
                     if (declaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                        variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
+                        EnumerableExt.TryFirst(variableDeclaration.Variables, x => x.Initializer != null, out var variable) &&
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
                         semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
                     {
@@ -200,7 +200,7 @@ namespace Gu.Analyzers
                 case ObjectCreationExpressionSyntax objectCreation when objectCreation.ArgumentList != null && objectCreation.ArgumentList.Arguments.TryFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _):
                     return true;
                 default:
-                    if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                    if (SymbolExt.IsEither<ILocalSymbol, IParameterSymbol>(symbol))
                     {
                         return expression is IdentifierNameSyntax identifierName &&
                                identifierName.Identifier.ValueText == symbol.Name &&

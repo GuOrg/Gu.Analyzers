@@ -1,8 +1,7 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
-    using System.Collections.Generic;
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -15,14 +14,14 @@
                 (typeName.Identifier.ValueText == qualifiedType.Type ||
                  AliasWalker.Contains(objectCreation.SyntaxTree, typeName.Identifier.ValueText)))
             {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
+                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken);
                 return ctor?.ContainingType == qualifiedType;
             }
 
             if (objectCreation.Type is QualifiedNameSyntax qualifiedName &&
                 qualifiedName.Right.Identifier.ValueText == qualifiedType.Type)
             {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
+                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken);
                 return ctor?.ContainingType == qualifiedType;
             }
 
@@ -32,7 +31,7 @@
 
         internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var created = semanticModel.GetSymbolSafe(creation, cancellationToken) as IMethodSymbol;
+            var created = semanticModel.GetSymbolSafe(creation, cancellationToken);
             var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
             if (SymbolComparer.Equals(ctorSymbol, created))
             {
@@ -133,86 +132,6 @@
             }
 
             return false;
-        }
-
-        internal static void AddRunBefore(SyntaxNode context, HashSet<IMethodSymbol> ctorsRunBefore, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (context == null)
-            {
-                return;
-            }
-
-            var contextCtor = context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (contextCtor == null)
-            {
-                var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);
-                if (type == null)
-                {
-                    return;
-                }
-
-                if (type.Constructors.Length != 0)
-                {
-                    foreach (var ctor in type.Constructors)
-                    {
-                        foreach (var reference in ctor.DeclaringSyntaxReferences)
-                        {
-                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                            ctorsRunBefore.Add(ctor).IgnoreReturnValue();
-                            AddCtorsRecursively(ctorDeclaration, ctorsRunBefore, semanticModel, cancellationToken);
-                        }
-                    }
-                }
-                else
-                {
-                    if (TryGetDefault(type, out IMethodSymbol ctor))
-                    {
-                        foreach (var reference in ctor.DeclaringSyntaxReferences)
-                        {
-                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                            ctorsRunBefore.Add(ctor).IgnoreReturnValue();
-                            AddCtorsRecursively(ctorDeclaration, ctorsRunBefore, semanticModel, cancellationToken);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                AddCtorsRecursively(contextCtor, ctorsRunBefore, semanticModel, cancellationToken);
-            }
-        }
-
-        private static void AddCtorsRecursively(ConstructorDeclarationSyntax ctor, HashSet<IMethodSymbol> ctorsRunBefore, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (ctor.Initializer != null)
-            {
-                var nestedCtor = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
-                if (nestedCtor == null)
-                {
-                    return;
-                }
-
-                foreach (var reference in nestedCtor.DeclaringSyntaxReferences)
-                {
-                    var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                    ctorsRunBefore.Add(nestedCtor).IgnoreReturnValue();
-                    AddCtorsRecursively(runBefore, ctorsRunBefore, semanticModel, cancellationToken);
-                }
-            }
-            else
-            {
-                var baseType = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken)
-                                            .ContainingType.BaseType;
-                if (TryGetDefault(baseType, out IMethodSymbol defaultCtor))
-                {
-                    foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
-                    {
-                        ctorsRunBefore.Add(defaultCtor).IgnoreReturnValue();
-                        var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                        AddCtorsRecursively(runBefore, ctorsRunBefore, semanticModel, cancellationToken);
-                    }
-                }
-            }
         }
 
         private static bool TryGetInitializer(IMethodSymbol ctor, CancellationToken cancellationToken, out ConstructorInitializerSyntax initializer)

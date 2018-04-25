@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class StringBuilderType : QualifiedType
     {
         internal readonly QualifiedMethod AppendLine;

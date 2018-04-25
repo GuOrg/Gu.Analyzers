@@ -1,9 +1,10 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -38,7 +39,7 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.ShouldVisit(node).IsEither(Result.AssumeNo, Result.No))
+            if (this.ShouldVisit(node) == false)
             {
                 return;
             }
@@ -426,7 +427,7 @@
                             {
                                 this.VisitObjectCreationExpression(creation);
                                 var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
+                                this.HandleInvoke(method, creation.ArgumentList);
                             }
                         }
 
@@ -668,7 +669,7 @@
             }
         }
 
-        private Result ShouldVisit(SyntaxNode node)
+        private bool? ShouldVisit(SyntaxNode node)
         {
             if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
@@ -679,7 +680,7 @@
                     return node.IsExecutedBefore(this.context);
                 }
 
-                return Result.Yes;
+                return true;
             }
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
@@ -693,7 +694,7 @@
                         return node.IsExecutedBefore(this.context);
                     }
 
-                    return Result.Yes;
+                    return true;
                 }
 
                 return node.IsExecutedBefore(this.context);
@@ -702,10 +703,10 @@
             if (this.context is InvocationExpressionSyntax &&
                 ReferenceEquals(node, this.context))
             {
-                return Result.No;
+                return false;
             }
 
-            return Result.Yes;
+            return true;
         }
 
         private class PublicMemberWalker : CSharpSyntaxWalker
@@ -777,7 +778,7 @@
                 {
                     foreach (var walker in this.map.Values)
                     {
-                        walker?.Dispose();
+                        ((IDisposable)walker)?.Dispose();
                     }
 
                     this.map.Clear();

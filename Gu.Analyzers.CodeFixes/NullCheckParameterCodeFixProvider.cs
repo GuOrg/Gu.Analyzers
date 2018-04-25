@@ -4,6 +4,7 @@ namespace Gu.Analyzers
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -40,7 +41,7 @@ namespace Gu.Analyzers
                 {
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
-                    var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
+                    var method = SyntaxNodeExt.FirstAncestor<BaseMethodDeclarationSyntax>(parameter);
                     if (method != null)
                     {
                         using (var walker = AssignmentExecutionWalker.Borrow(method, Search.TopLevel, semanticModel, context.CancellationToken))

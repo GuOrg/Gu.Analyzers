@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class FileType : QualifiedType
     {
         internal readonly QualifiedMethod OpenText;

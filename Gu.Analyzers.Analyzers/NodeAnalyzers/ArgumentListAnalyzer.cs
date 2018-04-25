@@ -1,6 +1,7 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -84,10 +85,10 @@
                     return false;
                 }
 
-                var lineNumber = argumentListSyntax.OpenParenToken.StartingLineNumber(context.CancellationToken);
+                var lineNumber = argumentListSyntax.OpenParenToken.FileLinePositionSpan(context.CancellationToken).StartLinePosition.Line;
                 foreach (var argument in argumentListSyntax.Arguments)
                 {
-                    var ln = argument.StartingLineNumber(context.CancellationToken);
+                    var ln = argument.FileLinePositionSpan(context.CancellationToken).StartLinePosition.Line;
                     if (ln == lineNumber)
                     {
                         return false;

@@ -1,5 +1,7 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class EnumerableType : QualifiedType
     {
         internal static readonly EnumerableType Default = new EnumerableType();

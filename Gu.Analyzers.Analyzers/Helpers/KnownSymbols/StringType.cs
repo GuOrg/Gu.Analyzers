@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class StringType : QualifiedType
     {
         internal readonly QualifiedMethod Format;

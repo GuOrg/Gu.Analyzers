@@ -2,6 +2,7 @@ namespace Gu.Analyzers.Test.Helpers
 {
     using System.Linq;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
@@ -47,7 +48,7 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("foo.Inner", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var value = syntaxTree.FindEqualsValueClause("var temp = ").Value;
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out var member));
+                Assert.AreEqual(true, Gu.Analyzers.MemberPath.TryFindRootMember(value, out var member));
                 Assert.AreEqual(expected, member.ToString());
 
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -100,7 +101,7 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("this.foo.Get<int>(1)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var invocation = syntaxTree.FindInvocation("Get<int>(1)");
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out var member));
+                Assert.AreEqual(true, Gu.Analyzers.MemberPath.TryFindRootMember(invocation, out var member));
                 Assert.AreEqual(expected, member.ToString());
 
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -128,7 +129,7 @@ namespace RoslynSandbox
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var invocation = syntaxTree.FindMemberAccessExpression("this.Value");
-                Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out var member));
+                Assert.AreEqual(true, Gu.Analyzers.MemberPath.TryFindRootMember(invocation, out var member));
                 Assert.AreEqual("this.Value", member.ToString());
             }
         }

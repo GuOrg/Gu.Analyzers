@@ -32,5 +32,7 @@ using Gu.Roslyn.Asserts;
     typeof(System.Xaml.XamlLanguage),
     typeof(System.Collections.Immutable.ImmutableArray),
     typeof(Ninject.StandardKernel),
+    typeof(Gu.Roslyn.AnalyzerExtensions.Cache),
+    typeof(Gu.Roslyn.CodeFixExtensions.CodeStyle),
     typeof(NUnit.Framework.Assert),
     typeof(Moq.Mock))]

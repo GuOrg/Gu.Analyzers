@@ -1,32 +1,11 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Threading;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class Property
     {
-        internal static bool AssignsSymbolInSetter(IPropertySymbol property, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var setMethod = property?.SetMethod;
-            if (setMethod == null ||
-                setMethod.DeclaringSyntaxReferences.Length == 0)
-            {
-                return false;
-            }
-
-            if (TryGetSetter(property, cancellationToken, out AccessorDeclarationSyntax setter))
-            {
-                if (AssignmentExecutionWalker.FirstForSymbol(symbol, setter, Search.Recursive, semanticModel, cancellationToken))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         internal static bool TryGetSetter(this IPropertySymbol property, CancellationToken cancellationToken, out AccessorDeclarationSyntax setter)
         {
             setter = null;
@@ -38,32 +17,7 @@
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
                 var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
-                if (propertyDeclaration.TryGetSetter(out setter))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        internal static bool IsAutoProperty(this IPropertySymbol propertySymbol, CancellationToken cancellationToken)
-        {
-            if (propertySymbol == null)
-            {
-                return false;
-            }
-
-            foreach (var reference in propertySymbol.DeclaringSyntaxReferences)
-            {
-                var declaration = (BasePropertyDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                if ((declaration as PropertyDeclarationSyntax)?.ExpressionBody != null)
-                {
-                    return false;
-                }
-
-                if (declaration.TryGetGetter(out AccessorDeclarationSyntax getter) &&
-                    getter.Body == null)
+                if (BasePropertyDeclarationSyntaxExt.TryGetSetter(propertyDeclaration, out setter))
                 {
                     return true;
                 }

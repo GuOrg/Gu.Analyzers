@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
@@ -7,6 +7,8 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -198,13 +200,13 @@
                         if (type.Name.Contains(constraintType.Name))
                         {
                             return type.Name.Replace(constraintType.Name, namedType.TypeArguments[0].Name)
-                                       .FirstCharLower();
+                                       .ToFirstCharLower();
                         }
                     }
                 }
             }
 
-            return type.Name.FirstCharLower();
+            return type.Name.ToFirstCharLower();
         }
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)

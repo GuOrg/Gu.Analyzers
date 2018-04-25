@@ -1,5 +1,7 @@
 namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class DependencyObjectType : QualifiedType
     {
         internal readonly QualifiedMethod GetValue;

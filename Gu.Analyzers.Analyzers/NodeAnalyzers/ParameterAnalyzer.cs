@@ -1,6 +1,7 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,10 +30,10 @@
             if (context.Node is ParameterSyntax parameterSyntax &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
-                method.Parameters.TryFirst(x => x.Name == parameterSyntax.Identifier.ValueText, out var parameter) &&
+                EnumerableExt.TryFirst(method.Parameters, x => x.Name == parameterSyntax.Identifier.ValueText, out var parameter) &&
                 parameter.Type.IsReferenceType &&
                 !parameter.HasExplicitDefaultValue &&
-                !NullCheck.IsChecked(parameter, parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                !NullCheck.IsChecked(parameter, SyntaxNodeExt.FirstAncestor<BaseMethodDeclarationSyntax>(parameterSyntax), context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, parameterSyntax.Identifier.GetLocation()));
             }
