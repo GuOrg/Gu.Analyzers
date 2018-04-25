@@ -3,7 +3,7 @@ namespace Gu.Analyzers
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static partial class TypeSyntaxExt
+    internal static class TypeSyntaxExt
     {
         internal static bool TryFindField(this TypeDeclarationSyntax type, string name, out FieldDeclarationSyntax match)
         {
