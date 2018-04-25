@@ -268,7 +268,7 @@ namespace Gu.Analyzers
                         return false;
                     }
 
-                    if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                    if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode declaration))
                     {
                         result = Borrow(() => new AssignedValueWalker());
                         this.memberWalkers.Add(key, result);
