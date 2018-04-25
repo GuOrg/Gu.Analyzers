@@ -7,22 +7,6 @@ namespace Gu.Analyzers
 
     internal static class Attribute
     {
-        internal static bool TryGetAttribute(MethodDeclarationSyntax methodDeclaration, QualifiedType attributeType, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax result)
-        {
-            if (methodDeclaration != null)
-            {
-                return TryGetAttribute(
-                    methodDeclaration.AttributeLists,
-                    attributeType,
-                    semanticModel,
-                    cancellationToken,
-                    out result);
-            }
-
-            result = null;
-            return false;
-        }
-
         internal static bool TryGetAttribute(SyntaxList<AttributeListSyntax> attributeLists, QualifiedType attributeType, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax result)
         {
             result = null;
