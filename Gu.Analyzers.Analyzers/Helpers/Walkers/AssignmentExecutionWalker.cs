@@ -133,7 +133,7 @@ namespace Gu.Analyzers
                 foreach (var declaration in walker.localDeclarations)
                 {
                     if (declaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                        EnumerableExt.TryFirst(variableDeclaration.Variables, x => x.Initializer != null, out var variable) &&
+                        variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
                         semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
                     {

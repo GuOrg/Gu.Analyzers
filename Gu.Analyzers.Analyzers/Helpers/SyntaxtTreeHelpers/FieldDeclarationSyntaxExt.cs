@@ -1,6 +1,7 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 

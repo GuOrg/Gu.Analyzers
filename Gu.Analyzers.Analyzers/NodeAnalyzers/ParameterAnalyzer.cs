@@ -30,10 +30,10 @@ namespace Gu.Analyzers
             if (context.Node is ParameterSyntax parameterSyntax &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
-                EnumerableExt.TryFirst(method.Parameters, x => x.Name == parameterSyntax.Identifier.ValueText, out var parameter) &&
+                method.Parameters.TryFirst(x => x.Name == parameterSyntax.Identifier.ValueText, out var parameter) &&
                 parameter.Type.IsReferenceType &&
                 !parameter.HasExplicitDefaultValue &&
-                !NullCheck.IsChecked(parameter, SyntaxNodeExt.FirstAncestor<BaseMethodDeclarationSyntax>(parameterSyntax), context.SemanticModel, context.CancellationToken))
+                !NullCheck.IsChecked(parameter, parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, parameterSyntax.Identifier.GetLocation()));
             }

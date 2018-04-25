@@ -39,9 +39,7 @@ namespace RoslynSandbox
 
                 Assert.AreEqual(
                     true,
-                    BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
-                        method,
-                        argument,
+                    method.TryGetMatchingParameter(argument,
                         out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
@@ -76,9 +74,7 @@ namespace RoslynSandbox
 
                 Assert.AreEqual(
                     true,
-                    BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
-                        method,
-                        argument,
+                    method.TryGetMatchingParameter(argument,
                         out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
@@ -113,9 +109,7 @@ namespace RoslynSandbox
 
                 Assert.AreEqual(
                     true,
-                    BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
-                        method,
-                        argument,
+                    method.TryGetMatchingParameter(argument,
                         out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
@@ -150,9 +144,7 @@ namespace RoslynSandbox
 
                 Assert.AreEqual(
                     true,
-                    BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
-                        method,
-                        argument,
+                    method.TryGetMatchingParameter(argument,
                         out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }

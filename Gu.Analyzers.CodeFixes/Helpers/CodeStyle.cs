@@ -301,7 +301,7 @@ namespace Gu.Analyzers
                 }
 
                 if (expression is IdentifierNameSyntax identifierName &&
-                    SyntaxNodeExt.FirstAncestor<TypeDeclarationSyntax>(expression) is TypeDeclarationSyntax typeDeclaration)
+                    expression.FirstAncestor<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration)
                 {
                     if (TypeSyntaxExt.TryFindField(typeDeclaration, identifierName.Identifier.ValueText, out var field) &&
                         (field.Modifiers.Any(SyntaxKind.StaticKeyword) || field.Modifiers.Any(SyntaxKind.ConstKeyword)))
@@ -369,9 +369,9 @@ namespace Gu.Analyzers
                     return Result.Unknown;
                 }
 
-                if (EnumerableExt.TryFirst(this.usingDirectives, x => SyntaxNodeExt.FirstAncestor<NamespaceDeclarationSyntax>(x) != null, out _))
+                if (this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() != null, out _))
                 {
-                    return EnumerableExt.TryFirst(this.usingDirectives, x => SyntaxNodeExt.FirstAncestor<NamespaceDeclarationSyntax>(x) == null, out _)
+                    return this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() == null, out _)
                         ? Result.Maybe
                         : Result.Yes;
                 }

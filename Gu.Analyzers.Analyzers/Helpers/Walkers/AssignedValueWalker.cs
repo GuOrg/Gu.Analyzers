@@ -436,7 +436,7 @@ namespace Gu.Analyzers
                             foreach (var initializer in ctorWalker.Initializers)
                             {
                                 var other = (ConstructorDeclarationSyntax)initializer.Parent;
-                                if (Constructor.IsRunBefore(contextCtor, other, this.semanticModel, this.cancellationToken))
+                                if (contextCtor.IsRunBefore(other, this.semanticModel, this.cancellationToken))
                                 {
                                     this.Visit(other);
                                 }

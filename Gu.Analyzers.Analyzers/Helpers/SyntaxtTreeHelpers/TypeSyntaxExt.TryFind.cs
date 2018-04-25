@@ -1,5 +1,6 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class TypeSyntaxExt

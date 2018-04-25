@@ -41,7 +41,7 @@ namespace Gu.Analyzers
                 {
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
-                    var method = SyntaxNodeExt.FirstAncestor<BaseMethodDeclarationSyntax>(parameter);
+                    var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
                     if (method != null)
                     {
                         using (var walker = AssignmentExecutionWalker.Borrow(method, Search.TopLevel, semanticModel, context.CancellationToken))

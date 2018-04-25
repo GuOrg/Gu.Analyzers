@@ -17,7 +17,7 @@ namespace Gu.Analyzers
             foreach (var reference in property.DeclaringSyntaxReferences)
             {
                 var propertyDeclaration = reference.GetSyntax(cancellationToken) as PropertyDeclarationSyntax;
-                if (BasePropertyDeclarationSyntaxExt.TryGetSetter(propertyDeclaration, out setter))
+                if (propertyDeclaration.TryGetSetter(out setter))
                 {
                     return true;
                 }
