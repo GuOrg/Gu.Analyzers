@@ -5,6 +5,7 @@ namespace Gu.Analyzers
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -54,15 +55,13 @@ namespace Gu.Analyzers
             {
                 editor.ReplaceNode(
                     argument.Expression,
-                    (x, _) => SyntaxFactory.ParseExpression($"nameof(this.{name})")
-                                           .WithTriviaFrom(x));
+                    (x, _) => SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseExpression($"nameof(this.{name})"), x));
             }
             else
             {
                 editor.ReplaceNode(
                     argument.Expression,
-                    (x, _) => SyntaxFactory.ParseExpression($"nameof({name})")
-                                           .WithTriviaFrom(x));
+                    (x, _) => SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseExpression($"nameof({name})"), x));
             }
         }
 
