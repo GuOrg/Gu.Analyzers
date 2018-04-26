@@ -1,12 +1,14 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Rename;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RenameConstructorArgumentsCodeFixProvider))]
     [Shared]
@@ -24,21 +26,21 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-
-                if (diagnostic.Properties.TryGetValue("Name", out var name))
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is ParameterSyntax parameterSyntax &&
+                    semanticModel.TryGetSymbol(parameterSyntax, context.CancellationToken, out IParameterSymbol parameter) &&
+                    diagnostic.Properties.TryGetValue("Name", out var name))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             "Rename parameter",
-                            cancellationToken => RenameHelper.RenameSymbolAsync(
-                                context.Document,
-                                syntaxRoot,
-                                token,
+                            cancellationToken => Renamer.RenameSymbolAsync(
+                                context.Document.Project.Solution,
+                                parameter,
                                 name,
+                                null,
                                 cancellationToken),
                             nameof(NameArgumentsCodeFixProvider)),
                         diagnostic);
