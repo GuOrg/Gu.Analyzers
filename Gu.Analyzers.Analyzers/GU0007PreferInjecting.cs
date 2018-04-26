@@ -106,7 +106,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                if (MemberPath.TryFindRootMember(memberAccess, out var rootMember))
+                if (MemberPath.TryFindRoot(memberAccess, out var rootMember))
                 {
                     var rootSymbol = semanticModel.GetSymbolSafe(rootMember, cancellationToken);
                     if (rootSymbol == null)
@@ -197,7 +197,7 @@ namespace Gu.Analyzers
 
         internal static bool IsRootValid(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (MemberPath.TryFindRootMember(memberAccess, out var root))
+            if (MemberPath.TryFindRoot(memberAccess, out var root))
             {
                 var symbol = semanticModel.GetSymbolSafe(root, cancellationToken);
                 if (symbol is IParameterSymbol parameter)
