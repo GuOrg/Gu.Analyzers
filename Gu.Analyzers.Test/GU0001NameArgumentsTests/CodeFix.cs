@@ -1,12 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
-        private static readonly NameArgumentsCodeFixProvider Fix = new NameArgumentsCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new ArgumentListAnalyzer();
+        private static readonly CodeFixProvider Fix = new NameArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0001");
 
         [Test]

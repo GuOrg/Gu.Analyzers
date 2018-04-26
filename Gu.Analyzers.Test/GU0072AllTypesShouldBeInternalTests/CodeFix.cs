@@ -1,12 +1,15 @@
 namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
-        private static readonly MakeInternalFixProvider Fix = new MakeInternalFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new GU0072AllTypesShouldBeInternal();
+        private static readonly CodeFixProvider Fix = new MakeInternalFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0072");
 
         [Test]

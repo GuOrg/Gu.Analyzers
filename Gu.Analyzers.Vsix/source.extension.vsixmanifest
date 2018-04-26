@@ -16,10 +16,8 @@
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="4.5" />
   </Dependencies>
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Gu.Analyzers.Analyzers" Path="|Gu.Analyzers.Analyzers|"/>
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Gu.Analyzers.Analyzers" Path="|Gu.Analyzers.Analyzers|"/>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Gu.Analyzers.CodeFixes" Path="|Gu.Analyzers.CodeFixes|"/>
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Gu.Analyzers.CodeFixes" Path="|Gu.Analyzers.CodeFixes|"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Gu.Analyzers" Path="|Gu.Analyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Gu.Analyzers" Path="|Gu.Analyzers|"/>
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.Compiler" Version="[15.0.26208.0,16.0)" DisplayName="C# and Visual Basic Roslyn compilers" />

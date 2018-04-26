@@ -8,7 +8,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <NoWarn>NU1605</NoWarn>
+    <NoWarn>NU1605,NU1108</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

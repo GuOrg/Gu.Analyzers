@@ -10,6 +10,6 @@ group Test
 
 group Analyzers
   AsyncUsageAnalyzers
+  Gu.Analyzers
   IDisposableAnalyzers
   StyleCop.Analyzers
-  Gu.Analyzers

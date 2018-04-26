@@ -1,12 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
+namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
-        private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
+        private static readonly CodeFixProvider Fix = new MoveArgumentCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0005");
 
         [TestCase(@"throw new ArgumentException(↓nameof(o), ""message"");", @"throw new ArgumentException(""message"", nameof(o));")]

@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Diagnostics;

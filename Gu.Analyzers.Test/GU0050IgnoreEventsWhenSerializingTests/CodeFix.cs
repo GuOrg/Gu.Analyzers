@@ -1,12 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
-        private static readonly AddNonSerializedFixProvider Fix = new AddNonSerializedFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new GU0050IgnoreEventsWhenSerializing();
+        private static readonly CodeFixProvider Fix = new AddNonSerializedFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0050");
 
         [Test]

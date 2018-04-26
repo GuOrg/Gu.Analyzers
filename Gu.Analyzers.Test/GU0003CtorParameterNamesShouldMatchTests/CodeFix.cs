@@ -1,12 +1,15 @@
 namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly RenameConstructorArgumentsCodeFixProvider Fix = new RenameConstructorArgumentsCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly CodeFixProvider Fix = new RenameConstructorArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0003");
 
         [Test]

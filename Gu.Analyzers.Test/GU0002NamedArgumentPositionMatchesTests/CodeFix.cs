@@ -1,12 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
+namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
-        private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new ArgumentListAnalyzer();
+        private static readonly CodeFixProvider Fix = new MoveArgumentCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0002");
 
         [Test]

@@ -1,12 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
+namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
-        private static readonly UseNameofCodeFixProvider Fix = new UseNameofCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new GU0006UseNameof();
+        private static readonly CodeFixProvider Fix = new UseNameofCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0006");
 
         [Test]

@@ -7,7 +7,7 @@
     <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CodeAnalysisRuleSet>Gu.Analyzers.Analyzers.ruleset</CodeAnalysisRuleSet>
-    <NoWarn>NU1605</NoWarn>
+    <NoWarn>NU1108</NoWarn>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -18,8 +18,9 @@
   <PropertyGroup>
     <Version>1.2.11.0-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
-    <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
+    <Description>Misc Roslyn analyzers.</Description>
+    <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>BUGFIXES: Don't nag on fluent moq.</PackageReleaseNotes>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/GuOrg/Gu.Localization</PackageProjectUrl>

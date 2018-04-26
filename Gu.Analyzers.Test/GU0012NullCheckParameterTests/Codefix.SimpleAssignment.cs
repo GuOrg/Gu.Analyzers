@@ -1,14 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
         internal class SimpleAssignment
         {
-            private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
-            private static readonly NullCheckParameterCodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
+            private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+            private static readonly CodeFixProvider Fix = new NullCheckParameterCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
 
             [TestCase("public")]

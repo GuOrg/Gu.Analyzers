@@ -6,7 +6,7 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>Gu.Analyzers</RootNamespace>
     <AssemblyName>Gu.Analyzers.Vsix</AssemblyName>
-    <NoWarn>NU1605</NoWarn>
+    <NoWarn>NU1605,NU1108</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <!-- https://github.com/dotnet/sdk/issues/433 -->
     <ProjectReference Update="@(ProjectReference)" AdditionalProperties="TargetFramework=netstandard1.3" />

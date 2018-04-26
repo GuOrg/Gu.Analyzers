@@ -1,5 +1,6 @@
-﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 

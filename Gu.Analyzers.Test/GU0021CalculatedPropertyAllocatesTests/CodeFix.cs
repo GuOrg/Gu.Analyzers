@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 {
+    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
