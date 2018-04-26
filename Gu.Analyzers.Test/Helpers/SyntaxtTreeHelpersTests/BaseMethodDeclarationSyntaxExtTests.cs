@@ -37,10 +37,7 @@ namespace RoslynSandbox
                                          .ArgumentList.Arguments[index];
                 var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
-                Assert.AreEqual(
-                    true,
-                    method.TryGetMatchingParameter(argument,
-                        out var parameter));
+                Assert.AreEqual(true, method.TryGetMatchingParameter(argument, out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -72,10 +69,7 @@ namespace RoslynSandbox
                                          .ArgumentList.Arguments[index];
                 var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
-                Assert.AreEqual(
-                    true,
-                    method.TryGetMatchingParameter(argument,
-                        out var parameter));
+                Assert.AreEqual(true, method.TryGetMatchingParameter(argument, out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -107,10 +101,7 @@ namespace RoslynSandbox
                                          .ArgumentList.Arguments[index];
                 var method = syntaxTree.FindMethodDeclaration("internal void Meh(int v1, int v2, int v3)");
 
-                Assert.AreEqual(
-                    true,
-                    method.TryGetMatchingParameter(argument,
-                        out var parameter));
+                Assert.AreEqual(true, method.TryGetMatchingParameter(argument, out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -142,10 +133,7 @@ namespace RoslynSandbox
                                          .ArgumentList.Arguments[index];
                 var method = syntaxTree.FindMethodDeclaration("internal void Meh(params int[] values)");
 
-                Assert.AreEqual(
-                    true,
-                    method.TryGetMatchingParameter(argument,
-                        out var parameter));
+                Assert.AreEqual(true, method.TryGetMatchingParameter(argument, out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
         }
