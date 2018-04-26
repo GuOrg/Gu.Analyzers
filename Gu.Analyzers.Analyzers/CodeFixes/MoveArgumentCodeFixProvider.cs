@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers.CodeFixes
 {
     using System.Collections.Immutable;
     using System.Composition;

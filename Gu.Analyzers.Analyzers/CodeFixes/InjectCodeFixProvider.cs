@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers.CodeFixes
 {
     using System;
     using System.Collections.Generic;
@@ -15,6 +15,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using SymbolComparer = Gu.Analyzers.SymbolComparer;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InjectCodeFixProvider))]
     [Shared]

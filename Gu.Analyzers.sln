@@ -58,9 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0083.md = documentation\GU0083.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.Analyzers", "Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.CodeFixes", "Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj", "{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers", "Gu.Analyzers.Analyzers\Gu.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.Test", "Gu.Analyzers.Test\Gu.Analyzers.Test.csproj", "{3EB54B68-A7AA-45E8-A97B-A0746712140B}"
 EndProject
@@ -78,10 +76,6 @@ Global
 		{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3EB54B68-A7AA-45E8-A97B-A0746712140B}.Release|Any CPU.ActiveCfg = Release|Any CPU

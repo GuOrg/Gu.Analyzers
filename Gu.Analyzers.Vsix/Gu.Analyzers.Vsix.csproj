@@ -25,8 +25,7 @@
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj" />
-    <ProjectReference Include="..\Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj" />
+    <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.csproj" />
   </ItemGroup>
   <ItemGroup>
     <!-- https://github.com/dotnet/sdk/issues/433 -->
