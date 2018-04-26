@@ -1,11 +1,8 @@
 namespace Gu.Analyzers
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     internal static class TypeSymbolExt
@@ -51,74 +48,6 @@ namespace Gu.Analyzers
                    AreEquivalent(first, other);
         }
 
-        internal static bool IsRepresentationPreservingConversion(
-            this ITypeSymbol toType,
-            ExpressionSyntax valueExpression,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken)
-        {
-            var conversion = semanticModel.SemanticModelFor(valueExpression)
-                                          .ClassifyConversion(valueExpression, toType);
-            if (!conversion.Exists)
-            {
-                return false;
-            }
-
-            if (conversion.IsIdentity)
-            {
-                return true;
-            }
-
-            if (conversion.IsReference &&
-                conversion.IsImplicit)
-            {
-                return true;
-            }
-
-            if (conversion.IsNullable &&
-                conversion.IsNullLiteral)
-            {
-                return true;
-            }
-
-            if (conversion.IsBoxing ||
-                conversion.IsUnboxing)
-            {
-                return true;
-            }
-
-            if (toType.IsNullable(valueExpression, semanticModel, cancellationToken))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        internal static bool IsNullable(
-            this ITypeSymbol nullableType,
-            ExpressionSyntax value,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken)
-        {
-            var namedTypeSymbol = nullableType as INamedTypeSymbol;
-            if (namedTypeSymbol == null ||
-                !namedTypeSymbol.IsGenericType ||
-                namedTypeSymbol.Name != "Nullable" ||
-                namedTypeSymbol.TypeParameters.Length != 1)
-            {
-                return false;
-            }
-
-            if (value.IsKind(SyntaxKind.NullLiteralExpression))
-            {
-                return true;
-            }
-
-            var typeInfo = semanticModel.GetTypeInfoSafe(value, cancellationToken);
-            return namedTypeSymbol.TypeArguments[0].IsSameType(typeInfo.Type);
-        }
-
         internal static bool Is(this ITypeSymbol type, QualifiedType qualifiedType)
         {
             while (type != null)
@@ -140,45 +69,6 @@ namespace Gu.Analyzers
             }
 
             return false;
-        }
-
-        internal static bool Is(this ITypeSymbol type, ITypeSymbol other)
-        {
-            if (other.IsInterface())
-            {
-                foreach (var @interface in type.AllInterfaces)
-                {
-                    if (IsSameType(@interface, other))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            while (type?.BaseType != null)
-            {
-                if (IsSameType(type, other))
-                {
-                    return true;
-                }
-
-                type = type.BaseType;
-            }
-
-            return false;
-        }
-
-        internal static bool IsInterface(this ITypeSymbol type)
-        {
-            if (type == null ||
-                type.TypeKind == TypeKind.Error)
-            {
-                return false;
-            }
-
-            return type != KnownSymbol.Object && type.BaseType == null;
         }
 
         internal static bool AreEquivalent(this INamedTypeSymbol first, INamedTypeSymbol other)
