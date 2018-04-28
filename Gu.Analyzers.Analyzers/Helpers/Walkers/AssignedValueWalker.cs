@@ -309,7 +309,7 @@ namespace Gu.Analyzers
                             this.refParameters.Contains(symbol as IParameterSymbol) ||
                             this.outParameters.Contains(symbol as IParameterSymbol))
                         {
-                            return method.TryGetMatchingParameter(argument, out parameter);
+                            return method.TryFindParameter(argument, out parameter);
                         }
                     }
 
@@ -331,9 +331,9 @@ namespace Gu.Analyzers
             ExpressionSyntax GetArgumentValue(ExpressionSyntax value)
             {
                 if (value is IdentifierNameSyntax identifierName &&
-                    method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                    method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
                 {
-                    if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                    if (argumentList.TryFind(parameter, out var argument))
                     {
                         return argument.Expression;
                     }

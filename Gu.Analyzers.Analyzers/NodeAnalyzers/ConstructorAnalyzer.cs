@@ -166,7 +166,7 @@ namespace Gu.Analyzers
                     initializer.ArgumentList is ArgumentListSyntax argumentList &&
                     argumentList.Arguments.TrySingle(IsParameter, out var argument) &&
                     context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is IMethodSymbol chained &&
-                    chained.TryGetMatchingParameter(argument, out var parameterSymbol) &&
+                    chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
                     parameterSymbol.Name != parameter.Identifier.ValueText)
                 {

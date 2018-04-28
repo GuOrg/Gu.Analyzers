@@ -48,7 +48,7 @@ namespace Gu.Analyzers
                         {
                             context.ReportDiagnostic(Diagnostic.Create(GU0005ExceptionArgumentsPositions.Descriptor, argument.GetLocation()));
                         }
-                        else if (objectCreation.TryGetMatchingArgument(parameterName, out argument) &&
+                        else if (objectCreation.TryFindArgument(parameterName, out argument) &&
                                  objectCreation.Parent is ThrowExpressionSyntax throwExpression &&
                                  throwExpression.Parent is BinaryExpressionSyntax binary &&
                                  binary.IsKind(SyntaxKind.CoalesceExpression) &&
