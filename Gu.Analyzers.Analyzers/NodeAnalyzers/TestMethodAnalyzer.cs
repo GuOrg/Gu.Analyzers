@@ -55,7 +55,7 @@ namespace Gu.Analyzers
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
+                        if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
                         {
                             if (!CountMatches(testMethod, candidate))
                             {
@@ -85,13 +85,13 @@ namespace Gu.Analyzers
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
+                    if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
                     {
                         attribute = candidate;
                         count++;
                     }
-                    else if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) ||
-                             Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, semanticModel, cancellationToken))
+                    else if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) ||
+                             Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, semanticModel, cancellationToken))
                     {
                         count++;
                     }
@@ -108,7 +108,7 @@ namespace Gu.Analyzers
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
+                    if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
                     {
                         if (attribute != null)
                         {
@@ -211,13 +211,13 @@ namespace Gu.Analyzers
 
         private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, out AttributeSyntax identical)
         {
-            if (Attribute.TryGetTypeName(attribute, out var name))
+            if (Roslyn.AnalyzerExtensions.Attribute.TryGetTypeName(attribute, out var name))
             {
                 foreach (var attributeList in method.AttributeLists)
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (Attribute.TryGetTypeName(candidate, out var candidateName) &&
+                        if (Roslyn.AnalyzerExtensions.Attribute.TryGetTypeName(candidate, out var candidateName) &&
                             name == candidateName &&
                             !ReferenceEquals(candidate, attribute) &&
                             IsIdentical(attribute, candidate))
