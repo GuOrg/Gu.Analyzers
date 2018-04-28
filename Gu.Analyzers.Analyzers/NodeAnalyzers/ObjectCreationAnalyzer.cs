@@ -36,9 +36,9 @@ namespace Gu.Analyzers
                 argumentList.Arguments.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol method)
             {
-                if (objectCreation.TryGetConstructor(KnownSymbol.ArgumentException, context.SemanticModel, context.CancellationToken, out var ctor) ||
-                    objectCreation.TryGetConstructor(KnownSymbol.ArgumentNullException, context.SemanticModel, context.CancellationToken, out ctor) ||
-                    objectCreation.TryGetConstructor(KnownSymbol.ArgumentOutOfRangeException, context.SemanticModel, context.CancellationToken, out ctor))
+                if (context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentException, context.CancellationToken, out var ctor) ||
+                    context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentNullException, context.CancellationToken, out ctor) ||
+                    context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentOutOfRangeException, context.CancellationToken, out ctor))
                 {
                     if (ctor.Parameters.TryFirst(x => x.Name == "paramName", out var parameterName))
                     {

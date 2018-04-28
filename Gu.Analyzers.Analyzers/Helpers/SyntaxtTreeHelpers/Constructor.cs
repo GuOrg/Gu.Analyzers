@@ -8,27 +8,6 @@ namespace Gu.Analyzers
 
     internal static class Constructor
     {
-        internal static bool TryGetConstructor(this ObjectCreationExpressionSyntax objectCreation, QualifiedType qualifiedType, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
-        {
-            if (objectCreation.Type is SimpleNameSyntax typeName &&
-                (typeName.Identifier.ValueText == qualifiedType.Type ||
-                 AliasWalker.Contains(objectCreation.SyntaxTree, typeName.Identifier.ValueText)))
-            {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken);
-                return ctor?.ContainingType == qualifiedType;
-            }
-
-            if (objectCreation.Type is QualifiedNameSyntax qualifiedName &&
-                qualifiedName.Right.Identifier.ValueText == qualifiedType.Type)
-            {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken);
-                return ctor?.ContainingType == qualifiedType;
-            }
-
-            ctor = null;
-            return false;
-        }
-
         internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var created = semanticModel.GetSymbolSafe(creation, cancellationToken);

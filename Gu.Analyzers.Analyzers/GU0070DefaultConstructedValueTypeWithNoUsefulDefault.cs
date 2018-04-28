@@ -61,7 +61,7 @@ namespace Gu.Analyzers
             // TODO: Stop using linear search if the number of types becomes large
             foreach (var qualifiedType in KnownTypes)
             {
-                if (objectCreation.TryGetConstructor(qualifiedType, context.SemanticModel, context.CancellationToken, out ctor))
+                if (context.SemanticModel.TryGetSymbol(objectCreation, qualifiedType, context.CancellationToken, out ctor))
                 {
                     return true;
                 }

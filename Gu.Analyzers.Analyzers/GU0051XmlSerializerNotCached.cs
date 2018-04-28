@@ -41,7 +41,7 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                objectCreation.TryGetConstructor(KnownSymbol.XmlSerializer, context.SemanticModel, context.CancellationToken, out var ctor) &&
+                context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.XmlSerializer, context.CancellationToken, out var ctor) &&
                 IsLeakyConstructor(ctor))
             {
                 var assignment = objectCreation.FirstAncestor<AssignmentExpressionSyntax>();
