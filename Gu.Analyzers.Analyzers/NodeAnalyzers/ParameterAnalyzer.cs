@@ -33,7 +33,8 @@ namespace Gu.Analyzers
                 method.TryFindParameter(parameterSyntax.Identifier.ValueText, out var parameter) &&
                 parameter.Type.IsReferenceType &&
                 !parameter.HasExplicitDefaultValue &&
-                !NullCheck.IsChecked(parameter, parameterSyntax.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                parameterSyntax.TryFirstAncestor<BaseMethodDeclarationSyntax>(out var methodDeclaration) &&
+                !NullCheck.IsChecked(parameter, methodDeclaration, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, parameterSyntax.Identifier.GetLocation()));
             }
