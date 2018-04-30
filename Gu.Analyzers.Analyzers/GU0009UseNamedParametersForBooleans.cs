@@ -40,63 +40,46 @@ namespace Gu.Analyzers
                 return;
             }
 
-            var argumentSyntax = (ArgumentSyntax)context.Node;
-            if (argumentSyntax.Expression?.IsEitherKind(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) != true)
+            if (context.Node is ArgumentSyntax argumentSyntax &&
+                argumentSyntax.NameColon == null &&
+                argumentSyntax.Expression is ExpressionSyntax expression &&
+                expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
+                !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
+                argumentSyntax.Parent is ArgumentListSyntax argumentList &&
+                context.SemanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out IMethodSymbol method) &&
+                !IsIgnored(method))
             {
-                return;
-            }
-
-            if (argumentSyntax.NameColon != null)
-            {
-                return;
-            }
-
-            if (argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken))
-            {
-                return;
-            }
-
-            var methodSymbol = context.SemanticModel.GetSymbolSafe(argumentSyntax.FirstAncestor<ArgumentListSyntax>().Parent, context.CancellationToken) as IMethodSymbol;
-            if (methodSymbol == null)
-            {
-                return;
-            }
-
-            if (IsIgnored(methodSymbol))
-            {
-                return;
-            }
-
-            if (!ReferenceEquals(methodSymbol.OriginalDefinition, methodSymbol))
-            {
-                var methodGenericSymbol = methodSymbol.OriginalDefinition;
-                var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
-                //// ReSharper disable once IsExpressionAlwaysTrue R# dumbs analysis here.
-                if (parameterIndexOpt is int parameterIndex &&
-                    methodGenericSymbol.Parameters[parameterIndex]
-                                       .Type is ITypeParameterSymbol)
+                if (!ReferenceEquals(method.OriginalDefinition, method))
                 {
-                    return;
+                    var methodGenericSymbol = method.OriginalDefinition;
+                    var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
+                    //// ReSharper disable once IsExpressionAlwaysTrue R# dumbs analysis here.
+                    if (parameterIndexOpt is int parameterIndex &&
+                        methodGenericSymbol.Parameters[parameterIndex]
+                                           .Type is ITypeParameterSymbol)
+                    {
+                        return;
+                    }
                 }
-            }
-            else
-            {
-                var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(methodSymbol, argumentSyntax);
-                if (parameterIndexOpt == null)
+                else
                 {
-                    return;
+                    var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
+                    if (parameterIndexOpt == null)
+                    {
+                        return;
+                    }
+
+                    var parameterIndex = System.Math.Min(parameterIndexOpt.Value, method.Parameters.Length - 1);
+                    var parameter = method.Parameters[parameterIndex];
+                    if (parameter.IsParams ||
+                        parameter.Type != KnownSymbol.Boolean)
+                    {
+                        return;
+                    }
                 }
 
-                var parameterIndex = System.Math.Min(parameterIndexOpt.Value, methodSymbol.Parameters.Length - 1);
-                var parameter = methodSymbol.Parameters[parameterIndex];
-                if (parameter.IsParams ||
-                    parameter.Type != KnownSymbol.Boolean)
-                {
-                    return;
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
             }
-
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
         }
 
         private static bool IsIgnored(IMethodSymbol methodSymbol)
