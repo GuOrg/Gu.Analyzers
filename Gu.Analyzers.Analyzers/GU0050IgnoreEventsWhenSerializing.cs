@@ -79,7 +79,7 @@ namespace Gu.Analyzers
 
             if (context.Node is FieldDeclarationSyntax fieldDeclaration &&
                 context.ContainingSymbol is IFieldSymbol field &&
-                field.Type.Is(KnownSymbol.EventHandler) &&
+                field.Type.IsAssignableTo(KnownSymbol.EventHandler, context.Compilation) &&
                 HasSerializableAttribute(field.ContainingType))
             {
                 foreach (var attributeList in fieldDeclaration.AttributeLists)

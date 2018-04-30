@@ -60,7 +60,7 @@ namespace Gu.Analyzers
             if (context.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, context.CancellationToken) is IMethodSymbol method)
             {
                 if (method.ContainingType == KnownSymbol.String ||
-                    method.ContainingType.Is(KnownSymbol.Tuple) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbol.Tuple, context.Compilation) ||
                     method.ContainingType == KnownSymbol.DependencyProperty)
                 {
                     return false;

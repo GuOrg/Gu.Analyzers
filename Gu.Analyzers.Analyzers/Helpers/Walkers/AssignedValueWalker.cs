@@ -120,7 +120,7 @@ namespace Gu.Analyzers
                     method.Name == "Add" &&
                     SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(memberAccess.Expression, this.cancellationToken)))
                 {
-                    if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
+                    if (method.ContainingType.IsAssignableTo(KnownSymbol.IDictionary, this.semanticModel.Compilation) &&
                         node.ArgumentList?.Arguments.Count == 2)
                     {
                         this.values.Add(node.ArgumentList.Arguments[1].Expression);
@@ -242,7 +242,7 @@ namespace Gu.Analyzers
         {
             if (method != null &&
                 (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
-                 this.CurrentSymbol.ContainingType.Is(method.ContainingType)))
+                 this.CurrentSymbol.ContainingType.IsAssignableTo(method.ContainingType, this.semanticModel.Compilation)))
             {
                 if (TryGetWalker(out var walker))
                 {
@@ -472,7 +472,7 @@ namespace Gu.Analyzers
                     if (scope != null &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
-                        while (type.Is(this.CurrentSymbol.ContainingType))
+                        while (type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
                         {
                             foreach (var reference in type.DeclaringSyntaxReferences)
                             {
@@ -625,7 +625,7 @@ namespace Gu.Analyzers
 
                 if (TryGetProperty(out var property) &&
                     !SymbolComparer.Equals(this.CurrentSymbol, property) &&
-                    property.ContainingType.Is(this.CurrentSymbol.ContainingType))
+                    property.ContainingType.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
                 {
                     if (this.memberWalkers.TryGetValue(value, out walker))
                     {

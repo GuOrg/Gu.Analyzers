@@ -42,8 +42,8 @@ namespace Gu.Analyzers
 
             if (context.Node is ClassDeclarationSyntax classDeclaration &&
                 context.ContainingSymbol is INamedTypeSymbol type &&
-                type.Is(KnownSymbol.Exception) &&
-                !Attribute.TryFind(classDeclaration.AttributeLists, KnownSymbol.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
+                type.IsAssignableTo(KnownSymbol.Exception, context.Compilation) &&
+                !Attribute.TryFind(classDeclaration, KnownSymbol.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, classDeclaration.Identifier.GetLocation()));
             }

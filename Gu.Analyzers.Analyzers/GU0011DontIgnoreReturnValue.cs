@@ -1,7 +1,6 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -59,7 +58,7 @@ namespace Gu.Analyzers
 
             if (context.Node is InvocationExpressionSyntax invocation &&
                 IsIgnored(invocation) &&
-                !CanIgnore(invocation, context.SemanticModel, context.CancellationToken))
+                !CanIgnore(invocation, context))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -71,14 +70,14 @@ namespace Gu.Analyzers
                    expressionStatement.Parent is BlockSyntax;
         }
 
-        private static bool CanIgnore(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool CanIgnore(InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context)
         {
-            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+            if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method))
             {
                 if (method.ReturnsVoid ||
-                    method.ContainingType.Is(KnownSymbol.MoqMockOfT) ||
-                    method.ContainingType.Is(KnownSymbol.MoqIFluentInterface) ||
-                    method.ContainingType.Is(KnownSymbol.NinjectIFluentSyntax))
+                    method.ContainingType.IsAssignableTo(KnownSymbol.MoqMockOfT, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbol.MoqIFluentInterface, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbol.NinjectIFluentSyntax, context.Compilation))
                 {
                     return true;
                 }
@@ -104,7 +103,7 @@ namespace Gu.Analyzers
                     method = method.ReducedFrom;
                 }
 
-                if (method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration) &&
+                if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax declaration) &&
                     ReturnValueWalker.TrySingle(declaration, out var returnValue))
                 {
                     if (returnValue is IdentifierNameSyntax identifierName &&

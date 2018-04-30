@@ -190,7 +190,7 @@ namespace Gu.Analyzers
                 if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                 {
                     if (parameterType.IsValueType &&
-                        !parameterType.Is(KnownSymbol.NullableOfT))
+                        parameterType.Name != "Nullable")
                     {
                         return false;
                     }
@@ -199,7 +199,7 @@ namespace Gu.Analyzers
                 }
 
                 var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
-                if (!argumentType.Type.Is(parameterType) &&
+                if (!argumentType.Type.IsAssignableTo(parameterType, context.Compilation) &&
                     !context.SemanticModel.ClassifyConversion(argument.Expression, parameterType).IsImplicit)
                 {
                     return false;

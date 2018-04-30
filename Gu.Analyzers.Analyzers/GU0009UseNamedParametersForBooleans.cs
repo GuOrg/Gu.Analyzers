@@ -47,7 +47,7 @@ namespace Gu.Analyzers
                 !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
                 argumentSyntax.Parent is ArgumentListSyntax argumentList &&
                 context.SemanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out IMethodSymbol method) &&
-                !IsIgnored(method))
+                !IsIgnored(method, context.Compilation))
             {
                 if (!ReferenceEquals(method.OriginalDefinition, method))
                 {
@@ -82,11 +82,11 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool IsIgnored(IMethodSymbol methodSymbol)
+        private static bool IsIgnored(IMethodSymbol methodSymbol, Compilation compilation)
         {
             return IsDisposePattern(methodSymbol) ||
                    IsConfigureAwait(methodSymbol) ||
-                   IsAttachedSetMethod(methodSymbol) ||
+                   IsAttachedSetMethod(methodSymbol, compilation) ||
                    methodSymbol == KnownSymbol.NUnitAssert.AreEqual ||
                    methodSymbol == KnownSymbol.XunitAssert.Equal;
         }
@@ -109,7 +109,7 @@ namespace Gu.Analyzers
                                .Type == KnownSymbol.Boolean;
         }
 
-        private static bool IsAttachedSetMethod(IMethodSymbol method)
+        private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
         {
             if (method == null ||
                 !method.ReturnsVoid ||
@@ -121,12 +121,12 @@ namespace Gu.Analyzers
             if (method.IsStatic)
             {
                 return method.Parameters.Length == 2 &&
-                       method.Parameters[0].Type.Is(KnownSymbol.DependencyObject) &&
+                       method.Parameters[0].Type.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
                        method.Name.StartsWith("Set");
             }
 
             return method.IsExtensionMethod &&
-                   method.ReceiverType.Is(KnownSymbol.DependencyObject) &&
+                   method.ReceiverType.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
                    method.Parameters.Length == 1 &&
                    method.Name.StartsWith("Set");
         }

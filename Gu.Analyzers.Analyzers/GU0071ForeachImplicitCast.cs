@@ -59,7 +59,7 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            if (enumerableType.Type.Is(KnownSymbol.IEnumerable))
+            if (enumerableType.Type.IsAssignableTo(KnownSymbol.IEnumerable, context.Compilation))
             {
                 if (enumerableType.ConvertedType is INamedTypeSymbol namedType &&
                     namedType.TypeArguments.TrySingle(out var enumerableTypeArg))
