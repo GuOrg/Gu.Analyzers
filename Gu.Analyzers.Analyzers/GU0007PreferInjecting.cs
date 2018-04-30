@@ -98,30 +98,21 @@ namespace Gu.Analyzers
 
             if (expression is MemberAccessExpressionSyntax memberAccess)
             {
-                if (memberAccess.Parent is AssignmentExpressionSyntax assignment)
+                if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
+                    assignment.Left == expression)
                 {
-                    if (assignment.Left == expression)
-                    {
-                        return Injectable.No;
-                    }
+                    return Injectable.No;
                 }
 
-                if (MemberPath.TryFindRoot(memberAccess, out var rootMember))
+                if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
+                    semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
                 {
-                    var rootSymbol = semanticModel.GetSymbolSafe(rootMember, cancellationToken);
-                    if (rootSymbol == null)
+                    switch (rootSymbol)
                     {
-                        return Injectable.No;
-                    }
-
-                    if (rootSymbol is IParameterSymbol)
-                    {
-                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
-                    }
-
-                    if (rootSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
-                    {
-                        return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                        case IParameterSymbol _:
+                        case IFieldSymbol _:
+                        case IPropertySymbol _:
+                            return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
                     }
                 }
 

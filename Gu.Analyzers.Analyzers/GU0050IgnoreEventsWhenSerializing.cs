@@ -44,28 +44,9 @@ namespace Gu.Analyzers
 
             if (context.Node is EventFieldDeclarationSyntax eventFieldDeclaration &&
                 context.ContainingSymbol is IEventSymbol eventSymbol &&
-                HasSerializableAttribute(eventSymbol.ContainingType))
+                HasSerializableAttribute(eventSymbol.ContainingType) &&
+                !Attribute.TryFind(eventFieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                foreach (var attributeList in eventFieldDeclaration.AttributeLists)
-                {
-                    foreach (var attribute in attributeList.Attributes)
-                    {
-                        if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") ==
-                            true)
-                        {
-                            var attributeType =
-                                context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
-                                       ?.ContainingType;
-                            if (attributeType != KnownSymbol.NonSerializedAttribute)
-                            {
-                                continue;
-                            }
-
-                            return;
-                        }
-                    }
-                }
-
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, eventFieldDeclaration.GetLocation()));
             }
         }
@@ -80,26 +61,9 @@ namespace Gu.Analyzers
             if (context.Node is FieldDeclarationSyntax fieldDeclaration &&
                 context.ContainingSymbol is IFieldSymbol field &&
                 field.Type.IsAssignableTo(KnownSymbol.EventHandler, context.Compilation) &&
-                HasSerializableAttribute(field.ContainingType))
+                HasSerializableAttribute(field.ContainingType) &&
+                !Attribute.TryFind(fieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                foreach (var attributeList in fieldDeclaration.AttributeLists)
-                {
-                    foreach (var attribute in attributeList.Attributes)
-                    {
-                        if ((attribute.Name as IdentifierNameSyntax)?.Identifier.ValueText.Contains("NonSerialized") == true)
-                        {
-                            var attributeType = context.SemanticModel.GetSymbolSafe(attribute, context.CancellationToken)
-                                                       ?.ContainingType;
-                            if (attributeType != KnownSymbol.NonSerializedAttribute)
-                            {
-                                continue;
-                            }
-
-                            return;
-                        }
-                    }
-                }
-
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldDeclaration.GetLocation()));
             }
         }
@@ -107,7 +71,7 @@ namespace Gu.Analyzers
         private static bool HasSerializableAttribute(INamedTypeSymbol type)
         {
             return type.GetAttributes()
-                       .TryFirst(x => x.AttributeClass == KnownSymbol.SerializableAttribute, out AttributeData _);
+                       .TryFirst(x => x.AttributeClass == KnownSymbol.SerializableAttribute, out _);
         }
     }
 }
