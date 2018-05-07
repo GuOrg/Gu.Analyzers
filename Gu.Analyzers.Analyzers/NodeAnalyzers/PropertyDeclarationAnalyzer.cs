@@ -60,9 +60,10 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            var member = semanticModel.GetSymbolSafe(memberAccess.Expression, cancellationToken);
-            if (member == null ||
-                !IsInjected(member, semanticModel, cancellationToken))
+            if (semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out ISymbol member) &&
+                FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
+                memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
+                !IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken))
             {
                 return false;
             }
@@ -82,42 +83,16 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsInjected(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (member is IFieldSymbol field)
+            using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, Scope.Instance, semanticModel, cancellationToken))
             {
-                using (var walker = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
+                foreach (var assignment in walker.Assignments)
                 {
-                    foreach (var assignedValue in walker)
+                    if (assignment.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _) &&
+                        semanticModel.GetSymbolSafe(assignment.Right, cancellationToken) is IParameterSymbol)
                     {
-                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
-                        {
-                            continue;
-                        }
-
-                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            if (member is IPropertySymbol property)
-            {
-                using (var walker = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
-                {
-                    foreach (var assignedValue in walker)
-                    {
-                        if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null)
-                        {
-                            continue;
-                        }
-
-                        if (semanticModel.GetSymbolSafe(assignedValue, cancellationToken) is IParameterSymbol)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
