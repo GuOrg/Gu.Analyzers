@@ -124,7 +124,7 @@ namespace Gu.Analyzers
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
                     }
 
-                    enumValuesSet.Add(value).IgnoreReturnValue();
+                    enumValuesSet.Add(value);
                 }
             }
         }
