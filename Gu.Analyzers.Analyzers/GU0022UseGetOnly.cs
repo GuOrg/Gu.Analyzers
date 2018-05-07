@@ -47,7 +47,7 @@ namespace Gu.Analyzers
                 context.ContainingProperty() is IPropertySymbol property &&
                 !property.IsIndexer)
             {
-                using (var walker = AssignedValueWalker.Borrow(property, context.SemanticModel, context.CancellationToken))
+                using (var walker = MutationWalker.For(property, context.SemanticModel, context.CancellationToken))
                 {
                     foreach (var value in walker)
                     {
@@ -62,52 +62,25 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool MeansPropertyIsMutable(ExpressionSyntax assignedValue)
+        private static bool MeansPropertyIsMutable(SyntaxNode mutation)
         {
-            if (assignedValue.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null)
+            switch (mutation)
             {
-                if (assignedValue.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() != null)
-                {
+                case AssignmentExpressionSyntax assignment when !MemberPath.TrySingle(assignment.Left, out _):
                     return true;
-                }
-
-                return !IsAssigningMember(assignedValue);
+                case PostfixUnaryExpressionSyntax unary when !MemberPath.TrySingle(unary.Operand, out _):
+                    return true;
+                case PrefixUnaryExpressionSyntax unary when !MemberPath.TrySingle(unary.Operand, out _):
+                    return true;
             }
 
-            var propertyDeclaration = assignedValue.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-            if (propertyDeclaration != null)
+            if (mutation.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _))
             {
-                return assignedValue.Parent != propertyDeclaration.Initializer;
+                return mutation.TryFirstAncestor<AnonymousFunctionExpressionSyntax>(out _) ||
+                       mutation.TryFirstAncestor<ObjectCreationExpressionSyntax>(out _);
             }
 
             return true;
-        }
-
-        private static bool IsAssigningMember(ExpressionSyntax assignedValue)
-        {
-            if (assignedValue.Parent is AssignmentExpressionSyntax assignment)
-            {
-                if (assignment.Left is IdentifierNameSyntax ||
-                    (assignment.Left as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
-                    (assignment.Left as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
-                {
-                    return true;
-                }
-            }
-
-            var operand = (assignedValue.Parent as PostfixUnaryExpressionSyntax)?.Operand ??
-                                   (assignedValue.Parent as PrefixUnaryExpressionSyntax)?.Operand;
-            if (operand != null)
-            {
-                if (operand is IdentifierNameSyntax ||
-                    (operand as MemberAccessExpressionSyntax)?.Expression is ThisExpressionSyntax ||
-                    (operand as MemberAccessExpressionSyntax)?.Expression is BaseExpressionSyntax)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }
