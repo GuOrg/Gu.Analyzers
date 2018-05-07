@@ -11,10 +11,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Int32 = Create("System.Int32", "int");
         internal static readonly QualifiedType Int64 = Create("System.Int64", "long");
         internal static readonly StringType String = new StringType();
-        internal static readonly QualifiedType NullableOfT = new QualifiedType("System.Nullable`1");
-        internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
-        internal static readonly QualifiedType Func = Create("System.Func");
         internal static readonly QualifiedType Type = Create("System.Type");
         internal static readonly QualifiedType Guid = Create("System.Guid");
         internal static readonly QualifiedType Exception = Create("System.Exception");
