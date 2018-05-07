@@ -45,7 +45,7 @@ namespace Gu.Analyzers
                     var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
                     if (method != null)
                     {
-                        using (var walker = AssignmentExecutionWalker.Borrow(method, Search.TopLevel, semanticModel, context.CancellationToken))
+                        using (var walker = AssignmentExecutionWalker.Borrow(method, Scope.Member, semanticModel, context.CancellationToken))
                         {
                             if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
                             {

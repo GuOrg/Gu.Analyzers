@@ -293,13 +293,7 @@ namespace Gu.Analyzers
             {
                 var node = reference.GetSyntax(cancellationToken);
 
-                if (AssignmentExecutionWalker.SingleForSymbol(
-                        symbol,
-                        node.FirstAncestor<TypeDeclarationSyntax>(),
-                        Search.TopLevel,
-                        semanticModel,
-                        cancellationToken,
-                        out var assignment) &&
+                if (AssignmentExecutionWalker.SingleFor(symbol, node.FirstAncestor<TypeDeclarationSyntax>(), Scope.Member, semanticModel, cancellationToken, out var assignment) &&
                     assignment.Right is IdentifierNameSyntax identifier)
                 {
                     var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
