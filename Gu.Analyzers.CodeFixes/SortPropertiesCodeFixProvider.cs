@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Generic;
@@ -6,6 +6,8 @@
     using System.Composition;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions.StyleCopComparers;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -34,28 +36,19 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing || syntaxRoot.Members.Count != 1)
+                if (syntaxRoot.TryFindNodeOrAncestor<BasePropertyDeclarationSyntax>(diagnostic, out var property))
                 {
-                    continue;
-                }
-
-                var property = (BasePropertyDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (!property.IsPropertyOrIndexer())
-                {
-                    continue;
-                }
-
-                using (var sorted = new SortedMembers())
-                {
-                    sorted.Sort(property);
-                    var updated = new SortRewriter(sorted).Visit(syntaxRoot);
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "Move property.",
-                            _ => Task.FromResult(context.Document.WithSyntaxRoot(updated)),
-                           this.GetType().FullName),
-                        diagnostic);
+                    using (var sorted = new SortedMembers())
+                    {
+                        sorted.Sort(property);
+                        var updated = new SortRewriter(sorted).Visit(syntaxRoot);
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Sort properties.",
+                                _ => Task.FromResult(context.Document.WithSyntaxRoot(updated)),
+                                this.GetType().FullName),
+                            diagnostic);
+                    }
                 }
             }
         }
@@ -73,10 +66,14 @@
             {
                 foreach (var member in type.Members)
                 {
-                    var property = member as BasePropertyDeclarationSyntax;
-                    if (property.IsPropertyOrIndexer())
+                    switch (member)
                     {
-                        this.Sort(property);
+                        case PropertyDeclarationSyntax property:
+                            this.Sort(property);
+                            break;
+                        case IndexerDeclarationSyntax indexer:
+                            this.Sort(indexer);
+                            break;
                     }
                 }
             }
@@ -121,20 +118,20 @@
                         continue;
                     }
 
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) == 0 &&
+                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) == 0 &&
                         fromIndex < i)
                     {
                         toIndex = i + 1;
                         continue;
                     }
 
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) > 0)
+                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) > 0)
                     {
                         toIndex = i + 1;
                         continue;
                     }
 
-                    if (GU0020SortProperties.PropertyPositionComparer.Default.Compare(propertyDeclaration, otherPropertyDeclaration) < 0)
+                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) < 0)
                     {
                         toIndex = i;
                         break;
