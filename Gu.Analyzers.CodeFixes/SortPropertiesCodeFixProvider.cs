@@ -6,6 +6,7 @@ namespace Gu.Analyzers
     using System.Composition;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.AnalyzerExtensions.StyleCopComparers;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
@@ -55,11 +56,11 @@ namespace Gu.Analyzers
 
         private class SortedMembers : IDisposable
         {
-            private readonly Pool<Dictionary<TypeDeclarationSyntax, List<MemberDeclarationSyntax>>>.Pooled sorted;
+            private readonly PooledDictionary<TypeDeclarationSyntax, List<MemberDeclarationSyntax>> sorted;
 
             public SortedMembers()
             {
-                this.sorted = DictionaryPool<TypeDeclarationSyntax, List<MemberDeclarationSyntax>>.Create();
+                this.sorted = PooledDictionary.Borrow<TypeDeclarationSyntax, List<MemberDeclarationSyntax>>();
             }
 
             public void Sort(TypeDeclarationSyntax type)
@@ -86,10 +87,10 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                if (!this.sorted.Item.TryGetValue(type, out List<MemberDeclarationSyntax> members))
+                if (!this.sorted.TryGetValue(type, out var members))
                 {
                     members = new List<MemberDeclarationSyntax>(type.Members);
-                    this.sorted.Item[type] = members;
+                    this.sorted[type] = members;
                 }
 
                 var fromIndex = members.IndexOf(propertyDeclaration);
@@ -161,7 +162,7 @@ namespace Gu.Analyzers
                     return false;
                 }
 
-                if (this.sorted.Item.TryGetValue(type, out List<MemberDeclarationSyntax> sortedMembers))
+                if (this.sorted.TryGetValue(type, out List<MemberDeclarationSyntax> sortedMembers))
                 {
                     var index = type.Members.IndexOf(member);
                     if (index == -1)
