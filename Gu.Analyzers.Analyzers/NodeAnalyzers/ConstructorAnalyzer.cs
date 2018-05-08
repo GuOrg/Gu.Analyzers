@@ -57,7 +57,8 @@ namespace Gu.Analyzers
                                TryGetIdentifier(assignment.Right, out var right) &&
                                parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
                                !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
-                                walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _))
+                                walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _) &&
+                                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol leftSymbol))
                             {
                                 foreach (var argument in walker.Arguments)
                                 {
@@ -69,7 +70,7 @@ namespace Gu.Analyzers
                                         continue;
                                     }
 
-                                    if (ShouldUseParameter(context, left, argument.Expression))
+                                    if (ShouldUseParameter(context, leftSymbol, argument.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
@@ -78,7 +79,7 @@ namespace Gu.Analyzers
 
                                 foreach (var invocation in walker.Invocations)
                                 {
-                                    if (ShouldUseParameter(context, left, invocation.Expression))
+                                    if (ShouldUseParameter(context, leftSymbol, invocation.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
@@ -87,7 +88,7 @@ namespace Gu.Analyzers
 
                                 foreach (var memberAccess in walker.MemberAccesses)
                                 {
-                                    if (ShouldUseParameter(context, left, memberAccess.Expression))
+                                    if (ShouldUseParameter(context, leftSymbol, memberAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
@@ -96,7 +97,7 @@ namespace Gu.Analyzers
 
                                 foreach (var conditionalAccess in walker.ConditionalAccesses)
                                 {
-                                    if (ShouldUseParameter(context, left, conditionalAccess.Expression))
+                                    if (ShouldUseParameter(context, leftSymbol, conditionalAccess.Expression))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
@@ -105,13 +106,13 @@ namespace Gu.Analyzers
 
                                 foreach (var binaryExpression in walker.BinaryExpressionSyntaxes)
                                 {
-                                    if (ShouldUseParameter(context, left, binaryExpression.Left))
+                                    if (ShouldUseParameter(context, leftSymbol, binaryExpression.Left))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Left.GetLocation(), properties));
                                     }
 
-                                    if (ShouldUseParameter(context, left, binaryExpression.Right))
+                                    if (ShouldUseParameter(context, leftSymbol, binaryExpression.Right))
                                     {
                                         var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                         context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
@@ -248,29 +249,27 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool ShouldUseParameter(SyntaxNodeAnalysisContext context, IdentifierNameSyntax left, ExpressionSyntax expression)
+        private static bool ShouldUseParameter(SyntaxNodeAnalysisContext context, ISymbol left, ExpressionSyntax expression)
         {
             if (expression.FirstAncestor<AnonymousFunctionExpressionSyntax>() != null)
             {
-                var symbol = context.SemanticModel.GetSymbolSafe(left, context.CancellationToken);
-                if (symbol is IFieldSymbol field &&
+                if (left is IFieldSymbol field &&
                     !field.IsReadOnly)
                 {
                     return false;
                 }
 
-                if (symbol is IPropertySymbol property &&
-                    property.TryGetSetter(context.CancellationToken, out _))
+                if (left is IPropertySymbol property &&
+                    !property.IsGetOnly())
                 {
                     return false;
                 }
             }
 
             return TryGetIdentifier(expression, out var identifierName) &&
-                   identifierName.Identifier.ValueText == left.Identifier.ValueText &&
-                   Equals(
-                       context.SemanticModel.GetSymbolSafe(left, context.CancellationToken),
-                       context.SemanticModel.GetSymbolSafe(identifierName, context.CancellationToken));
+                   identifierName.Identifier.ValueText == left.Name &&
+                   context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ISymbol symbol) &&
+                   symbol.Equals(left);
         }
 
         private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
