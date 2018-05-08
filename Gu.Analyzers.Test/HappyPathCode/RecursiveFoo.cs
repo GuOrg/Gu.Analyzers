@@ -16,6 +16,7 @@
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
+#pragma warning disable IDE0025
 namespace Gu.Analyzers.Test.HappyPathCode
 {
     using System;
