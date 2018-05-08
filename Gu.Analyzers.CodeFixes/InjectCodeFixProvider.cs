@@ -335,32 +335,19 @@ namespace Gu.Analyzers
             private bool TryGetReplaceNode(MemberAccessExpressionSyntax node, MemberAccessExpressionSyntax expected, out SyntaxNode result)
             {
                 result = null;
-                if (node == null || expected == null)
+                if (node != null &&
+                    expected != null &&
+                    node.Name.Identifier.ValueText == expected.Name.Identifier.ValueText &&
+                    this.semanticModel.TryGetSymbol(node, this.cancellationToken, out ISymbol nodeSymbol) &&
+                    this.semanticModel.TryGetSymbol(this.identifierName, this.cancellationToken, out ISymbol expectedSymbol) &&
+                    nodeSymbol.Equals(expectedSymbol) &&
+                    GU0007PreferInjecting.IsRootValid(node, this.semanticModel, this.cancellationToken))
                 {
-                    return false;
+                    result = node;
+                    return true;
                 }
 
-                if (node.Name.Identifier.ValueText != expected.Name.Identifier.ValueText)
-                {
-                    return false;
-                }
-
-                var nodeSymbol = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                var expectedSymbol = this.semanticModel.GetSymbolSafe(this.identifierName, this.cancellationToken);
-                if (nodeSymbol == null ||
-                    expectedSymbol == null ||
-                    !SymbolComparer.Equals(nodeSymbol, expectedSymbol))
-                {
-                    return false;
-                }
-
-                if (!GU0007PreferInjecting.IsRootValid(node, this.semanticModel, this.cancellationToken))
-                {
-                    return false;
-                }
-
-                result = node;
-                return true;
+                return false;
             }
         }
     }

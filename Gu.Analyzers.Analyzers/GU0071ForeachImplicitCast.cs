@@ -53,6 +53,11 @@ namespace Gu.Analyzers
         private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
         {
             var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
+            if (enumerableType.Type is IErrorTypeSymbol)
+            {
+                return null;
+            }
+
             if (enumerableType.Type == KnownSymbol.IEnumerable &&
                 enumerableType.ConvertedType == KnownSymbol.IEnumerable)
             {
@@ -65,7 +70,7 @@ namespace Gu.Analyzers
                     namedType.TypeArguments.TrySingle(out var enumerableTypeArg))
                 {
                     var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                    return SymbolComparer.Equals(variableType, enumerableTypeArg);
+                    return variableType.Equals(enumerableTypeArg);
                 }
 
                 return enumerableType.ConvertedType != KnownSymbol.IEnumerable;
@@ -76,7 +81,7 @@ namespace Gu.Analyzers
                 returnType.TypeArguments.TrySingle(out var enumeratorTypeArg))
             {
                 var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                return SymbolComparer.Equals(variableType, enumeratorTypeArg);
+                return variableType.Equals(enumeratorTypeArg);
             }
 
             return null;
