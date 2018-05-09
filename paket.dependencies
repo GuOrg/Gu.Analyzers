@@ -11,7 +11,6 @@ group Analyzers
   source http://www.nuget.org/api/v2/
   nuget AsyncUsageAnalyzers
   nuget IDisposableAnalyzers
-  nuget Gu.Analyzers
   nuget StyleCop.Analyzers
 
 group Test

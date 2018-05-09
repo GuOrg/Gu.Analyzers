@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
-    <PackageId>Gu.Analyzers.NewIdRequiredDueToNuGetBug</PackageId>
     <Version>1.2.11.0</Version>
     <RootNamespace>Gu.Analyzers</RootNamespace>
     <Authors>Johan Larsson, milleniumbug</Authors>
