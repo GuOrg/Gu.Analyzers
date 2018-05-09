@@ -1,6 +1,7 @@
 ﻿type project
 id Gu.Analyzers
 include-referenced-projects true
+developmentDependency true
 
 excludedgroups
   Main
