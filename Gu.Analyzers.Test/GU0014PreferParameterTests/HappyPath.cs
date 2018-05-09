@@ -101,6 +101,48 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void IgnoreWhenSideEffect()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            this.Text = text.ToLower();
+            var temp = this.Text;
+        }
+
+        public string Text { get; }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void IgnoreWhenAssignedWithAddition()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int value)
+        {
+            this.Value = value + 1;
+            var temp = this.Value;
+        }
+
+        public int Value { get; }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void IgnoreMutableInLambda()
         {
             var testCode = @"
