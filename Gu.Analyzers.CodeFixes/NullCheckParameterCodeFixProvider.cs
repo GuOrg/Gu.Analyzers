@@ -43,7 +43,7 @@ namespace Gu.Analyzers
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
                     if (parameter.Parent is ParameterListSyntax parameterList &&
-                        parameterList.Parent is MethodDeclarationSyntax methodDeclaration)
+                        parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration)
                     {
                         using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, Scope.Member, semanticModel, context.CancellationToken))
                         {
