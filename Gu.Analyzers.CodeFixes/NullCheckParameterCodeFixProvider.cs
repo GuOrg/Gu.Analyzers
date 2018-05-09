@@ -42,10 +42,10 @@ namespace Gu.Analyzers
                 {
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
-                    var method = parameter.FirstAncestor<BaseMethodDeclarationSyntax>();
-                    if (method != null)
+                    if (parameter.Parent is ParameterListSyntax parameterList &&
+                        parameterList.Parent is MethodDeclarationSyntax methodDeclaration)
                     {
-                        using (var walker = AssignmentExecutionWalker.Borrow(method, Scope.Member, semanticModel, context.CancellationToken))
+                        using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, Scope.Member, semanticModel, context.CancellationToken))
                         {
                             if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
                             {
@@ -57,14 +57,15 @@ namespace Gu.Analyzers
                                     this.GetType(),
                                     diagnostic);
                             }
-                            else if (method.Body != null)
+                            else if (methodDeclaration.Body is BlockSyntax block &&
+                                     block.Statements.Count > 0)
                             {
                                 context.RegisterCodeFix(
                                     "Add null check.",
                                     (editor, _) => editor.ReplaceNode(
-                                        method.Body,
-                                        method.Body.InsertNodesBefore(
-                                            method.Body.Statements[0],
+                                        methodDeclaration.Body,
+                                        methodDeclaration.Body.InsertNodesBefore(
+                                            methodDeclaration.Body.Statements[0],
                                             new[] { IfNullThrow(parameter.Identifier.ValueText) })),
                                     this.GetType(),
                                     diagnostic);
