@@ -15,7 +15,6 @@
 
   <PropertyGroup>
     <PackageId>Gu.Analyzers</PackageId>
-    <Product>Gu.Analyzers</Product>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
