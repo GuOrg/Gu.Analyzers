@@ -3,13 +3,28 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Version>1.2.11.0-dev</Version>
+    <RootNamespace>Gu.Analyzers</RootNamespace>
+    <Authors>Johan Larsson, milleniumbug</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>Gu.Analyzers.CodeFixes.ruleset</CodeAnalysisRuleSet>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <RootNamespace>Gu.Analyzers</RootNamespace>
-    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <PackageId>Gu.Analyzers</PackageId>
+    <Product>Gu.Analyzers</Product>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Roslyn analyzers and fixes.</Description>
+    <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
+    <PackageReleaseNotes>BUGFIX: Nullchecks in routed event analyzer.</PackageReleaseNotes>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
@@ -19,5 +34,9 @@
     <ProjectReference Include="..\Gu.Analyzers.Analyzers\Gu.Analyzers.Analyzers.csproj" />
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Exec Command=".paket\paket.exe pack publish --template $(ProjectDir)paket.template" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+  
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
