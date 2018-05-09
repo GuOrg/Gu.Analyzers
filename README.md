@@ -64,6 +64,10 @@
   <td>Prefer using parameter.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0015.md">GU0015</a></td>
+  <td>Don't assign same more than once.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/JohanLarsson/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
   <td>Sort properties.</td>
 </tr>

@@ -17,7 +17,8 @@ namespace Gu.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0003CtorParameterNamesShouldMatch.Descriptor,
             GU0004AssignAllReadOnlyMembers.Descriptor,
-            GU0014PreferParameter.Descriptor);
+            GU0014PreferParameter.Descriptor,
+            GU0015DontAssignMoreThanOnce.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -53,69 +54,84 @@ namespace Gu.Analyzers
                         foreach (var assignment in walker.Assignments)
                         {
                             if (constructorDeclaration.Contains(assignment) &&
-                               TryGetIdentifier(assignment.Left, out var left) &&
-                               TryGetIdentifier(assignment.Right, out var right) &&
-                               parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
-                               !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
-                                walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _) &&
-                                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol leftSymbol))
+                               TryGetIdentifier(assignment.Left, out var left))
                             {
-                                foreach (var argument in walker.Arguments)
+                                if (TryGetIdentifier(assignment.Right, out var right) &&
+                                    parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
+                                    !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
+                                    walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _) &&
+                                    context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol leftSymbol))
                                 {
-                                    if (argument.Parent is ArgumentListSyntax al &&
-                                        al.Parent is InvocationExpressionSyntax invocation &&
-                                        invocation.TryGetMethodName(out var methodName) &&
-                                        methodName == "nameof")
+                                    foreach (var argument in walker.Arguments)
                                     {
-                                        continue;
+                                        if (argument.Parent is ArgumentListSyntax al &&
+                                            al.Parent is InvocationExpressionSyntax invocation &&
+                                            invocation.TryGetMethodName(out var methodName) &&
+                                            methodName == "nameof")
+                                        {
+                                            continue;
+                                        }
+
+                                        if (ShouldUseParameter(context, leftSymbol, argument.Expression))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
+                                        }
                                     }
 
-                                    if (ShouldUseParameter(context, leftSymbol, argument.Expression))
+                                    foreach (var invocation in walker.Invocations)
                                     {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
+                                        if (ShouldUseParameter(context, leftSymbol, invocation.Expression))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
+                                        }
+                                    }
+
+                                    foreach (var memberAccess in walker.MemberAccesses)
+                                    {
+                                        if (ShouldUseParameter(context, leftSymbol, memberAccess.Expression))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
+                                        }
+                                    }
+
+                                    foreach (var conditionalAccess in walker.ConditionalAccesses)
+                                    {
+                                        if (ShouldUseParameter(context, leftSymbol, conditionalAccess.Expression))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
+                                        }
+                                    }
+
+                                    foreach (var binaryExpression in walker.BinaryExpressionSyntaxes)
+                                    {
+                                        if (ShouldUseParameter(context, leftSymbol, binaryExpression.Left))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Left.GetLocation(), properties));
+                                        }
+
+                                        if (ShouldUseParameter(context, leftSymbol, binaryExpression.Right))
+                                        {
+                                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
+                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
+                                        }
                                     }
                                 }
 
-                                foreach (var invocation in walker.Invocations)
+                                foreach (var candidate in walker.Assignments)
                                 {
-                                    if (ShouldUseParameter(context, leftSymbol, invocation.Expression))
+                                    if (candidate != assignment &&
+                                        TryGetIdentifier(candidate.Left, out var candidateLeft) &&
+                                        candidateLeft.Identifier.ValueText == left.Identifier.ValueText &&
+                                        assignment.TryFirstAncestor<BlockSyntax>(out var block) &&
+                                        block.Contains(candidate) &&
+                                        candidate.SpanStart > assignment.SpanStart)
                                     {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
-                                    }
-                                }
-
-                                foreach (var memberAccess in walker.MemberAccesses)
-                                {
-                                    if (ShouldUseParameter(context, leftSymbol, memberAccess.Expression))
-                                    {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
-                                    }
-                                }
-
-                                foreach (var conditionalAccess in walker.ConditionalAccesses)
-                                {
-                                    if (ShouldUseParameter(context, leftSymbol, conditionalAccess.Expression))
-                                    {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
-                                    }
-                                }
-
-                                foreach (var binaryExpression in walker.BinaryExpressionSyntaxes)
-                                {
-                                    if (ShouldUseParameter(context, leftSymbol, binaryExpression.Left))
-                                    {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Left.GetLocation(), properties));
-                                    }
-
-                                    if (ShouldUseParameter(context, leftSymbol, binaryExpression.Right))
-                                    {
-                                        var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
+                                        context.ReportDiagnostic(Diagnostic.Create(GU0015DontAssignMoreThanOnce.Descriptor, candidate.GetLocation()));
                                     }
                                 }
                             }
