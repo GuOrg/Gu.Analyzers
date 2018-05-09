@@ -10,7 +10,8 @@ group Analyzers
   storage: none
   source http://www.nuget.org/api/v2/
   nuget AsyncUsageAnalyzers
-  nuget IDisposableAnalyzers  
+  nuget IDisposableAnalyzers
+  nuget Gu.Analyzers
   nuget StyleCop.Analyzers
 
 group Test
