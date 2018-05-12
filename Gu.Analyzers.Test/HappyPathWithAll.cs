@@ -23,7 +23,7 @@ namespace Gu.Analyzers.Test
             AnalyzerAssert.MetadataReferences);
 
         private static readonly Solution GuAnalyzersProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("Gu.Analyzers.Analyzers.csproj"),
+            ProjectFile.Find("Gu.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 

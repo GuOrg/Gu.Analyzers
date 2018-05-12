@@ -148,7 +148,7 @@ namespace Gu.Analyzers.Test.Documentation
                              .Replace("{SEVERITY}", severity.ToString())
                              .Replace("{ENABLED}", enabled ? "true" : "false")
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/GuOrg/Gu.Analyzers/blob/master/Gu.Analyzers.Analyzers/")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/GuOrg/Gu.Analyzers/blob/master/Gu.Analyzers/")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)
