@@ -21,19 +21,30 @@
     <!-- This property disables extension deployment for command line builds; required for AppVeyor and the build script -->
     <DeployExtension>False</DeployExtension>
   </PropertyGroup>
+
   <ItemGroup>
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
     <ProjectReference Include="..\Gu.Analyzers.CodeFixes\Gu.Analyzers.CodeFixes.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <!-- https://github.com/dotnet/sdk/issues/433 -->
     <ProjectReference Update="@(ProjectReference)" AdditionalProperties="TargetFramework=netstandard1.3" />
     <!-- https://github.com/Microsoft/extendvs/issues/57 -->
     <ProjectReference Update="@(ProjectReference)" Name="%(Filename)" />
   </ItemGroup>
+
+  <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
+    <ItemGroup>
+      <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Gu.Roslyn.AnalyzerExtensions'" />
+      <VSIXSourceItem Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == 'Gu.Roslyn.CodeFixExtensions'" />
+    </ItemGroup>
+  </Target>
+  
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
   <Import Project="..\.paket\paket.targets" />
