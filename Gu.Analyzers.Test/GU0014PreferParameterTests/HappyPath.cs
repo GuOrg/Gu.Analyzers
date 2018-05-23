@@ -1,11 +1,12 @@
 namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
         public void SimpleAssign()
@@ -21,6 +22,51 @@ namespace RoslynSandbox
 
         public Foo(string text)
         {
+            this.text = text;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void AssignWithExpression()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(int value)
+        {
+            this.Square = value * value;
+            if (this.Square > 10)
+            {
+                throw new ArgumentException(nameof(value));
+            }
+        }
+
+        public int Square { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void UsedBeforeAssign()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            var temp = this.text;
             this.text = text;
         }
     }
