@@ -6,11 +6,11 @@ namespace Gu.Analyzers.Test.GU0015DontAssignMoreThanOnceTests
 
     internal class Diagnostic
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0015");
 
         [Test]
-        public void Field()
+        public void FieldInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Property()
+        public void PropertyInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -49,6 +49,27 @@ namespace RoslynSandbox
     }
 }";
 
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void FieldInMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly string text;
+
+        public Foo(string text)
+        {
+            this.text = text;
+            ↓this.text = text;
+            var length = this.text.ToString();
+        }
+    }
+}";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }

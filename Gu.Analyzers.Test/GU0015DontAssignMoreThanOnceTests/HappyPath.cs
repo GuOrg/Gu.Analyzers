@@ -1,11 +1,12 @@
 namespace Gu.Analyzers.Test.GU0015DontAssignMoreThanOnceTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
         [Test]
         public void SimpleAssign()
@@ -17,11 +18,11 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        private readonly string text;
+        private readonly int value;
 
-        public Foo(string text)
+        public Foo(int value)
         {
-            this.text = text;
+            this.value = value;
         }
     }
 }";
@@ -36,17 +37,17 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly string text;
+        private readonly int value;
 
-        public Foo(string text)
+        public Foo(int value)
         {
-            if (text == null)
+            if (value < 0)
             {
-                this.text = string.Empty;
+                this.value = 0;
             }
             else
             {
-                this.text = text;
+                this.value = value;
             }
         }
     }
@@ -64,13 +65,13 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        public Foo(string text)
+        public Foo(int value)
         {
-            this.Text = text;
-            System.Console.CancelKeyPress += (_, __) => Console.WriteLine(this.Text);
+            this.Value = value;
+            System.Console.CancelKeyPress += (_, __) => Console.WriteLine(this.Value);
         }
 
-        public string Text { get; set; }
+        public int Value { get; set; }
     }
 }";
 

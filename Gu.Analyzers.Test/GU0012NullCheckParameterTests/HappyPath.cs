@@ -109,8 +109,10 @@ namespace RoslynSandbox
 
         public Foo(string text)
         {
+#pragma warning disable GU0015 // Don't assign same more than once.
             this.text = text ?? throw new ArgumentNullException(nameof(text));
             this.text = text;
+#pragma warning restore GU0015 // Don't assign same more than once.
         }
     }
 }";

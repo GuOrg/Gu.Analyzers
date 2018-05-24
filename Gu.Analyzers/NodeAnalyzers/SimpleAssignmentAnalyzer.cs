@@ -13,7 +13,8 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0010DoNotAssignSameValue.Descriptor,
-            GU0012NullCheckParameter.Descriptor);
+            GU0012NullCheckParameter.Descriptor,
+            GU0015DontAssignMoreThanOnce.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -30,12 +31,12 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is AssignmentExpressionSyntax assignment)
+            if (context.Node is AssignmentExpressionSyntax assignment &&
+                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left) &&
+                context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right))
             {
                 if (AreSame(assignment.Left, assignment.Right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
-                    context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left) &&
-                    context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right) &&
                     left.Equals(right))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
@@ -50,6 +51,11 @@ namespace Gu.Analyzers
                     !NullCheck.IsChecked(parameter, assignment.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, assignment.Right.GetLocation()));
+                }
+
+                if (IsAssignedBefore(left, assignment, context))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(GU0015DontAssignMoreThanOnce.Descriptor, assignment.GetLocation()));
                 }
             }
         }
@@ -80,15 +86,39 @@ namespace Gu.Analyzers
         {
             switch (expression)
             {
-                    case IdentifierNameSyntax identifierName:
-                        result = identifierName;
-                        return true;
-                    case MemberAccessExpressionSyntax memberAccess when memberAccess.Expression is ThisExpressionSyntax:
-                        return TryGetIdentifierName(memberAccess.Name, out result);
-                    default:
-                        result = null;
-                        return false;
+                case IdentifierNameSyntax identifierName:
+                    result = identifierName;
+                    return true;
+                case MemberAccessExpressionSyntax memberAccess when memberAccess.Expression is ThisExpressionSyntax:
+                    return TryGetIdentifierName(memberAccess.Name, out result);
+                default:
+                    result = null;
+                    return false;
             }
+        }
+
+        private static bool IsAssignedBefore(ISymbol left, AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
+        {
+            if (assignment.TryFirstAncestor<MemberDeclarationSyntax>(out var member))
+            {
+                using (var walker = AssignmentExecutionWalker.For(left, member, Scope.Member, context.SemanticModel, context.CancellationToken))
+                {
+                    foreach (var candaidate in walker.Assignments)
+                    {
+                        if (candaidate == assignment)
+                        {
+                            continue;
+                        }
+
+                        if (candaidate.IsExecutedBefore(assignment) == true)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

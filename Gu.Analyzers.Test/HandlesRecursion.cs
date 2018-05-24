@@ -38,6 +38,7 @@ namespace RoslynSandbox
         public Foo()
             : this()
         {
+#pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -46,6 +47,7 @@ namespace RoslynSandbox
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
             // value = value;
+#pragma warning restore GU0015 // Don't assign same more than once.
         }
 
         public int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
@@ -74,6 +76,7 @@ namespace RoslynSandbox
 
         public void Meh()
         {
+#pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -82,6 +85,7 @@ namespace RoslynSandbox
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
             // value = value;
+#pragma warning restore GU0015 // Don't assign same more than once.
         }
 
         private static IReadOnlyList<IDisposable> Flatten(IReadOnlyList<IDisposable> source, List<IDisposable> result = null)

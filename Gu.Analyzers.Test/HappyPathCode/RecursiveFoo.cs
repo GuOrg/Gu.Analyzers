@@ -29,6 +29,7 @@ namespace Gu.Analyzers.Test.HappyPathCode
 
         public RecursiveFoo()
         {
+#pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -37,6 +38,7 @@ namespace Gu.Analyzers.Test.HappyPathCode
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
             value = value;
+#pragma warning restore GU0015 // Don't assign same more than once.
         }
 
         public IDisposable RecursiveProperty => this.RecursiveProperty;
@@ -228,6 +230,7 @@ namespace Gu.Analyzers.Test.HappyPathCode
 
         public void Meh()
         {
+#pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -241,6 +244,7 @@ namespace Gu.Analyzers.Test.HappyPathCode
             RecursiveOut(string.Empty, out value);
             RecursiveRef(ref value);
             value = value;
+#pragma warning restore GU0015 // Don't assign same more than once.
         }
 
         private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)

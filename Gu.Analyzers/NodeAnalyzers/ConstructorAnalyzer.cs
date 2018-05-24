@@ -17,8 +17,7 @@ namespace Gu.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0003CtorParameterNamesShouldMatch.Descriptor,
             GU0004AssignAllReadOnlyMembers.Descriptor,
-            GU0014PreferParameter.Descriptor,
-            GU0015DontAssignMoreThanOnce.Descriptor);
+            GU0014PreferParameter.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -119,19 +118,6 @@ namespace Gu.Analyzers
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
                                             context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
                                         }
-                                    }
-                                }
-
-                                foreach (var candidate in walker.Assignments)
-                                {
-                                    if (candidate != assignment &&
-                                        TryGetIdentifier(candidate.Left, out var candidateLeft) &&
-                                        candidateLeft.Identifier.ValueText == left.Identifier.ValueText &&
-                                        assignment.TryFirstAncestor<BlockSyntax>(out var block) &&
-                                        block.Contains(candidate) &&
-                                        candidate.SpanStart > assignment.SpanStart)
-                                    {
-                                        context.ReportDiagnostic(Diagnostic.Create(GU0015DontAssignMoreThanOnce.Descriptor, candidate.GetLocation()));
                                     }
                                 }
                             }
