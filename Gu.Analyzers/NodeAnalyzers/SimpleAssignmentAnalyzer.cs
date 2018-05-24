@@ -32,6 +32,15 @@ namespace Gu.Analyzers
 
             if (context.Node is AssignmentExpressionSyntax assignment)
             {
+                if (AreSame(assignment.Left, assignment.Right) &&
+                    assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
+                    context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left) &&
+                    context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right) &&
+                    left.Equals(right))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
+                }
+
                 if (assignment.Right is IdentifierNameSyntax identifier &&
                     context.ContainingSymbol is IMethodSymbol method &&
                     method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
@@ -41,23 +50,6 @@ namespace Gu.Analyzers
                     !NullCheck.IsChecked(parameter, assignment.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, assignment.Right.GetLocation()));
-                }
-
-                if (AreSame(assignment.Left, assignment.Right))
-                {
-                    if (assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() != null)
-                    {
-                        return;
-                    }
-
-                    var left = context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken);
-                    var right = context.SemanticModel.GetSymbolSafe(assignment.Right, context.CancellationToken);
-                    if (!ReferenceEquals(left, right))
-                    {
-                        return;
-                    }
-
-                    context.ReportDiagnostic(Diagnostic.Create(GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
                 }
             }
         }
