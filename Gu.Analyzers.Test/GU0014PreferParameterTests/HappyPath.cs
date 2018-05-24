@@ -55,6 +55,36 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void AssignedTwice()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+#pragma warning disable GU0003 // Name the parameters to match the assigned members.
+        public Foo(int value1, int value2)
+#pragma warning restore GU0003 // Name the parameters to match the assigned members.
+        {
+#pragma warning disable GU0015 // Don't assign same more than once.
+            this.Bar = value1;
+            this.Bar = value2 * 2;
+#pragma warning restore GU0015 // Don't assign same more than once.
+            if (this.Bar > 10)
+            {
+                throw new ArgumentException(nameof(value1));
+            }
+        }
+
+        public int Bar { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void UsedBeforeAssign()
         {
             var testCode = @"

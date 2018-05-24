@@ -282,6 +282,21 @@ namespace Gu.Analyzers
                 }
             }
 
+            using (var walker = MutationWalker.For(left, context.SemanticModel, context.CancellationToken))
+            {
+                if (walker.TrySingle(out var single))
+                {
+                    if (single.IsExecutedBefore(expression) != true)
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
             return TryGetIdentifier(expression, out var identifierName) &&
                    identifierName.Identifier.ValueText == left.Name &&
                    context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ISymbol symbol) &&
