@@ -29,11 +29,7 @@ namespace Gu.Analyzers
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false) as CompilationUnitSyntax;
-            if (syntaxRoot == null)
-            {
-                return;
-            }
+                                          .ConfigureAwait(false);
 
             foreach (var diagnostic in context.Diagnostics)
             {

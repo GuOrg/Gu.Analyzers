@@ -121,15 +121,16 @@ namespace Gu.Analyzers
 
             foreach (var expression in initializer.Expressions)
             {
-                var assignment = expression as AssignmentExpressionSyntax;
-                if (assignment == null)
+                if (expression is AssignmentExpressionSyntax assignment)
+                {
+                    if (IsMutable(semanticModel, cancellationToken, assignment.Right))
+                    {
+                        return true;
+                    }
+                }
+                else
                 {
                     // Don't know if this can ever happen but erroring on the safe side flagging it as mutable.
-                    return true;
-                }
-
-                if (IsMutable(semanticModel, cancellationToken, assignment.Right))
-                {
                     return true;
                 }
             }

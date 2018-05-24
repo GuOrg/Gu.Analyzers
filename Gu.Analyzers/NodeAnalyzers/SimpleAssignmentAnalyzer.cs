@@ -72,14 +72,10 @@ namespace Gu.Analyzers
                 return leftName.Identifier.ValueText == rightName.Identifier.ValueText;
             }
 
-            var leftMember = left as MemberAccessExpressionSyntax;
-            var rightMember = right as MemberAccessExpressionSyntax;
-            if (leftMember == null || rightMember == null)
-            {
-                return false;
-            }
-
-            return AreSame(leftMember.Name, rightMember.Name) && AreSame(leftMember.Expression, rightMember.Expression);
+            return left is MemberAccessExpressionSyntax leftMember &&
+                   right is MemberAccessExpressionSyntax rightMember &&
+                   AreSame(leftMember.Name, rightMember.Name) &&
+                   AreSame(leftMember.Expression, rightMember.Expression);
         }
 
         private static bool TryGetIdentifierName(ExpressionSyntax expression, out IdentifierNameSyntax result)

@@ -35,23 +35,16 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (HasAnyNamedArgument(arguments))
+                if (syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
+                    !HasAnyNamedArgument(arguments) &&
+                    semanticModel.GetSymbolSafe(arguments.Parent, context.CancellationToken) is IMethodSymbol method)
                 {
-                    continue;
-                }
-
-                var method = semanticModel.GetSymbolSafe(arguments.Parent, context.CancellationToken) as IMethodSymbol;
-                if (method == null)
-                {
-                    continue;
-                }
-
-                context.RegisterCodeFix(
+                    context.RegisterCodeFix(
                         "Name arguments",
                         (editor, _) => ApplyFix(editor, method, arguments),
                         this.GetType(),
-                    diagnostic);
+                        diagnostic);
+                }
             }
         }
 
