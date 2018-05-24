@@ -1,11 +1,12 @@
 namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
         public void ConstructorSettingProperties()
@@ -284,6 +285,56 @@ namespace RoslynSandbox
         }
 
         public int ID { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void IgnoresTupleCreate()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            var tuple = Tuple.Create(
+                1,
+                2,
+                3,
+                4);
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void IgnoresNumbered()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo : Bar
+    {
+        public Foo(int x, int y, int z)
+            : base(x, y, z)
+        {
+        }
+    }
+
+    public class Bar
+    {
+        public Bar(int value1, int value2, int value3)
+        {
+            this.Values = new int[] { value1, value2, value3 };
+        }
+
+        public int[] Values { get; }
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);

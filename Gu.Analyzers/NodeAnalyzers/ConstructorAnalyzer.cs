@@ -171,7 +171,8 @@ namespace Gu.Analyzers
                     context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is IMethodSymbol chained &&
                     chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
-                    parameterSymbol.Name != parameter.Identifier.ValueText)
+                    parameterSymbol.Name != parameter.Identifier.ValueText &&
+                    !char.IsDigit(parameterSymbol.Name[parameterSymbol.Name.Length - 1]))
                 {
                     name = parameterSymbol.Name;
                     return true;
