@@ -50,7 +50,7 @@ namespace Gu.Analyzers
             {
                 using (var walker = MutationWalker.For(property, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var value in walker)
+                    foreach (var value in walker.All())
                     {
                         if (MeansPropertyIsMutable(value))
                         {

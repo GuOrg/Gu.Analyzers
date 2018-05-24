@@ -91,21 +91,18 @@ namespace Gu.Analyzers
             }
 
             var enumDeclaration = (EnumDeclarationSyntax)context.Node;
-            var enumSymbol = context.SemanticModel.GetDeclaredSymbolSafe(enumDeclaration, context.CancellationToken) as INamedTypeSymbol;
-            if (enumSymbol == null)
+            if (context.SemanticModel.GetDeclaredSymbolSafe(enumDeclaration, context.CancellationToken) is INamedTypeSymbol enumSymbol)
             {
-                return;
-            }
+                var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
 
-            var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
-
-            if (hasFlagsAttribute)
-            {
-                this.HandleFlagEnumMember(context, enumDeclaration);
-            }
-            else
-            {
-                this.HandleNonFlagEnumMember(context, enumDeclaration);
+                if (hasFlagsAttribute)
+                {
+                    this.HandleFlagEnumMember(context, enumDeclaration);
+                }
+                else
+                {
+                    this.HandleNonFlagEnumMember(context, enumDeclaration);
+                }
             }
         }
 

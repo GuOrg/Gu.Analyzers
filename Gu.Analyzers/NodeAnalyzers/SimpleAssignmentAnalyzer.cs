@@ -86,19 +86,17 @@ namespace Gu.Analyzers
 
         private static bool TryGetIdentifierName(ExpressionSyntax expression, out IdentifierNameSyntax result)
         {
-            result = expression as IdentifierNameSyntax;
-            if (result != null)
+            switch (expression)
             {
-                return true;
+                    case IdentifierNameSyntax identifierName:
+                        result = identifierName;
+                        return true;
+                    case MemberAccessExpressionSyntax memberAccess when memberAccess.Expression is ThisExpressionSyntax:
+                        return TryGetIdentifierName(memberAccess.Name, out result);
+                    default:
+                        result = null;
+                        return false;
             }
-
-            var memberAccess = expression as MemberAccessExpressionSyntax;
-            if (memberAccess?.Expression is ThisExpressionSyntax)
-            {
-                return TryGetIdentifierName(memberAccess.Name, out result);
-            }
-
-            return false;
         }
     }
 }
