@@ -32,10 +32,10 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is AssignmentExpressionSyntax assignment &&
-                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left) &&
-                context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right))
+                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left))
             {
-                if (AreSame(assignment.Left, assignment.Right) &&
+                if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right) &&
+                    AreSame(assignment.Left, assignment.Right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
                     left.Equals(right))
                 {
@@ -53,7 +53,7 @@ namespace Gu.Analyzers
                     context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, assignment.Right.GetLocation()));
                 }
 
-                if (IsAssignedBefore(left, assignment, context))
+                if (IsRedundantAssignment(left, assignment, context))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(GU0015DontAssignMoreThanOnce.Descriptor, assignment.GetLocation()));
                 }
@@ -93,21 +93,52 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool IsAssignedBefore(ISymbol left, AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
+        private static bool IsRedundantAssignment(ISymbol left, AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
         {
+            if (left is IDiscardSymbol ||
+                assignment.TryFirstAncestor<ObjectCreationExpressionSyntax>(out _))
+            {
+                return false;
+            }
+
             if (assignment.TryFirstAncestor<MemberDeclarationSyntax>(out var member))
             {
+                if (!(member is ConstructorDeclarationSyntax) &&
+                    context.SemanticModel.TryGetType(assignment.Left, context.CancellationToken, out var type) &&
+                    FieldOrProperty.TryCreate(left, out _))
+                {
+                    if (type == KnownSymbol.Boolean ||
+                        type.TypeKind == TypeKind.Enum)
+                    {
+                        return false;
+                    }
+                }
+
                 using (var walker = AssignmentExecutionWalker.For(left, member, Scope.Member, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var candaidate in walker.Assignments)
+                    foreach (var candidate in walker.Assignments)
                     {
-                        if (candaidate == assignment)
+                        if (candidate == assignment)
                         {
                             continue;
                         }
 
-                        if (candaidate.IsExecutedBefore(assignment) == true)
+                        if (!MemberPath.Equals(candidate.Left, assignment.Left))
                         {
+                            continue;
+                        }
+
+                        if (candidate.IsExecutedBefore(assignment) == true)
+                        {
+                            if (left is IParameterSymbol parameter &&
+                                parameter.RefKind == RefKind.Out &&
+                                assignment.TryFirstAncestor<BlockSyntax>(out var assignmentBlock) &&
+                                candidate.TryFirstAncestor<BlockSyntax>(out var candidateBlock) &&
+                                candidateBlock.Contains(assignmentBlock))
+                            {
+                                return false;
+                            }
+
                             return true;
                         }
                     }
