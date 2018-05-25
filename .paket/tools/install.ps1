@@ -1,49 +1,27 @@
 param($installPath, $toolsPath, $package, $project)
-
-$analyzersPaths = Join-Path (Join-Path (Split-Path -Path $toolsPath -Parent) "analyzers" ) * -Resolve
-
-foreach($analyzersPath in $analyzersPaths)
+function Add-AnalyzerReferences($folderPath)
 {
-    # Install the language agnostic analyzers.
-    if (Test-Path $analyzersPath)
+    # Write-Host 'Folder '$folderPath
+    if (Test-Path $folderPath)
     {
-        foreach ($analyzerFilePath in Get-ChildItem $analyzersPath -Filter *.dll)
+        foreach ($dllPath in Get-ChildItem $folderPath -Filter *.dll)
         {
-            if($project.Object.AnalyzerReferences)
-            {
-                $project.Object.AnalyzerReferences.Add($analyzerFilePath.FullName)
-            }
+            # Write-Host 'File '$dllPath.FullName
+            $project.Object.AnalyzerReferences.Add($dllPath.FullName)
         }
     }
 }
 
-$project.Type # gives the language name like (C# or VB.NET)
-$languageFolder = ""
+$analyzersPath = Join-Path (Split-Path -Path $toolsPath -Parent) "analyzers\dotnet"
+Add-AnalyzerReferences($analyzersPath)
+
 if($project.Type -eq "C#")
 {
-    $languageFolder = "cs"
+    $csAnalyzersPath = Join-Path $analyzersPath "cs"
+    Add-AnalyzerReferences($csAnalyzersPath)
 }
 if($project.Type -eq "VB.NET")
 {
-    $languageFolder = "vb"
-}
-if($languageFolder -eq "")
-{
-    return
-}
-
-foreach($analyzersPath in $analyzersPaths)
-{
-    # Install language specific analyzers.
-    $languageAnalyzersPath = join-path $analyzersPath $languageFolder
-    if (Test-Path $languageAnalyzersPath)
-    {
-        foreach ($analyzerFilePath in Get-ChildItem $languageAnalyzersPath -Filter *.dll)
-        {
-            if($project.Object.AnalyzerReferences)
-            {
-                $project.Object.AnalyzerReferences.Add($analyzerFilePath.FullName)
-            }
-        }
-    }
+    $vbAnalyzersPath = Join-Path $analyzersPath "vb"
+    Add-AnalyzerReferences($vbAnalyzersPath)
 }
