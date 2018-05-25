@@ -5,7 +5,7 @@ function Remove-AnalyzerReferences($folderPath)
     # Write-Host 'Folder '$folderPath
     if (Test-Path $folderPath)
     {
-        foreach ($dllPath in Get-ChildItem $folderPath -Filter *.dll)
+        foreach ($dllPath in Get-ChildItem -Path "$folderPath\*.dll" -Exclude *.resources.dll)
         {
             # Write-Host 'File '$dllPath.FullName
             $project.Object.AnalyzerReferences.Remove($dllPath.FullName)
