@@ -140,7 +140,7 @@ namespace Gu.Analyzers
                                 return false;
                             }
 
-                            using (IdentifierNameWalker nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
+                            using (var nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
                             {
                                 foreach (var name in nameWalker.IdentifierNames)
                                 {
