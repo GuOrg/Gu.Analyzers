@@ -94,43 +94,10 @@ namespace Gu.Analyzers
                 var toIndex = 0;
                 for (var i = 0; i < members.Count; i++)
                 {
+                    toIndex = i;
                     var member = members[i];
-                    if (member is FieldDeclarationSyntax ||
-                        member is ConstructorDeclarationSyntax ||
-                        member is BaseFieldDeclarationSyntax)
+                    if (MemberDeclarationComparer.Compare(propertyDeclaration, member) < 0)
                     {
-                        toIndex = i + 1;
-                        continue;
-                    }
-
-                    if (member is MethodDeclarationSyntax)
-                    {
-                        toIndex = i;
-                        break;
-                    }
-
-                    var otherPropertyDeclaration = member as BasePropertyDeclarationSyntax;
-                    if (otherPropertyDeclaration == null || !otherPropertyDeclaration.IsPropertyOrIndexer())
-                    {
-                        continue;
-                    }
-
-                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) == 0 &&
-                        fromIndex < i)
-                    {
-                        toIndex = i + 1;
-                        continue;
-                    }
-
-                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) > 0)
-                    {
-                        toIndex = i + 1;
-                        continue;
-                    }
-
-                    if (MemberDeclarationComparer.Compare(propertyDeclaration, otherPropertyDeclaration) < 0)
-                    {
-                        toIndex = i;
                         break;
                     }
                 }
