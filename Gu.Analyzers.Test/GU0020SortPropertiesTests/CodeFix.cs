@@ -12,6 +12,72 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
 
         [Test]
+        public void MutableBeforeGetOnlySimple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        ↓public int B { get; set; }
+
+        public int A { get; }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public int A { get; }
+
+        public int B { get; set; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void MutableBeforeGetOnlySimpleWithDocs()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        /// <summary>
+        /// B
+        /// </summary>
+        ↓public int B { get; set; }
+
+        /// <summary>
+        /// A
+        /// </summary>
+        public int A { get; }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        /// <summary>
+        /// A
+        /// </summary>
+        public int A { get; }
+
+        /// <summary>
+        /// B
+        /// </summary>
+        public int B { get; set; }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void ExplicitImplementation()
         {
             var interfaceCode = @"
@@ -30,7 +96,7 @@ namespace RoslynSandbox
     {
         ↓private int Value { get; } = 5;
 
-        ↓object IValue.Value { get; } = 5;
+        object IValue.Value { get; } = 5;
     }
 }";
 
@@ -44,11 +110,11 @@ namespace RoslynSandbox
         private int Value { get; } = 5;
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { interfaceCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { interfaceCode, testCode }, fixedCode);
         }
 
         [Test]
-        public void WhenMutableBeforeGetOnlyFirst()
+        public void MutableBeforeGetOnlyFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +131,7 @@ namespace RoslynSandbox
 
         ↓public int A { get; set; }
 
-        ↓public int B { get; }
+        public int B { get; }
 
         public int C { get; }
 
@@ -95,11 +161,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void WhenMutableBeforeGetOnlyFirstWithNamespaces()
+        public void MutableBeforeGetOnlyFirstWithNamespaces()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -118,7 +184,7 @@ namespace RoslynSandbox
 
         ↓public int A { get; set; }
 
-        ↓public int B { get; }
+        public int B { get; }
 
         public int C { get; }
 
@@ -150,11 +216,11 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void WhenMutableBeforeGetOnlyLast()
+        public void MutableBeforeGetOnlyLast()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -175,7 +241,7 @@ namespace RoslynSandbox
 
         ↓public int C { get; set; }
 
-        ↓public int D { get; }
+        public int D { get; }
     }
 }";
 
@@ -201,11 +267,11 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void WhenPrivateSetAfterPublicSet()
+        public void PrivateSetAfterPublicSet()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -237,7 +303,7 @@ namespace RoslynSandbox
             }
         }
 
-        ↓public int D
+        public int D
         {
             get
             {
@@ -294,11 +360,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void WhenMutableBeforeGetOnlyFirstWithInitializers()
+        public void MutableBeforeGetOnlyFirstWithInitializers()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -315,7 +381,7 @@ namespace RoslynSandbox
 
         ↓public int A { get; set; } = 1;
 
-        ↓public int B { get; } = 2;
+        public int B { get; } = 2;
 
         public int C { get; } = 3;
 
@@ -345,11 +411,11 @@ namespace RoslynSandbox
         public int A { get; set; } = 1;
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
-        public void WhenMutableBeforeGetOnlyWithComments()
+        public void MutableBeforeGetOnlyWithComments()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -376,7 +442,7 @@ namespace RoslynSandbox
         /// <summary>
         /// D
         /// </summary>
-        ↓public int D { get; }
+        public int D { get; }
     }
 }";
 
@@ -408,7 +474,7 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -426,7 +492,7 @@ namespace RoslynSandbox
 
         ↓public int A => B;
 
-        ↓public int B { get; }
+        public int B { get; }
     }
 }";
 
@@ -445,7 +511,7 @@ namespace RoslynSandbox
         public int A => B;
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -469,7 +535,7 @@ namespace RoslynSandbox
             }
         }
 
-        ↓public int B { get; }
+        public int B { get; }
     }
 }";
 
@@ -494,7 +560,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -524,7 +590,7 @@ namespace RoslynSandbox
             }
         }
 
-        ↓public int A { get; set; }
+        public int A { get; set; }
 
         public IEnumerator<int> GetEnumerator()
         {
@@ -575,7 +641,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -594,7 +660,7 @@ namespace RoslynSandbox
 
         ↓public int A { get; set; }
 
-        ↓public int B { get; private set; }
+        public int B { get; private set; }
     }
 }";
 
@@ -614,7 +680,7 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -639,7 +705,7 @@ namespace RoslynSandbox
         {
             ↓public int Value1 { get; set; }
             
-            ↓public int Value2 { get; private set; }
+            public int Value2 { get; private set; }
         }
     }
 }";
@@ -661,14 +727,13 @@ namespace RoslynSandbox
 
         public class Nested
         {
-            
             public int Value2 { get; private set; }
 
             public int Value1 { get; set; }
         }
     }
 }";
-            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

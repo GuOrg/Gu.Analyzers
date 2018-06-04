@@ -47,15 +47,6 @@ namespace Gu.Analyzers
                 propertyDeclaration.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration))
             {
                 var index = typeDeclaration.Members.IndexOf(propertyDeclaration);
-                if (typeDeclaration.Members.TryElementAt(index - 1, out var before) &&
-                    (before is PropertyDeclarationSyntax || before is IndexerDeclarationSyntax))
-                {
-                    if (MemberDeclarationComparer.Compare(propertyDeclaration, before) < 0)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                    }
-                }
-
                 if (typeDeclaration.Members.TryElementAt(index + 1, out var after) &&
                     (after is PropertyDeclarationSyntax || after is IndexerDeclarationSyntax))
                 {

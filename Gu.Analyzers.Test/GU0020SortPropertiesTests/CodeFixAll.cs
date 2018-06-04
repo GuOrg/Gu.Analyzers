@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -19,7 +19,7 @@ namespace RoslynSandbox
     {
         ↓public int A { get; set; }
 
-        ↓public int B { get; }
+        public int B { get; }
 
         public int C { get; }
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAMess1()
+        public void WhenAMess()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
 
         ↓public int B { get; private set; }
 
-        ↓public int C { get; }
+        public int C { get; }
 
         public int D => C;
     }
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Docs for C
         /// </summary>
-        ↓public int C { get; }
+        public int C { get; }
 
         /// <summary>
         /// Docs for D
@@ -148,11 +148,11 @@ namespace RoslynSandbox
     {
         ↓public int A { get; set; }
 
-        ↓public int B { get; private set; }
+        public int B { get; private set; }
 
         ↓public int C { get; set; }
 
-        ↓public int D { get; private set; }
+        public int D { get; private set; }
     }
 }";
 

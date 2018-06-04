@@ -1,32 +1,26 @@
 namespace Gu.Analyzers
 {
-    using System;
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.AnalyzerExtensions.StyleCopComparers;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SortPropertiesCodeFixProvider))]
     [Shared]
-    internal class SortPropertiesCodeFixProvider : CodeFixProvider
+    internal class SortPropertiesCodeFixProvider : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0020SortProperties.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => BatchFixer.Default;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -35,208 +29,92 @@ namespace Gu.Analyzers
             {
                 if (syntaxRoot.TryFindNodeOrAncestor<BasePropertyDeclarationSyntax>(diagnostic, out var property))
                 {
-                    using (var sorted = new SortedMembers())
-                    {
-                        sorted.Sort(property);
-                        var updated = new SortRewriter(sorted).Visit(syntaxRoot);
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Sort properties.",
-                                _ => Task.FromResult(context.Document.WithSyntaxRoot(updated)),
-                                this.GetType().FullName),
-                            diagnostic);
-                    }
+                    context.RegisterCodeFix(
+                        "Sort property.",
+                        (editor, _) => Move(editor, property),
+                        "Sort property.",
+                        diagnostic);
                 }
             }
         }
 
-        private class SortedMembers : IDisposable
+        private static void Move(DocumentEditor editor, BasePropertyDeclarationSyntax property)
         {
-            private readonly PooledDictionary<TypeDeclarationSyntax, List<MemberDeclarationSyntax>> sorted;
+            editor.TrackNode(property);
+            editor.ReplaceNode(
+                (TypeDeclarationSyntax)property.Parent,
+                WithMoved);
 
-            public SortedMembers()
+            SyntaxNode WithMoved(TypeDeclarationSyntax old)
             {
-                this.sorted = PooledDictionary.Borrow<TypeDeclarationSyntax, List<MemberDeclarationSyntax>>();
-            }
-
-            public void Sort(TypeDeclarationSyntax type)
-            {
-                foreach (var member in type.Members)
+                switch (old)
                 {
-                    switch (member)
-                    {
-                        case PropertyDeclarationSyntax property:
-                            this.Sort(property);
-                            break;
-                        case IndexerDeclarationSyntax indexer:
-                            this.Sort(indexer);
-                            break;
-                    }
-                }
-            }
-
-            public void Sort(BasePropertyDeclarationSyntax propertyDeclaration)
-            {
-                var type = propertyDeclaration.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                if (type == null)
-                {
-                    return;
-                }
-
-                if (!this.sorted.TryGetValue(type, out var members))
-                {
-                    members = new List<MemberDeclarationSyntax>(type.Members);
-                    this.sorted[type] = members;
-                }
-
-                var fromIndex = members.IndexOf(propertyDeclaration);
-                members.RemoveAt(fromIndex);
-                var toIndex = 0;
-                for (var i = 0; i < members.Count; i++)
-                {
-                    toIndex = i;
-                    var member = members[i];
-                    if (MemberDeclarationComparer.Compare(propertyDeclaration, member) < 0)
-                    {
-                        break;
-                    }
-                }
-
-                members.Insert(toIndex, propertyDeclaration);
-            }
-
-            public void Dispose()
-            {
-                this.sorted?.Dispose();
-            }
-
-            public bool TryGetSorted(SyntaxNode node, out MemberDeclarationSyntax sortedNode)
-            {
-                sortedNode = null;
-                var member = node as MemberDeclarationSyntax;
-                if (member == null || member is TypeDeclarationSyntax || member is NamespaceDeclarationSyntax)
-                {
-                    return false;
-                }
-
-                var type = member.FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                if (type == null)
-                {
-                    return false;
-                }
-
-                if (this.sorted.TryGetValue(type, out List<MemberDeclarationSyntax> sortedMembers))
-                {
-                    var index = type.Members.IndexOf(member);
-                    if (index == -1)
-                    {
-                        return false;
-                    }
-
-                    sortedNode = sortedMembers[index];
-                    if (index == 0)
-                    {
-                        if (sortedNode.HasLeadingTrivia)
-                        {
-                            var leadingTrivia = sortedNode.GetLeadingTrivia();
-                            if (leadingTrivia.Any() &&
-                                leadingTrivia[0].IsKind(SyntaxKind.EndOfLineTrivia))
-                            {
-                                sortedNode = sortedNode.WithLeadingTrivia(leadingTrivia.RemoveAt(0));
-                            }
-                        }
-                    }
-                    else if (!(sortedNode is FieldDeclarationSyntax))
-                    {
-                        if (sortedNode.HasLeadingTrivia)
-                        {
-                            var leadingTrivia = sortedNode.GetLeadingTrivia();
-                            if (!leadingTrivia[0].IsKind(SyntaxKind.EndOfLineTrivia))
-                            {
-                                sortedNode = sortedNode.WithLeadingTrivia(leadingTrivia.Insert(0, SyntaxFactory.EndOfLine(Environment.NewLine)));
-                            }
-                        }
-                        else
-                        {
-                            sortedNode = sortedNode.WithLeadingTrivia(SyntaxTriviaList.Create(SyntaxFactory.EndOfLine(Environment.NewLine)));
-                        }
-                    }
-
-                    return true;
-                }
-
-                return true;
-            }
-        }
-
-        private class SortRewriter : CSharpSyntaxRewriter
-        {
-            private readonly SortedMembers sorted;
-
-            public SortRewriter(SortedMembers sorted)
-            {
-                this.sorted = sorted;
-            }
-
-            public override SyntaxNode Visit(SyntaxNode node)
-            {
-                if (node is TypeDeclarationSyntax type)
-                {
-                    this.sorted.Sort(type);
-                    return base.Visit(node);
-                }
-
-                if (this.sorted.TryGetSorted(node, out MemberDeclarationSyntax sortedNode))
-                {
-                    return base.Visit(sortedNode);
-                }
-
-                return base.Visit(node);
-            }
-        }
-
-        private class BatchFixer : FixAllProvider
-        {
-            public static readonly BatchFixer Default = new BatchFixer();
-            private static readonly ImmutableArray<FixAllScope> SupportedFixAllScopes = ImmutableArray.Create(FixAllScope.Document);
-
-            private BatchFixer()
-            {
-            }
-
-            public override IEnumerable<FixAllScope> GetSupportedFixAllScopes()
-            {
-                return SupportedFixAllScopes;
-            }
-
-            [SuppressMessage("ReSharper", "RedundantCaseLabel", Justification = "Mute R#")]
-            public override Task<CodeAction> GetFixAsync(FixAllContext fixAllContext)
-            {
-                switch (fixAllContext.Scope)
-                {
-                    case FixAllScope.Document:
-                        return Task.FromResult(CodeAction.Create(
-                            "Sort properties.",
-                            _ => FixDocumentAsync(fixAllContext),
-                            this.GetType().Name));
-                    case FixAllScope.Project:
-                    case FixAllScope.Solution:
-                    case FixAllScope.Custom:
+                    case ClassDeclarationSyntax classDeclaration:
+                        return classDeclaration.WithMembers(SortPropertiesCodeFixProvider.WithMoved(old.Members, old.GetCurrentNode(property)));
+                    case StructDeclarationSyntax structDeclaration:
+                        return structDeclaration.WithMembers(SortPropertiesCodeFixProvider.WithMoved(old.Members, old.GetCurrentNode(property)));
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        return old;
+                }
+            }
+        }
+
+        private static SyntaxList<MemberDeclarationSyntax> WithMoved(SyntaxList<MemberDeclarationSyntax> members, MemberDeclarationSyntax member)
+        {
+            members = members.Remove(member);
+            for (var i = 0; i < members.Count; i++)
+            {
+                var current = members[i];
+                if (MemberDeclarationComparer.Compare(member, current) < 0)
+                {
+                    return RemoveLeadingEndOfLine(members.Insert(i, UpdateLineFeed(member)));
                 }
             }
 
-            private static async Task<Document> FixDocumentAsync(FixAllContext context)
+            return RemoveLeadingEndOfLine(members.Add(UpdateLineFeed(member)));
+        }
+
+        private static SyntaxList<MemberDeclarationSyntax> RemoveLeadingEndOfLine(SyntaxList<MemberDeclarationSyntax> members)
+        {
+            if (members.TryFirst(out var first) &&
+                first.HasLeadingTrivia &&
+                first.GetLeadingTrivia() is SyntaxTriviaList triviaList &&
+                triviaList.TryFirst(x => x.IsKind(SyntaxKind.EndOfLineTrivia), out var eol))
             {
-                var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                              .ConfigureAwait(false);
-                using (var sorted = new SortedMembers())
-                {
-                    var updated = new SortRewriter(sorted).Visit(syntaxRoot);
-                    return context.Document.WithSyntaxRoot(updated);
-                }
+                return members.Replace(
+                    first,
+                    first.WithLeadingTrivia(RemoveLeading()));
             }
+
+            return members;
+
+            SyntaxTriviaList RemoveLeading()
+            {
+                for (var i = triviaList.IndexOf(eol); i >= 0; i--)
+                {
+                    if (triviaList[i] is SyntaxTrivia trivia &&
+                        (trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia)))
+                    {
+                        triviaList = triviaList.Remove(trivia);
+                    }
+                }
+
+                return triviaList;
+            }
+        }
+
+        private static T UpdateLineFeed<T>(T member)
+            where T : MemberDeclarationSyntax
+        {
+            if (member.HasLeadingTrivia &&
+                member.GetLeadingTrivia() is SyntaxTriviaList triviaList &&
+                triviaList.First() is SyntaxTrivia trivia &&
+                trivia.IsKind(SyntaxKind.EndOfLineTrivia))
+            {
+                return member.WithLeadingTrivia(triviaList.Replace(trivia, SyntaxFactory.ElasticLineFeed));
+            }
+
+            return member.WithLeadingElasticLineFeed();
         }
     }
 }
