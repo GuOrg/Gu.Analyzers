@@ -1,3 +1,6 @@
+#### 1.2.13
+* FEATURE: Code fix for GU0009.
+
 #### 1.2.10
 * BUGFIXES: Don't nag on fluent moq.
 
