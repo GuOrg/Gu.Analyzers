@@ -34,11 +34,9 @@ namespace Gu.Analyzers.Test.HappyPathCode
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
         private readonly Lazy<IDisposable> lazyDisposable;
+        private readonly IDisposable disposable;
 
-        private IDisposable meh1;
-        private IDisposable meh2;
         private bool isDirty;
-        private IDisposable disposable;
 
         public Foo1(IDisposable disposable)
         {

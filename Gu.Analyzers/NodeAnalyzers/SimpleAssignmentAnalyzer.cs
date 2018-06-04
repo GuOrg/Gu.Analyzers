@@ -139,6 +139,22 @@ namespace Gu.Analyzers
                                 return false;
                             }
 
+                            using (IdentifierNameWalker nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
+                            {
+                                foreach (var name in nameWalker.IdentifierNames)
+                                {
+                                    if (left.Name == name.Identifier.ValueText &&
+                                        context.SemanticModel.TryGetSymbol(
+                                            name,
+                                            context.CancellationToken,
+                                            out ISymbol symbol) &&
+                                        symbol.Equals(left))
+                                    {
+                                        return false;
+                                    }
+                                }
+                            }
+
                             return true;
                         }
                     }

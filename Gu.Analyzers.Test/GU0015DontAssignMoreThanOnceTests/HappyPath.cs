@@ -203,5 +203,116 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void WhenUsingTheValueStringReplace()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static string Bar(string text)
+        {
+            text = text.Replace("" "", ""_"");
+            text = text.Replace("":"", ""_"");
+            return text;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenUsingTheValue1()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = this.Value1 * 397;
+                hash = hash ^ this.Value2;
+                return hash;
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenUsingTheValue2()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int value1, int value2)
+        {
+            this.Value1 = value1;
+            this.Value2 = value2;
+        }
+
+        public int Value1 { get; }
+
+        public int Value2 { get; }
+
+        public static bool operator ==(Foo left, Foo right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(Foo left, Foo right)
+        {
+            return !Equals(left, right);
+        }
+
+        protected bool Equals(Foo other)
+        {
+            return this.Value1 == other.Value1 && this.Value2 == other.Value2;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            if (obj.GetType() != this.GetType())
+            {
+                return false;
+            }
+
+            return this.Equals((Foo)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = this.Value1 * 397;
+                hash = hash ^ this.Value2;
+                return hash;
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
