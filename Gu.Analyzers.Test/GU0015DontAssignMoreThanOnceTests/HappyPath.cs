@@ -103,6 +103,37 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void IgnoreOutParameterIfReturn()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static bool TryGet(int i, out string text)
+        {
+            if (i > 10)
+            {
+                text = i.ToString();
+                return true;
+            }
+
+            if (i < 10)
+            {
+                text = null;
+                return false;
+            }
+
+            text = ""0"";
+            return true;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void IgnoreObjectInitializer()
         {
             var testCode = @"

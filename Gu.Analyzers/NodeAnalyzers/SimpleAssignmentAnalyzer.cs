@@ -134,7 +134,8 @@ namespace Gu.Analyzers
                                 parameter.RefKind == RefKind.Out &&
                                 assignment.TryFirstAncestor<BlockSyntax>(out var assignmentBlock) &&
                                 candidate.TryFirstAncestor<BlockSyntax>(out var candidateBlock) &&
-                                candidateBlock.Contains(assignmentBlock))
+                                (candidateBlock.Contains(assignmentBlock) ||
+                                 candidateBlock.Statements.Last() is ReturnStatementSyntax))
                             {
                                 return false;
                             }
