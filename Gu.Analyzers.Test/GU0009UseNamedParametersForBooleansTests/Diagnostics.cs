@@ -1,11 +1,14 @@
-﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
+namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal class CodeFix
     {
-        private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
+        private static readonly DiagnosticAnalyzer Analyzer = new GU0009UseNamedParametersForBooleans();
+        private static readonly CodeFixProvider Fix = new NameArgumentsCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0009");
 
         [Test]
@@ -31,12 +34,33 @@ namespace RoslynSandbox
         }
     }
 }";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
+    {
+        public void Floof(int howMuch, bool useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, useFluffyBuns: false);
+        }
+    }
+}";
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
                 diagnosticId: "GU0009",
                 message: "The boolean parameter is not named.",
                 code: testCode,
                 cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -64,7 +88,29 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+    using Alias = System.Boolean;
+
+    public class Foo
+    {
+        public void Floof(int howMuch, Alias useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, useFluffyBuns: false);
+        }
+    }
+}";
+
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -90,7 +136,28 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Xml.Serialization;
+
+    public class Foo
+    {
+        public void Floof(int howMuch, System.Boolean useFluffyBuns)
+        {
+        
+        }
+
+        public void Another()
+        {
+            Floof(42, useFluffyBuns: false);
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

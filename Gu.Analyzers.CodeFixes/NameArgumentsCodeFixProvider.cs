@@ -18,7 +18,9 @@ namespace Gu.Analyzers
         private static readonly SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
 
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0001NameArguments.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0001NameArguments.DiagnosticId,
+            GU0009UseNamedParametersForBooleans.DiagnosticId);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -35,28 +37,46 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                if (syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
+                if (diagnostic.Id == GU0001NameArguments.DiagnosticId &&
+                    syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
                     !HasAnyNamedArgument(arguments) &&
-                    semanticModel.GetSymbolSafe(arguments.Parent, context.CancellationToken) is IMethodSymbol method)
+                    semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol method))
                 {
                     context.RegisterCodeFix(
                         "Name arguments",
-                        (editor, _) => ApplyFix(editor, method, arguments),
+                        (editor, _) => ApplyFix(editor, method, arguments, 0),
+                        this.GetType(),
+                        diagnostic);
+                }
+                else if (diagnostic.Id == GU0009UseNamedParametersForBooleans.DiagnosticId &&
+                         syntaxRoot.TryFindNode<ArgumentSyntax>(diagnostic, out var boolArgument) &&
+                         boolArgument.Parent is ArgumentListSyntax argumentList &&
+                         !HasAnyNamedArgument(argumentList) &&
+                         semanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out method))
+                {
+                    context.RegisterCodeFix(
+                        "Name arguments",
+                        (editor, _) => ApplyFix(editor, method, argumentList, argumentList.Arguments.IndexOf(boolArgument)),
                         this.GetType(),
                         diagnostic);
                 }
             }
         }
 
-        private static void ApplyFix(DocumentEditor editor, IMethodSymbol method, ArgumentListSyntax arguments)
+        private static void ApplyFix(DocumentEditor editor, IMethodSymbol method, ArgumentListSyntax arguments, int startIndex)
         {
             var withNames = arguments;
-            for (int i = 0; i < arguments.Arguments.Count; i++)
+            for (var i = startIndex; i < arguments.Arguments.Count; i++)
             {
                 var argument = withNames.Arguments[i];
-                var leadingTrivia = argument.GetLeadingTrivia();
-                var withNameColon = argument.WithLeadingTrivia(SpaceTrivia).WithNameColon(SyntaxFactory.NameColon(method.Parameters[i].Name)).WithLeadingTrivia(leadingTrivia);
-                withNames = withNames.ReplaceNode(argument, withNameColon);
+
+                editor.ReplaceNode(
+                    argument,
+                    argument.WithLeadingTrivia(SpaceTrivia)
+                            .WithNameColon(
+                                SyntaxFactory.NameColon(method.Parameters[i].Name)
+                                             .WithLeadingTriviaFrom(argument))
+                            .WithTrailingTriviaFrom(argument));
             }
 
             editor.ReplaceNode(arguments, withNames);
