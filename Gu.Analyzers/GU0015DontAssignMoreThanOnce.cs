@@ -12,7 +12,7 @@ namespace Gu.Analyzers
             messageFormat: "Don't assign same more than once.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
+            isEnabledByDefault: false,
             description: "Don't assign same more than once.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
