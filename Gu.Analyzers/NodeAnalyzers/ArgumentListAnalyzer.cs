@@ -20,10 +20,10 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleArgumentList, SyntaxKind.ArgumentList);
+            context.RegisterSyntaxNodeAction(x => Handle(x), SyntaxKind.ArgumentList);
         }
 
-        private static void HandleArgumentList(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
