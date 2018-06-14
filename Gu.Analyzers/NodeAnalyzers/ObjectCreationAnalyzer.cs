@@ -31,12 +31,13 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation)
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+                context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor))
             {
                 if (objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
                     argumentList.Arguments.Count > 0 &&
                     context.ContainingSymbol is IMethodSymbol method &&
-                    TryGetExceptionCtor(objectCreation, context, out var ctor) &&
+                    ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
                     ctor.TryFindParameter("paramName", out var nameParameter))
                 {
                     if (objectCreation.TryFindArgument(nameParameter, out var nameArgument) &&
@@ -67,13 +68,6 @@ namespace Gu.Analyzers
                     }
                 }
             }
-        }
-
-        private static bool TryGetExceptionCtor(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, out IMethodSymbol ctor)
-        {
-            return context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentException, context.CancellationToken, out ctor) ||
-                   context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentNullException, context.CancellationToken, out ctor) ||
-                   context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentOutOfRangeException, context.CancellationToken, out ctor);
         }
 
         private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, out ArgumentSyntax argument)
