@@ -31,38 +31,49 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
-                argumentList.Arguments.Count > 0 &&
-                context.ContainingSymbol is IMethodSymbol method)
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation)
             {
-                if (context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentException, context.CancellationToken, out var ctor) ||
-                    context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentNullException, context.CancellationToken, out ctor) ||
-                    context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentOutOfRangeException, context.CancellationToken, out ctor))
+                if (objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
+                    argumentList.Arguments.Count > 0 &&
+                    context.ContainingSymbol is IMethodSymbol method &&
+                    TryGetExceptionCtor(objectCreation, context, out var ctor) &&
+                    ctor.TryFindParameter("paramName", out var nameParameter))
                 {
-                    if (ctor.TryFindParameter("paramName", out var nameParameter))
+                    if (objectCreation.TryFindArgument(nameParameter, out var nameArgument) &&
+                        objectCreation.Parent is ThrowExpressionSyntax throwExpression &&
+                        throwExpression.Parent is BinaryExpressionSyntax binary &&
+                        binary.IsKind(SyntaxKind.CoalesceExpression) &&
+                        nameArgument.TryGetStringValue(context.SemanticModel, context.CancellationToken, out var name) &&
+                        binary.Left is IdentifierNameSyntax identifierName &&
+                        identifierName.Identifier.ValueText != name)
                     {
-                        if (objectCreation.TryFindArgument(nameParameter, out var nameArgument) &&
-                            objectCreation.Parent is ThrowExpressionSyntax throwExpression &&
-                            throwExpression.Parent is BinaryExpressionSyntax binary &&
-                            binary.IsKind(SyntaxKind.CoalesceExpression) &&
-                            nameArgument.TryGetStringValue(context.SemanticModel, context.CancellationToken, out var name) &&
-                            binary.Left is IdentifierNameSyntax identifierName &&
-                            identifierName.Identifier.ValueText != name)
-                        {
-                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", identifierName.Identifier.ValueText) });
-                            context.ReportDiagnostic(Diagnostic.Create(GU0013CheckNameInThrow.Descriptor, nameArgument.GetLocation(), properties));
-                        }
+                        var properties = ImmutableDictionary.CreateRange(
+                            new[] { new KeyValuePair<string, string>("Name", identifierName.Identifier.ValueText) });
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                GU0013CheckNameInThrow.Descriptor,
+                                nameArgument.GetLocation(),
+                                properties));
+                    }
 
-                        if (TryGetWithParameterName(argumentList, method.Parameters, out var argument) &&
-                            argument.NameColon == null &&
-                            objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(GU0005ExceptionArgumentsPositions.Descriptor, argument.GetLocation()));
-                        }
+                    if (TryGetWithParameterName(argumentList, method.Parameters, out var argument) &&
+                        argument.NameColon == null &&
+                        objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
+                    {
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                GU0005ExceptionArgumentsPositions.Descriptor,
+                                argument.GetLocation()));
                     }
                 }
             }
+        }
+
+        private static bool TryGetExceptionCtor(ObjectCreationExpressionSyntax objectCreation, SyntaxNodeAnalysisContext context, out IMethodSymbol ctor)
+        {
+            return context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentException, context.CancellationToken, out ctor) ||
+                   context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentNullException, context.CancellationToken, out ctor) ||
+                   context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.ArgumentOutOfRangeException, context.CancellationToken, out ctor);
         }
 
         private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, out ArgumentSyntax argument)
