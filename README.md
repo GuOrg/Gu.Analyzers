@@ -68,6 +68,10 @@
   <td>Don't assign same more than once.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md">GU0016</a></td>
+  <td>Prefer lambda.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
   <td>Sort properties.</td>
 </tr>
