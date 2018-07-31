@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Gu.Analyzers
 {
     using System;
@@ -191,6 +193,14 @@ namespace Gu.Analyzers
                 {
                     foreach (var constraintType in typeParameter.ConstraintTypes)
                     {
+                        if (constraintType is INamedTypeSymbol namedType &&
+                            namedType.IsGenericType &&
+                            namedType.TypeArguments.Any(x => x is ITypeParameterSymbol))
+                        {
+                            // Lazy here.
+                            continue;
+                        }
+
                         if (!IsTypeMatch(constraintType, argument))
                         {
                             return false;

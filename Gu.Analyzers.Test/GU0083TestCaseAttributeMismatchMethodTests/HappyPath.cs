@@ -303,6 +303,8 @@ namespace RoslynSandbox
 
         [TestCase("where T : struct")]
         [TestCase("where T : IComparable")]
+        [TestCase("where T : IComparable<T>")]
+        [TestCase("where T : struct, IComparable<T>, IComparable")]
         public void GenericFixtureWithTestCase(string constraints)
         {
             var testCode = @"
