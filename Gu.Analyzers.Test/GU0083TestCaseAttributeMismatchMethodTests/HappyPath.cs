@@ -300,5 +300,30 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [TestCase("where T : struct")]
+        [TestCase("where T : IComparable")]
+        public void GenericFixtureWithTestCase(string constraints)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    [TestFixture(typeof(int))]
+    [TestFixture(typeof(double))]
+    public class Foo<T>
+        where T : struct, IComparable<T>, IComparable
+    {
+        [TestCase(1)]
+        public void Test(T value)
+        {
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("where T : struct, IComparable<T>, IComparable", constraints);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

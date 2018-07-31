@@ -187,6 +187,19 @@ namespace Gu.Analyzers
                     return true;
                 }
 
+                if (parameterType is ITypeParameterSymbol typeParameter)
+                {
+                    foreach (var constraintType in typeParameter.ConstraintTypes)
+                    {
+                        if (!IsTypeMatch(constraintType, argument))
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+
                 if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                 {
                     if (parameterType.IsValueType &&
@@ -198,9 +211,7 @@ namespace Gu.Analyzers
                     return true;
                 }
 
-                var argumentType = context.SemanticModel.GetTypeInfoSafe(argument.Expression, context.CancellationToken);
-                if (!argumentType.Type.IsAssignableTo(parameterType, context.Compilation) &&
-                    !context.SemanticModel.ClassifyConversion(argument.Expression, parameterType).IsImplicit)
+                if (!argument.Expression.IsAssignableTo(parameterType, context.SemanticModel))
                 {
                     return false;
                 }
