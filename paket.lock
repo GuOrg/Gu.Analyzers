@@ -1651,7 +1651,7 @@ NUGET
     Microsoft.NETCore.Runtime.CoreCLR (2.0.8) - restriction: && (>= uap10.0) (< uap10.1)
       Microsoft.NETCore.Jit (>= 2.0.8)
     Microsoft.NETCore.Targets (2.1) - restriction: || (&& (< monoandroid) (< monotouch) (< net20) (>= netstandard1.6) (< netstandard2.0) (< win8) (< wpa81) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< monoandroid) (< monotouch) (< net35) (>= netstandard1.5) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< monoandroid) (< net20) (< netstandard1.2) (>= netstandard1.6) (< win8)) (&& (< monoandroid) (< net20) (< netstandard1.3) (>= netstandard1.6) (< win8) (< wpa81)) (&& (< monoandroid) (< net20) (< netstandard1.4) (>= netstandard1.6) (< win8) (< wpa81)) (&& (< monoandroid) (< net20) (< netstandard1.5) (>= netstandard1.6) (< win8) (< wpa81)) (&& (< monoandroid) (< net35) (>= netstandard1.3) (< netstandard1.5)) (&& (< monoandroid) (< net35) (< netstandard1.3) (>= netstandard1.5) (< win8) (< wpa81)) (&& (< net20) (>= net46) (< netstandard1.4) (>= netstandard1.6)) (&& (< net20) (>= net46) (< netstandard1.4) (>= netstandard2.0)) (&& (< net20) (< netstandard1.2) (>= netstandard2.0) (< win8)) (&& (< net20) (< netstandard1.3) (>= netstandard2.0) (< win8) (< wpa81)) (&& (< net20) (< netstandard1.4) (>= netstandard2.0) (< win8) (< wpa81)) (&& (< net20) (< netstandard1.5) (>= netstandard2.0) (< win8) (< wpa81)) (&& (< net20) (>= netstandard1.6) (< portable-net45+win8+wpa81)) (&& (< net20) (< netstandard1.6) (>= netstandard2.0) (< win8) (< wpa81)) (&& (< net20) (>= netstandard2.0) (< portable-net45+win8+wpa81)) (&& (< net35) (>= netstandard1.3) (< portable-net45+win8+wp8+wpa81)) (&& (< net35) (>= netstandard1.5) (< portable-net45+win8+wp8+wpa81)) (&& (< netstandard1.5) (>= netstandard2.0) (>= uap10.0) (< win8) (< wpa81)) (&& (>= netstandard1.6) (>= uap10.0)) (&& (>= netstandard2.0) (< portable-net45+win8+wpa81) (>= uap10.0)) (&& (>= uap10.0) (< uap10.1))
-    Microsoft.NETCore.UniversalWindowsPlatform (6.1.5) - restriction: >= uap10.0
+    Microsoft.NETCore.UniversalWindowsPlatform (6.1.7) - restriction: >= uap10.0
       Microsoft.Net.Native.Compiler (>= 1.7.3) - restriction: < uap10.1
       Microsoft.Net.Native.Compiler (>= 2.1.8) - restriction: >= uap10.1
       Microsoft.Net.UWPCoreRuntimeSdk (>= 2.1.2) - restriction: >= uap10.1
@@ -1684,11 +1684,11 @@ NUGET
       System.Runtime.Serialization.Xml (>= 4.1.2) - restriction: < uap10.1
       System.Runtime.WindowsRuntime (>= 4.0.11) - restriction: < uap10.1
       System.Runtime.WindowsRuntime.UI.Xaml (>= 4.0.1) - restriction: < uap10.1
-      System.ServiceModel.Duplex (>= 4.0.2) - restriction: < uap10.1
-      System.ServiceModel.Http (>= 4.1.1) - restriction: < uap10.1
-      System.ServiceModel.NetTcp (>= 4.1.1) - restriction: < uap10.1
-      System.ServiceModel.Primitives (>= 4.1.1) - restriction: < uap10.1
-      System.ServiceModel.Security (>= 4.0.2) - restriction: < uap10.1
+      System.ServiceModel.Duplex (>= 4.0.4) - restriction: < uap10.1
+      System.ServiceModel.Http (>= 4.1.3) - restriction: < uap10.1
+      System.ServiceModel.NetTcp (>= 4.1.3) - restriction: < uap10.1
+      System.ServiceModel.Primitives (>= 4.1.3) - restriction: < uap10.1
+      System.ServiceModel.Security (>= 4.0.4) - restriction: < uap10.1
       System.Text.Encoding.CodePages (>= 4.0.1) - restriction: < uap10.1
       System.Threading.Overlapped (>= 4.0.1) - restriction: < uap10.1
       System.Xml.XmlDocument (>= 4.0.1) - restriction: < uap10.1
