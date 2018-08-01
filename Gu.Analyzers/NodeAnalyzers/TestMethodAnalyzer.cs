@@ -1,9 +1,8 @@
-using System.Linq;
-
 namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;

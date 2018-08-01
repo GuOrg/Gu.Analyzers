@@ -11,7 +11,7 @@ namespace Gu.Analyzers
             title: "Prefer lambda.",
             messageFormat: "Prefer lambda to reduce allocations.",
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
+            defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
             description: "Prefer lambda to reduce allocations.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));

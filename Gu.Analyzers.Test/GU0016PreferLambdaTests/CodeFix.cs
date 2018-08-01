@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
 
     internal class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
         private static readonly CodeFixProvider Fix = new UseLambdaFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0016");
 
@@ -85,6 +85,48 @@ namespace RoslynSandbox
         }
 
         private static bool IsEven(int x) => x % 2 == 0;
+    }
+}";
+
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public void EventHandler()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += ↓OnCancelKeyPress;
+        }
+
+        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += (sender, e) => OnCancelKeyPress(sender, e);
+        }
+
+        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        {
+        }
     }
 }";
 

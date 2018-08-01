@@ -2,6 +2,8 @@ namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
@@ -9,6 +11,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseLambdaFixProvider))]
     [Shared]
@@ -25,41 +28,61 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode<ArgumentSyntax>(diagnostic, out var argument))
+                if (syntaxRoot.TryFindNodeOrAncestor<IdentifierNameSyntax>(diagnostic, out var identifierName))
                 {
-                    switch (argument.Expression)
-                    {
-                        case IdentifierNameSyntax identifierName when argument.TryFirstAncestor<MemberDeclarationSyntax>(out _):
-                            context.RegisterCodeFix(
-                                "Use lambda.",
-                                (editor, _) => editor.ReplaceNode(
-                                    identifierName,
-                                    (node, __) => GetLambda(node)),
-                                "Use lambda.",
-                                diagnostic);
-                            break;
-                    }
+                    context.RegisterCodeFix(
+                        "Use lambda.",
+                        (editor, cancellationToken) => UseLambda(editor, identifierName, cancellationToken),
+                        "Use lambda.",
+                        diagnostic);
                 }
             }
         }
 
-        private static SyntaxNode GetLambda(SyntaxNode node)
+        private static void UseLambda(DocumentEditor editor, IdentifierNameSyntax identifierName, CancellationToken cancellationToken)
         {
-            if (node.TryFirstAncestor<MemberDeclarationSyntax>(out var ancestor))
+            if (editor.SemanticModel.TryGetSymbol(identifierName, cancellationToken, out IMethodSymbol method))
+            {
+                if (method.Parameters.Length == 0)
+                {
+                    editor.ReplaceNode(
+                        identifierName,
+                        x => SyntaxFactory.ParseExpression($"() => {x.Identifier.ValueText}()"));
+                }
+                else if (method.Parameters.TrySingle(out var parameter))
+                {
+                    var parameterName = SafeParameterName(parameter, identifierName);
+                    editor.ReplaceNode(
+                        identifierName,
+                        x => SyntaxFactory.ParseExpression($"{parameterName} => {x.Identifier.ValueText}({parameterName})"));
+                }
+                else
+                {
+                    var parameters = string.Join(", ", method.Parameters.Select(x => SafeParameterName(x, identifierName)));
+                    editor.ReplaceNode(
+                        identifierName,
+                        x => SyntaxFactory.ParseExpression($"({parameters}) => {x.Identifier.ValueText}({parameters})"));
+                }
+            }
+        }
+
+        private static string SafeParameterName(IParameterSymbol parameter, IdentifierNameSyntax context)
+        {
+            if (context.TryFirstAncestor<MemberDeclarationSyntax>(out var ancestor))
             {
                 using (var walker = IdentifierTokenWalker.Borrow(ancestor))
                 {
-                    var name = "x";
+                    var name = parameter.Name;
                     while (walker.TryFind(name, out _))
                     {
                         name += "_";
                     }
 
-                    return SyntaxFactory.ParseExpression($"{name} => {((IdentifierNameSyntax)node).Identifier.ValueText}({name})");
+                    return name;
                 }
             }
 
-            return node;
+            return parameter.Name;
         }
     }
 }

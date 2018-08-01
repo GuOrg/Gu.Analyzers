@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
 
     internal class HappyPath
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
 
         [Test]
         public void LinqWhereStaticMethod()

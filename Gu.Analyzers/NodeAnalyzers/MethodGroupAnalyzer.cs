@@ -8,7 +8,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class ArgumentAnalyzer : DiagnosticAnalyzer
+    internal class MethodGroupAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
@@ -19,7 +19,7 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(x => Handle(x), SyntaxKind.Argument);
+            context.RegisterSyntaxNodeAction(x => Handle(x), SyntaxKind.Argument, SyntaxKind.AddAssignmentExpression);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -29,16 +29,24 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is ArgumentSyntax argument &&
-                IsMethodGroup(argument, context))
+            switch (context.Node)
             {
-                context.ReportDiagnostic(Diagnostic.Create(GU0016PreferLambda.Descriptor, argument.GetLocation()));
+                case ArgumentSyntax argument when IsMethodGroup(argument.Expression, context):
+                    context.ReportDiagnostic(Diagnostic.Create(GU0016PreferLambda.Descriptor, argument.Expression.GetLocation()));
+                    break;
+                case AssignmentExpressionSyntax assignment when
+                     assignment.IsKind(SyntaxKind.AddAssignmentExpression) &&
+                     IsMethodGroup(assignment.Right, context):
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(GU0016PreferLambda.Descriptor, assignment.Right.GetLocation()));
+                    break;
+                }
             }
         }
 
-        private static bool IsMethodGroup(ArgumentSyntax argument, SyntaxNodeAnalysisContext context)
+        private static bool IsMethodGroup(ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
         {
-            return argument.Expression is IdentifierNameSyntax identifierName &&
+            return expression is IdentifierNameSyntax identifierName &&
                    context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out IMethodSymbol method) &&
                    method.IsStatic;
         }
