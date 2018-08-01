@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal partial class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DummyAnalyzer();
         private static readonly CodeFixProvider Fix = new GenerateUselessDocsFixProvider();

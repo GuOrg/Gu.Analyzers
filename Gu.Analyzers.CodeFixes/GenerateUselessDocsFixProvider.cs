@@ -19,6 +19,8 @@ namespace Gu.Analyzers
     [Shared]
     internal class GenerateUselessDocsFixProvider : DocumentEditorCodeFixProvider
     {
+        private const string GenerateStandardXmlDocumentationForParameter = "Generate standard xml documentation for parameter.";
+
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("SA1611");
 
@@ -33,11 +35,22 @@ namespace Gu.Analyzers
                     parameter.Parent is ParameterListSyntax parameterList &&
                     parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration)
                 {
-                    context.RegisterCodeFix(
-                        "Generate useless xml documentation for parameter.",
-                        (editor, _) => AddParameterDocs(editor, parameter, methodDeclaration, _),
-                        nameof(GenerateUselessDocsFixProvider),
-                        diagnostic);
+                    if (parameter.Type == KnownSymbol.CancellationToken)
+                    {
+                        context.RegisterCodeFix(
+                            GenerateStandardXmlDocumentationForParameter,
+                            (editor, _) => AddParameterDocs(editor, parameter, methodDeclaration, _),
+                            GenerateStandardXmlDocumentationForParameter,
+                            diagnostic);
+                    }
+                    else
+                    {
+                        context.RegisterCodeFix(
+                            "Generate useless xml documentation for parameter.",
+                            (editor, _) => AddParameterDocs(editor, parameter, methodDeclaration, _),
+                            nameof(GenerateUselessDocsFixProvider),
+                            diagnostic);
+                    }
                 }
             }
         }
@@ -96,7 +109,7 @@ namespace Gu.Analyzers
 
         private static IEnumerable<XmlNodeSyntax> CreateParameterElements(IParameterSymbol parameter, string leadingWhitespace)
         {
-            var code = $"/// <summary> </summary>\r\n{leadingWhitespace}/// <param name=\"{parameter.Name}\">The <see cref=\"{parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}\"/></param>";
+            var code = GetText();
             if (SyntaxFactory.ParseLeadingTrivia(code).TrySingle(x => x.HasStructure, out var trivia) &&
                 trivia.GetStructure() is DocumentationCommentTriviaSyntax syntax)
             {
@@ -104,6 +117,16 @@ namespace Gu.Analyzers
             }
 
             throw new InvalidOperationException("Bug! should never get here.");
+
+            string GetText()
+            {
+                if (parameter.Type == KnownSymbol.CancellationToken)
+                {
+                    return $"/// <summary> </summary>\r\n{leadingWhitespace}/// <param name=\"{parameter.Name}\">The <see cref=\"{parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}\"/> that the task will observe.</param>";
+                }
+
+                return $"/// <summary> </summary>\r\n{leadingWhitespace}/// <param name=\"{parameter.Name}\">The <see cref=\"{parameter.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)}\"/></param>";
+            }
         }
     }
 }
