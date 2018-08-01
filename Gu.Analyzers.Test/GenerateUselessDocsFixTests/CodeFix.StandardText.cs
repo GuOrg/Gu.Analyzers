@@ -5,7 +5,6 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
 
     internal partial class CodeFix
     {
-
         [Test]
         public void StandardTextForCancellationToken()
         {
@@ -43,6 +42,5 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Generate standard xml documentation for parameter.");
         }
-
     }
 }
