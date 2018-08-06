@@ -3,7 +3,6 @@ namespace Gu.Analyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class KnownSymbol
     {
