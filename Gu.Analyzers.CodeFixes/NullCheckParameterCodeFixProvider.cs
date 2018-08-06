@@ -64,9 +64,7 @@ namespace Gu.Analyzers
                                     "Add null check.",
                                     (editor, _) => editor.ReplaceNode(
                                         methodDeclaration.Body,
-                                        methodDeclaration.Body.InsertNodesBefore(
-                                            methodDeclaration.Body.Statements[0],
-                                            new[] { IfNullThrow(parameter.Identifier.ValueText) })),
+                                        WithNullCheck(methodDeclaration.Body, parameter)),
                                     this.GetType(),
                                     diagnostic);
                             }
@@ -92,18 +90,75 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static StatementSyntax IfNullThrow(string name)
+        private static BlockSyntax WithNullCheck(BlockSyntax block, ParameterSyntax parameter)
         {
             var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"if ({name} == null)")
+                                        .AppendLine($"if ({parameter.Identifier.ValueText} == null)")
                                         .AppendLine("{")
-                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({name}));")
+                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({parameter.Identifier.ValueText}));")
                                         .AppendLine("}")
                                         .Return();
-            return SyntaxFactory.ParseStatement(code)
-                                .WithSimplifiedNames()
-                                .WithAdditionalAnnotations(Formatter.Annotation)
-                                .WithTrailingElasticLineFeed();
+            var nullCheck = SyntaxFactory.ParseStatement(code)
+                                         .WithSimplifiedNames()
+                                         .WithAdditionalAnnotations(Formatter.Annotation)
+                                         .WithLeadingElasticLineFeed()
+                                         .WithTrailingElasticLineFeed();
+
+            return block.WithStatements(block.Statements.Insert(FindPosition(), nullCheck));
+
+            int FindPosition()
+            {
+                if (parameter.Parent is ParameterListSyntax parameterList)
+                {
+                    int ordinal = parameterList.Parameters.IndexOf(parameter);
+                    if (ordinal <= 0)
+                    {
+                        return 0;
+                    }
+
+                    if (parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
+                        methodDeclaration.Body is BlockSyntax body)
+                    {
+                        var position = 0;
+                        for (var i = 0; i < body.Statements.Count; i++)
+                        {
+                            var statement = body.Statements[i];
+                            if (statement is IfStatementSyntax ifStatement &&
+                                IsThrow(ifStatement.Statement) &&
+                                ifStatement.Condition is BinaryExpressionSyntax condition &&
+                                condition.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) &&
+                                condition.Right is LiteralExpressionSyntax literal &&
+                                literal.IsKind(SyntaxKind.NullLiteralExpression) &&
+                                condition.Left is IdentifierNameSyntax identifierName &&
+                                methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&
+                                parameterList.Parameters.IndexOf(other) < ordinal)
+                            {
+                                position++;
+                            }
+                            else
+                            {
+                                return position;
+                            }
+                        }
+
+                        return position;
+                    }
+                }
+
+                return 0;
+            }
+        }
+
+        private static bool IsThrow(StatementSyntax statement)
+        {
+            if (statement is ThrowStatementSyntax)
+            {
+                return true;
+            }
+
+            return statement is BlockSyntax block &&
+                   block.Statements.TrySingle(out var single) &&
+                   single is ThrowStatementSyntax;
         }
     }
 }
