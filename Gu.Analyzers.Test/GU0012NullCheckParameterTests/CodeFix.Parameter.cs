@@ -129,6 +129,37 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void WhenNotUsed()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            if (text == null)
+            {
+                throw new System.ArgumentNullException(nameof(text));
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
             public void AfterOtherParameter()
             {
                 var testCode = @"
@@ -206,6 +237,42 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public void FixAll()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public Foo(string ↓s1, string ↓s2)
+        {
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public sealed class Foo
+    {
+        public Foo(string s1, string s2)
+        {
+            if (s1 == null)
+            {
+                throw new System.ArgumentNullException(nameof(s1));
+            }
+
+            if (s2 == null)
+            {
+                throw new System.ArgumentNullException(nameof(s2));
+            }
+        }
+    }
+}";
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

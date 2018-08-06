@@ -57,14 +57,13 @@ namespace Gu.Analyzers
                                     this.GetType(),
                                     diagnostic);
                             }
-                            else if (methodDeclaration.Body is BlockSyntax block &&
-                                     block.Statements.Count > 0)
+                            else if (methodDeclaration.Body is BlockSyntax block)
                             {
                                 context.RegisterCodeFix(
                                     "Add null check.",
                                     (editor, _) => editor.ReplaceNode(
                                         methodDeclaration.Body,
-                                        WithNullCheck(methodDeclaration.Body, parameter)),
+                                        x => WithNullCheck(x, parameter)),
                                     this.GetType(),
                                     diagnostic);
                             }
@@ -90,7 +89,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static BlockSyntax WithNullCheck(BlockSyntax block, ParameterSyntax parameter)
+        private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter)
         {
             var code = StringBuilderPool.Borrow()
                                         .AppendLine($"if ({parameter.Identifier.ValueText} == null)")
@@ -104,7 +103,7 @@ namespace Gu.Analyzers
                                          .WithLeadingElasticLineFeed()
                                          .WithTrailingElasticLineFeed();
 
-            return block.WithStatements(block.Statements.Insert(FindPosition(), nullCheck));
+            return body.WithStatements(body.Statements.Insert(FindPosition(), nullCheck));
 
             int FindPosition()
             {
@@ -116,33 +115,30 @@ namespace Gu.Analyzers
                         return 0;
                     }
 
-                    if (parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                        methodDeclaration.Body is BlockSyntax body)
+                    var position = 0;
+                    for (var i = 0; i < body.Statements.Count; i++)
                     {
-                        var position = 0;
-                        for (var i = 0; i < body.Statements.Count; i++)
+                        var statement = body.Statements[i];
+                        if (statement is IfStatementSyntax ifStatement &&
+                            IsThrow(ifStatement.Statement) &&
+                            ifStatement.Condition is BinaryExpressionSyntax condition &&
+                            condition.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) &&
+                            condition.Right is LiteralExpressionSyntax literal &&
+                            literal.IsKind(SyntaxKind.NullLiteralExpression) &&
+                            condition.Left is IdentifierNameSyntax identifierName &&
+                            body.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
+                            methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&
+                            parameterList.Parameters.IndexOf(other) < ordinal)
                         {
-                            var statement = body.Statements[i];
-                            if (statement is IfStatementSyntax ifStatement &&
-                                IsThrow(ifStatement.Statement) &&
-                                ifStatement.Condition is BinaryExpressionSyntax condition &&
-                                condition.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) &&
-                                condition.Right is LiteralExpressionSyntax literal &&
-                                literal.IsKind(SyntaxKind.NullLiteralExpression) &&
-                                condition.Left is IdentifierNameSyntax identifierName &&
-                                methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&
-                                parameterList.Parameters.IndexOf(other) < ordinal)
-                            {
-                                position++;
-                            }
-                            else
-                            {
-                                return position;
-                            }
+                            position++;
                         }
-
-                        return position;
+                        else
+                        {
+                            return position;
+                        }
                     }
+
+                    return position;
                 }
 
                 return 0;
