@@ -30,7 +30,7 @@ namespace Gu.Analyzers
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {
                     context.RegisterCodeFix(
-                        "Throw if null.",
+                        "Use correct parameter name.",
                         (editor, _) => editor.ReplaceNode(
                             argument.Expression,
                             SyntaxFactory.ParseExpression($"nameof({name})")),

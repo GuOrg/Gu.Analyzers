@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
+namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use correct parameter name.");
         }
     }
 }
