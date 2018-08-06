@@ -51,7 +51,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool IsInitializedWithUninitialized(ExpressionSyntax value,SyntaxNodeAnalysisContext context, out FieldOrProperty other)
+        private static bool IsInitializedWithUninitialized(ExpressionSyntax value, SyntaxNodeAnalysisContext context, out FieldOrProperty other)
         {
             using (var walker = IdentifierNameExecutionWalker.Borrow(value, Scope.Recursive, context.SemanticModel, context.CancellationToken))
             {
