@@ -15,6 +15,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0022UseGetOnlyBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0022UseGetOnly());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0023StaticMemberOrderAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0023StaticMemberOrderAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0050IgnoreEventsWhenSerializingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0051XmlSerializerNotCachedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0051XmlSerializerNotCached());
@@ -79,6 +81,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0022UseGetOnly()
         {
             GU0022UseGetOnlyBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0023StaticMemberOrderAnalyzer()
+        {
+            GU0023StaticMemberOrderAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

@@ -84,6 +84,10 @@
   <td>Use get-only.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md">GU0023</a></td>
+  <td>Static members that initialize with other static members depend on document order.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md">GU0050</a></td>
   <td>Ignore events when serializing.</td>
 </tr>

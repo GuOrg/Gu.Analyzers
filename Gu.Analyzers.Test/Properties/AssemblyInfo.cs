@@ -35,4 +35,5 @@ using Gu.Roslyn.Asserts;
     typeof(Gu.Roslyn.AnalyzerExtensions.Cache),
     typeof(Gu.Roslyn.CodeFixExtensions.CodeStyle),
     typeof(NUnit.Framework.Assert),
+    typeof(Gu.Roslyn.Asserts.AnalyzerAssert),
     typeof(Moq.Mock))]
