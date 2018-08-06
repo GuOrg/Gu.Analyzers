@@ -17,7 +17,7 @@ namespace Gu.Analyzers
             title: "Static members that initialize with other static members depend on document order.",
             messageFormat: "Member '{0}' must come before '{1}'",
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Error,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "Static members that initialize with other static members depend on document order.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));

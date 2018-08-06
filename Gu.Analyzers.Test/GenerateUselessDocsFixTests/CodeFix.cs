@@ -41,7 +41,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         public StringBuilder Meh(StringBuilder builder) => builder;
     }
 }";
@@ -77,7 +77,7 @@ namespace RoslynSandbox
         /// Does nothing
         /// </summary>
         /// <typeparam name=""T""></typeparam>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         public StringBuilder Meh<T>(StringBuilder builder) => builder;
     }
 }";
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""text"">The <see cref=""string""/></param>
+        /// <param name=""text"">The <see cref=""string""/>.</param>
         public StringBuilder Meh(↓StringBuilder builder, string text) => builder;
     }
 }";
@@ -112,8 +112,8 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
-        /// <param name=""text"">The <see cref=""string""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
+        /// <param name=""text"">The <see cref=""string""/>.</param>
         public StringBuilder Meh(StringBuilder builder, string text) => builder;
     }
 }";
@@ -133,7 +133,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         public StringBuilder Meh(StringBuilder builder, ↓string text) => builder;
     }
 }";
@@ -148,8 +148,8 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
-        /// <param name=""text"">The <see cref=""string""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
+        /// <param name=""text"">The <see cref=""string""/>.</param>
         public StringBuilder Meh(StringBuilder builder, string text) => builder;
     }
 }";
@@ -169,8 +169,8 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
-        /// <param name=""builder2"">The <see cref=""StringBuilder""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
+        /// <param name=""builder2"">The <see cref=""StringBuilder""/>.</param>
         public StringBuilder Meh(StringBuilder builder, ↓string text, StringBuilder builder2) => builder;
     }
 }";
@@ -185,9 +185,9 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/></param>
-        /// <param name=""text"">The <see cref=""string""/></param>
-        /// <param name=""builder2"">The <see cref=""StringBuilder""/></param>
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
+        /// <param name=""text"">The <see cref=""string""/>.</param>
+        /// <param name=""builder2"">The <see cref=""StringBuilder""/>.</param>
         public StringBuilder Meh(StringBuilder builder, string text, StringBuilder builder2) => builder;
     }
 }";
