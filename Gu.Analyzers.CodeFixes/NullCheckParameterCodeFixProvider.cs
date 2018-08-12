@@ -62,7 +62,7 @@ namespace Gu.Analyzers
                                 context.RegisterCodeFix(
                                     "Add null check.",
                                     (editor, _) => editor.ReplaceNode(
-                                        methodDeclaration.Body,
+                                        block,
                                         x => WithNullCheck(x, parameter)),
                                     this.GetType(),
                                     diagnostic);
