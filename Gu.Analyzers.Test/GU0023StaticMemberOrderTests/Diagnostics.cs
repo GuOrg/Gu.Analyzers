@@ -9,6 +9,22 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
         private static readonly DiagnosticAnalyzer Analyzer = new GU0023StaticMemberOrderAnalyzer();
 
         [Test]
+        public void Message()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static readonly int Value1 = ↓Value2;
+
+        public static readonly int Value2 = 2;
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'RoslynSandbox.Foo.Value2' must be declared before 'RoslynSandbox.Foo.Value1'"), code);
+        }
+
+        [Test]
         public void FieldInitializedWithField()
         {
             var code = @"
