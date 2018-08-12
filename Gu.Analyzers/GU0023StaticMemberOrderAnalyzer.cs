@@ -15,7 +15,7 @@ namespace Gu.Analyzers
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Static members that initialize with other static members depend on document order.",
-            messageFormat: "Member '{0}' must come before '{1}'",
+            messageFormat: "Member '{0}' must be declared before '{1}'",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -26,6 +26,8 @@ namespace Gu.Analyzers
 
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.FieldDeclaration, SyntaxKind.PropertyDeclaration);
         }
 

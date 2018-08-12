@@ -98,5 +98,34 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public void DependencyPropertyRegisterReadOnly()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.Windows;
+    using System.Windows.Controls;
+
+    public class FooControl : Control
+    {
+        private static readonly DependencyPropertyKey ValuePropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(Value),
+            typeof(int),
+            typeof(FooControl), 
+            new PropertyMetadata(default(int)));
+
+        public static readonly DependencyProperty ValueProperty = ValuePropertyKey.DependencyProperty;
+
+        public int Value
+        {
+            get => (int) this.GetValue(ValueProperty);
+            private set => this.SetValue(ValuePropertyKey, value);
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
     }
 }
