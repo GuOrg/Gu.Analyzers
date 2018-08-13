@@ -1,7 +1,10 @@
 ﻿type project
-id Gu.Analyzers
-include-referenced-projects true
 developmentDependency true
+
+projectUrl https://github.com/GuOrg/Gu.Analyzers
+
+releasenotes
+  BUGFIX: Static member order.
 
 excludedgroups
   Main

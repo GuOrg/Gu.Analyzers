@@ -3,11 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
-    <Version>1.2.15.0</Version>
-    <RootNamespace>Gu.Analyzers</RootNamespace>
-    <Authors>Johan Larsson, milleniumbug</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <PackageId>Gu.Analyzers.NewIdRequiredDueToNuGetBug</PackageId>
     <CodeAnalysisRuleSet>Gu.Analyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   
@@ -16,9 +12,33 @@
     <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>Gu.Analyzers</PackageId>
+    <Version>1.2.15.0</Version>
+    <Authors>Johan Larsson, milleniumbug</Authors>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Roslyn analyzers and fixes.</Description>
+    <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
+    <PackageReleaseNotes>FEATURE: Code fix for GU0009.</PackageReleaseNotes>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Exec Command=".paket\paket.exe pack publish" WorkingDirectory="$(SolutionDir)" />
+  </Target>
 
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
