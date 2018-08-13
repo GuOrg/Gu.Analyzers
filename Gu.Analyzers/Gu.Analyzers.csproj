@@ -21,12 +21,12 @@
 
   <PropertyGroup>
     <PackageId>Gu.Analyzers</PackageId>
-    <Version>1.2.15.0</Version>
+    <Version>1.2.16.0-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
-    <PackageReleaseNotes>FEATURE: Code fix for GU0009.</PackageReleaseNotes>
+    <PackageReleaseNotes>BUGFIX: Static member order.</PackageReleaseNotes>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>

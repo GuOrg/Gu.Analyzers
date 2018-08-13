@@ -1,4 +1,7 @@
 #### 1.2.13
+* BUGFIX: Static member order.
+
+#### 1.2.13
 * FEATURE: Code fix for GU0009.
 
 #### 1.2.10
