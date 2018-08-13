@@ -21,7 +21,7 @@
 
   <PropertyGroup>
     <PackageId>Gu.Analyzers</PackageId>
-    <Version>1.2.16.0-dev</Version>
+    <Version>1.2.17.0-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers and fixes.</Description>
