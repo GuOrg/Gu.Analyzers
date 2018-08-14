@@ -88,6 +88,10 @@
   <td>Static members that initialize with other static members depend on document order.</td>
 </tr>
 <tr>
+  <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md">GU0024</a></td>
+  <td>Seal type with default member.</td>
+</tr>
+<tr>
   <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md">GU0050</a></td>
   <td>Ignore events when serializing.</td>
 </tr>

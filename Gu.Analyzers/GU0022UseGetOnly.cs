@@ -31,10 +31,10 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.SetAccessorDeclaration);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.SetAccessorDeclaration);
         }
 
-        private static void HandleProperty(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
