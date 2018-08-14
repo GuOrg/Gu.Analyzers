@@ -4,7 +4,7 @@ developmentDependency true
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 
 releasenotes
-  BUGFIX: Static member order.
+  FEATURE: New analyzer GU0024.
 
 excludedgroups
   Main

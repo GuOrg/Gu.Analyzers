@@ -1,3 +1,6 @@
+#### 1.2.18
+* FEATURE: New analyzer GU0024.
+
 #### 1.2.13
 * BUGFIX: Static member order.
 
