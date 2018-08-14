@@ -119,7 +119,7 @@ namespace RoslynSandbox
     using System.Windows.Controls;
     using System.Windows.Data;
 
-    internal class ValidationErrorToStringConverter : IValueConverter
+    internal sealed class ValidationErrorToStringConverter : IValueConverter
     {
         /// <summary> Gets the default instance </summary>
         public static readonly ValidationErrorToStringConverter Default = new ValidationErrorToStringConverter();

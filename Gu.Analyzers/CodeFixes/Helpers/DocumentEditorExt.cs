@@ -15,7 +15,7 @@ namespace Gu.Analyzers
             return editor;
         }
 
-        private class MakeSealedRewriter : CSharpSyntaxRewriter
+        private sealed class MakeSealedRewriter : CSharpSyntaxRewriter
         {
             public static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
 

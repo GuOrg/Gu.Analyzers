@@ -39,9 +39,18 @@ namespace Gu.Analyzers
                     if (member is PropertyDeclarationSyntax property &&
                         IsStaticPublicOrInternal(property.Modifiers) &&
                         property.IsGetOnly() &&
-                        property.Initializer?.Value is ObjectCreationExpressionSyntax objectCreation &&
-                        context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var createdType) &&
-                        type.Equals(createdType))
+                        IsInitializedWithContainingType(property.Initializer, context))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(GU0024SealTypeWithDefaultMember.Descriptor, classDeclaration.Identifier.GetLocation()));
+                        return;
+                    }
+
+                    if (member is FieldDeclarationSyntax field &&
+                            IsStaticPublicOrInternal(field.Modifiers) &&
+                            field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                            field.Declaration is VariableDeclarationSyntax declaration &&
+                            declaration.Variables.TrySingle(out var variable) &&
+                             IsInitializedWithContainingType(variable.Initializer, context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(GU0024SealTypeWithDefaultMember.Descriptor, classDeclaration.Identifier.GetLocation()));
                         return;
@@ -55,6 +64,13 @@ namespace Gu.Analyzers
             return propertyModifiers.Any(SyntaxKind.StaticKeyword) &&
                    !propertyModifiers.Any(SyntaxKind.ProtectedKeyword) &&
                    !propertyModifiers.Any(SyntaxKind.PrivateKeyword);
+        }
+
+        private static bool IsInitializedWithContainingType(EqualsValueClauseSyntax iniializer, SyntaxNodeAnalysisContext context)
+        {
+            return iniializer?.Value is ObjectCreationExpressionSyntax objectCreation &&
+                   context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var createdType) &&
+                   createdType.Equals(context.ContainingSymbol);
         }
     }
 }
