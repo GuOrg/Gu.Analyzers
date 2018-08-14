@@ -25,6 +25,24 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void FieldInitializedWithFuncUsingField()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public static readonly Func<int> Value1 = () => Value2;
+
+        public static readonly int Value2 = 2;
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public void FieldInitializedWithStaticProperty()
         {
             var code = @"

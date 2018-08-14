@@ -1,6 +1,8 @@
 namespace Gu.Analyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -55,7 +57,7 @@ namespace Gu.Analyzers
 
         private static bool IsInitializedWithUninitialized(ExpressionSyntax value, SyntaxNodeAnalysisContext context, out FieldOrProperty other)
         {
-            using (var walker = IdentifierNameExecutionWalker.Borrow(value, Scope.Type, context.SemanticModel, context.CancellationToken))
+            using (var walker = Walker.Borrow(value, context.SemanticModel, context.CancellationToken))
             {
                 foreach (var identifierName in walker.IdentifierNames)
                 {
@@ -96,6 +98,55 @@ namespace Gu.Analyzers
                            variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _);
                 default:
                     return false;
+            }
+        }
+
+        private sealed class Walker : ExecutionWalker<Walker>
+        {
+            private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
+
+            private Walker()
+            {
+            }
+
+            /// <summary>
+            /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
+            /// </summary>
+            public IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
+
+            /// <summary>
+            /// Get a walker that has visited <paramref name="node"/>
+            /// </summary>
+            /// <param name="node">The node</param>
+            /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
+            /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
+            /// <returns>A walker that has visited <paramref name="node"/></returns>
+            public static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());
+            }
+
+            public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
+            {
+                // don't walk lambda
+            }
+
+            public override void VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
+            {
+                // don't walk lambda
+            }
+
+            /// <inheritdoc />
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                this.identifierNames.Add(node);
+                base.VisitIdentifierName(node);
+            }
+
+            /// <inheritdoc />
+            protected override void Clear()
+            {
+                this.identifierNames.Clear();
             }
         }
     }
