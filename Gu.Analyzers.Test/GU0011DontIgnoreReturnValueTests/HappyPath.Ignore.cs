@@ -301,7 +301,8 @@ namespace RoslynSandbox
 
             [TestCase("this.Bind<Foo>().To<Foo>()")]
             [TestCase("this.Bind<Foo>().To<Foo>().InSingletonScope()")]
-            public void Ninject(string bind)
+            [TestCase("this.Bind<Foo>().ToMethod(x => new Foo())")]
+            public void NinjectFluent(string bind)
             {
                 var testCode = @"
 namespace RoslynSandbox
