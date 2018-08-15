@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
         private static readonly DiagnosticAnalyzer Analyzer = new GU0023StaticMemberOrderAnalyzer();
 
         [Test]
-        public void FieldInitializedWithField()
+        public void StaticFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -19,6 +19,22 @@ namespace RoslynSandbox
         public static readonly int Value1 = 1;
 
         public static readonly int Value2 = Value1;
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public void ConstFieldInitializedWithField()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public const int Value1 = 1;
+
+        public const int Value2 = Value1;
     }
 }";
             AnalyzerAssert.Valid(Analyzer, code);

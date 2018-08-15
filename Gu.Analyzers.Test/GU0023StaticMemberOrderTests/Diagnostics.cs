@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInitializedWithField()
+        public void StaticFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -35,6 +35,22 @@ namespace RoslynSandbox
         public static readonly int Value1 = ↓Value2;
 
         public static readonly int Value2 = 2;
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, code);
+        }
+
+        [Test]
+        public void ConstFieldInitializedWithField()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public const int Value1 = ↓Value2;
+
+        public const int Value2 = 2;
     }
 }";
             AnalyzerAssert.Diagnostics(Analyzer, code);
