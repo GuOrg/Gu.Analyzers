@@ -26,7 +26,7 @@ namespace Gu.Analyzers
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax classDeclaration))
                 {
                     context.RegisterCodeFix(
-                        "Make sealed.", 
+                        "Make sealed.",
                         (editor, _) => editor.MakeSealed(classDeclaration),
                         "Make sealed.",
                         diagnostic);
