@@ -11,30 +11,49 @@
 // ReSharper disable PossibleUnintendedReferenceComparison
 // ReSharper disable RedundantCheckBeforeAssignment
 // ReSharper disable UnusedMethodReturnValue.Global
-// ReSharper disable CollectionNeverUpdated.Local
+// ReSharper disable NotAccessedVariable
+// ReSharper disable InlineOutVariableDeclaration
 #pragma warning disable 1717
 #pragma warning disable SA1101 // Prefix local calls with this
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
-namespace Gu.Analyzers.Test.HappyPathCode
+#pragma warning disable IDE0018 // Inline variable declaration
+namespace ValidCode
 {
-    using System.Collections;
-    using System.Collections.Generic;
+    using System;
+    using System.IO;
 
-    internal class FooList<T> : IReadOnlyList<T>
+    internal class FooOut
     {
-        private readonly List<T> inner = new List<T>();
-
-        public int Count => this.inner.Count;
-
-        public T this[int index] => this.inner[index];
-
-        public IEnumerator<T> GetEnumerator()
+        public static bool TryGetStream(out Stream stream)
         {
-            return this.inner.GetEnumerator();
+            return TryGetStreamCore(out stream);
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        public void Bar()
+        {
+            IDisposable disposable;
+            using (disposable = new Disposable())
+            {
+            }
+        }
+
+        public void Baz()
+        {
+            Stream disposable;
+            if (TryGetStreamCore(out disposable))
+            {
+                using (disposable)
+                {
+                }
+            }
+        }
+
+        private static bool TryGetStreamCore(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }

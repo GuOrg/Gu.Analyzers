@@ -16,22 +16,26 @@
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
-namespace Gu.Analyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System;
-    using System.IO;
 
-    internal abstract class FooBase : IDisposable
+    internal sealed class LazyFoo : IDisposable
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
+        private readonly IDisposable created;
         private bool disposed;
+        private IDisposable lazyDisposable;
 
-        public void Dispose()
+        public LazyFoo(IDisposable injected)
         {
-            this.Dispose(true);
+            this.Disposable = injected ?? (this.created = new Disposable());
         }
 
-        protected virtual void Dispose(bool disposing)
+        public IDisposable Disposable { get; }
+
+        public IDisposable LazyDisposable => this.lazyDisposable ?? (this.lazyDisposable = new Disposable());
+
+        public void Dispose()
         {
             if (this.disposed)
             {
@@ -39,11 +43,8 @@ namespace Gu.Analyzers.Test.HappyPathCode
             }
 
             this.disposed = true;
-
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
+            this.created?.Dispose();
+            this.lazyDisposable?.Dispose();
         }
     }
 }

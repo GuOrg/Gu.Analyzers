@@ -1,4 +1,5 @@
-namespace Gu.Analyzers.Test.HappyPathCode
+// ReSharper disable All
+namespace ValidCode
 {
     using System.Threading.Tasks;
 

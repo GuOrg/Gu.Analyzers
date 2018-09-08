@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System;
     using System.Threading.Tasks;

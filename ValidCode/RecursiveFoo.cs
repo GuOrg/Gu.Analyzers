@@ -17,7 +17,7 @@
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
 #pragma warning disable IDE0025
-namespace Gu.Analyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
