@@ -108,6 +108,50 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void DoubleAndIntMaxValue()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(int.MaxValue)]
+        [TestCase(double.MaxValue)]
+        public void WithDouble(double value)
+        {
+            Assert.AreEqual(value, 1 * value);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void DoubleMaxValueAndMinValue()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(double.MinValue)]
+        [TestCase(double.MaxValue)]
+        public void WithDouble(double value)
+        {
+            Assert.AreEqual(value, 1 * value);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void TestCaseParams()
         {
             var testCode = @"

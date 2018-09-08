@@ -63,7 +63,7 @@ namespace Gu.Analyzers
                                 context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), parameterList, attribute));
                             }
 
-                            if (TryFindIdentical(methodDeclaration, candidate, out _))
+                            if (TryFindIdentical(methodDeclaration, candidate, context, out _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(GU0082IdenticalTestCase.Descriptor, candidate.GetLocation(), candidate));
                             }
@@ -229,7 +229,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, out AttributeSyntax identical)
+        private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, SyntaxNodeAnalysisContext context, out AttributeSyntax identical)
         {
             if (Roslyn.AnalyzerExtensions.Attribute.TryGetTypeName(attribute, out var name))
             {
@@ -290,13 +290,21 @@ namespace Gu.Analyzers
                             return false;
                         }
                     }
+                    else if (xa.Expression is IdentifierNameSyntax xn &&
+                             ya.Expression is IdentifierNameSyntax yn)
+                    {
+                        return xn.Identifier.ValueText == yn.Identifier.ValueText &&
+                               context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out ISymbol xs) &&
+                               context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out ISymbol ys) &&
+                               xs.Equals(ys);
+                    }
                     else if (xa.Expression is MemberAccessExpressionSyntax xma &&
                              ya.Expression is MemberAccessExpressionSyntax yma)
                     {
-                        if (xma.Name.Identifier.ValueText != yma.Name.Identifier.ValueText)
-                        {
-                            return false;
-                        }
+                        return xma.Name.Identifier.ValueText == yma.Name.Identifier.ValueText &&
+                               context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out ISymbol xs) &&
+                               context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out ISymbol ys) &&
+                               xs.Equals(ys);
                     }
                     else if (TryGetArrayExpressions(xa.Expression, out var xExpressions) &&
                              TryGetArrayExpressions(ya.Expression, out var yExpressions))
