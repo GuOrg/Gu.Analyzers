@@ -1,10 +1,10 @@
 ﻿type project
 developmentDependency true
+releasenotes
+  BUGFIX: Handle MemberAccess in Gu0082
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
-
-releasenotes
-  FEATURE: New analyzer GU0024.
+licenseUrl http://opensource.org/licenses/MIT
 
 excludedgroups
   Main
