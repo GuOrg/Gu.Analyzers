@@ -194,6 +194,56 @@ namespace RoslynSandbox
             AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
+        [Test]
+        public void ForGenericParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Windows.Controls;
+
+    /// <summary>
+    /// A collection of <see cref=""System.Windows.Controls.ColumnDefinition""/>
+    /// </summary>
+    public class ColumnDefinitions : Collection<System.Windows.Controls.ColumnDefinition>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""ColumnDefinitions""/> class.
+        /// </summary>
+        public ColumnDefinitions(↓IList<ColumnDefinition> collection)
+            : base(collection)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Windows.Controls;
+
+    /// <summary>
+    /// A collection of <see cref=""System.Windows.Controls.ColumnDefinition""/>
+    /// </summary>
+    public class ColumnDefinitions : Collection<System.Windows.Controls.ColumnDefinition>
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref=""ColumnDefinitions""/> class.
+        /// </summary>
+        /// <param name=""collection"">The <see cref=""IList{ColumnDefinition}""/>.</param>
+        public ColumnDefinitions(IList<ColumnDefinition> collection)
+            : base(collection)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class DummyAnalyzer : DiagnosticAnalyzer
         {

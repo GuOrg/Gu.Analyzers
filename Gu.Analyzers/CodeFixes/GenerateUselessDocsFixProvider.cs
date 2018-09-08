@@ -42,7 +42,7 @@ namespace Gu.Analyzers
                     {
                         context.RegisterCodeFix(
                             "Generate useless xml documentation for parameter.",
-                            (editor, _) => editor.ReplaceNode(docs, docs.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString()}\"/>.")),
+                            (editor, _) => editor.ReplaceNode(docs, docs.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
                             nameof(GenerateUselessDocsFixProvider),
                             diagnostic);
                     }
