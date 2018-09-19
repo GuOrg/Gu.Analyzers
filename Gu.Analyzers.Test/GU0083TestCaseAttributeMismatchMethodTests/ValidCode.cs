@@ -116,7 +116,7 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(int[] {3, 5})]
+        [TestCase(new int[] { 3, 5 })]
         public void Test(int[] array)
         {
         }
@@ -135,7 +135,7 @@ namespace RoslynSandbox
 
     public class FooTests
     {
-        [TestCase(int[] {3, 5}, string[] {""hello""})]
+        [TestCase(new int[] { 3, 5 }, new string[] { ""hello"" })]
         public void Test(int[] array, string[] stringArray)
         {
         }

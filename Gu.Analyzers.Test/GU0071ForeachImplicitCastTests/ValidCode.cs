@@ -94,7 +94,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(Analyzer), AnalyzerAssert.MetadataReferences);
+            var diagnostics = Analyze.GetDiagnostics(Analyzer, sln);
+            AnalyzerAssert.NoDiagnostics(diagnostics);
         }
 
         [Test]

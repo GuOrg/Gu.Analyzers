@@ -25,6 +25,25 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
+        public void CtorCallingSelf(DiagnosticAnalyzer analyzer)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    internal abstract class Foo
+    {
+        public Foo()
+            : this()
+        {
+        }
+    }
+}";
+            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), AnalyzerAssert.MetadataReferences);
+            var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
+            AnalyzerAssert.NoDiagnostics(diagnostics);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
         public void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
@@ -36,7 +55,6 @@ namespace RoslynSandbox
     internal abstract class Foo
     {
         public Foo()
-            : this()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
