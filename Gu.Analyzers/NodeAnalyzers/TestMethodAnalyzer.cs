@@ -25,7 +25,7 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.MethodDeclaration);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.MethodDeclaration);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)

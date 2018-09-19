@@ -31,8 +31,8 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleEventField, SyntaxKind.EventFieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
+            context.RegisterSyntaxNodeAction(c => HandleEventField(c), SyntaxKind.EventFieldDeclaration);
+            context.RegisterSyntaxNodeAction(c => HandleField(c), SyntaxKind.FieldDeclaration);
         }
 
         private static void HandleEventField(SyntaxNodeAnalysisContext context)

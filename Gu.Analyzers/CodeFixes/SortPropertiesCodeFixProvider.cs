@@ -43,7 +43,7 @@ namespace Gu.Analyzers
             editor.TrackNode(property);
             _ = editor.ReplaceNode(
                 (TypeDeclarationSyntax)property.Parent,
-                WithMoved);
+                syntax => WithMoved(syntax));
 
             SyntaxNode WithMoved(TypeDeclarationSyntax old)
             {

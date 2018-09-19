@@ -31,8 +31,8 @@ namespace Gu.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleCreation, SyntaxKind.ObjectCreationExpression);
-            context.RegisterSyntaxNodeAction(HandleInvocation, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(c => HandleCreation(c), SyntaxKind.ObjectCreationExpression);
+            context.RegisterSyntaxNodeAction(c => HandleInvocation(c), SyntaxKind.InvocationExpression);
         }
 
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
