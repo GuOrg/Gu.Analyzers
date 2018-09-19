@@ -17,7 +17,7 @@ using Gu.Roslyn.Asserts;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
-[assembly: TransitiveMetadataReferences(typeof(Microsoft.CodeAnalysis.Editing.DocumentEditor))]
+[assembly: TransitiveMetadataReferences(typeof(Gu.Roslyn.CodeFixExtensions.DocumentEditorAction))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Concurrency.DispatcherScheduler))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),

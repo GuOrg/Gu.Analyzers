@@ -18,8 +18,8 @@ namespace Gu.Analyzers.Test
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                      .ToImmutableArray();
 
-        private static readonly Solution GuAnalyzersSln = CodeFactory.CreateSolution(
-            SolutionFile.Find("Gu.Analyzers.sln"),
+        private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
+            ProjectFile.Find("Gu.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
@@ -50,18 +50,18 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task RunOnGuAnalyzersSln(DiagnosticAnalyzer analyzer)
+        public async Task AnalyzerProject(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer ||
                 analyzer is GU0007PreferInjecting)
             {
-                await Analyze.GetDiagnosticsAsync(GuAnalyzersSln, analyzer)
+                await Analyze.GetDiagnosticsAsync(AnalyzerProjectSln, analyzer)
                              .ConfigureAwait(false);
             }
             else
             {
-                AnalyzerAssert.Valid(analyzer, GuAnalyzersSln);
+                AnalyzerAssert.Valid(analyzer, AnalyzerProjectSln);
             }
         }
 
@@ -84,6 +84,8 @@ namespace Gu.Analyzers.Test
         public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var syntaxErrorCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -107,8 +109,11 @@ namespace Gu.Analyzers.Test
 
             base.Dispose(disposing);
         }
-    }";
-            AnalyzerAssert.Valid(analyzer, syntaxErrorCode);
+    }
+}";
+            var sln = CodeFactory.CreateSolution(syntaxErrorCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
+            var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
+            AnalyzerAssert.NoDiagnostics(diagnostics);
         }
     }
 }

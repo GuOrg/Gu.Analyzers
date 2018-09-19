@@ -103,7 +103,7 @@ namespace RoslynSandbox
     public class BarException : FooException
     {
         public BarException()
-        : base(string.Empty)
+        : base()
         {
         }
     }

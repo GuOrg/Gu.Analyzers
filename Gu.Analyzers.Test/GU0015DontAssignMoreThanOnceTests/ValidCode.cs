@@ -201,7 +201,7 @@ namespace RoslynSandbox
         public Status Status { get; private set; }
     }
 
-    enum Status
+    public enum Status
     {
         Running,
         Finished,
@@ -263,6 +263,10 @@ namespace RoslynSandbox
 {
     public class Foo
     {
+        public int Value1 { get; }
+
+        public int Value2 { get; }
+
         public override int GetHashCode()
         {
             unchecked

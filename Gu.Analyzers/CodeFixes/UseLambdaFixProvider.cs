@@ -45,21 +45,21 @@ namespace Gu.Analyzers
             {
                 if (method.Parameters.Length == 0)
                 {
-                    editor.ReplaceNode(
+                    _ = editor.ReplaceNode(
                         identifierName,
                         x => SyntaxFactory.ParseExpression($"() => {x.Identifier.ValueText}()"));
                 }
                 else if (method.Parameters.TrySingle(out var parameter))
                 {
                     var parameterName = SafeParameterName(parameter, identifierName);
-                    editor.ReplaceNode(
+                    _ = editor.ReplaceNode(
                         identifierName,
                         x => SyntaxFactory.ParseExpression($"{parameterName} => {x.Identifier.ValueText}({parameterName})"));
                 }
                 else
                 {
                     var parameters = string.Join(", ", method.Parameters.Select(x => SafeParameterName(x, identifierName)));
-                    editor.ReplaceNode(
+                    _ = editor.ReplaceNode(
                         identifierName,
                         x => SyntaxFactory.ParseExpression($"({parameters}) => {x.Identifier.ValueText}({parameters})"));
                 }

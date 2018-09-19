@@ -62,7 +62,7 @@ namespace RoslynSandbox
     using System.Collections;
     using System.Collections.Generic;
 
-    class Lol : IEnumerable<IEnumerable<char>>, IEnumerable<int>
+    class Foo : IEnumerable<IEnumerable<char>>, IEnumerable<int>
     {
         IEnumerator<int> IEnumerable<int>.GetEnumerator()
         {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
     {
         public void F()
         {
-            foreach(int a in new Lol())
+            foreach(int a in new Foo())
             {
             }
         }
@@ -127,9 +127,9 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    class Lol
+    class Foo
     {
-        IEnumerator<int> GetEnumerator()
+        public IEnumerator<int> GetEnumerator()
         {
             yield return 1;
         }
@@ -139,7 +139,7 @@ namespace RoslynSandbox
     {
         public void F()
         {
-            foreach(int a in new Lol())
+            foreach(int a in new Foo())
             {
             }
         }

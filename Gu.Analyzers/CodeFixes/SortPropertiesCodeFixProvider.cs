@@ -41,7 +41,7 @@ namespace Gu.Analyzers
         private static void Move(DocumentEditor editor, BasePropertyDeclarationSyntax property)
         {
             editor.TrackNode(property);
-            editor.ReplaceNode(
+            _ = editor.ReplaceNode(
                 (TypeDeclarationSyntax)property.Parent,
                 WithMoved);
 

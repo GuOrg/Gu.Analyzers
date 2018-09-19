@@ -358,37 +358,6 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, extCode, testCode);
             }
-
-            [Test]
-            public void WithSyntaxErrors()
-            {
-                var syntaxErrorCode = @"
-    using System;
-    using System.IO;
-
-    internal class Foo : SyntaxError
-    {
-        private readonly Stream stream = File.SyntaxError(string.Empty);
-        private bool disposed;
-
-        protected override void Dispose(bool disposing)
-        {
-            if (this.syntaxError)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
-
-            base.Dispose(disposing);
-        }
-    }";
-                AnalyzerAssert.Valid(Analyzer, syntaxErrorCode);
-            }
         }
     }
 }

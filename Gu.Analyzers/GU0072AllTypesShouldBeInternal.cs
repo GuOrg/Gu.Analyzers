@@ -30,7 +30,7 @@ namespace Gu.Analyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ClassDeclaration, SyntaxKind.StructDeclaration);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
