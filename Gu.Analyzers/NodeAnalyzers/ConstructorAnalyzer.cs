@@ -167,7 +167,7 @@ namespace Gu.Analyzers
 
                 if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList is ArgumentListSyntax argumentList &&
-                    argumentList.Arguments.TrySingle(IsParameter, out var argument) &&
+                    argumentList.Arguments.TrySingle(syntax => IsParameter(syntax), out var argument) &&
                     context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is IMethodSymbol chained &&
                     chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
