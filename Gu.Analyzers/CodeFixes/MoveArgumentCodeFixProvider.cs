@@ -43,9 +43,9 @@ namespace Gu.Analyzers
                     }
 
                     context.RegisterCodeFix(
-                            "Move arguments to match parameter positions.",
-                            (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
-                            this.GetType(),
+                        "Move arguments to match parameter positions.",
+                        (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
+                        this.GetType(),
                         diagnostic);
                 }
 
@@ -53,9 +53,9 @@ namespace Gu.Analyzers
                 {
                     var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     context.RegisterCodeFix(
-                            "Move name argument to match parameter positions.",
-                            (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
-                            this.GetType(),
+                        "Move name argument to match parameter positions.",
+                        (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
+                        this.GetType(),
                         diagnostic);
                 }
             }

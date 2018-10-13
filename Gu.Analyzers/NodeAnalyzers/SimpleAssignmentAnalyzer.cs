@@ -128,7 +128,7 @@ namespace Gu.Analyzers
                             continue;
                         }
 
-                        if (candidate.IsExecutedBefore(assignment) == true)
+                        if (candidate.IsExecutedBefore(assignment) == ExecutedBefore.Yes)
                         {
                             if (left is IParameterSymbol parameter &&
                                 parameter.RefKind == RefKind.Out &&

@@ -57,9 +57,10 @@ namespace Gu.Analyzers
                         if (TryGetConstructor(property, out var ctor))
                         {
                             context.RegisterCodeFix(
-                                    "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                    (editor, cancellationToken) => ApplyInitializeInCtorFix(editor, ctor, property, objectCreation),
-                                   this.GetType().FullName + "UNSAFE",
+                                "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
+                                (editor, cancellationToken) =>
+                                    ApplyInitializeInCtorFix(editor, ctor, property, objectCreation),
+                                this.GetType().FullName + "UNSAFE",
                                 diagnostic);
                         }
                     }

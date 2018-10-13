@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -29,12 +30,8 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ConstructorDeclarationSyntax constructorDeclaration)
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ConstructorDeclarationSyntax constructorDeclaration)
             {
                 using (var walker = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
                 {
@@ -269,25 +266,24 @@ namespace Gu.Analyzers
                 }
             }
 
-            using (var walker = MutationWalker.For(left, context.SemanticModel, context.CancellationToken))
+            return TryGetIdentifier(expression, out var identifierName) &&
+                   identifierName.IsSymbol(left, context.SemanticModel, context.CancellationToken) &&
+                   IsMutatedOnceBefore();
+
+            bool IsMutatedOnceBefore()
             {
-                if (walker.TrySingle(out var single))
+                if (expression.TryFirstAncestor(out StatementSyntax statement))
                 {
-                    if (single.IsExecutedBefore(expression) != true)
+                    using (var walker = MutationWalker.For(left, context.SemanticModel, context.CancellationToken))
                     {
-                        return false;
+                        return walker.TrySingle(out var single) &&
+                               single.TryFirstAncestor(out StatementSyntax singleStatement) &&
+                               singleStatement.IsExecutedBefore(statement) == ExecutedBefore.Yes;
                     }
                 }
-                else
-                {
-                    return false;
-                }
-            }
 
-            return TryGetIdentifier(expression, out var identifierName) &&
-                   identifierName.Identifier.ValueText == left.Name &&
-                   context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ISymbol symbol) &&
-                   symbol.Equals(left);
+                return false;
+            }
         }
 
         private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)

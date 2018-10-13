@@ -26,7 +26,7 @@ namespace Gu.Analyzers
         private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
         {
             KnownSymbol.Guid,
-            KnownSymbol.DateTime
+            KnownSymbol.DateTime,
         };
 
         /// <inheritdoc/>
@@ -42,12 +42,8 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 objectCreation.ArgumentList != null &&
                 objectCreation.ArgumentList.Arguments.Count == 0 &&
                 IsTheCreatedTypeKnownForHavingNoUsefulDefault(context, objectCreation, out _))

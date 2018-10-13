@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly DiagnosticDescriptor Descriptor = GU0014PreferParameter.Descriptor;
 
         [Test]
         public void SimpleAssign()
@@ -55,7 +57,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedTwice()
+        public void AssignedTwiceWithDifferent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,14 +66,10 @@ namespace RoslynSandbox
 
     public class Foo
     {
-#pragma warning disable GU0003 // Name the parameters to match the assigned members.
         public Foo(int value1, int value2)
-#pragma warning restore GU0003 // Name the parameters to match the assigned members.
         {
-#pragma warning disable GU0015 // Don't assign same more than once.
             this.Bar = value1;
-            this.Bar = value2 * 2;
-#pragma warning restore GU0015 // Don't assign same more than once.
+            this.Bar = value2;
             if (this.Bar > 10)
             {
                 throw new ArgumentException(nameof(value1));
@@ -81,7 +79,59 @@ namespace RoslynSandbox
         public int Bar { get; }
     }
 }";
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+        }
+
+        [Test]
+        public void SecondAssignmentWithExpression()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(int bar)
+        {
+            this.Bar = bar;
+            this.Bar = bar * 2;
+            if (this.Bar > 10)
+            {
+                throw new ArgumentException(nameof(bar));
+            }
+        }
+
+        public int Bar { get; }
+    }
+}";
             AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void SecondAssignmentWithExpressionRepro()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo(int value1, int value2)
+        {
+            this.Bar = value1;
+            this.Bar = value2 * 2;
+            if (this.Bar > 10)
+            {
+                throw new ArgumentException(nameof(value1));
+            }
+        }
+
+        public int Bar { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [Test]
@@ -239,6 +289,77 @@ namespace RoslynSandbox
 }";
 
             AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void BaseConstructorCall()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int a, int b, int c, int d)
+        {
+            this.A = a;
+            this.B = b;
+            this.C = c;
+            this.D = d;
+        }
+
+        public int A { get; }
+
+        public int B { get; }
+
+        public int C { get; }
+
+        public int D { get; }
+    }
+}";
+
+            var barCode = @"
+namespace RoslynSandbox
+{
+    public class Bar : Foo
+    {
+        public Bar(int a, int b, int c, int d)
+            : base(a, b, c, d)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
+        }
+
+        [Test]
+        public void BaseConstructorCallSimple()
+        {
+            var fooCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(int a)
+        {
+            this.A = a;
+        }
+
+        public int A { get; }
+    }
+}";
+
+            var barCode = @"
+namespace RoslynSandbox
+{
+    public class Bar : Foo
+    {
+        public Bar(int a)
+            : base(a)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
     }
 }

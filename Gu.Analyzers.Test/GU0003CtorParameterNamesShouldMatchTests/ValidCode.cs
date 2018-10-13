@@ -103,17 +103,6 @@ namespace RoslynSandbox
             var fooCode = @"
 namespace RoslynSandbox
 {
-    public class Bar : Foo
-    {
-        public Bar(int a, int b, int c, int d)
-            : base(a, b, c, d)
-        {
-        }
-    }
-}";
-            var barCode = @"
-namespace RoslynSandbox
-{
     public class Foo
     {
         public Foo(int a, int b, int c, int d)
@@ -131,6 +120,18 @@ namespace RoslynSandbox
         public int C { get; }
 
         public int D { get; }
+    }
+}";
+
+            var barCode = @"
+namespace RoslynSandbox
+{
+    public class Bar : Foo
+    {
+        public Bar(int a, int b, int c, int d)
+            : base(a, b, c, d)
+        {
+        }
     }
 }";
             AnalyzerAssert.Valid(Analyzer, fooCode, barCode);

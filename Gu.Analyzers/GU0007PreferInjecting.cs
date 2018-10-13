@@ -28,7 +28,7 @@ namespace Gu.Analyzers
         {
             No,
             Safe,
-            Unsafe
+            Unsafe,
         }
 
         /// <inheritdoc/>
