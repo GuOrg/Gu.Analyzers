@@ -1,10 +1,8 @@
 namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.CodeFixExtensions;
@@ -71,7 +69,7 @@ namespace Gu.Analyzers
                     default(SyntaxList<AttributeListSyntax>),
                     default(SyntaxTokenList),
                     SyntaxFactory.ParseTypeName(
-                        semanticModel.GetTypeInfo(argument.Expression)
+                        semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
                                      .Type.ToMinimalDisplayString(
                                          semanticModel,
                                          attributeArgumentList.SpanStart)),

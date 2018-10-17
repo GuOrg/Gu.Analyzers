@@ -56,10 +56,10 @@ namespace RoslynSandbox
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
         {
-            private static readonly DiagnosticDescriptor SA1614Descriptor = new DiagnosticDescriptor("SA1614", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("SA1614", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                SA1614Descriptor);
+                Descriptor);
 
             public override void Initialize(AnalysisContext context)
             {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
                 if (context.Node is XmlElementSyntax element &&
                     !element.Content.Any())
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(SA1614Descriptor, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
             }
         }
