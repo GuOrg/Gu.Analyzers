@@ -18,9 +18,9 @@
   <Assets>
     <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Gu.Analyzers" Path="|Gu.Analyzers|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Gu.Analyzers" Path="|Gu.Analyzers|"/>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Gu.Roslyn.AnalyzerExtensions.dll" />
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="File" Path="Gu.Roslyn.AnalyzerExtensions.dll" />
-    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Gu.Roslyn.CodeFixExtensions.dll" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="File" Path="Gu.Roslyn.Extensions.dll" />
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="File" Path="Gu.Roslyn.Extensions.dll" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Gu.Roslyn.Extensions.dll" />
   </Assets>
   <Prerequisites>
     <Prerequisite Id="Microsoft.VisualStudio.Component.Roslyn.Compiler" Version="[15.0.26208.0,16.0)" DisplayName="C# and Visual Basic Roslyn compilers" />
