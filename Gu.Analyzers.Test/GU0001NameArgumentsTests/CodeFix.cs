@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -47,8 +47,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0001", "Name the arguments.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the arguments."), testCode);
         }
 
         [Test]

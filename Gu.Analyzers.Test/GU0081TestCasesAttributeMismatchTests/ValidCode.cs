@@ -64,8 +64,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(1, 2)]", testCase);
+}".AssertReplace("[TestCase(1, 2)]", testCase);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
+namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -29,12 +29,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
-                diagnosticId: "GU0051",
-                message: "The serializer is not cached.",
-                code: testCode,
-                cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The serializer is not cached."), testCode);
         }
 
         [Test]
@@ -80,8 +76,8 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", code);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
@@ -107,8 +103,8 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", code);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }

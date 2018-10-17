@@ -55,12 +55,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
-                diagnosticId: "GU0009",
-                message: "The boolean parameter is not named.",
-                code: testCode,
-                cleanedSources: out testCode);
-            AnalyzerAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, testCode, fixedCode);
+ 
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("The boolean parameter is not named."), testCode, fixedCode);
         }
 
         [Test]

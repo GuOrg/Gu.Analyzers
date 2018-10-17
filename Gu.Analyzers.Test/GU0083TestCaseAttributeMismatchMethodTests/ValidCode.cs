@@ -44,8 +44,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
+}".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -323,8 +323,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("where T : struct, IComparable<T>, IComparable", constraints);
+}".AssertReplace("where T : struct, IComparable<T>, IComparable", constraints);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

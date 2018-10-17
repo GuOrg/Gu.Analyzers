@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -42,8 +42,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0050", "Ignore events when serializing.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Ignore events when serializing."), testCode);
         }
 
         [Test]

@@ -25,8 +25,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[Test]", attribute);
+}".AssertReplace("[Test]", attribute);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -46,8 +46,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(1)]", attribute);
+}".AssertReplace("[TestCase(1)]", attribute);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -110,8 +110,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(1, 2, 3)]", testCase);
+}".AssertReplace("[TestCase(1, 2, 3)]", testCase);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -132,8 +132,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(1, 2, 3)]", testCase);
+}".AssertReplace("[TestCase(1, 2, 3)]", testCase);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

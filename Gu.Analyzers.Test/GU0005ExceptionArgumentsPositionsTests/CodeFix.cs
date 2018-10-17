@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
+namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -28,7 +28,7 @@ namespace RoslynSandbox
             throw new ArgumentException(↓nameof(o), ""message"");
         }
     }
-}";
+}".AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -42,9 +42,8 @@ namespace RoslynSandbox
             throw new ArgumentException(""message"", nameof(o));
         }
     }
-}";
-            testCode = testCode.AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
-            fixedCode = fixedCode.AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
+}".AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
+
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 

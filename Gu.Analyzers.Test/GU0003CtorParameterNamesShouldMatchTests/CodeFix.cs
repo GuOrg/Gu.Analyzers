@@ -35,8 +35,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0003", "Name the parameters to match the assigned members.", testCode, out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the parameters to match the assigned members."), testCode);
         }
 
         [Test]

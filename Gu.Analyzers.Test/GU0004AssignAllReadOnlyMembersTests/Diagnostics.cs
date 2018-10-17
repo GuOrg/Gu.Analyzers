@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
+namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -29,8 +29,7 @@ namespace RoslynSandbox
 
             var message = "The following readonly members are not assigned:\r\n" +
                           "RoslynSandbox.Foo.B";
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated("GU0004", message, testCode, out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), testCode);
         }
 
         [Test]

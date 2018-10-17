@@ -32,8 +32,8 @@ namespace RoslynSandbox
             return new Foo(a, b);
         }
     }
-}";
-            testCode = testCode.AssertReplace("new Foo(a, b)", call);
+}".AssertReplace("new Foo(a, b)", call);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -62,8 +62,8 @@ namespace RoslynSandbox
             return new Foo(a, b);
         }
     }
-}";
-            testCode = testCode.AssertReplace("new Foo(a, b)", call);
+}".AssertReplace("new Foo(a, b)", call);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

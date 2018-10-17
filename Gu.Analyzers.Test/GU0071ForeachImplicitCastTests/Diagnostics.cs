@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
+namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -25,8 +25,8 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("int[]", type);
+}".AssertReplace("int[]", type);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 

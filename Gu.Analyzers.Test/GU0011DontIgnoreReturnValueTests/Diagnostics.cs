@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
     internal class Diagnostics
     {
         private static readonly GU0011DontIgnoreReturnValue Analyzer = new GU0011DontIgnoreReturnValue();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0011");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0011DontIgnoreReturnValue.DiagnosticId);
 
         [TestCase("ints.Select(x => x);")]
         [TestCase("ints.Select(x => x).Where(x => x > 1);")]
@@ -25,15 +25,9 @@ namespace RoslynSandbox
             ↓ints.Select(x => x);
         }
     }
-}";
-            testCode = testCode.AssertReplace("ints.Select(x => x);", linq);
+}".AssertReplace("ints.Select(x => x);", linq);
 
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
-                diagnosticId: "GU0011",
-                message: "Don't ignore the return value.",
-                code: testCode,
-                cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), testCode);
         }
 
         [Test]
@@ -73,8 +67,8 @@ namespace RoslynSandbox
             ↓values.Add(1);
         }
     }
-}";
-            testCode = testCode.AssertReplace("Add(1)", call);
+}".AssertReplace("Add(1)", call);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
@@ -94,8 +88,8 @@ namespace RoslynSandbox
             ↓values.Add(1);
         }
     }
-}";
-            testCode = testCode.AssertReplace("Add(1)", call);
+}".AssertReplace("Add(1)", call);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 

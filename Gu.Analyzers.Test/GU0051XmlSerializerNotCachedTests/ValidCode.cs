@@ -135,8 +135,8 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", code);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

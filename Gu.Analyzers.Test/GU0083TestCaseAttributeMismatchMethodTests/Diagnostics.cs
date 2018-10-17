@@ -45,8 +45,8 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            testCode = testCode.AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
+}".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
+
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 

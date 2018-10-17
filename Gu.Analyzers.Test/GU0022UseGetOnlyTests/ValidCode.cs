@@ -35,9 +35,9 @@ namespace RoslynSandbox
             this.A = a;
         }
     }
-}";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", data.Update)
+  .AssertReplace("int", data.Type);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -56,9 +56,9 @@ namespace RoslynSandbox
             A = a;
         }
     }
-}";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", data.Update)
+  .AssertReplace("int", data.Type);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -77,9 +77,9 @@ namespace RoslynSandbox
 
         public int A { get; private set; }
     }
-}";
-            testCode = testCode.AssertReplace("A = a;", data.Update)
-                               .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", data.Update)
+  .AssertReplace("int", data.Type);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

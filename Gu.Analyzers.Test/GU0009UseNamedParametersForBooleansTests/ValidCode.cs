@@ -248,8 +248,8 @@ namespace RoslynSandbox
             textBox.SetValue(TextBoxBase.IsReadOnlyProperty, true);
         }
     }
-}";
-            testCode = testCode.AssertReplace("SetValue", method);
+}".AssertReplace("SetValue", method);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -296,8 +296,8 @@ namespace RoslynSandbox
             textBox.SetBar(true);
         }
     }
-}";
-            testCode = testCode.AssertReplace("textBox.SetBar(true)", method);
+}".AssertReplace("textBox.SetBar(true)", method);
+
             AnalyzerAssert.Valid(Analyzer, apCode, testCode);
         }
 

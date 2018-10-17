@@ -130,8 +130,8 @@ namespace RoslynSandbox
             foo.A = A;
         }
     }
-}";
-            testCode = testCode.AssertReplace("foo.A = A;", after);
+}".AssertReplace("foo.A = A;", after);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

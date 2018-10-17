@@ -142,8 +142,8 @@ namespace RoslynSandbox
             this.text = text;
         }
     }
-}";
-            testCode = testCode.AssertReplace("text == null", check);
+}".AssertReplace("text == null", check);
+
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }

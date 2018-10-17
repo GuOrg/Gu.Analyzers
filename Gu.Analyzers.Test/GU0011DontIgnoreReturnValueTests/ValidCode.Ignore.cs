@@ -26,8 +26,8 @@ namespace RoslynSandbox
             stringBuilder.AppendLine(""test"");
         }
     }
-}";
-                testCode = testCode.AssertReplace("stringBuilder.AppendLine(\"test\");", code);
+}".AssertReplace("stringBuilder.AppendLine(\"test\");", code);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -177,8 +177,8 @@ namespace RoslynSandbox
             this.ints.Add(1);
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
+}".AssertReplace("this.ints.Add(1);", operation);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -202,8 +202,8 @@ namespace RoslynSandbox
             this.ints.Add(1);
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.ints.Add(1);", operation);
+}".AssertReplace("this.ints.Add(1);", operation);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -224,8 +224,8 @@ namespace RoslynSandbox
             ints.RemoveAll(x => x > 2);
         }
     }
-}";
-                testCode = testCode.AssertReplace("ints.RemoveAll(x => x > 2);", operation);
+}".AssertReplace("ints.RemoveAll(x => x > 2);", operation);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -244,8 +244,8 @@ namespace RoslynSandbox
             map.TryAdd(1, 1);
         }
     }
-}";
-                testCode = testCode.AssertReplace("map.TryAdd(1, 1);", operation);
+}".AssertReplace("map.TryAdd(1, 1);", operation);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -268,8 +268,8 @@ namespace RoslynSandbox
             mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null);
         }
     }
-}";
-                testCode = testCode.AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", code);
+}".AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", code);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -294,8 +294,8 @@ namespace RoslynSandbox
     {
         void Bar();
     }
-}";
-                testCode = testCode.AssertReplace("mock.Setup(x => x.Bar())", setup);
+}".AssertReplace("mock.Setup(x => x.Bar())", setup);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -316,8 +316,8 @@ namespace RoslynSandbox
             this.Bind<Foo>().To<Foo>();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.Bind<Foo>().To<Foo>()", bind);
+}".AssertReplace("this.Bind<Foo>().To<Foo>()", bind);
+
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 

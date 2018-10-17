@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
+namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -28,12 +28,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
-                diagnosticId: "GU0010",
-                message: "Assigning made to same, did you mean to assign something else?",
-                code: testCode,
-                cleanedSources: out testCode);
-            AnalyzerAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Assigning made to same, did you mean to assign something else?"), testCode);
         }
 
         [Test]

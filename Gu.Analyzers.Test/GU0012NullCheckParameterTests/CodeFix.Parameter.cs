@@ -30,8 +30,8 @@ namespace RoslynSandbox
             this.text = text;
         }
     }
-}";
-                testCode = testCode.AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public Foo", $"{access} Foo");
+
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -44,8 +44,8 @@ namespace RoslynSandbox
             this.text = text ?? throw new System.ArgumentNullException(nameof(text));
         }
     }
-}";
-                fixedCode = fixedCode.AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public Foo", $"{access} Foo");
+
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
