@@ -8,9 +8,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeInternalFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeInternalFix))]
     [Shared]
-    internal class MakeInternalFixProvider : CodeFixProvider
+    internal class MakeInternalFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0072AllTypesShouldBeInternal.DiagnosticId);
@@ -36,7 +36,7 @@ namespace Gu.Analyzers
                                     syntaxRoot.ReplaceToken(
                                         token,
                                         SyntaxFactory.Token(SyntaxKind.InternalKeyword)))),
-                            nameof(MakeInternalFixProvider)),
+                            nameof(MakeInternalFix)),
                         diagnostic);
                 }
             }

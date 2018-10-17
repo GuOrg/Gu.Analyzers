@@ -12,9 +12,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SortPropertiesCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SortPropertiesFix))]
     [Shared]
-    internal class SortPropertiesCodeFixProvider : DocumentEditorCodeFixProvider
+    internal class SortPropertiesFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0020SortProperties.DiagnosticId);
@@ -50,9 +50,9 @@ namespace Gu.Analyzers
                 switch (old)
                 {
                     case ClassDeclarationSyntax classDeclaration:
-                        return classDeclaration.WithMembers(SortPropertiesCodeFixProvider.WithMoved(old.Members, old.GetCurrentNode(property)));
+                        return classDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property)));
                     case StructDeclarationSyntax structDeclaration:
-                        return structDeclaration.WithMembers(SortPropertiesCodeFixProvider.WithMoved(old.Members, old.GetCurrentNode(property)));
+                        return structDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property)));
                     default:
                         return old;
                 }

@@ -13,9 +13,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseLambdaFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseLambdaFix))]
     [Shared]
-    internal class UseLambdaFixProvider : DocumentEditorCodeFixProvider
+    internal class UseLambdaFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0016PreferLambda.DiagnosticId);

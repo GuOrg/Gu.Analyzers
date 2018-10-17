@@ -9,9 +9,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ThrowForCorrectParameterCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ThrowForCorrectParameterFix))]
     [Shared]
-    internal class ThrowForCorrectParameterCodeFixProvider : DocumentEditorCodeFixProvider
+    internal class ThrowForCorrectParameterFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(

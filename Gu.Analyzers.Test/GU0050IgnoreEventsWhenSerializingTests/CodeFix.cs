@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
     internal class CodeFix
     {
         private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
-        private static readonly AddNonSerializedFixProvider Fix = new AddNonSerializedFixProvider();
+        private static readonly NonSerializedFix Fix = new NonSerializedFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0050");
 
         [Test]

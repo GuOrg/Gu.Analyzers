@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     internal class CodeFix
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
-        private static readonly ThrowForCorrectParameterCodeFixProvider Fix = new ThrowForCorrectParameterCodeFixProvider();
+        private static readonly ThrowForCorrectParameterFix Fix = new ThrowForCorrectParameterFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0013");
 
         [Test]

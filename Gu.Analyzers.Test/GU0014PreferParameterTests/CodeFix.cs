@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly CodeFixProvider Fix = new UseParameterCodeFixProvider();
+        private static readonly CodeFixProvider Fix = new UseParameterFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0014");
 
         [Test]

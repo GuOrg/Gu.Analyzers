@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     internal class CodeFixAll
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
-        private static readonly SortPropertiesCodeFixProvider Fix = new SortPropertiesCodeFixProvider();
+        private static readonly SortPropertiesFix Fix = new SortPropertiesFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
 
         [Test]

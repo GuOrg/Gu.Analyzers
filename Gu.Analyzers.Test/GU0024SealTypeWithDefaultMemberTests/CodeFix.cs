@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
-        private static readonly CodeFixProvider Fix = new MakeSealedFixProvider();
+        private static readonly CodeFixProvider Fix = new MakeSealedFix();
 
         [Test]
         public void Field()

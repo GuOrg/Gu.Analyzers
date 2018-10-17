@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
     internal class CodeFix
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
-        private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
+        private static readonly MoveArgumentFix Fix = new MoveArgumentFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0002");
 
         [Test]

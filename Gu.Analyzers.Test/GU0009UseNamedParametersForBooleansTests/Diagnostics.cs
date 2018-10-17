@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0009UseNamedParametersForBooleans();
-        private static readonly CodeFixProvider Fix = new NameArgumentsCodeFixProvider();
+        private static readonly CodeFixProvider Fix = new NameArgumentsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0009");
 
         [Test]

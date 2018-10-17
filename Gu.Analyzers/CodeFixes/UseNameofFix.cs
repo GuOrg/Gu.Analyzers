@@ -12,9 +12,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseNameofCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseNameofFix))]
     [Shared]
-    internal class UseNameofCodeFixProvider : DocumentEditorCodeFixProvider
+    internal class UseNameofFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0006UseNameof.DiagnosticId);

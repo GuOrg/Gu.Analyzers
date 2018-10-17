@@ -11,9 +11,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NameArgumentsCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NameArgumentsFix))]
     [Shared]
-    internal class NameArgumentsCodeFixProvider : DocumentEditorCodeFixProvider
+    internal class NameArgumentsFix : DocumentEditorCodeFixProvider
     {
         private static readonly SyntaxTriviaList SpaceTrivia = SyntaxTriviaList.Empty.Add(SyntaxFactory.SyntaxTrivia(SyntaxKind.WhitespaceTrivia, " "));
 

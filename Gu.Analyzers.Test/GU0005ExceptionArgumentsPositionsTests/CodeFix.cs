@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
     internal class CodeFix
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
-        private static readonly MoveArgumentCodeFixProvider Fix = new MoveArgumentCodeFixProvider();
+        private static readonly MoveArgumentFix Fix = new MoveArgumentFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0005");
 
         [TestCase(@"throw new ArgumentException(↓nameof(o), ""message"");", @"throw new ArgumentException(""message"", nameof(o));")]

@@ -12,9 +12,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseGetOnlyCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UseGetOnlyFix))]
     [Shared]
-    internal class UseGetOnlyCodeFixProvider : DocumentEditorCodeFixProvider
+    internal class UseGetOnlyFix : DocumentEditorCodeFixProvider
     {
         private static readonly AccessorListSyntax GetOnlyAccessorList =
             SyntaxFactory.AccessorList(

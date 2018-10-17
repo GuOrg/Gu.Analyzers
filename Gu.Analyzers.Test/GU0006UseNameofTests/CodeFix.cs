@@ -6,7 +6,7 @@
     internal class CodeFix
     {
         private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
-        private static readonly UseNameofCodeFixProvider Fix = new UseNameofCodeFixProvider();
+        private static readonly UseNameofFix Fix = new UseNameofFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0006");
 
         [Test]

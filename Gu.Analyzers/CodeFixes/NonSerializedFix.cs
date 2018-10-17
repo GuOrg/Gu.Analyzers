@@ -9,9 +9,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddNonSerializedFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NonSerializedFix))]
     [Shared]
-    internal class AddNonSerializedFixProvider : DocumentEditorCodeFixProvider
+    internal class NonSerializedFix : DocumentEditorCodeFixProvider
     {
         private static readonly SeparatedSyntaxList<AttributeSyntax> NonSerializedList = SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Attribute(SyntaxFactory.ParseName(nameof(NonSerialized))));
 
@@ -48,7 +48,7 @@ namespace Gu.Analyzers
                             eventField,
                             x => x.AddAttributeLists(NonSerializedWithTargetSpecifier)
                                   .WithLeadingTriviaFrom(x)),
-                        nameof(AddNonSerializedFixProvider),
+                        nameof(NonSerializedFix),
                         diagnostic);
                     continue;
                 }
@@ -61,7 +61,7 @@ namespace Gu.Analyzers
                             field,
                             x => x.AddAttributeLists(NonSerialized)
                                   .WithLeadingTriviaFrom(x)),
-                        nameof(AddNonSerializedFixProvider),
+                        nameof(NonSerializedFix),
                         diagnostic);
                 }
             }

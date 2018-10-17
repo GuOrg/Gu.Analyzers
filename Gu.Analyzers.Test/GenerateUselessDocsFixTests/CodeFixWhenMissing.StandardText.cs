@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFixWhenMissing
     {
         [Test]
         public void StandardTextForCancellationToken()
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""cancellationToken"">The <see cref=""CancellationToken""/> that the task will observe.</param>
+        /// <param name=""cancellationToken"">The <see cref=""CancellationToken""/> that cancels the operation.</param>
         public void Meh(CancellationToken cancellationToken)
         {
         }

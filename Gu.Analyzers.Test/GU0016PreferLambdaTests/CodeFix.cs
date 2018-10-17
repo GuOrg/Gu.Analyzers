@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
-        private static readonly CodeFixProvider Fix = new UseLambdaFixProvider();
+        private static readonly CodeFixProvider Fix = new UseLambdaFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0016");
 
         [Test]

@@ -8,9 +8,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeSealedFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeSealedFix))]
     [Shared]
-    internal class MakeSealedFixProvider : DocumentEditorCodeFixProvider
+    internal class MakeSealedFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0024SealTypeWithDefaultMember.DiagnosticId);

@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
     internal class CodeFix
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
-        private static readonly UseGetOnlyCodeFixProvider Fix = new UseGetOnlyCodeFixProvider();
+        private static readonly UseGetOnlyFix Fix = new UseGetOnlyFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0021");
 
         [Test]

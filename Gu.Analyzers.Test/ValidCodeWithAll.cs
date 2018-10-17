@@ -50,14 +50,13 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task AnalyzerProject(DiagnosticAnalyzer analyzer)
+        public void AnalyzerProject(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer ||
                 analyzer is GU0007PreferInjecting)
             {
-                await Analyze.GetDiagnosticsAsync(AnalyzerProjectSln, analyzer)
-                             .ConfigureAwait(false);
+                Analyze.GetDiagnostics(AnalyzerProjectSln, analyzer);
             }
             else
             {

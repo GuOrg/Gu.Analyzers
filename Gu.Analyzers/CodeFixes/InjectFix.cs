@@ -16,9 +16,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InjectCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InjectFix))]
     [Shared]
-    internal class InjectCodeFixProvider : CodeFixProvider
+    internal class InjectFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0007PreferInjecting.DiagnosticId);
@@ -61,7 +61,7 @@ namespace Gu.Analyzers
                                 CodeAction.Create(
                                     "Inject",
                                     cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
-                                    nameof(InjectCodeFixProvider)),
+                                    nameof(InjectFix)),
                                 diagnostic);
                             break;
                         case GU0007PreferInjecting.Injectable.Unsafe:
@@ -69,7 +69,7 @@ namespace Gu.Analyzers
                                 CodeAction.Create(
                                     "Inject UNSAFE",
                                     cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
-                                    nameof(InjectCodeFixProvider)),
+                                    nameof(InjectFix)),
                                 diagnostic);
                             break;
                         default:
@@ -93,7 +93,7 @@ namespace Gu.Analyzers
                                 CodeAction.Create(
                                     "Inject UNSAFE",
                                     cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, parameterSyntax),
-                                    nameof(InjectCodeFixProvider)),
+                                    nameof(InjectFix)),
                                 diagnostic);
                             break;
                         default:

@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     internal class Codefix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0022UseGetOnly();
-        private static readonly CodeFixProvider Fix = new UseGetOnlyCodeFixProvider();
+        private static readonly CodeFixProvider Fix = new UseGetOnlyFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0022");
 
         [Test]

@@ -9,10 +9,10 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal partial class CodeFixWhenMissing
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DummyAnalyzer();
-        private static readonly CodeFixProvider Fix = new GenerateUselessDocsFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
+        private static readonly CodeFixProvider Fix = new UselessDocsFix();
 
         [Test]
         public void ForFirstParameterWhenSummaryOnly()
@@ -245,12 +245,12 @@ namespace RoslynSandbox
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class DummyAnalyzer : DiagnosticAnalyzer
+        private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
         {
-            public static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("SA1611", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            private static readonly DiagnosticDescriptor SA1611Descriptor = new DiagnosticDescriptor("SA1611", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
+                SA1611Descriptor);
 
             public override void Initialize(AnalysisContext context)
             {
@@ -265,7 +265,7 @@ namespace RoslynSandbox
                     methodDeclaration.HasLeadingTrivia &&
                     !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(SA1611Descriptor, context.Node.GetLocation()));
                 }
             }
         }
