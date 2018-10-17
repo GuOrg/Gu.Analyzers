@@ -1,7 +1,8 @@
 ﻿type project
 developmentDependency true
 releasenotes
-  BUGFIX: Handle MemberAccess in Gu0082
+  Generate useless docs for SA1614. 
+  Fix: create parameter when adding testcase arg.
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT

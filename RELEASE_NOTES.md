@@ -1,3 +1,7 @@
+#### 1.3.0
+* Generate useless docs for SA1614. 
+* Fix: create parameter when adding testcase arg.
+
 #### 1.2.18
 * FEATURE: New analyzer GU0024.
 
