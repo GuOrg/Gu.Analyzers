@@ -49,7 +49,7 @@ namespace Gu.Analyzers
                                 diagnostic);
                         }
                     }
-                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, true, true) is XmlElementSyntax element &&
+                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, findInsideTrivia: true, getInnermostNodeForTie: true) is XmlElementSyntax element &&
                              element.TryGetNameAttribute(out var name) &&
                              methodDeclaration.TryFindParameter(name.Identifier?.Identifier.ValueText, out parameter))
                     {

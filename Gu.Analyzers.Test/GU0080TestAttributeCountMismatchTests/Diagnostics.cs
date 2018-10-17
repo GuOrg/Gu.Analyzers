@@ -1,15 +1,18 @@
 namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     internal class Diagnostics
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0080");
+        private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor);
 
-        [Test]
-        public void TestAttributeAndParameter()
+        [TestCase("string text")]
+        [TestCase("string text, int index, bool value")]
+        public void TestAttributeAndParameter(string parameters)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -23,14 +26,9 @@ namespace RoslynSandbox
         {
         }
     }
-}";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
-        }
+}".AssertReplace("string text", parameters);
 
-        [Test]
-        public void TestAttributeAndParameter_Multiple()
-        {
-            var testCode = @"
+            var fixedCode = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -38,17 +36,16 @@ namespace RoslynSandbox
     public class FooTests
     {
         [Test]
-        public void Test↓(string text, int index, bool value)
+        public void Test()
         {
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
-        [TestCase("Test↓()")]
-        [TestCase("Test↓(1, 2)")]
-        public void TestCaseAttributeAndParameter(string signature)
+        [Test]
+        public void TestCaseAttributeAndParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,18 +55,30 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        public void Test↓(int i)
+        public void Test↓()
         {
         }
     }
-}".AssertReplace("Test↓(int i)", signature);
+}";
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1)]
+        public void Test(int arg0)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
-        [TestCase("Test↓()")]
-        [TestCase("Test↓(1, 2)")]
-        public void TestAndTestCaseAttributeAndParameter(string signature)
+        [Test]
+        public void TestCaseAttributeAndTooManyParameters()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -79,13 +88,13 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        public void Test↓(int i)
+        public void Test↓(int arg0, int j)
         {
         }
     }
-}".AssertReplace("Test↓(int i)", signature);
+}";
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]
