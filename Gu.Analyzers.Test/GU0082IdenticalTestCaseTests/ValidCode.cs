@@ -170,5 +170,47 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void TwoEnumsSameTypes()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    class C
+    {
+        [TestCase(StringComparison.Ordinal, StringComparison.CurrentCulture)]
+        [TestCase(StringComparison.Ordinal, StringComparison.InvariantCulture)]
+        public void M(StringComparison comparison, StringComparison modifiers)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void TwoEnumsDifferentTypes()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using NUnit.Framework;
+
+    class C
+    {
+        [TestCase(StringComparison.Ordinal, ConsoleModifiers.Alt)]
+        [TestCase(StringComparison.Ordinal, ConsoleModifiers.Shift)]
+        public void M(StringComparison comparison, ConsoleModifiers modifiers)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

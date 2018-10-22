@@ -285,53 +285,64 @@ namespace Gu.Analyzers
                     if (xa.Expression is LiteralExpressionSyntax xl &&
                         ya.Expression is LiteralExpressionSyntax yl)
                     {
-                        if (xl.Token.Text != yl.Token.Text)
+                        if (xl.Token.Text == yl.Token.Text)
+                        {
+                           continue;
+                        }
+
+                        return false;
+                    }
+
+                    if (xa.Expression is IdentifierNameSyntax xn &&
+                        ya.Expression is IdentifierNameSyntax yn)
+                    {
+                        if (xn.Identifier.ValueText == yn.Identifier.ValueText &&
+                            context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out ISymbol xs) &&
+                            context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out ISymbol ys) &&
+                            xs.Equals(ys))
+                        {
+                            continue;
+                        }
+
+                        return false;
+                    }
+
+                    if (xa.Expression is MemberAccessExpressionSyntax xma &&
+                        ya.Expression is MemberAccessExpressionSyntax yma)
+                    {
+                        if (xma.Name.Identifier.ValueText == yma.Name.Identifier.ValueText &&
+                            context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out ISymbol xs) &&
+                            context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out ISymbol ys) &&
+                            xs.Equals(ys))
+                        {
+                            continue;
+                        }
+
+                        return false;
+                    }
+
+                    if (TryGetArrayExpressions(xa.Expression, out var xExpressions) &&
+                        TryGetArrayExpressions(ya.Expression, out var yExpressions))
+                    {
+                        if (xExpressions.Count != yExpressions.Count)
                         {
                             return false;
                         }
-                    }
-                    else if (xa.Expression is IdentifierNameSyntax xn &&
-                             ya.Expression is IdentifierNameSyntax yn)
-                    {
-                        return xn.Identifier.ValueText == yn.Identifier.ValueText &&
-                               context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out ISymbol xs) &&
-                               context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out ISymbol ys) &&
-                               xs.Equals(ys);
-                    }
-                    else if (xa.Expression is MemberAccessExpressionSyntax xma &&
-                             ya.Expression is MemberAccessExpressionSyntax yma)
-                    {
-                        return xma.Name.Identifier.ValueText == yma.Name.Identifier.ValueText &&
-                               context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out ISymbol xs) &&
-                               context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out ISymbol ys) &&
-                               xs.Equals(ys);
-                    }
-                    else if (TryGetArrayExpressions(xa.Expression, out var xExpressions) &&
-                             TryGetArrayExpressions(ya.Expression, out var yExpressions))
-                    {
+
+                        for (var j = 0; j < xExpressions.Count; j++)
                         {
-                            if (xExpressions.Count != yExpressions.Count)
+                            if (xExpressions[j] is LiteralExpressionSyntax xLiteral &&
+                                yExpressions[j] is LiteralExpressionSyntax yLiteral &&
+                                xLiteral.Token.Text != yLiteral.Token.Text)
                             {
                                 return false;
                             }
-
-                            for (var j = 0; j < xExpressions.Count; j++)
-                            {
-                                if (xExpressions[j] is LiteralExpressionSyntax xLiteral &&
-                                    yExpressions[j] is LiteralExpressionSyntax yLiteral &&
-                                    xLiteral.Token.Text != yLiteral.Token.Text)
-                                {
-                                    return false;
-                                }
-                            }
-
-                            return true;
                         }
+
+                        continue;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return false;
                 }
 
                 return true;
