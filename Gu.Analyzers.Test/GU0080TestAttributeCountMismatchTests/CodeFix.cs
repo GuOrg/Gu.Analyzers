@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal class CodeFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
@@ -77,8 +77,11 @@ namespace RoslynSandbox
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
-        [Test]
-        public void TestCaseAttributeAndTooManyParameters()
+        [TestCase("int i, int j")]
+        [TestCase("string i, int j")]
+        [TestCase("string i, int j, int k")]
+        [TestCase("string i,string j, int k, int l")]
+        public void TestCaseAttributeAndTooManyParameters(string parameters)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -88,13 +91,27 @@ namespace RoslynSandbox
     public class FooTests
     {
         [TestCase(1)]
-        public void Test↓(int arg0, int j)
+        public void Test↓(int i, int j)
+        {
+        }
+    }
+}".AssertReplace("int i, int j", parameters);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1)]
+        public void Test(int i)
         {
         }
     }
 }";
 
-            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]

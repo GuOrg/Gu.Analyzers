@@ -1,12 +1,14 @@
 namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal class CodeFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0083");
+        private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor);
 
         [Test]
         public void SingleArgument()
@@ -24,7 +26,21 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1)]
+        public void Test(int str)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [TestCase("[TestCase(\"a\", ↓1, null)]")]
@@ -47,7 +63,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -66,7 +82,20 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1, 2)]
+        public void Test(int i, int str)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -85,7 +114,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -104,7 +133,20 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(new double[] {3, 5})]
+        public void Test(double[] array)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -123,7 +165,20 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class FooTests
+    {
+        [TestCase(1.0)]
+        public void Test(double i)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -142,7 +197,21 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    class Foo
+    {
+        [TestCase(1, 2, 3.0)]
+        public void Test(int i, int j, params double[] ints)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

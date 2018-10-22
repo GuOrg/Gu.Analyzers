@@ -1,10 +1,11 @@
 namespace Gu.Analyzers
 {
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -16,8 +17,9 @@ namespace Gu.Analyzers
     internal class TestMethodParametersFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-            ImmutableArray.Create(GU0080TestAttributeCountMismatch.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0080TestAttributeCountMismatch.DiagnosticId,
+            GU0083TestCaseAttributeMismatchMethod.DiagnosticId);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -29,71 +31,116 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax parameterList) &&
-                    parameterList.Parent is MethodDeclarationSyntax method)
+                    TryFindTestAttribute(parameterList.Parent as MethodDeclarationSyntax, semanticModel, context.CancellationToken, out var attribute) &&
+                    TryGetParameters(attribute, semanticModel, context.CancellationToken, out var parameters))
                 {
-                    if (TryFirstTestCaseAttribute(method, semanticModel, context.CancellationToken, out var attribute))
+                    context.RegisterCodeFix(
+                        "Update parameters",
+                        (editor, c) =>
+                            editor.ReplaceNode(
+                                parameterList,
+                                x => x.WithParameters(parameters)),
+                        nameof(TestMethodParametersFix),
+                        diagnostic);
+                }
+                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out attribute) &&
+                         attribute.TryFirstAncestor(out MethodDeclarationSyntax method) &&
+                         TryGetParameters(attribute, semanticModel, context.CancellationToken, out parameters))
+                {
+                    context.RegisterCodeFix(
+                        "Update parameters",
+                        (editor, c) =>
+                            editor.ReplaceNode(
+                                method.ParameterList,
+                                x => x.WithParameters(parameters)),
+                        nameof(TestMethodParametersFix),
+                        diagnostic);
+                }
+            }
+        }
+
+        private static bool TryGetParameters(AttributeSyntax testCase, SemanticModel semanticModel, CancellationToken cancellationToken, out SeparatedSyntaxList<ParameterSyntax> parameters)
+        {
+            if (testCase.ArgumentList is null)
+            {
+                parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+                return true;
+            }
+
+            if (testCase.ArgumentList is AttributeArgumentListSyntax argumentList &&
+                !argumentList.Arguments.Any(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression)) &&
+                testCase.TryFirstAncestor(out MethodDeclarationSyntax method) &&
+                method.ParameterList is ParameterListSyntax current)
+            {
+                if (argumentList.Arguments.Count == 0)
+                {
+                    parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+                    return true;
+                }
+
+                parameters = SyntaxFactory.SeparatedList(argumentList.Arguments.Select(syntax => CreateParameter(syntax)));
+                return true;
+
+                ParameterSyntax CreateParameter(AttributeArgumentSyntax argument)
+                {
+                    var i = ((AttributeArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
+                    if (current.Parameters.TryElementAt(i, out var parameter))
                     {
-                        if (parameterList.Parameters.Count == 0)
+                        if (parameter.Modifiers.Any(SyntaxKind.ParamsKeyword))
                         {
-                            context.RegisterCodeFix(
-                                "Add parameters",
-                                (editor, c) =>
-                                    editor.ReplaceNode(
-                                        parameterList,
-                                        x => x.WithParameters(x.Parameters.AddRange(CreateParameters(attribute.ArgumentList, semanticModel, c)))),
-                                nameof(TestMethodParametersFix),
-                                diagnostic);
+                            return parameter.WithType(
+                                ((ArrayTypeSyntax)parameter.Type).WithElementType(
+                                    SyntaxFactory.ParseTypeName(
+                                        semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
+                                                     .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart))));
+                        }
+
+                        return parameter.WithType(
+                            SyntaxFactory.ParseTypeName(
+                                             semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
+                                                          .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart))
+                                         .WithTriviaFrom(parameter.Type));
+                    }
+
+                    return SyntaxFactory.Parameter(
+                        default(SyntaxList<AttributeListSyntax>),
+                        default(SyntaxTokenList),
+                        SyntaxFactory.ParseTypeName(
+                            semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
+                                         .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart)),
+                        SyntaxFactory.Identifier("arg" + i),
+                        null);
+                }
+            }
+
+            parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+            return false;
+        }
+
+        private static bool TryFindTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        {
+            attribute = null;
+            if (method != null)
+            {
+                foreach (var attributeList in method.AttributeLists)
+                {
+                    foreach (var candidate in attributeList.Attributes)
+                    {
+                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
+                        {
+                            attribute = candidate;
+                            return true;
+                        }
+
+                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
+                        {
+                            attribute = candidate;
                         }
                     }
-                    else
-                    {
-                        context.RegisterCodeFix(
-                            "Remove parameters",
-                            (editor, _) =>
-                                editor.ReplaceNode(
-                                    parameterList,
-                                    x => x.WithParameters(default(SeparatedSyntaxList<ParameterSyntax>))),
-                            nameof(TestMethodParametersFix),
-                            diagnostic);
-                    }
-                }
-            }
-        }
-
-        private static IEnumerable<ParameterSyntax> CreateParameters(AttributeArgumentListSyntax attributeArgumentList, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            for (var i = 0; i < attributeArgumentList.Arguments.Count; i++)
-            {
-                var argument = attributeArgumentList.Arguments[i];
-                yield return SyntaxFactory.Parameter(
-                    default(SyntaxList<AttributeListSyntax>),
-                    default(SyntaxTokenList),
-                    SyntaxFactory.ParseTypeName(
-                        semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
-                                     .Type.ToMinimalDisplayString(
-                                         semanticModel,
-                                         attributeArgumentList.SpanStart)),
-                    SyntaxFactory.Identifier("arg" + i),
-                    null);
-            }
-        }
-
-        private static bool TryFirstTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
-        {
-            foreach (var attributeList in method.AttributeLists)
-            {
-                foreach (var candidate in attributeList.Attributes)
-                {
-                    if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
-                    {
-                        attribute = candidate;
-                        return true;
-                    }
                 }
             }
 
-            attribute = null;
-            return false;
+            return attribute != null;
         }
     }
 }
