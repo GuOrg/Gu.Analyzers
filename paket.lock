@@ -801,7 +801,7 @@ NUGET
       System.ObjectModel (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
       System.Text.RegularExpressions (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
       System.Threading.Tasks.Parallel (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
-    Microsoft.Diagnostics.Tracing.TraceEvent (2.0.33) - restriction: || (>= net46) (>= netstandard2.0)
+    Microsoft.Diagnostics.Tracing.TraceEvent (2.0.34) - restriction: || (>= net46) (>= netstandard2.0)
     Microsoft.DotNet.PlatformAbstractions (2.1) - restriction: || (>= net46) (>= netstandard2.0)
       System.AppContext (>= 4.1) - restriction: && (< net45) (>= netstandard1.3)
       System.Collections (>= 4.0.11) - restriction: && (< net45) (>= netstandard1.3)
