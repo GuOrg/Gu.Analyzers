@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
     }
 }";
- 
+
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("The boolean parameter is not named."), testCode, fixedCode);
         }
 
