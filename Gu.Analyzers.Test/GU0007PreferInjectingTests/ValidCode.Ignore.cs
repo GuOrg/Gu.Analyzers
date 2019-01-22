@@ -91,9 +91,7 @@ namespace RoslynSandbox
             this.value = value;
         }
     }
-}";
-
-                barCode = barCode.AssertReplace("int", type);
+}".AssertReplace("int", type);
 
                 var fooCode = @"
 namespace RoslynSandbox
@@ -107,9 +105,7 @@ namespace RoslynSandbox
             bar = new Bar(default(int));
         }
     }
-}";
-
-                fooCode = fooCode.AssertReplace("default(int)", $"default({type})");
+}".AssertReplace("default(int)", $"default({type})");
                 AnalyzerAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
             }
 

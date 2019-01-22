@@ -32,7 +32,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
+}".AssertReplace("this.bar.Value;", getter);
             var barCode = @"
 namespace RoslynSandbox
 {
@@ -41,7 +41,6 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            fooCode = fooCode.AssertReplace("this.bar.Value;", getter);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
 
@@ -63,7 +62,7 @@ namespace RoslynSandbox
 
         public int Value => ↓this.bar.Value;
     }
-}";
+}".AssertReplace("this.bar.Value;", body);
             var barCode = @"
 namespace RoslynSandbox
 {
@@ -72,7 +71,6 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            fooCode = fooCode.AssertReplace("this.bar.Value;", body);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
     }

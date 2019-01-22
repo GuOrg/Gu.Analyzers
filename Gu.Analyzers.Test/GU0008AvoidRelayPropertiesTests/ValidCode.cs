@@ -18,9 +18,7 @@ namespace RoslynSandbox
     {
         public int Value { get; set; }
     }
-}";
-
-            fooCode = fooCode.AssertReplace("public int Value { get; set; }", property);
+}".AssertReplace("public int Value { get; set; }", property);
             AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
@@ -37,8 +35,7 @@ namespace RoslynSandbox
 
         public int Value => this.value;
     }
-}";
-            fooCode = fooCode.AssertReplace("this.value;", getter);
+}".AssertReplace("this.value;", getter);
             AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
@@ -59,8 +56,7 @@ namespace RoslynSandbox
             set { this.value = value; }
         }
     }
-}";
-            fooCode = fooCode.AssertReplace("get { return this.value; }", getter);
+}".AssertReplace("get { return this.value; }", getter);
             AnalyzerAssert.Valid(Analyzer, fooCode);
         }
 
@@ -88,7 +84,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
+}".AssertReplace("return this.bar.Value;", getter);
             var barCode = @"
 namespace RoslynSandbox
 {
@@ -97,7 +93,6 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            fooCode = fooCode.AssertReplace("return this.bar.Value;", getter);
             AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
@@ -119,7 +114,7 @@ namespace RoslynSandbox
 
         public int Value => this.bar.Value;
     }
-}";
+}".AssertReplace("this.bar.Value;", getter);
             var barCode = @"
 namespace RoslynSandbox
 {
@@ -128,7 +123,6 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            fooCode = fooCode.AssertReplace("this.bar.Value;", getter);
             AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
     }
