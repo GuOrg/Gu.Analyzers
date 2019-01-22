@@ -15,19 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A965
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6739-4830-BC74-2F8CF785A572}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
-		.paket\Readme.paket.md = .paket\Readme.paket.md
-		RELEASE_NOTES.md = RELEASE_NOTES.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83-4723-44EA-95EC-D591AF6EC75D}"
-	ProjectSection(SolutionItems) = preProject
-		.paket\tools\install.ps1 = .paket\tools\install.ps1
-		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{86B34826-9404-4170-A381-5855FB3BE4FA}"
-	ProjectSection(SolutionItems) = preProject
 		documentation\GU0001.md = documentation\GU0001.md
 		documentation\GU0002.md = documentation\GU0002.md
 		documentation\GU0003.md = documentation\GU0003.md
@@ -60,6 +47,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\GU0081.md = documentation\GU0081.md
 		documentation\GU0082.md = documentation\GU0082.md
 		documentation\GU0083.md = documentation\GU0083.md
+		README.md = README.md
+		.paket\Readme.paket.md = .paket\Readme.paket.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83-4723-44EA-95EC-D591AF6EC75D}"
+	ProjectSection(SolutionItems) = preProject
+		.paket\tools\install.ps1 = .paket\tools\install.ps1
+		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers", "Gu.Analyzers\Gu.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
@@ -70,7 +66,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.Vsix", "Gu.Ana
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gu.Analyzers.Benchmarks", "Gu.Analyzers.Benchmarks\Gu.Analyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidCode", "ValidCode\ValidCode.csproj", "{4EE32E45-5C89-4087-83AA-ADEDE3DA5793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode", "ValidCode\ValidCode.csproj", "{4EE32E45-5C89-4087-83AA-ADEDE3DA5793}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,7 +100,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AB970A83-4723-44EA-95EC-D591AF6EC75D} = {A1A96555-15B1-4A0C-ADC1-059CEAA3F788}
-		{86B34826-9404-4170-A381-5855FB3BE4FA} = {BAD2A4EE-6739-4830-BC74-2F8CF785A572}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3DCF2CA0-D7D9-4C4E-B02C-FD570ACDD55B}
