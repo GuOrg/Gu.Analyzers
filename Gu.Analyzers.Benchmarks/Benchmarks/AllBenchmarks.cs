@@ -3,6 +3,24 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     internal class AllBenchmarks
     {
+        private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ClassDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ClassDeclarationAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ConstructorAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ConstructorAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark MethodGroupAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.MethodGroupAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ParameterAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ParameterAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark PropertyDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.PropertyDeclarationAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark TestMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.TestMethodAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0006UseNameofBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0006UseNameof());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
@@ -31,23 +49,59 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0072AllTypesShouldBeInternalBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0072AllTypesShouldBeInternal());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ArgumentListAnalyzer()
+        {
+            ArgumentListAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ClassDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ClassDeclarationAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ClassDeclarationAnalyzer()
+        {
+            ClassDeclarationAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ConstructorAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ConstructorAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ConstructorAnalyzer()
+        {
+            ConstructorAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark MethodGroupAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.MethodGroupAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void MethodGroupAnalyzer()
+        {
+            MethodGroupAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ObjectCreationAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ObjectCreationAnalyzer()
+        {
+            ObjectCreationAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ParameterAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ParameterAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ParameterAnalyzer()
+        {
+            ParameterAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark PropertyDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.PropertyDeclarationAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void PropertyDeclarationAnalyzer()
+        {
+            PropertyDeclarationAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void SimpleAssignmentAnalyzer()
+        {
+            SimpleAssignmentAnalyzerBenchmark.Run();
+        }
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark TestMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.TestMethodAnalyzer());
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void TestMethodAnalyzer()
+        {
+            TestMethodAnalyzerBenchmark.Run();
+        }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0006UseNameof()
@@ -131,60 +185,6 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0072AllTypesShouldBeInternal()
         {
             GU0072AllTypesShouldBeInternalBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void ArgumentListAnalyzer()
-        {
-            ArgumentListAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void ClassDeclarationAnalyzer()
-        {
-            ClassDeclarationAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void ConstructorAnalyzer()
-        {
-            ConstructorAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void MethodGroupAnalyzer()
-        {
-            MethodGroupAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void ObjectCreationAnalyzer()
-        {
-            ObjectCreationAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void ParameterAnalyzer()
-        {
-            ParameterAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void PropertyDeclarationAnalyzer()
-        {
-            PropertyDeclarationAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void SimpleAssignmentAnalyzer()
-        {
-            SimpleAssignmentAnalyzerBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void TestMethodAnalyzer()
-        {
-            TestMethodAnalyzerBenchmark.Run();
         }
     }
 }
