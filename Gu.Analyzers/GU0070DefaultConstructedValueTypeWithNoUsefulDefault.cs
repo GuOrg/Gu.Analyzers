@@ -15,7 +15,7 @@ namespace Gu.Analyzers
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Default-constructed value type with no no useful default",
+            title: "Default-constructed value type with no useful default",
             messageFormat: "Default constructed value type was created, which is likely not what was intended.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,

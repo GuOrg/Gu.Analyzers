@@ -5,138 +5,40 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/nplt8lc7rhmgdi17/branch/master?svg=true)](https://ci.appveyor.com/project/GuOrg/gu-analyzers-qh7oa/branch/master)
 [![Join the chat at https://gitter.im/JohanLarsson/Gu.Analyzers](https://badges.gitter.im/JohanLarsson/Gu.Analyzers.svg)](https://gitter.im/JohanLarsson/Gu.Analyzers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-<!-- start generated table -->
-<table>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0001.md">GU0001</a></td>
-    <td>Name the arguments.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0002.md">GU0002</a></td>
-    <td>The position of a named argument should match.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0003.md">GU0003</a></td>
-    <td>Name the parameters to match the assigned members.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0004.md">GU0004</a></td>
-    <td>Assign all readonly members.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0005.md">GU0005</a></td>
-    <td>Use correct argument positions.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0006.md">GU0006</a></td>
-    <td>Use nameof.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0007.md">GU0007</a></td>
-    <td>Prefer injecting.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md">GU0008</a></td>
-    <td>Avoid relay properties.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0009.md">GU0009</a></td>
-    <td>Name the boolean parameter.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0010.md">GU0010</a></td>
-    <td>Assigning same value.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0011.md">GU0011</a></td>
-    <td>Don't ignore the return value.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md">GU0012</a></td>
-    <td>Check if parameter is null.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md">GU0013</a></td>
-    <td>Use correct parameter name.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md">GU0014</a></td>
-    <td>Prefer using parameter.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md">GU0015</a></td>
-    <td>Don't assign same more than once.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md">GU0016</a></td>
-    <td>Prefer lambda.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md">GU0020</a></td>
-    <td>Sort properties.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md">GU0021</a></td>
-    <td>Calculated property allocates reference type.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md">GU0022</a></td>
-    <td>Use get-only.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md">GU0023</a></td>
-    <td>Static members that initialize with other static members depend on document order.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md">GU0024</a></td>
-    <td>Seal type with default member.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md">GU0050</a></td>
-    <td>Ignore events when serializing.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md">GU0051</a></td>
-    <td>Cache the XmlSerializer.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md">GU0052</a></td>
-    <td>Mark exception with [Serializable].</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0060.md">GU0060</a></td>
-    <td>Enum member value conflict.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0070.md">GU0070</a></td>
-    <td>Default-constructed value type with no no useful default</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0071.md">GU0071</a></td>
-    <td>Implicit casting done by the foreach</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0072.md">GU0072</a></td>
-    <td>All types should be internal.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0080.md">GU0080</a></td>
-    <td>Parameter count does not match attribute.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0081.md">GU0081</a></td>
-    <td>TestCase does not match parameters.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0082.md">GU0082</a></td>
-    <td>TestCase is identical.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0083.md">GU0083</a></td>
-    <td>TestCase Arguments Mismatch Method Parameters</td>
-  </tr>
-<table>
-<!-- end generated table -->
+| Id       | Title
+| :--      | :--
+| [GU0001](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0001.md)| Name the arguments.
+| [GU0002](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0002.md)| The position of a named argument should match.
+| [GU0003](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0003.md)| Name the parameters to match the assigned members.
+| [GU0004](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0004.md)| Assign all readonly members.
+| [GU0005](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0005.md)| Use correct argument positions.
+| [GU0006](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0006.md)| Use nameof.
+| [GU0007](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0007.md)| Prefer injecting.
+| [GU0008](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md)| Avoid relay properties.
+| [GU0009](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0009.md)| Name the boolean parameter.
+| [GU0010](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0010.md)| Assigning same value.
+| [GU0011](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0011.md)| Don't ignore the return value.
+| [GU0012](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md)| Check if parameter is null.
+| [GU0013](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md)| Use correct parameter name.
+| [GU0014](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md)| Prefer using parameter.
+| [GU0015](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md)| Don't assign same more than once.
+| [GU0016](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md)| Prefer lambda.
+| [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties.
+| [GU0021](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md)| Calculated property allocates reference type.
+| [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only.
+| [GU0023](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md)| Static members that initialize with other static members depend on document order.
+| [GU0024](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md)| Seal type with default member.
+| [GU0050](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md)| Ignore events when serializing.
+| [GU0051](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md)| Cache the XmlSerializer.
+| [GU0052](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md)| Mark exception with [Serializable].
+| [GU0060](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0060.md)| Enum member value conflict.
+| [GU0070](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0070.md)| Default-constructed value type with no useful default
+| [GU0071](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0071.md)| Implicit casting done by the foreach
+| [GU0072](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0072.md)| All types should be internal.
+| [GU0080](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0080.md)| Parameter count does not match attribute.
+| [GU0081](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0081.md)| TestCase does not match parameters.
+| [GU0082](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0082.md)| TestCase is identical.
+| [GU0083](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0083.md)| TestCase Arguments Mismatch Method Parameters
 
 ## Using Gu.Analyzers
 
