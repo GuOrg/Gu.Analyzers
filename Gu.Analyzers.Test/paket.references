@@ -2,6 +2,7 @@ group Test
   Microsoft.CodeAnalysis.CSharp.Workspaces
   Gu.Roslyn.Asserts
   NUnit
+  NUnit3TestAdapter
   Moq
   System.Reactive
   System.Reactive.Linq
