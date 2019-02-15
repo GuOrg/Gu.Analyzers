@@ -2,6 +2,7 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable HeuristicUnreachableCode
 // ReSharper disable RedundantNameQualifier
+
 #pragma warning disable CS0162 // Unreachable code detected
 #pragma warning disable GU0011 // Don't ignore the return value.
 namespace Gu.Analyzers.Benchmarks
@@ -30,16 +31,9 @@ namespace Gu.Analyzers.Benchmarks
                 Console.ReadKey();
                 benchmark.Run();
             }
-            else if (false)
-            {
-                foreach (var summary in RunSingle<AllBenchmarks>())
-                {
-                    CopyResult(summary);
-                }
-            }
             else
             {
-                foreach (var summary in RunAll())
+                foreach (var summary in RunSingle<AllBenchmarks>())
                 {
                     CopyResult(summary);
                 }
@@ -55,19 +49,26 @@ namespace Gu.Analyzers.Benchmarks
 
         private static IEnumerable<Summary> RunSingle<T>()
         {
-            var summaries = new[] { BenchmarkRunner.Run<T>() };
-            return summaries;
+            yield return BenchmarkRunner.Run<T>();
         }
 
         private static void CopyResult(Summary summary)
         {
-            var fileName = $"{summary.Title}-report-github.md";
-            Console.WriteLine(fileName);
-            var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, fileName)
+            var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
                                           .Single();
-            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath, "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
-            Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
+            var destinationFileName = Path.ChangeExtension(FindCsFile(), ".md");
+            Console.WriteLine($"Copy: {sourceFileName}");
+            Console.WriteLine($"   -> {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
+
+            string FindCsFile()
+            {
+                return Directory.EnumerateFiles(
+                                    AppDomain.CurrentDomain.BaseDirectory.Split(new[] { "\\bin\\" }, StringSplitOptions.RemoveEmptyEntries).First(),
+                                    $"{summary.Title.Split('.').Last()}.cs",
+                                    SearchOption.AllDirectories)
+                                .Single();
+            }
         }
     }
 }

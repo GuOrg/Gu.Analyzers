@@ -2,7 +2,7 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
-    internal class GU0050IgnoreEventsWhenSerializingBenchmarks
+    public class GU0050IgnoreEventsWhenSerializingBenchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0050IgnoreEventsWhenSerializing());
 

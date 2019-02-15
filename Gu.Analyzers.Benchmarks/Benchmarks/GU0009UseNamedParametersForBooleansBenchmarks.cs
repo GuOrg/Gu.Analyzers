@@ -2,7 +2,7 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
-    internal class GU0009UseNamedParametersForBooleansBenchmarks
+    public class GU0009UseNamedParametersForBooleansBenchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 

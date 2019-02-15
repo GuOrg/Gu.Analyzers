@@ -1,7 +1,7 @@
 // ReSharper disable RedundantNameQualifier
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
-    internal class AllBenchmarks
+    public class AllBenchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 

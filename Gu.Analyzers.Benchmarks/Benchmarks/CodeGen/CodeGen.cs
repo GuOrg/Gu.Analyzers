@@ -9,7 +9,8 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeGen
+    [Explicit("Script")]
+    public class CodeGen
     {
         public static string ProjectDirectory { get; } = ProjectFile.Find("Gu.Analyzers.Benchmarks.csproj").DirectoryName;
 
@@ -30,7 +31,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
                                           .AppendLine("// ReSharper disable InconsistentNaming")
                                           .AppendLine($"namespace {this.GetType().Namespace}")
                                           .AppendLine("{")
-                                          .AppendLine($"    internal class {expectedName}")
+                                          .AppendLine($"    public class {expectedName}")
                                           .AppendLine("    {")
                                           .AppendLine($"        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
                                           .AppendLine()
@@ -58,7 +59,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
             builder.AppendLine("// ReSharper disable RedundantNameQualifier")
                    .AppendLine($"namespace {this.GetType().Namespace}")
                    .AppendLine("{")
-                   .AppendLine("    internal class AllBenchmarks")
+                   .AppendLine("    public class AllBenchmarks")
                    .AppendLine("    {");
             foreach (var analyzer in AllAnalyzers)
             {

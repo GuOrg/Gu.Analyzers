@@ -1,30 +1,35 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.13, OS=Windows 7 SP1 (6.1.7601.0)
-Intel Xeon CPU E5-2637 v4 3.50GHz, 2 CPU, 16 logical cores and 8 physical cores
-Frequency=3410117 Hz, Resolution=293.2451 ns, Timer=TSC
-  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
-  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
+BenchmarkDotNet=v0.11.4, OS=Windows 10.0.17134.523 (1803/April2018Update/Redstone4)
+Intel Xeon CPU E5-2637 v4 3.50GHz, 2 CPU, 16 logical and 8 physical cores
+Frequency=3410073 Hz, Resolution=293.2489 ns, Timer=TSC
+  [Host]     : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3260.0
+  DefaultJob : .NET Framework 4.7.2 (CLR 4.0.30319.42000), 32bit LegacyJIT-v4.7.3260.0
 
 
 ```
-|                                               Method |        Mean |       Error |     StdDev |      Median |   Gen 0 |  Gen 1 | Allocated |
-|----------------------------------------------------- |------------:|------------:|-----------:|------------:|--------:|-------:|----------:|
-|                                      GU0006UseNameof | 3,154.79 us |  62.8416 us | 173.084 us | 3,113.94 us | 46.8750 |      - |  318995 B |
-|                                GU0007PreferInjecting | 5,070.94 us | 100.7315 us | 221.108 us | 5,071.66 us |       - |      - |   21045 B |
-|                           GU0008AvoidRelayProperties |   739.19 us |  14.6156 us |  33.582 us |   730.53 us |       - |      - |    7007 B |
-|                  GU0009UseNamedParametersForBooleans | 3,084.43 us | 224.8630 us | 663.014 us | 2,651.06 us |       - |      - |     544 B |
-|                          GU0011DontIgnoreReturnValue | 2,251.18 us |  44.9386 us | 129.658 us | 2,237.04 us |  3.9063 |      - |   48122 B |
-|                                 GU0020SortProperties |    81.64 us |   1.6112 us |   3.065 us |    81.65 us |  0.8545 |      - |    5945 B |
-|                    GU0021CalculatedPropertyAllocates |    76.25 us |   1.5187 us |   3.237 us |    76.02 us |       - |      - |     441 B |
-|                                     GU0022UseGetOnly | 2,603.51 us |  54.4459 us | 160.535 us | 2,576.37 us | 11.7188 |      - |   91962 B |
-|                    GU0050IgnoreEventsWhenSerializing |   388.63 us |  22.8561 us |  67.392 us |   356.68 us |  2.9297 |      - |   20739 B |
-|                         GU0051XmlSerializerNotCached |   365.72 us |   7.2773 us |  15.820 us |   364.52 us |  3.9063 | 0.4883 |   27839 B |
-|            GU0060EnumMemberValueConflictsWithAnother |    21.39 us |   0.5526 us |   1.612 us |    20.88 us |  0.1831 | 0.0305 |    1350 B |
-| GU0070DefaultConstructedValueTypeWithNoUsefulDefault |   536.33 us |  11.1039 us |  32.214 us |   526.87 us |  7.8125 | 0.9766 |   55239 B |
-|                            GU0071ForeachImplicitCast |   100.86 us |   2.0147 us |   5.481 us |    99.84 us |       - |      - |     441 B |
-|                                 ArgumentListAnalyzer | 2,389.74 us |  47.4793 us | 100.150 us | 2,386.50 us |       - |      - |   18048 B |
-|                                  ConstructorAnalyzer | 5,705.98 us | 176.2743 us | 519.749 us | 5,632.14 us | 39.0625 |      - |  295799 B |
-|                               ObjectCreationAnalyzer |   430.46 us |   8.5982 us |  20.766 us |   426.80 us |  6.3477 | 0.9766 |   42172 B |
-|                                    ParameterAnalyzer | 5,586.77 us | 149.5943 us | 438.734 us | 5,495.79 us | 31.2500 | 7.8125 |  224054 B |
-|                             SimpleAssignmentAnalyzer |   777.37 us |  18.0857 us |  52.181 us |   772.29 us |  2.9297 | 0.9766 |   21959 B |
+|                                               Method |          Mean |       Error |      StdDev |        Median | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+|----------------------------------------------------- |--------------:|------------:|------------:|--------------:|------------:|------------:|------------:|--------------------:|
+|                                 ArgumentListAnalyzer |  9,726.853 us | 186.5343 us | 199.5896 us |  9,666.655 us |           - |           - |           - |             16384 B |
+|                             ClassDeclarationAnalyzer |    622.193 us |  12.2295 us |  21.7380 us |    618.755 us |           - |           - |           - |                   - |
+|                                  ConstructorAnalyzer |    432.323 us |   9.6392 us |  28.2702 us |    426.677 us |           - |           - |           - |                   - |
+|                                  MethodGroupAnalyzer | 15,890.005 us | 113.8963 us |  95.1086 us | 15,892.035 us |           - |           - |           - |             65536 B |
+|                               ObjectCreationAnalyzer |    945.271 us |  18.4327 us |  25.8400 us |    945.141 us |           - |           - |           - |                   - |
+|                                    ParameterAnalyzer |  4,114.692 us |  75.9160 us |  71.0119 us |  4,107.830 us |           - |           - |           - |             16384 B |
+|                          PropertyDeclarationAnalyzer |    960.345 us |  18.7300 us |  25.6379 us |    962.149 us |           - |           - |           - |                   - |
+|                             SimpleAssignmentAnalyzer |  4,033.481 us |  97.9041 us | 140.4111 us |  3,992.437 us |           - |           - |           - |             57344 B |
+|                                   TestMethodAnalyzer |  1,204.543 us |  19.2383 us |  21.3833 us |  1,204.666 us |           - |           - |           - |                   - |
+|                                      GU0006UseNameof |  2,680.803 us |  53.1731 us |  49.7381 us |  2,675.603 us |           - |           - |           - |             65536 B |
+|                                GU0007PreferInjecting | 18,885.391 us | 370.6691 us | 364.0467 us | 18,791.826 us |           - |           - |           - |                   - |
+|                  GU0009UseNamedParametersForBooleans | 13,743.362 us | 225.8859 us | 211.2938 us | 13,706.158 us |           - |           - |           - |                   - |
+|                          GU0011DontIgnoreReturnValue |  9,138.828 us | 149.7263 us | 132.7285 us |  9,095.406 us |           - |           - |           - |             40960 B |
+|                                 GU0020SortProperties |    433.710 us |   8.5785 us |  18.2814 us |    431.076 us |           - |           - |           - |                   - |
+|                                     GU0022UseGetOnly |      6.111 us |   0.1746 us |   0.4601 us |      6.158 us |           - |           - |           - |                   - |
+|                      GU0023StaticMemberOrderAnalyzer |    644.871 us |  12.7972 us |  13.6928 us |    644.561 us |           - |           - |           - |             24576 B |
+|                    GU0050IgnoreEventsWhenSerializing |  1,710.749 us |  44.2047 us |  47.2985 us |  1,700.403 us |           - |           - |           - |             98304 B |
+|                         GU0051XmlSerializerNotCached |    845.677 us |  16.4014 us |  23.5224 us |    836.639 us |           - |           - |           - |                   - |
+|                  GU0052ExceptionShouldBeSerializable |  1,011.823 us |  18.9894 us |  20.3184 us |  1,012.148 us |           - |           - |           - |             57344 B |
+|            GU0060EnumMemberValueConflictsWithAnother |     66.336 us |   3.4724 us |  10.1838 us |     62.169 us |           - |           - |           - |                   - |
+| GU0070DefaultConstructedValueTypeWithNoUsefulDefault |    787.120 us |  15.7017 us |  23.0154 us |    789.133 us |           - |           - |           - |                   - |
+|                            GU0071ForeachImplicitCast |    468.626 us |   9.2637 us |  16.4662 us |    466.852 us |           - |           - |           - |                   - |
+|                       GU0072AllTypesShouldBeInternal |    581.106 us |  11.2367 us |  17.1596 us |    585.618 us |           - |           - |           - |                   - |

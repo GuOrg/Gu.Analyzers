@@ -2,7 +2,7 @@
 // ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
-    internal class GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmarks
+    public class GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
 

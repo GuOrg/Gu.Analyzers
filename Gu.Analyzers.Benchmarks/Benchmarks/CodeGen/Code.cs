@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.Diagnostics;
 
-    internal static class Code
+    public static class Code
     {
         private static readonly IReadOnlyList<MetadataReference> MetadataReferences = new[]
         {
