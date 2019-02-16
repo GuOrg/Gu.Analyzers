@@ -1,5 +1,7 @@
 # Gu.Analyzers
 
+This is a collection of warnings and refactorings with no real plan/scope. Made a package of it for the event someone finds something useful in it.
+
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![NuGet](https://img.shields.io/nuget/v/Gu.Analyzers.svg)](https://www.nuget.org/packages/Gu.Analyzers/)
 [![Build status](https://ci.appveyor.com/api/projects/status/nplt8lc7rhmgdi17/branch/master?svg=true)](https://ci.appveyor.com/project/GuOrg/gu-analyzers-qh7oa/branch/master)
