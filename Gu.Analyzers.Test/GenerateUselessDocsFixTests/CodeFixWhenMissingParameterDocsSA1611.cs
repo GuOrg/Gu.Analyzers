@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFixWhenMissing
+    internal partial class CodeFixWhenMissingParameterDocsSA1611
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
         private static readonly CodeFixProvider Fix = new UselessDocsFix();
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        public StringBuilder Meh(↓StringBuilder builder) => builder;
+        public StringBuilder Meh(StringBuilder ↓builder) => builder;
     }
 }";
 
@@ -62,7 +62,7 @@ namespace RoslynSandbox
         /// Does nothing
         /// </summary>
         /// <typeparam name=""T""></typeparam>
-        public StringBuilder Meh<T>(↓StringBuilder builder) => builder;
+        public StringBuilder Meh<T>(StringBuilder ↓builder) => builder;
     }
 }";
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         /// Does nothing
         /// </summary>
         /// <param name=""text"">The <see cref=""string""/>.</param>
-        public StringBuilder Meh(↓StringBuilder builder, string text) => builder;
+        public StringBuilder Meh(StringBuilder ↓builder, string text) => builder;
     }
 }";
 
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         /// Does nothing
         /// </summary>
         /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, ↓string text) => builder;
+        public StringBuilder Meh(StringBuilder builder, string ↓text) => builder;
     }
 }";
 
@@ -171,7 +171,7 @@ namespace RoslynSandbox
         /// </summary>
         /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         /// <param name=""builder2"">The <see cref=""StringBuilder""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, ↓string text, StringBuilder builder2) => builder;
+        public StringBuilder Meh(StringBuilder builder, string ↓text, StringBuilder builder2) => builder;
     }
 }";
 
@@ -212,7 +212,7 @@ namespace RoslynSandbox
         /// <summary>
         /// Initializes a new instance of the <see cref=""ColumnDefinitions""/> class.
         /// </summary>
-        public ColumnDefinitions(↓IList<ColumnDefinition> collection)
+        public ColumnDefinitions(IList<ColumnDefinition> ↓collection)
             : base(collection)
         {
         }
@@ -265,7 +265,7 @@ namespace RoslynSandbox
                     methodDeclaration.HasLeadingTrivia &&
                     !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
                 }
             }
         }

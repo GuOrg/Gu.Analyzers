@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFixWhenEmpty
+    internal class CodeFixWhenEmptyParameterDocsSA1614
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
         private static readonly CodeFixProvider Fix = new UselessDocsFix();

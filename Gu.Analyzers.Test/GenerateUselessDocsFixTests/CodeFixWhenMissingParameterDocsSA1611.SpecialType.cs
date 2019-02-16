@@ -3,44 +3,47 @@ namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFixWhenMissing
+    internal partial class CodeFixWhenMissingParameterDocsSA1611
     {
-        [Test]
-        public void StandardTextForCancellationToken()
+        internal class SpecialType
         {
-            var testCode = @"
+            [Test]
+            public void StandardTextForCancellationToken()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System.Threading;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
         /// </summary>
-        public void Meh(↓CancellationToken cancellationToken)
+        public void M(CancellationToken ↓cancellationToken)
         {
         }
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System.Threading;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
         /// </summary>
         /// <param name=""cancellationToken"">The <see cref=""CancellationToken""/> that cancels the operation.</param>
-        public void Meh(CancellationToken cancellationToken)
+        public void M(CancellationToken cancellationToken)
         {
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Generate standard xml documentation for parameter.");
+                AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Generate standard xml documentation for parameter.");
+            }
         }
     }
 }

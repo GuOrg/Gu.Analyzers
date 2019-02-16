@@ -25,7 +25,7 @@ namespace Gu.Analyzers
             {
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    if (syntaxRoot.TryFindNode(diagnostic, out ParameterSyntax parameter) &&
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax parameter) &&
                         methodDeclaration.TryGetDocumentationComment(out var docs))
                     {
                         if (StandardDocs.TryGet(parameter, out var text))
