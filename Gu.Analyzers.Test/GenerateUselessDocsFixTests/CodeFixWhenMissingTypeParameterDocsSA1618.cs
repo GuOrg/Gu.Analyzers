@@ -1,0 +1,149 @@
+namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
+{
+    using System.Collections.Immutable;
+    using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Diagnostics;
+    using NUnit.Framework;
+
+    internal class CodeFixWhenMissingTypeParameterDocsSA1618
+    {
+        private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
+        private static readonly CodeFixProvider Fix = new UselessDocsFix();
+
+        [Test]
+        public void ForFirstParameterWhenSummaryOnly()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        public static void M<↓T>(T item)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <typeparam name=""T"">The type of <paramref name=""item""/>.</typeparam>
+        public static void M<T>(T item)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
+        [Test]
+        public void ForFirstParameterWhenSummaryAndParam()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""item"">text.</param>
+        public static void M<↓T>(T item)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <typeparam name=""T"">The type of <paramref name=""item""/>.</typeparam>
+        /// <param name=""item"">text.</param>
+        public static void M<T>(T item)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
+        [Test]
+        public void ForManyParametersWhenSummaryOnly()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        public static void M<↓T>(T x, T y)
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <typeparam name=""T""></typeparam>
+        public static void M<T>(T x, T y)
+        {
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
+        [DiagnosticAnalyzer(LanguageNames.CSharp)]
+        private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+        {
+            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+                "SA1618",
+                "Title",
+                "Message",
+                "Category",
+                DiagnosticSeverity.Warning,
+                isEnabledByDefault: true);
+
+            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+                Descriptor);
+
+            public override void Initialize(AnalysisContext context)
+            {
+                context.RegisterSyntaxNodeAction(this.Handle, SyntaxKind.TypeParameter);
+            }
+
+            private void Handle(SyntaxNodeAnalysisContext context)
+            {
+                if (context.Node is TypeParameterSyntax parameter)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
+                }
+            }
+        }
+    }
+}
