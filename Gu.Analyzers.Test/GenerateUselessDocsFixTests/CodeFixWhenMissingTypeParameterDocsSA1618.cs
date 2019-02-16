@@ -85,7 +85,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ForManyParametersWhenSummaryOnly()
+        public void ForManyParameters()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,6 +115,48 @@ namespace RoslynSandbox
         }
     }
 }";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
+        [TestCase("T[]")]
+        [TestCase("List<T>")]
+        [TestCase("System.Collections.Generic.List<T>")]
+        public void ForEnumerableParameter(string type)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""xs"">text.</param>
+        public static void M<↓T>(T[] xs)
+        {
+        }
+    }
+}".AssertReplace("T[]", type);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <typeparam name=""T"">The type of the elements in <paramref name=""xs""/>.</typeparam>
+        /// <param name=""xs"">text.</param>
+        public static void M<T>(T[] xs)
+        {
+        }
+    }
+}".AssertReplace("T[]", type);
             AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 

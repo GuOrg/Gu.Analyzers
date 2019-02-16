@@ -113,8 +113,7 @@ namespace Gu.Analyzers
             {
                 foreach (var parameter in parameterList.Parameters)
                 {
-                    if (parameter.Type is SimpleNameSyntax simpleName &&
-                        simpleName.Identifier.Text == typeParameter.Identifier.Text)
+                    if (IsParameterType(parameter.Type))
                     {
                         if (text != null)
                         {
@@ -124,10 +123,40 @@ namespace Gu.Analyzers
 
                         text = $"The type of <paramref name=\"{parameter.Identifier.Text}\"/>.";
                     }
+                    else if (parameter.Type is ArrayTypeSyntax arrayType &&
+                             IsParameterType(arrayType.ElementType))
+                    {
+                        if (text != null)
+                        {
+                            text = null;
+                            return false;
+                        }
+
+                        text = $"The type of the elements in <paramref name=\"{parameter.Identifier.Text}\"/>.";
+                    }
+                    else if (semanticModel.TryGetType(parameter.Type, cancellationToken, out var type) &&
+                             type.Interfaces.TrySingle(x => x.MetadataName == "IEnumerable`1", out var enumerable) &&
+                             enumerable.TypeParameters.TrySingle(out var tp) &&
+                             tp.Name == typeParameter.Identifier.Text)
+                    {
+                        if (text != null)
+                        {
+                            text = null;
+                            return false;
+                        }
+
+                        text = $"The type of the elements in <paramref name=\"{parameter.Identifier.Text}\"/>.";
+                    }
                 }
             }
 
             return text != null;
+
+            bool IsParameterType(TypeSyntax typeSyntax)
+            {
+                return typeSyntax is SimpleNameSyntax simple &&
+                       simple.Identifier.Text == typeParameter.Identifier.Text;
+            }
         }
 
         private static XmlElementSyntax WithText(XmlElementSyntax element, string text)
