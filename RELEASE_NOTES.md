@@ -1,3 +1,7 @@
+#### 1.3.2
+* BUGFIX: Garbage docs for SA1611.
+* Garbage docs for type parameter.
+
 #### 1.3.0
 * Generate useless docs for SA1614. 
 * Fix: create parameter when adding testcase arg.

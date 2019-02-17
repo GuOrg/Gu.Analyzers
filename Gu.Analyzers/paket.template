@@ -1,8 +1,9 @@
 ﻿type project
 developmentDependency true
+
 releasenotes
-  Generate useless docs for SA1614. 
-  Fix: create parameter when adding testcase arg.
+  BUGFIX: Garbage docs for SA1611.
+  Garbage docs for type parameter.
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
