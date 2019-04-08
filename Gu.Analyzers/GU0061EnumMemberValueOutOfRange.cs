@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -34,6 +35,11 @@ namespace Gu.Analyzers
 
         private void HandleEnumMember(SyntaxNodeAnalysisContext context)
         {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
             var enumMemberDeclaration = (EnumMemberDeclarationSyntax)context.Node;
             var enumType = context.ContainingSymbol?.ContainingSymbol as INamedTypeSymbol;
             if (enumType?.EnumUnderlyingType.SpecialType != SpecialType.System_Int32)
@@ -41,47 +47,14 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (!(enumMemberDeclaration.EqualsValue?.Value is BinaryExpressionSyntax leftShiftExpression))
-            {
-                return;
-            }
-
-            if (leftShiftExpression.Kind() != SyntaxKind.LeftShiftExpression)
-            {
-                return;
-            }
-
-            if (!(leftShiftExpression.Left is LiteralExpressionSyntax literalExpression))
-            {
-                return;
-            }
-
-            if (!(literalExpression.Token.Value is int intValue))
-            {
-                return;
-            }
-
-            if (intValue != 1)
-            {
-                return;
-            }
-
-            if (leftShiftExpression.Kind() != SyntaxKind.LeftShiftExpression)
-            {
-                return;
-            }
-
-            if (!(leftShiftExpression.Right is LiteralExpressionSyntax literalExpressionRight))
-            {
-                return;
-            }
-
-            if (!(literalExpressionRight.Token.Value is int intValueRight))
-            {
-                return;
-            }
-
-            if (intValueRight > 30)
+            if (enumMemberDeclaration.EqualsValue?.Value is BinaryExpressionSyntax leftShiftExpression &&
+                leftShiftExpression.Kind() == SyntaxKind.LeftShiftExpression &&
+                leftShiftExpression.Left is LiteralExpressionSyntax literalExpression &&
+                literalExpression.Token.Value is int intValue &&
+                intValue == 1 &&
+                leftShiftExpression.Right is LiteralExpressionSyntax literalExpressionRight &&
+                literalExpressionRight.Token.Value is int intValueRight &&
+                intValueRight > 30)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, literalExpression.GetLocation()));
             }
