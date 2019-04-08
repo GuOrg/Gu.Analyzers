@@ -41,13 +41,10 @@ namespace Gu.Analyzers
             }
 
             var enumMemberDeclaration = (EnumMemberDeclarationSyntax)context.Node;
-            var enumType = context.ContainingSymbol?.ContainingSymbol as INamedTypeSymbol;
-            if (enumType?.EnumUnderlyingType.SpecialType != SpecialType.System_Int32)
-            {
-                return;
-            }
 
-            if (enumMemberDeclaration.EqualsValue?.Value is BinaryExpressionSyntax leftShiftExpression &&
+            if (context.ContainingSymbol?.ContainingSymbol is INamedTypeSymbol enumType &&
+                enumType.EnumUnderlyingType.SpecialType == SpecialType.System_Int32 &&
+                enumMemberDeclaration.EqualsValue?.Value is BinaryExpressionSyntax leftShiftExpression &&
                 leftShiftExpression.Kind() == SyntaxKind.LeftShiftExpression &&
                 leftShiftExpression.Left is LiteralExpressionSyntax literalExpression &&
                 literalExpression.Token.Value is int intValue &&

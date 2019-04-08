@@ -17,6 +17,7 @@ namespace RoslynSandbox
 
     public enum EnumHigh
     {
+        None = 0,
         A = 1<<1,
         B = 1<<2,
         Good = 1<<30
@@ -35,6 +36,7 @@ namespace RoslynSandbox
 
     public enum EnumHigh: long
     {
+        None = 0,
         A = 1<<1,
         B = 1<<2,
         Bad = 1<<31
@@ -53,6 +55,7 @@ namespace RoslynSandbox
 
     public enum StandardEnum
     {
+        None = 0,
         A,
         B,
         C,		

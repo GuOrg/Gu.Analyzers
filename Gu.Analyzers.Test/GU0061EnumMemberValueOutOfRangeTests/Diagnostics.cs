@@ -18,6 +18,7 @@ namespace RoslynSandbox
 
     public enum EnumHigh
     {
+        None = 0,
         A = 1<<1,
         B = 1<<2,
         Bad = ↓1<<31
