@@ -34,6 +34,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0051](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md)| Cache the XmlSerializer.
 | [GU0052](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md)| Mark exception with [Serializable].
 | [GU0060](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0060.md)| Enum member value conflict.
+| [GU0061](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0061.md)| Enum member value out of range.
 | [GU0070](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0070.md)| Default-constructed value type with no useful default
 | [GU0071](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0071.md)| Implicit casting done by the foreach
 | [GU0072](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0072.md)| All types should be internal.
