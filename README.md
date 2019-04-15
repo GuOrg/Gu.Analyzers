@@ -42,6 +42,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0081](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0081.md)| TestCase does not match parameters.
 | [GU0082](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0082.md)| TestCase is identical.
 | [GU0083](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0083.md)| TestCase Arguments Mismatch Method Parameters
+| [GU0090](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0090.md)| Don't throw NotImplementedException.
 
 ## Using Gu.Analyzers
 
