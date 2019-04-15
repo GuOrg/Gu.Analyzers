@@ -39,5 +39,24 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [Test]
+        public void ExceptionNullCoalescing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    class Foo
+    {
+        void Method()
+        {
+            int? integer = null;
+            
+            int nonNull = integer ?? throw new System.NotImplementedException();
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }
