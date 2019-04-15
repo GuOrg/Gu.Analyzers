@@ -2,7 +2,6 @@ namespace Gu.Analyzers.Analyzers
 {
     using System;
     using System.Collections.Immutable;
-    using System.IO;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,10 +17,10 @@ namespace Gu.Analyzers.Analyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(AnalyzeNode, SyntaxKind.ThrowStatement, SyntaxKind.ThrowExpression);
+            context.RegisterSyntaxNodeAction(c => AnalyzeNode(c), SyntaxKind.ThrowStatement, SyntaxKind.ThrowExpression);
         }
 
-        private void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             ExpressionSyntax expressionSyntax = null;
 
@@ -34,10 +33,10 @@ namespace Gu.Analyzers.Analyzers
                 expressionSyntax = throwExpressionSyntax.Expression;
             }
 
-            this.FindException<NotImplementedException>(context, expressionSyntax, GU0090DontThrowNotImplementedException.Descriptor);
+            FindException<NotImplementedException>(context, expressionSyntax, GU0090DontThrowNotImplementedException.Descriptor);
         }
 
-        private void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)
+        private static void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)
             where TException : Exception
         {
             var typeInfo = context.SemanticModel.GetTypeInfo(expressionSyntax);
