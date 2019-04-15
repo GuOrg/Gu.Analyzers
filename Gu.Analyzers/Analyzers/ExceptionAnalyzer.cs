@@ -37,7 +37,8 @@ namespace Gu.Analyzers.Analyzers
             this.FindException<NotImplementedException>(context, expressionSyntax, GU0090DontThrowNotImplementedException.Descriptor);
         }
 
-        private void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor) where TException : Exception
+        private void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)
+            where TException : Exception
         {
             var typeInfo = context.SemanticModel.GetTypeInfo(expressionSyntax);
 
