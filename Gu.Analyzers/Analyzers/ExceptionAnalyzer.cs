@@ -43,7 +43,7 @@ namespace Gu.Analyzers.Analyzers
 
             if (typeInfo.Type.Name == typeof(TException).Name)
             {
-                context.ReportDiagnostic(Diagnostic.Create(GU0090DontThrowNotImplementedException.Descriptor, expressionSyntax.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, expressionSyntax.GetLocation()));
             }
         }
     }
