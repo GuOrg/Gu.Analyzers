@@ -1,6 +1,7 @@
 // ReSharper disable RedundantNameQualifier
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
+    [BenchmarkDotNet.Attributes.MemoryDiagnoser]
     public class AllBenchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
@@ -43,11 +44,15 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0060EnumMemberValueConflictsWithAnotherBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0060EnumMemberValueConflictsWithAnother());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0061EnumMemberValueOutOfRangeBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0061EnumMemberValueOutOfRange());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0070DefaultConstructedValueTypeWithNoUsefulDefault());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0071ForeachImplicitCastBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0071ForeachImplicitCast());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0072AllTypesShouldBeInternalBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0072AllTypesShouldBeInternal());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.Analyzers.ExceptionAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void ArgumentListAnalyzer()
@@ -170,6 +175,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
+        public void GU0061EnumMemberValueOutOfRange()
+        {
+            GU0061EnumMemberValueOutOfRangeBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0070DefaultConstructedValueTypeWithNoUsefulDefault()
         {
             GU0070DefaultConstructedValueTypeWithNoUsefulDefaultBenchmark.Run();
@@ -185,6 +196,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void GU0072AllTypesShouldBeInternal()
         {
             GU0072AllTypesShouldBeInternalBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ExceptionAnalyzer()
+        {
+            ExceptionAnalyzerBenchmark.Run();
         }
     }
 }
