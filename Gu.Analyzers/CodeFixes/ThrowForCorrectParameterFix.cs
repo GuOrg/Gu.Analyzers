@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -24,18 +25,25 @@ namespace Gu.Analyzers
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
-                                           .FirstAncestorOrSelf<ArgumentSyntax>();
-                if (argument != null &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument) &&
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {
                     context.RegisterCodeFix(
                         "Use correct parameter name.",
                         (editor, _) => editor.ReplaceNode(
                             argument.Expression,
-                            SyntaxFactory.ParseExpression($"nameof({name})")),
+                            CreateNode()),
                         this.GetType(),
                         diagnostic);
+
+                    ExpressionSyntax CreateNode()
+                    {
+                        return argument.Parent is ArgumentListSyntax argumentList &&
+                               argumentList.Parent is InvocationExpressionSyntax invocation &&
+                               invocation.IsNameOf()
+                            ? SyntaxFactory.IdentifierName(name)
+                            : SyntaxFactory.ParseExpression($"nameof({name})");
+                    }
                 }
             }
         }

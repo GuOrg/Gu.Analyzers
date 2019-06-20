@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0013");
 
         [Test]
-        public void ThrowExpression()
+        public void ThrowExpressionNameofWrong()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -23,7 +23,44 @@ namespace RoslynSandbox
 
         public Foo(string bar)
         {
-            this.bar = bar ?? throw new ArgumentNullException(↓nameof(Foo));
+            this.bar = bar ?? throw new ArgumentNullException(nameof(↓Foo));
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string bar;
+
+        public Foo(string bar)
+        {
+            this.bar = bar ?? throw new ArgumentNullException(nameof(bar));
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use correct parameter name.");
+        }
+
+        [Test]
+        public void ThrowExpressionStringLiteral()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string bar;
+
+        public Foo(string bar)
+        {
+            this.bar = bar ?? throw new ArgumentNullException(↓""Foo"");
         }
     }
 }";
