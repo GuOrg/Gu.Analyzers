@@ -26,12 +26,8 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
                 objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
                 argumentList.Arguments.Count > 0 &&
