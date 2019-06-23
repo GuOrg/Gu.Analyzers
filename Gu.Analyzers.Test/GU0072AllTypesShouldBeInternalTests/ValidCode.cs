@@ -21,7 +21,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("internal class Foo", signature);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("internal class Bar")]
@@ -45,7 +45,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("private class Bar", signature);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

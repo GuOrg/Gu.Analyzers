@@ -45,7 +45,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [TestCase("T[]")]
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("T[]", type);
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]

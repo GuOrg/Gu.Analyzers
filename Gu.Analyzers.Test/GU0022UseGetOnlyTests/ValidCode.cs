@@ -38,7 +38,7 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCaseSource(nameof(TestCases))]
@@ -59,7 +59,7 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCaseSource(nameof(TestCases))]
@@ -80,7 +80,7 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         public int A { get; private set; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         // }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -193,7 +193,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -257,7 +257,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         internal class TestCase

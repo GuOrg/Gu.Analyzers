@@ -21,7 +21,7 @@ namespace RoslynSandbox
         public static readonly int Value2 = 2;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'RoslynSandbox.Foo.Value2' must be declared before 'RoslynSandbox.Foo.Value1'"), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'RoslynSandbox.Foo.Value2' must be declared before 'RoslynSandbox.Foo.Value1'"), code);
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static readonly int Value2 = 2;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, code);
+            RoslynAssert.Diagnostics(Analyzer, code);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public const int Value2 = 2;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, code);
+            RoslynAssert.Diagnostics(Analyzer, code);
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static int Value2 { get; } = 2;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, code);
+            RoslynAssert.Diagnostics(Analyzer, code);
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         private static int Id(int value) => value;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, code);
+            RoslynAssert.Diagnostics(Analyzer, code);
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace RoslynSandbox
         public string Text { get; set; } = text;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, code);
+            RoslynAssert.Diagnostics(Analyzer, code);
         }
     }
 }

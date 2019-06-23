@@ -38,9 +38,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), AnalyzerAssert.MetadataReferences);
+            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), RoslynAssert.MetadataReferences);
             var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
-            AnalyzerAssert.NoDiagnostics(diagnostics);
+            RoslynAssert.NoDiagnostics(diagnostics);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -172,7 +172,7 @@ namespace RoslynSandbox
 #pragma warning restore GU0012
     }
 }";
-            AnalyzerAssert.Valid(analyzer, testCode, converterCode);
+            RoslynAssert.Valid(analyzer, testCode, converterCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -216,7 +216,7 @@ namespace RoslynSandbox.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, AnalyzerAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -268,7 +268,7 @@ namespace RoslynSandbox.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, AnalyzerAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -345,7 +345,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, AnalyzerAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
         }
     }
 }

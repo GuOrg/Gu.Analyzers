@@ -27,7 +27,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("ints.Select(x => x);", linq);
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), testCode);
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [TestCase("Add(1)")]
@@ -69,7 +69,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Add(1)", call);
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [TestCase("Add(1)")]
@@ -90,7 +90,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Add(1)", call);
 
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
         [Explicit("Fix later.")]
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

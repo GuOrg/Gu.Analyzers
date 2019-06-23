@@ -19,7 +19,7 @@ namespace RoslynSandbox
         public int Value { get; set; }
     }
 }".AssertReplace("public int Value { get; set; }", property);
-            AnalyzerAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, fooCode);
         }
 
         [TestCase("this.value;")]
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public int Value => this.value;
     }
 }".AssertReplace("this.value;", getter);
-            AnalyzerAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, fooCode);
         }
 
         [TestCase("get { return this.value; }")]
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("get { return this.value; }", getter);
-            AnalyzerAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, fooCode);
         }
 
         [TestCase("return this.bar.Value;")]
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [TestCase("this.bar.Value;")]
@@ -123,7 +123,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, fooCode, barCode);
         }
     }
 }

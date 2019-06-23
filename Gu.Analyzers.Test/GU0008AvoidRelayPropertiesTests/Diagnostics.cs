@@ -41,7 +41,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
 
         [TestCase("this.bar.Value;")]
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
         }
     }
 }

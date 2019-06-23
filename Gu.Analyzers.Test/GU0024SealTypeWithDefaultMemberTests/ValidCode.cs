@@ -19,7 +19,7 @@ namespace RoslynSandbox
         public static Foo Default { get; } = new Foo();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static readonly Foo Default = new Foo();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace RoslynSandbox
     {
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

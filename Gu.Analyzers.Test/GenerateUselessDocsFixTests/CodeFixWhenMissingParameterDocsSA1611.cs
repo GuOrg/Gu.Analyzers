@@ -45,7 +45,7 @@ namespace RoslynSandbox
         public StringBuilder Meh(StringBuilder builder) => builder;
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         public StringBuilder Meh<T>(StringBuilder builder) => builder;
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         public StringBuilder Meh(StringBuilder builder, string text) => builder;
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -153,7 +153,7 @@ namespace RoslynSandbox
         public StringBuilder Meh(StringBuilder builder, string text) => builder;
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace RoslynSandbox
         public StringBuilder Meh(StringBuilder builder, string text, StringBuilder builder2) => builder;
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]

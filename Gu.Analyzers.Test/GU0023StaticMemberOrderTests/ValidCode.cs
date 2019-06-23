@@ -21,7 +21,7 @@ namespace RoslynSandbox
         public static readonly int Value2 = Value1;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public const int Value2 = Value1;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         public static readonly int Value2 = 2;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public static readonly DateTime DateTime = DateTime.MaxValue;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         public static readonly string Value2 = ""2"";
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         public static int Value1;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         public static int Value2 { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         public static int Value2 => 2;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

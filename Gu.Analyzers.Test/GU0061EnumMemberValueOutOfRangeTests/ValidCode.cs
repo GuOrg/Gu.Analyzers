@@ -23,7 +23,7 @@ namespace RoslynSandbox
         Good = 1<<30
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         Bad = 1<<31
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         C,		
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

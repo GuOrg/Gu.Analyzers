@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static readonly Foo Default = new Foo();
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static Foo Default { get; } = new Foo();
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
         }
     }
 }

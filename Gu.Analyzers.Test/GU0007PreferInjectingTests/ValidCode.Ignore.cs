@@ -23,7 +23,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, fooCode, BarCode);
+                RoslynAssert.Valid(Analyzer, fooCode, BarCode);
             }
 
             [Test]
@@ -43,7 +43,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, fooCode, BarCode);
+                RoslynAssert.Valid(Analyzer, fooCode, BarCode);
             }
 
             [Test]
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, LocatorCode, BarCode, fooCode);
+                RoslynAssert.Valid(Analyzer, LocatorCode, BarCode, fooCode);
             }
 
             [TestCase("int")]
@@ -106,7 +106,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("default(int)", $"default({type})");
-                AnalyzerAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
+                RoslynAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
             }
 
             [Test]
@@ -148,7 +148,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
+                RoslynAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
             }
 
             [Test]
@@ -170,7 +170,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, BarCode, fooCode);
+                RoslynAssert.Valid(Analyzer, BarCode, fooCode);
             }
 
             [Test]
@@ -192,7 +192,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, BarCode, LocatorCode, fooCode);
+                RoslynAssert.Valid(Analyzer, BarCode, LocatorCode, fooCode);
             }
         }
     }

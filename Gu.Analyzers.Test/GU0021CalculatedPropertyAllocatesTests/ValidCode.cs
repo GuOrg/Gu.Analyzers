@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public int Sum => this.A + this.B + this.C + this.D;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         public Foo Sum => new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

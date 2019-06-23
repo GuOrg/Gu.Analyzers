@@ -40,7 +40,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [TestCase("[TestCase(\"a\", ↓1, null)]")]
@@ -63,7 +63,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
 
-            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -178,7 +178,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }
