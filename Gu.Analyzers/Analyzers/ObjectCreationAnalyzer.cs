@@ -50,7 +50,7 @@ namespace Gu.Analyzers
                             ImmutableDictionary.CreateRange(
                                 new[]
                                 {
-                                    new KeyValuePair<string, string>("Name", identifierName.Identifier.ValueText)
+                                    new KeyValuePair<string, string>("Name", identifierName.Identifier.ValueText),
                                 })));
 
                     Location GetLocation()

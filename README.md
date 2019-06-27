@@ -25,6 +25,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0014](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md)| Prefer using parameter.
 | [GU0015](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md)| Don't assign same more than once.
 | [GU0016](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md)| Prefer lambda.
+| [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded.
 | [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties.
 | [GU0021](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md)| Calculated property allocates reference type.
 | [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only.
