@@ -2,8 +2,7 @@
 developmentDependency true
 
 releasenotes
-  BUGFIX: Garbage docs for SA1611.
-  Garbage docs for type parameter.
+  FEATURE: GU0017 don't use discarded.
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT

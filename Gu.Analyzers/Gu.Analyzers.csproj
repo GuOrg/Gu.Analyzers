@@ -21,13 +21,12 @@
 
   <PropertyGroup>
     <PackageId>Gu.Analyzers</PackageId>
-    <Version>1.3.2.0-dev</Version>
+    <Version>1.4.0.0-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
-    <PackageReleaseNotes>BUGFIX: Garbage docs for SA1611.
-Garbage docs for type parameter.</PackageReleaseNotes>
+    <PackageReleaseNotes>FEATURE: GU0017 don't use discarded.</PackageReleaseNotes>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>

@@ -7,41 +7,41 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
-[DiagnosticAnalyzer(LanguageNames.CSharp)]
-internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
-{
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-        GU0017DonNotUseDiscarded.Descriptor);
-
-    public override void Initialize(AnalysisContext context)
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
     {
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.IdentifierName);
-    }
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            GU0017DonNotUseDiscarded.Descriptor);
 
-    private static void Handle(SyntaxNodeAnalysisContext context)
-    {
-        if (!context.IsExcludedFromAnalysis() &&
-            context.Node is IdentifierNameSyntax name &&
-            name.Identifier.ValueText == "_" &&
-            IsUsed(name))
+        public override void Initialize(AnalysisContext context)
         {
-            context.ReportDiagnostic(Diagnostic.Create(GU0017DonNotUseDiscarded.Descriptor, name.Identifier.GetLocation()));
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+            context.EnableConcurrentExecution();
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.IdentifierName);
         }
 
-        bool IsUsed(IdentifierNameSyntax candidate)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            switch (candidate.Parent)
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is IdentifierNameSyntax name &&
+                name.Identifier.ValueText == "_" &&
+                IsUsed(name))
             {
-                case ArgumentSyntax arg when arg.RefOrOutKeyword.IsKind(SyntaxKind.None):
-                    return true;
-                case ExpressionSyntax e when !e.IsKind(SyntaxKind.SimpleAssignmentExpression):
-                    return true;
-                default:
-                    return false;
+                context.ReportDiagnostic(Diagnostic.Create(GU0017DonNotUseDiscarded.Descriptor, name.Identifier.GetLocation()));
+            }
+
+            bool IsUsed(IdentifierNameSyntax candidate)
+            {
+                switch (candidate.Parent)
+                {
+                    case ArgumentSyntax arg when arg.RefOrOutKeyword.IsKind(SyntaxKind.None):
+                        return true;
+                    case ExpressionSyntax e when !e.IsKind(SyntaxKind.SimpleAssignmentExpression):
+                        return true;
+                    default:
+                        return false;
+                }
             }
         }
     }
-}
 }
