@@ -3,6 +3,7 @@ namespace Gu.Analyzers.Refactoring
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Composition;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -11,6 +12,8 @@ namespace Gu.Analyzers.Refactoring
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+    [ExportCodeRefactoringProvider(LanguageNames.CSharp, Name = nameof(SplitStringRefactoring))]
+    [Shared]
     internal class SplitStringRefactoring : CodeRefactoringProvider
     {
         public override async Task ComputeRefactoringsAsync(CodeRefactoringContext context)
