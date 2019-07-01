@@ -40,6 +40,36 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public static void NoFixWhenEndingWithNewLine()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""↓a\n"";
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""\n"" +
+                       ""a"";
+        }
+    }
+}";
+            RoslynAssert.NoRefactoring(Refactoring, code, fixedCode);
+        }
+
+        [Test]
         public static void StartingAndEndingWithNewLine()
         {
             var code = @"
@@ -71,7 +101,38 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void SimpleStringOneCarriageReturnNewLine()
+        public static void OneCarriageReturnNewLine()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""↓a\r\nb"";
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""a\r\n"" +
+                       ""b"";
+        }
+    }
+}";
+
+            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+        }
+
+        [Test]
+        public static void OneCarriageReturnNewLineAndEndingWithCarriageReturnNewLine()
         {
             var code = @"
 namespace RoslynSandbox
@@ -102,7 +163,39 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void SimpleStringThreeCarriageReturnNewLine()
+        public static void TwoCarriageReturnNewLines()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""↓a\r\nb\r\nc"";
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static void Test()
+        {
+            var text = ""a\r\n"" +
+                       ""b\r\n"" +
+                       ""c"";
+        }
+    }
+}";
+
+            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+        }
+
+        [Test]
+        public static void TwoCarriageReturnNewLinesAndEndingWithCarriageReturnNewLine()
         {
             var code = @"
 namespace RoslynSandbox
@@ -134,7 +227,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void SimpleStringNewLine()
+        public static void TwoNewLinesEndingWithNewline()
         {
             var code = @"
 namespace RoslynSandbox

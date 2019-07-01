@@ -1,6 +1,8 @@
 namespace Gu.Analyzers.Refactoring
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -32,25 +34,55 @@ namespace Gu.Analyzers.Refactoring
                 {
                     var leadingWhiteSpace = SyntaxFactory.TriviaList(
                         SyntaxFactory.Whitespace(new string(' ', literal.FileLinePositionSpan(context.CancellationToken).StartLinePosition.Character)));
-                    var index = literal.Token.Text.IndexOf("\\n", StringComparison.Ordinal);
-                    return SyntaxFactory.BinaryExpression(
+                    var lines = Lines().ToImmutableArray();
+
+                    var binaryExpression = SyntaxFactory.BinaryExpression(
                         SyntaxKind.AddExpression,
-                        StringLiteral(literal.GetLeadingTrivia(), literal.Token.Text.Substring(1, index + 1)),
+                        StringLiteral(literal.GetLeadingTrivia(), lines[0]),
                         SyntaxFactory.Token(
                             SyntaxFactory.TriviaList(SyntaxFactory.Whitespace(" ")),
                             SyntaxKind.PlusToken,
                             SyntaxFactory.TriviaList(SyntaxFactory.LineFeed)),
-                        StringLiteral(leadingWhiteSpace, literal.Token.Text.Substring(index + 2, literal.Token.Text.Length - index - 3)));
+                        StringLiteral(leadingWhiteSpace, lines[1]));
+                    for (var i = 2; i < lines.Length; i++)
+                    {
+                        binaryExpression = SyntaxFactory.BinaryExpression(
+                            SyntaxKind.AddExpression,
+                            binaryExpression,
+                            SyntaxFactory.Token(
+                                SyntaxFactory.TriviaList(SyntaxFactory.Whitespace(" ")),
+                                SyntaxKind.PlusToken,
+                                SyntaxFactory.TriviaList(SyntaxFactory.LineFeed)),
+                            StringLiteral(leadingWhiteSpace, lines[i]));
+                    }
+
+                    return binaryExpression;
+
+                    IEnumerable<string> Lines()
+                    {
+                        var start = 1;
+                        for (var i = 1; i < literal.Token.Text.Length - 2; i++)
+                        {
+                            if (literal.Token.Text[i - 1] == '\\' &&
+                                literal.Token.Text[i] == 'n')
+                            {
+                                yield return literal.Token.Text.Slice(start, i + 1);
+                                start = i + 1;
+                            }
+                        }
+
+                        yield return literal.Token.Text.Slice(start, literal.Token.Text.Length - 1);
+                    }
 
                     LiteralExpressionSyntax StringLiteral(SyntaxTriviaList leading, string text)
                     {
                         return SyntaxFactory.LiteralExpression(
                             SyntaxKind.StringLiteralExpression,
                             SyntaxFactory.Literal(
-                                leading,
-                                $"\"{text}\"",
-                                text,
-                                default));
+                                leading: leading,
+                                text: $"\"{text}\"",
+                                value: text,
+                                trailing: SyntaxFactory.TriviaList()));
                     }
                 }
             }
