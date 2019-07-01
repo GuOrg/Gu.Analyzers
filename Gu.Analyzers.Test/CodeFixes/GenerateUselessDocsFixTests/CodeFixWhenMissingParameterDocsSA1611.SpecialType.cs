@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
+namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;

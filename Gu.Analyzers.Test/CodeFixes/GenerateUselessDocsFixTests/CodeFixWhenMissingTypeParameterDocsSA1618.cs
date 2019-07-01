@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GenerateUselessDocsFixTests
+namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
