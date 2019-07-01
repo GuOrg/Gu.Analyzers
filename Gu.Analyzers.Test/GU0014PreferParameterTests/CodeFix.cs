@@ -5,14 +5,14 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly CodeFixProvider Fix = new UseParameterFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0014");
 
         [Test]
-        public void WhenAccessingFieldProperty()
+        public static void WhenAccessingFieldProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAccessingFieldElvisProperty()
+        public static void WhenAccessingFieldElvisProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAccessingFieldMethod()
+        public static void WhenAccessingFieldMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingPropertyProperty()
+        public static void WhenUsingPropertyProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -152,7 +152,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingPropertyMethod()
+        public static void WhenUsingPropertyMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenPassingFieldAsArgument()
+        public static void WhenPassingFieldAsArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -226,7 +226,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenPassingFieldAsArgumentWhitespace()
+        public static void WhenPassingFieldAsArgumentWhitespace()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -267,7 +267,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenPassingUnderscoreFieldAsArgumentWhitespace()
+        public static void WhenPassingUnderscoreFieldAsArgumentWhitespace()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -308,7 +308,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenPassingUnderscoreFieldAsArgument()
+        public static void WhenPassingUnderscoreFieldAsArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -347,7 +347,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GetOnlyInLambda()
+        public static void GetOnlyInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -386,7 +386,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LeftFieldInMultiplication()
+        public static void LeftFieldInMultiplication()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -421,7 +421,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RightFieldInMultiplication()
+        public static void RightFieldInMultiplication()
         {
             var testCode = @"
 namespace RoslynSandbox

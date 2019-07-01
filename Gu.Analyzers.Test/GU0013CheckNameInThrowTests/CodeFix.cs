@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly ThrowForCorrectParameterFix Fix = new ThrowForCorrectParameterFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0013");
 
         [Test]
-        public void ThrowExpressionNameofWrong()
+        public static void ThrowExpressionNameofWrong()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ThrowExpressionStringLiteral()
+        public static void ThrowExpressionStringLiteral()
         {
             var testCode = @"
 namespace RoslynSandbox

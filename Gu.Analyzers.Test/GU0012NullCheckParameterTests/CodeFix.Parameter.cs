@@ -5,9 +5,9 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal static partial class CodeFix
     {
-        internal class Parameter
+        internal static class Parameter
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ParameterAnalyzer();
             private static readonly CodeFixProvider Fix = new NullCheckParameterFix();
@@ -16,7 +16,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             [TestCase("public")]
             [TestCase("internal")]
             [TestCase("protected")]
-            public void SimpleAssignFullyQualified(string access)
+            public static void SimpleAssignFullyQualified(string access)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SimpleAssignWhenUsingExists()
+            public static void SimpleAssignWhenUsingExists()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -87,7 +87,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PassAsArgument()
+            public static void PassAsArgument()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotUsed()
+            public static void WhenNotUsed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -160,7 +160,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AfterOtherParameter()
+            public static void AfterOtherParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -200,7 +200,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void BeforeOtherParameter()
+            public static void BeforeOtherParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -240,7 +240,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FixAll()
+            public static void FixAll()
             {
                 var testCode = @"
 namespace RoslynSandbox

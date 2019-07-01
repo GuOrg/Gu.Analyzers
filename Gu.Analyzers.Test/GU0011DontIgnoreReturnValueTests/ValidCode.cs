@@ -1,14 +1,14 @@
-namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    internal static partial class ValidCode
     {
         private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
 
         [Test]
-        public void ChainedCtor()
+        public static void ChainedCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RealisticClass()
+        public static void RealisticClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Using()
+        public static void Using()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RealisticExtensionMethodClass()
+        public static void RealisticExtensionMethodClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void VoidMethod()
+        public static void VoidMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -233,7 +233,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void VoidMethodWithReturn()
+        public static void VoidMethodWithReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -256,7 +256,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticVoidMethod()
+        public static void StaticVoidMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -278,7 +278,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticVoidMethodWithReturn()
+        public static void StaticVoidMethodWithReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -301,7 +301,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IfTry()
+        public static void IfTry()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -328,7 +328,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenThrowing()
+        public static void WhenThrowing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -347,7 +347,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenInvocationInExpressionBody()
+        public static void WhenInvocationInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -366,7 +366,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNewInExpressionBody()
+        public static void WhenNewInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox

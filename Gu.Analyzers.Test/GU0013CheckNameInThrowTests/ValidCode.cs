@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
 
         [Test]
-        public void WhenPrivate()
+        public static void WhenPrivate()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDefaultValue()
+        public static void WhenDefaultValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenValueType()
+        public static void WhenValueType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenThrowing()
+        public static void WhenThrowing()
         {
             var testCode = @"
 namespace RoslynSandbox

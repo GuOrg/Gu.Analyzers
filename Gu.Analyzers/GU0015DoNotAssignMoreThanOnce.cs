@@ -2,7 +2,7 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class GU0015DontAssignMoreThanOnce
+    internal static class GU0015DoNotAssignMoreThanOnce
     {
         public const string DiagnosticId = "GU0015";
 

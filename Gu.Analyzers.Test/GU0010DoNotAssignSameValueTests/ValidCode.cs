@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
         [Test]
-        public void ConstructorSettingProperties()
+        public static void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFields()
+        public static void ConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Increment()
+        public static void Increment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ObjectInitializer()
+        public static void ObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ObjectInitializerStruct()
+        public static void ObjectInitializerStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
 
         [TestCase("foo.A = this.A;")]
         [TestCase("foo.A = A;")]
-        public void SetSameMemberOnOtherInstance(string after)
+        public static void SetSameMemberOnOtherInstance(string after)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SetSameMemberOnOtherInstance2()
+        public static void SetSameMemberOnOtherInstance2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SetSameMemberOnOtherInstanceRecursive()
+        public static void SetSameMemberOnOtherInstanceRecursive()
         {
             var testCode = @"
 namespace RoslynSandbox

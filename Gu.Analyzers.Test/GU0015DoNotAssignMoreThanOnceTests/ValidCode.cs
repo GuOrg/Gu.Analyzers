@@ -1,15 +1,15 @@
-namespace Gu.Analyzers.Test.GU0015DontAssignMoreThanOnceTests
+namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
         [Test]
-        public void SimpleAssign()
+        public static void SimpleAssign()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignInIfElse()
+        public static void AssignInIfElse()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreMutableInLambda()
+        public static void IgnoreMutableInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreOutParameter()
+        public static void IgnoreOutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreOutParameterIfReturn()
+        public static void IgnoreOutParameterIfReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreObjectInitializer()
+        public static void IgnoreObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DifferentInstances()
+        public static void DifferentInstances()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -182,7 +182,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Enum()
+        public static void Enum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -212,7 +212,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Boolean()
+        public static void Boolean()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingTheValueStringReplace()
+        public static void WhenUsingTheValueStringReplace()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -256,7 +256,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingTheValue1()
+        public static void WhenUsingTheValue1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -283,7 +283,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingTheValue2()
+        public static void WhenUsingTheValue2()
         {
             var testCode = @"
 namespace RoslynSandbox

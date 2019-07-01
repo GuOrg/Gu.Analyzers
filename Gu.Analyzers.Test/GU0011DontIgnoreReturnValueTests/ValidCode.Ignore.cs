@@ -1,17 +1,17 @@
 // ReSharper disable InconsistentNaming
-namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    internal static partial class ValidCode
     {
-        internal class Ignore
+        internal static class Ignore
         {
             [TestCase("stringBuilder.AppendLine(\"test\");")]
             [TestCase("stringBuilder.Append(\"test\");")]
             [TestCase("stringBuilder.Clear();")]
-            public void StringBuilder(string code)
+            public static void StringBuilder(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void StringBuilderAppendChained()
+            public static void StringBuilderAppendChained()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenReturningSameInstance()
+            public static void WhenReturningSameInstance()
             {
                 var ensureCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenReturningThis()
+            public static void WhenReturningThis()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenExtensionMethodReturningThis()
+            public static void WhenExtensionMethodReturningThis()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -161,7 +161,7 @@ namespace RoslynSandbox
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]
             [TestCase("this.ints.Remove(1);")]
-            public void HashSet(string operation)
+            public static void HashSet(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -185,7 +185,7 @@ namespace RoslynSandbox
             [TestCase("this.ints.Add(1);")]
             [TestCase("ints.Add(1);")]
             [TestCase("this.ints.Remove(1);")]
-            public void IList(string operation)
+            public static void IList(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -210,7 +210,7 @@ namespace RoslynSandbox
             [TestCase("ints.Add(1);")]
             [TestCase("ints.Remove(1);")]
             [TestCase("ints.RemoveAll(x => x > 2);")]
-            public void ListOfInt(string operation)
+            public static void ListOfInt(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -230,7 +230,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("map.TryAdd(1, 1);")]
-            public void ConcurrentDictionary(string operation)
+            public static void ConcurrentDictionary(string operation)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -250,7 +250,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)")]
-            public void MoqSetupReturns(string code)
+            public static void MoqSetupReturns(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -274,7 +274,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("mock.Setup(x => x.Bar())")]
-            public void MoqSetupVoid(string setup)
+            public static void MoqSetupVoid(string setup)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -302,7 +302,7 @@ namespace RoslynSandbox
             [TestCase("this.Bind<Foo>().To<Foo>()")]
             [TestCase("this.Bind<Foo>().To<Foo>().InSingletonScope()")]
             [TestCase("this.Bind<Foo>().ToMethod(x => new Foo())")]
-            public void NinjectFluent(string bind)
+            public static void NinjectFluent(string bind)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -322,7 +322,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DocumentEditorExtensionMethod()
+            public static void DocumentEditorExtensionMethod()
             {
                 var extCode = @"
 namespace RoslynSandbox

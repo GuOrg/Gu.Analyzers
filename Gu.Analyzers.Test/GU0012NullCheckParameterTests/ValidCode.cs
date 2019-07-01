@@ -6,13 +6,13 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 
     [TestFixture(typeof(SimpleAssignmentAnalyzer))]
     [TestFixture(typeof(ParameterAnalyzer))]
-    internal class ValidCode<T>
+    internal static class ValidCode<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
 
         [Test]
-        public void WhenPrivate()
+        public static void WhenPrivate()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDefaultValue()
+        public static void WhenDefaultValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenValueType()
+        public static void WhenValueType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenThrowing()
+        public static void WhenThrowing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -96,7 +96,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenThrowingOnLineAbove()
+        public static void WhenThrowingOnLineAbove()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
 
         [TestCase("text == null")]
         [TestCase("text is null")]
-        public void WhenOldStyleNullCheckAbove(string check)
+        public static void WhenOldStyleNullCheckAbove(string check)
         {
             var testCode = @"
 namespace RoslynSandbox

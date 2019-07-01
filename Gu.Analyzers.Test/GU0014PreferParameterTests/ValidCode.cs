@@ -5,13 +5,13 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = GU0014PreferParameter.Descriptor;
 
         [Test]
-        public void SimpleAssign()
+        public static void SimpleAssign()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignWithExpression()
+        public static void AssignWithExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedTwiceWithDifferent()
+        public static void AssignedTwiceWithDifferent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SecondAssignmentWithExpression()
+        public static void SecondAssignmentWithExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -109,7 +109,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SecondAssignmentWithExpressionRepro()
+        public static void SecondAssignmentWithExpressionRepro()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsedBeforeAssign()
+        public static void UsedBeforeAssign()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignInIfElse()
+        public static void AssignInIfElse()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -181,7 +181,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ParameterAsArgument()
+        public static void ParameterAsArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -204,7 +204,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreNameof()
+        public static void IgnoreNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -227,7 +227,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreWhenSideEffect()
+        public static void IgnoreWhenSideEffect()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -248,7 +248,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreWhenAssignedWithAddition()
+        public static void IgnoreWhenAssignedWithAddition()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -269,7 +269,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreMutableInLambda()
+        public static void IgnoreMutableInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -292,7 +292,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BaseConstructorCall()
+        public static void BaseConstructorCall()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -332,7 +332,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BaseConstructorCallSimple()
+        public static void BaseConstructorCallSimple()
         {
             var fooCode = @"
 namespace RoslynSandbox

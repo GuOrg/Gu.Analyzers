@@ -1,16 +1,16 @@
-namespace Gu.Analyzers.Test.GU0015DontAssignMoreThanOnceTests
+namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostic
+    internal static class Diagnostic
     {
         private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0015");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0015DoNotAssignMoreThanOnce.Descriptor);
 
         [Test]
-        public void FieldInConstructor()
+        public static void FieldInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyInConstructor()
+        public static void PropertyInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInMethod()
+        public static void FieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox

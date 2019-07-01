@@ -14,7 +14,7 @@ namespace Gu.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             GU0010DoNotAssignSameValue.Descriptor,
             GU0012NullCheckParameter.Descriptor,
-            GU0015DontAssignMoreThanOnce.Descriptor);
+            GU0015DoNotAssignMoreThanOnce.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -55,7 +55,7 @@ namespace Gu.Analyzers
 
                 if (IsRedundantAssignment(left, assignment, context))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0015DontAssignMoreThanOnce.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(GU0015DoNotAssignMoreThanOnce.Descriptor, assignment.GetLocation()));
                 }
             }
         }

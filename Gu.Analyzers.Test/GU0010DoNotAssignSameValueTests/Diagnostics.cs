@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0010");
@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         [TestCase("this.A = this.A;", "this.A = A;")]
         [TestCase("this.A = this.A;", "A = A;")]
         [TestCase("this.A = this.A;", "A = this.A;")]
-        public void SetPropertyToSelf(string before, string after)
+        public static void SetPropertyToSelf(string before, string after)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SetPropertyToSelfWithThis()
+        public static void SetPropertyToSelfWithThis()
         {
             var testCode = @"
 namespace RoslynSandbox

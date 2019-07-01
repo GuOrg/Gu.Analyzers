@@ -3,9 +3,9 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal static partial class CodeFix
     {
-        internal class SimpleAssignment
+        internal static class SimpleAssignment
         {
             private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
             private static readonly NullCheckParameterFix Fix = new NullCheckParameterFix();
@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             [TestCase("public")]
             [TestCase("internal")]
             [TestCase("protected")]
-            public void ConstructorFullyQualified(string access)
+            public static void ConstructorFullyQualified(string access)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PublicCtor()
+            public static void PublicCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
