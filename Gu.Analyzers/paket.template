@@ -2,7 +2,8 @@
 developmentDependency true
 
 releasenotes
-  FEATURE: GU0017 don't use discarded.
+  FEATURE: SplitStringRefactoring
+  FEATURE: MakeStaticFix
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT

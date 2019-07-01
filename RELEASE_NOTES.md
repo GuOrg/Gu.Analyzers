@@ -1,3 +1,7 @@
+#### 1.5.0
+* FEATURE: SplitStringRefactoring
+* FEATURE: MakeStaticFix
+
 #### 1.4.0
 * FEATURE: GU0017 don't use discarded.
 
