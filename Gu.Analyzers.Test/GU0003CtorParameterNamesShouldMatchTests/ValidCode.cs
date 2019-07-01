@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
-        public void ConstructorSettingProperties()
+        public static void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingPropertiesStruct()
+        public static void ConstructorSettingPropertiesStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedConstructorSettingProperties()
+        public static void ChainedConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BaseConstructorCall()
+        public static void BaseConstructorCall()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -138,7 +138,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingField()
+        public static void ConstructorSettingField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -163,7 +163,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFieldPrefixedByUnderscore()
+        public static void ConstructorSettingFieldPrefixedByUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -188,7 +188,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenSettingTwoProperties()
+        public static void IgnoresWhenSettingTwoProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenBaseIsParams()
+        public static void IgnoresWhenBaseIsParams()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -240,7 +240,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenBaseIsParams2()
+        public static void IgnoresWhenBaseIsParams2()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -273,7 +273,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresIdCaps()
+        public static void IgnoresIdCaps()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -292,7 +292,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresTupleCreate()
+        public static void IgnoresTupleCreate()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -315,7 +315,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresNumbered()
+        public static void IgnoresNumbered()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -342,7 +342,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoredWhenAssigningWeakReferenceTarget()
+        public static void IgnoredWhenAssigningWeakReferenceTarget()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -364,7 +364,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsingParameterAsTwoArguments()
+        public static void WhenUsingParameterAsTwoArguments()
         {
             var testCode = @"
 namespace RoslynSandbox

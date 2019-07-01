@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
         private static readonly NameArgumentsFix Fix = new NameArgumentsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0001");
 
         [Test]
-        public void Message()
+        public static void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Constructor()
+        public static void Constructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorInArrayInitializer()
+        public static void ConstructorInArrayInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorInFunc()
+        public static void ConstructorInFunc()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -271,7 +271,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorIgnoredIfAnyNamed()
+        public static void ConstructorIgnoredIfAnyNamed()
         {
             var testCode = @"
 namespace RoslynSandbox

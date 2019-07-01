@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
 
         [Test]
-        public void ConstructorSettingProperties()
+        public static void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingPropertiesStruct()
+        public static void ConstructorSettingPropertiesStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorSettingProperties()
+        public static void StaticConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingAllFields()
+        public static void ConstructorSettingAllFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFieldRef()
+        public static void ConstructorSettingFieldRef()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFieldOut()
+        public static void ConstructorSettingFieldOut()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -143,7 +143,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedConstructorSettingAllFields()
+        public static void ChainedConstructorSettingAllFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -169,7 +169,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNoUninitializedFields()
+        public static void WhenNoUninitializedFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -189,7 +189,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorSettingFields()
+        public static void StaticConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorSettingQualifiedFields()
+        public static void StaticConstructorSettingQualifiedFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -233,7 +233,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorSettingUninitializedField()
+        public static void StaticConstructorSettingUninitializedField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -255,7 +255,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingReadonlyFieldIgnoringMutable()
+        public static void ConstructorSettingReadonlyFieldIgnoringMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -275,7 +275,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingPropertiesIgnoringMutable()
+        public static void ConstructorSettingPropertiesIgnoringMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -296,7 +296,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingReadonlyFieldIgnoringInitialized()
+        public static void ConstructorSettingReadonlyFieldIgnoringInitialized()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -316,7 +316,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingPropertiesIgnoringInitialized()
+        public static void ConstructorSettingPropertiesIgnoringInitialized()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -337,7 +337,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreAbstract()
+        public static void IgnoreAbstract()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -358,7 +358,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreIndexer()
+        public static void IgnoreIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -379,7 +379,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreCalculatedStatementBody()
+        public static void IgnoreCalculatedStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -406,7 +406,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreCalculatedExpressionBody()
+        public static void IgnoreCalculatedExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox

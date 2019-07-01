@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly RenameConstructorArgumentsFix Fix = new RenameConstructorArgumentsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0003");
 
         [Test]
-        public void Message()
+        public static void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingProperties()
+        public static void ConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedConstructor()
+        public static void ChainedConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -151,7 +151,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BaseConstructorCall()
+        public static void BaseConstructorCall()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -202,7 +202,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFields()
+        public static void ConstructorSettingFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -247,7 +247,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorSettingFieldsPrefixedWithUnderscore()
+        public static void ConstructorSettingFieldsPrefixedWithUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -292,7 +292,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenBaseIsParams()
+        public static void WhenBaseIsParams()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -337,7 +337,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenSettingPropertyAndChained()
+        public static void WhenSettingPropertyAndChained()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -382,7 +382,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAssignAndBaseCall()
+        public static void WhenAssignAndBaseCall()
         {
             var fooCode = @"
 namespace RoslynSandbox

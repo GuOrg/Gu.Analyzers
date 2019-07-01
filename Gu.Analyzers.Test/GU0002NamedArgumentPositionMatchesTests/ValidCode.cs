@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
         [TestCase("new Foo(a, b: b)")]
-        public void ConstructorCallWithTwoArguments(string call)
+        public static void ConstructorCallWithTwoArguments(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
         [TestCase("new Foo(a, b: b)")]
-        public void ConstructorCallWithTwoArgumentsStruct(string call)
+        public static void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorCallWithNamedArgumentsOnSameRow()
+        public static void ConstructorCallWithNamedArgumentsOnSameRow()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorCallWithArgumentsOnSameRow()
+        public static void ConstructorCallWithArgumentsOnSameRow()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstructorCallWithNamedArgumentsOnSeparateRows()
+        public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresStringFormat()
+        public static void IgnoresStringFormat()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -200,7 +200,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhendifferentTypes()
+        public static void IgnoresWhendifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -238,7 +238,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenInExpressionTree()
+        public static void IgnoresWhenInExpressionTree()
         {
             var testCode = @"
 namespace RoslynSandbox

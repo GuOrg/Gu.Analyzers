@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0004");
 
         [Test]
-        public void Message()
+        public static void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotSettingGetOnlyProperty()
+        public static void NotSettingGetOnlyProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotSettingGetOnlyPropertyInOneCtor()
+        public static void NotSettingGetOnlyPropertyInOneCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotSettingReadOnlyField()
+        public static void NotSettingReadOnlyField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorSettingProperties()
+        public static void StaticConstructorSettingProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConstructorNotSettingField()
+        public static void StaticConstructorNotSettingField()
         {
             var testCode = @"
 namespace RoslynSandbox

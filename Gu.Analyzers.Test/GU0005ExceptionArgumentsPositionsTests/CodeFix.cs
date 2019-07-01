@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly MoveArgumentFix Fix = new MoveArgumentFix();
@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         [TestCase(@"throw new ArgumentException(↓""o"", ""message"");", @"throw new ArgumentException(""message"", ""o"");")]
         [TestCase(@"throw new ArgumentException(↓""o"", ""message"", new Exception());", @"throw new ArgumentException(""message"", ""o"", new Exception());")]
         [TestCase(@"throw new ArgumentNullException(""Meh"", ↓nameof(o));", @"throw new ArgumentNullException(nameof(o), ""Meh"");")]
-        public void WhenThrowing(string error, string @fixed)
+        public static void WhenThrowing(string error, string @fixed)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AliasedInside()
+        public static void AliasedInside()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AliasedOutside()
+        public static void AliasedOutside()
         {
             var testCode = @"
 using Meh = System.ArgumentException;

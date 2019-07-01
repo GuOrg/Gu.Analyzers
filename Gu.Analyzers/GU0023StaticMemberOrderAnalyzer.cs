@@ -65,7 +65,7 @@ namespace Gu.Analyzers
                         context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ISymbol symbol) &&
                         FieldOrProperty.TryCreate(symbol, out other) &&
                         other.IsStatic &&
-                        other.ContainingType == context.ContainingSymbol.ContainingType &&
+                        Equals(other.ContainingType, context.ContainingSymbol.ContainingType) &&
                         symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax otherDeclaration) &&
                         otherDeclaration.SpanStart > context.Node.SpanStart &&
                         IsInitialized(otherDeclaration))
@@ -115,12 +115,12 @@ namespace Gu.Analyzers
             public IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
 
             /// <summary>
-            /// Get a walker that has visited <paramref name="node"/>
+            /// Get a walker that has visited <paramref name="node"/>.
             /// </summary>
-            /// <param name="node">The node</param>
-            /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
-            /// <param name="cancellationToken">The <see cref="CancellationToken"/></param>
-            /// <returns>A walker that has visited <paramref name="node"/></returns>
+            /// <param name="node">The node.</param>
+            /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
+            /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+            /// <returns>A walker that has visited <paramref name="node"/>.</returns>
             public static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());

@@ -31,6 +31,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ForEachStatement);
         }
