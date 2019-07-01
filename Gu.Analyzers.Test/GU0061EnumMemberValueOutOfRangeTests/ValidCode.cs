@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new GU0061EnumMemberValueOutOfRange();
 
         [Test]
-        public void BitShiftWithinRange()
+        public static void BitShiftWithinRange()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DoNotAnalyzeLong()
+        public static void DoNotAnalyzeLong()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StandardEnum()
+        public static void StandardEnum()
         {
             var testCode = @"
 namespace RoslynSandbox

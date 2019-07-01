@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new GU0061EnumMemberValueOutOfRange();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0061");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0061EnumMemberValueOutOfRange.DiagnosticId);
 
         [Test]
-        public void BitShiftOutOfRange()
+        public static void BitShiftOutOfRange()
         {
             var testCode = @"
 namespace RoslynSandbox

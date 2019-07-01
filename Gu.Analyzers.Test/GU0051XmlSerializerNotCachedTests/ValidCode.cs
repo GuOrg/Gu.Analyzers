@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
 
         [Test]
-        public void NoCreationsOfTheSerializer()
+        public static void NoCreationsOfTheSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CachedStaticReadonlyInitializedInlineXmlSerializer()
+        public static void CachedStaticReadonlyInitializedInlineXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
+        public static void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CachedStaticInitializedInlineXmlSerializer()
+        public static void CachedStaticInitializedInlineXmlSerializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,7 +116,7 @@ namespace RoslynSandbox
 
         [TestCase(@"new XmlSerializer(typeof(Foo), ""rootNode"")")]
         [TestCase(@"new XmlSerializer(typeof(Foo))")]
-        public void NonLeakyConstructor(string code)
+        public static void NonLeakyConstructor(string code)
         {
             var testCode = @"
 namespace RoslynSandbox

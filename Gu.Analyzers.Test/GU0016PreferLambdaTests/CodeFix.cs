@@ -5,14 +5,14 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
         private static readonly CodeFixProvider Fix = new UseLambdaFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0016");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0016PreferLambda.Descriptor);
 
         [Test]
-        public void LinqWhereStaticMethod()
+        public static void LinqWhereStaticMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LinqWhereStaticMethodWhenNameCollision()
+        public static void LinqWhereStaticMethodWhenNameCollision()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void EventHandler()
+        public static void EventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox

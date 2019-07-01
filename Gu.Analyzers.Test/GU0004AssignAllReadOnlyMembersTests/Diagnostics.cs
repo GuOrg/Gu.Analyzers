@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
     internal static class Diagnostics
     {
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0004");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor);
 
         [Test]
         public static void Message()

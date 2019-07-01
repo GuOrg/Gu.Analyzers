@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
 
         [Test]
-        public void DiscardSymbol()
+        public static void DiscardSymbol()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Local()
+        public static void Local()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -44,7 +44,7 @@ namespace RoslynSandbox
 
         [TestCase("out _")]
         [TestCase("out var _")]
-        public void Out(string arg)
+        public static void Out(string arg)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OneParameterLambda()
+        public static void OneParameterLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TwoParameterLambda()
+        public static void TwoParameterLambda()
         {
             var testCode = @"
 namespace RoslynSandbox

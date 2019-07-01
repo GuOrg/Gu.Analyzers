@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
 
         [Test]
-        public void IgnoredEvent()
+        public static void IgnoredEvent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoredEventSimple()
+        public static void IgnoredEventSimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoredEventHandler()
+        public static void IgnoredEventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotSerializable()
+        public static void NotSerializable()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
 
@@ -21,7 +21,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         };
 
         [TestCaseSource(nameof(TestCases))]
-        public void UpdatedInMethodThis(TestCase data)
+        public static void UpdatedInMethodThis(TestCase data)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public void UpdatedInMethodUnderscoreNames(TestCase data)
+        public static void UpdatedInMethodUnderscoreNames(TestCase data)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public void UpdatingOtherInstanceInCtor(TestCase data)
+        public static void UpdatingOtherInstanceInCtor(TestCase data)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -84,7 +84,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UpdatedInLambdaInCtor()
+        public static void UpdatedInLambdaInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DifferentProperties()
+        public static void DifferentProperties()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -159,7 +159,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OtherInstanceObjectInitializer()
+        public static void OtherInstanceObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -178,7 +178,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SideEffectStaticMethod()
+        public static void SideEffectStaticMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SideEffectStaticMethodPrivateProperty()
+        public static void SideEffectStaticMethodPrivateProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -216,7 +216,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedInSetOnlyWithTernary()
+        public static void AssignedInSetOnlyWithTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitImplementation()
+        public static void ExplicitImplementation()
         {
             var testCode = @"
 namespace RoslynSandbox

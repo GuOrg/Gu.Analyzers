@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0051");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0051XmlSerializerNotCached.DiagnosticId);
 
         [Test]
-        public void TrivialConstructionUnsaved()
+        public static void TrivialConstructionUnsaved()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TrivialConstructionUnsavedFullyQualified()
+        public static void TrivialConstructionUnsavedFullyQualified()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public void LocalVariable(string code)
+        public static void LocalVariable(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
+        public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
 namespace RoslynSandbox

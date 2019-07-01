@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
 
         [Test]
-        public void LinqWhereStaticMethod()
+        public static void LinqWhereStaticMethod()
         {
             var testCode = @"
 namespace RoslynSandbox

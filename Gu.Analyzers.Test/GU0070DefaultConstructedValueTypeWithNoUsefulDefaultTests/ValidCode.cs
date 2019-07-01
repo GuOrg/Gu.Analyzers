@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
 
         [Test]
-        public void DefaultValueForGuidCreatedWithDefaultValueExpression()
+        public static void DefaultValueForGuidCreatedWithDefaultValueExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GuidCreatedWithGuidNewGuid()
+        public static void GuidCreatedWithGuidNewGuid()
         {
             var testCode = @"
 namespace RoslynSandbox

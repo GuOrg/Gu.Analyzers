@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
         [Test]
-        public void SingleArgument()
+        public static void SingleArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SingleArgumentWithAndWithoutAuthor()
+        public static void SingleArgumentWithAndWithoutAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SingleArgumentWithAuthor()
+        public static void SingleArgumentWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Arrays()
+        public static void Arrays()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DoubleAndInt()
+        public static void DoubleAndInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -108,7 +108,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DoubleAndIntMaxValue()
+        public static void DoubleAndIntMaxValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DoubleMaxValueAndMinValue()
+        public static void DoubleMaxValueAndMinValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -152,7 +152,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -172,7 +172,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TwoEnumsSameTypes()
+        public static void TwoEnumsSameTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -193,7 +193,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TwoEnumsDifferentTypes()
+        public static void TwoEnumsDifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
 
         [Test]
-        public void WhenSealedWithProperty()
+        public static void WhenSealedWithProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -23,7 +23,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenSealedWithField()
+        public static void WhenSealedWithField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNoDefaultField()
+        public static void WhenNoDefaultField()
         {
             var testCode = @"
 namespace RoslynSandbox

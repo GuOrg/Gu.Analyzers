@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0023StaticMemberOrderAnalyzer();
 
         [Test]
-        public void Message()
+        public static void Message()
         {
             var code = @"
 namespace RoslynSandbox
@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticFieldInitializedWithField()
+        public static void StaticFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstFieldInitializedWithField()
+        public static void ConstFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyInitializedWithProperty()
+        public static void PropertyInitializedWithProperty()
         {
             var code = @"
 namespace RoslynSandbox
@@ -73,7 +73,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInitializedWithFieldViaMethod()
+        public static void FieldInitializedWithFieldViaMethod()
         {
             var code = @"
 namespace RoslynSandbox
@@ -91,7 +91,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DefaultFieldUsingStaticField()
+        public static void DefaultFieldUsingStaticField()
         {
             var code = @"
 namespace RoslynSandbox

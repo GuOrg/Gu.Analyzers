@@ -1,15 +1,15 @@
-﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
+namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0060");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0060EnumMemberValueConflictsWithAnother.DiagnosticId);
 
         [Test]
-        public void ImplicitValueSharing()
+        public static void ImplicitValueSharing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharing()
+        public static void ExplicitValueSharing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharingWithBitwiseSum()
+        public static void ExplicitValueSharingWithBitwiseSum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -73,7 +73,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharingDifferentBases()
+        public static void ExplicitValueSharingDifferentBases()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -96,7 +96,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharingBitshifts()
+        public static void ExplicitValueSharingBitshifts()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharingNonFlag()
+        public static void ExplicitValueSharingNonFlag()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitValueSharingPartial()
+        public static void ExplicitValueSharingPartial()
         {
             var testCode = @"
 namespace RoslynSandbox

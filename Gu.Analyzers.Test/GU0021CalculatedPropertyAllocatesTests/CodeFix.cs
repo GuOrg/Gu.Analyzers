@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
         private static readonly UseGetOnlyFix Fix = new UseGetOnlyFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0021");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor);
 
         [Test]
-        public void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
+        public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -66,7 +66,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
+        public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -122,7 +122,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
+        public static void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -181,7 +181,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
+        public static void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -237,7 +237,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromReadOnlyFields()
+        public static void AllocatingReferenceTypeFromReadOnlyFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -287,7 +287,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
+        public static void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -337,7 +337,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeEmptyCtor()
+        public static void AllocatingReferenceTypeEmptyCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -369,7 +369,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeLambdaUsingMutableCtor()
+        public static void AllocatingReferenceTypeLambdaUsingMutableCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -411,7 +411,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeMethodGroup()
+        public static void AllocatingReferenceTypeMethodGroup()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -457,7 +457,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromMutablePropertyNoFix1()
+        public static void AllocatingReferenceTypeFromMutablePropertyNoFix1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -513,7 +513,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromMutablePropertyNoFix2()
+        public static void AllocatingReferenceTypeFromMutablePropertyNoFix2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -569,7 +569,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromMutableFieldNoFix()
+        public static void AllocatingReferenceTypeFromMutableFieldNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -619,7 +619,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
+        public static void AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -669,7 +669,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
+        public static void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -731,7 +731,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromSecondLevelNoFix1()
+        public static void AllocatingReferenceTypeFromSecondLevelNoFix1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -793,7 +793,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AllocatingReferenceTypeFromSecondLevelNoFix2()
+        public static void AllocatingReferenceTypeFromSecondLevelNoFix2()
         {
             var testCode = @"
 namespace RoslynSandbox

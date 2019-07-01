@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 
         [TestCase("string text")]
         [TestCase("string text, int index, bool value")]
-        public void TestAttributeAndParameter(string parameters)
+        public static void TestAttributeAndParameter(string parameters)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttributeAndParameter()
+        public static void TestCaseAttributeAndParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         [TestCase("string i, int j")]
         [TestCase("string i, int j, int k")]
         [TestCase("string i,string j, int k, int l")]
-        public void TestCaseAttributeAndTooManyParameters(string parameters)
+        public static void TestCaseAttributeAndTooManyParameters(string parameters)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox

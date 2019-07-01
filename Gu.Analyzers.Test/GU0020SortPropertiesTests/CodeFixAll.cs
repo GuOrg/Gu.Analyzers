@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAll
+    internal static class CodeFixAll
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
         private static readonly SortPropertiesFix Fix = new SortPropertiesFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
 
         [Test]
-        public void WhenMutableBeforeGetOnlyFirst()
+        public static void WhenMutableBeforeGetOnlyFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAMess()
+        public static void WhenAMess()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAMess1WithDocs()
+        public static void WhenAMess1WithDocs()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PreservesDocumentOrder()
+        public static void PreservesDocumentOrder()
         {
             var testCode = @"
 namespace RoslynSandbox

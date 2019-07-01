@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0052ExceptionShouldBeSerializable();
 
         [Test]
-        public void WhenNoBaseClass()
+        public static void WhenNoBaseClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -22,7 +22,7 @@ public class Foo
         }
 
         [Test]
-        public void WhenSerializable()
+        public static void WhenSerializable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenSerializableAndObsoleteSameList()
+        public static void WhenSerializableAndObsoleteSameList()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenSerializableAndObsoleteDifferentLists()
+        public static void WhenSerializableAndObsoleteDifferentLists()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExtendedWithAttribute()
+        public static void ExtendedWithAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox

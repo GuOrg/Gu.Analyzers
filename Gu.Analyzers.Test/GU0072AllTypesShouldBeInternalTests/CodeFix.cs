@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
         private static readonly MakeInternalFix Fix = new MakeInternalFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0072");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0072AllTypesShouldBeInternal.Descriptor);
 
         [Test]
-        public void Class()
+        public static void Class()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Struct()
+        public static void Struct()
         {
             var testCode = @"
 namespace RoslynSandbox

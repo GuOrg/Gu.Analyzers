@@ -3,15 +3,15 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0071");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0071ForeachImplicitCast.DiagnosticId);
 
         [TestCase("int[]")]
         [TestCase("System.Collections.Generic.List<int>")]
         [TestCase("System.Collections.Generic.IEnumerable<int>")]
-        public void ExplicitDouble(string type)
+        public static void ExplicitDouble(string type)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericCollectionWithACast()
+        public static void GenericCollectionWithACast()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericCollectionWithAnExplicitImplementation()
+        public static void GenericCollectionWithAnExplicitImplementation()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Array()
+        public static void Array()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -112,7 +112,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DuckTypedEnumerable()
+        public static void DuckTypedEnumerable()
         {
             var testCode = @"
 namespace RoslynSandbox

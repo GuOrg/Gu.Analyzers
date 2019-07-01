@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
 
         [TestCase("internal class Foo")]
         [TestCase("internal struct Foo")]
-        public void SimpleType(string signature)
+        public static void SimpleType(string signature)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         [TestCase("internal struct Bar")]
         [TestCase("protected struct Bar")]
         [TestCase("private struct Bar")]
-        public void NestedType(string signature)
+        public static void NestedType(string signature)
         {
             var testCode = @"
 namespace RoslynSandbox

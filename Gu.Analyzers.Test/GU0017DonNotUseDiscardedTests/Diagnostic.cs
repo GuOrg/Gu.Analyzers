@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostic
+    internal static class Diagnostic
     {
         private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0017DonNotUseDiscarded.Descriptor);
@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         [TestCase("↓_++")]
         [TestCase("↓_.ToString()")]
         [TestCase("Console.WriteLine(↓_)")]
-        public void Local(string expression)
+        public static void Local(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OneParameterLambda()
+        public static void OneParameterLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TwoParameterLambda()
+        public static void TwoParameterLambda()
         {
             var testCode = @"
 namespace RoslynSandbox

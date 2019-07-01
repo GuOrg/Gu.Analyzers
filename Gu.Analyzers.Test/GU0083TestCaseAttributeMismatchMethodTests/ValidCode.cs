@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
         [Test]
-        public void NoAuthor()
+        public static void NoAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(null, \"a\", \"b\")]")]
         [TestCase("[TestCase(\"a\", null, \"b\")]")]
         [TestCase("[TestCase(null, null, null)]")]
-        public void NullArgument(string testCase)
+        public static void NullArgument(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArgumentIsNullAndParameterIsNullableInt()
+        public static void ArgumentIsNullAndParameterIsNullableInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WithAuthor()
+        public static void WithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NullArgumentWithAuthor()
+        public static void NullArgumentWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArrayOfInts()
+        public static void ArrayOfInts()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +126,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArraysOfDifferentTypes()
+        public static void ArraysOfDifferentTypes()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -145,7 +145,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ParameterOfTypeObject()
+        public static void ParameterOfTypeObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -164,7 +164,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ParameterOfInterfaceType()
+        public static void ParameterOfInterfaceType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -185,7 +185,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StringComparison()
+        public static void StringComparison()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -205,7 +205,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StringAndStringComparison()
+        public static void StringAndStringComparison()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -225,7 +225,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IntToDouble()
+        public static void IntToDouble()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -244,7 +244,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ShortToInt()
+        public static void ShortToInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -263,7 +263,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IntToShort()
+        public static void IntToShort()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -282,7 +282,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -305,7 +305,7 @@ namespace RoslynSandbox
         [TestCase("where T : IComparable")]
         [TestCase("where T : IComparable<T>")]
         [TestCase("where T : struct, IComparable<T>, IComparable")]
-        public void GenericFixtureWithTestCase(string constraints)
+        public static void GenericFixtureWithTestCase(string constraints)
         {
             var testCode = @"
 namespace RoslynSandbox

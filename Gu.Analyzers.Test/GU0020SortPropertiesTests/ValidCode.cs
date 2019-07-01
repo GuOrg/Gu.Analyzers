@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
 
         [Test]
-        public void WithCustomEvent()
+        public static void WithCustomEvent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GetOnlies()
+        public static void GetOnlies()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitImplementationGetOnly()
+        public static void ExplicitImplementationGetOnly()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitImplementationGetOnlyIndexer()
+        public static void ExplicitImplementationGetOnlyIndexer()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitGetSetIndexerAndGetOnlyIndexer()
+        public static void ExplicitGetSetIndexerAndGetOnlyIndexer()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitGetSetIndexerAndGetSetIndexer()
+        public static void ExplicitGetSetIndexerAndGetSetIndexer()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitImplementationCalculatedBeforeGetSet()
+        public static void ExplicitImplementationCalculatedBeforeGetSet()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -199,7 +199,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Mutables()
+        public static void Mutables()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -227,7 +227,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotifyingMutables()
+        public static void NotifyingMutables()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -318,7 +318,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutablesBySetter()
+        public static void MutablesBySetter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -346,7 +346,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExpressionBodies()
+        public static void ExpressionBodies()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -373,7 +373,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Calculated()
+        public static void Calculated()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -414,7 +414,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InternalBeforePublicIndexer()
+        public static void InternalBeforePublicIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -430,7 +430,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticBeforeInstance()
+        public static void StaticBeforeInstance()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -451,7 +451,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticGetOnlyBeforeCalculated()
+        public static void StaticGetOnlyBeforeCalculated()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -467,7 +467,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PublicBeforeProtectedStatic()
+        public static void PublicBeforeProtectedStatic()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -488,7 +488,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PublicInitializedWithProtectedStatic()
+        public static void PublicInitializedWithProtectedStatic()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -504,7 +504,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Realistic()
+        public static void Realistic()
         {
             var testCode = @"
 namespace RoslynSandbox

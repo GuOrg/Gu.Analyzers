@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0081");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor);
 
         [Test]
-        public void TestCaseAttributeAndParameter()
+        public static void TestCaseAttributeAndParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttributeWithAuthor()
+        public static void TestCaseAttributeWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox

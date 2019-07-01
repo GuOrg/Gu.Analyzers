@@ -4,14 +4,14 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor);
 
         [Test]
-        public void SingleArgument()
+        public static void SingleArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(null, \"a\", ↓1)]")]
         [TestCase("[TestCase(↓1, null, \"b\")]")]
         [TestCase("[TestCase(null, null, ↓1)]")]
-        public void NullArgument(string testCase)
+        public static void NullArgument(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttribute_IfMultipleParametersAreWrong()
+        public static void TestCaseAttribute_IfMultipleParametersAreWrong()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArgumentIsNullAndParameterIsInt()
+        public static void ArgumentIsNullAndParameterIsInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WrongArrayType()
+        public static void WrongArrayType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DoubleToInt()
+        public static void DoubleToInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -182,7 +182,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox

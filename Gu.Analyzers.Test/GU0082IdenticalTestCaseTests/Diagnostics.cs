@@ -5,13 +5,13 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0082");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0082IdenticalTestCase.Descriptor);
 
         [Test]
-        public void TestCaseAttributeAndParameter()
+        public static void TestCaseAttributeAndParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WithAndWithoutAuthor()
+        public static void WithAndWithoutAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WithAuthor()
+        public static void WithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Enum()
+        public static void Enum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StringAndEnum()
+        public static void StringAndEnum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Arrays()
+        public static void Arrays()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArraysWithAndWithoutExplicitTypeSpecification()
+        public static void ArraysWithAndWithoutExplicitTypeSpecification()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArraysWithAndWithoutAuthor()
+        public static void ArraysWithAndWithoutAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArraysWithAuthor()
+        public static void ArraysWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -194,7 +194,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseParams()
+        public static void TestCaseParams()
         {
             var testCode = @"
 namespace RoslynSandbox

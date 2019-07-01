@@ -4,13 +4,13 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0052ExceptionShouldBeSerializable();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0052");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0052ExceptionShouldBeSerializable.DiagnosticId);
 
         [Test]
-        public void WhenNoAttribute()
+        public static void WhenNoAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExtendedNoAttribute()
+        public static void ExtendedNoAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox

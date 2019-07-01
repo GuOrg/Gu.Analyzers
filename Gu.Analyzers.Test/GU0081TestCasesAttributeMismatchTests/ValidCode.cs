@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
         [Test]
-        public void TestCaseAttribute()
+        public static void TestCaseAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseAttributeWithAuthor()
+        public static void TestCaseAttributeWithAuthor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1)]")]
         [TestCase("[TestCase(1, 2)]")]
         [TestCase("[TestCase(1, 2, 3)]")]
-        public void TestCaseParams(string testCase)
+        public static void TestCaseParams(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox

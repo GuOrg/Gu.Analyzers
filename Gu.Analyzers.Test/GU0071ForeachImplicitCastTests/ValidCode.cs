@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
 
@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
         [TestCase("List<int>")]
         [TestCase("IEnumerable<int>")]
         [TestCase("IEnumerable<IEnumerable<char>>")]
-        public void VarInAForeach(string type)
+        public static void VarInAForeach(string type)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitTypeMatchesInAForeach()
+        public static void ExplicitTypeMatchesInAForeach()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MultipleIEnumerableInterfaces()
+        public static void MultipleIEnumerableInterfaces()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitTypeWhenLoopingRegexMatches()
+        public static void ExplicitTypeWhenLoopingRegexMatches()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DuckTypedEnumerable()
+        public static void DuckTypedEnumerable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -151,7 +151,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NonGenericIEnumerable()
+        public static void NonGenericIEnumerable()
         {
             var testCode = @"
 namespace RoslynSandbox

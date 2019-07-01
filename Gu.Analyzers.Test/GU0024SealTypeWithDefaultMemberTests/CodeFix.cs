@@ -5,13 +5,13 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
         private static readonly CodeFixProvider Fix = new MakeSealedFix();
 
         [Test]
-        public void Field()
+        public static void Field()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Property()
+        public static void Property()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -5,14 +5,14 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Codefix
+    internal static class Codefix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0022UseGetOnly();
         private static readonly CodeFixProvider Fix = new UseGetOnlyFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0022");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0022UseGetOnly.DiagnosticId);
 
         [Test]
-        public void InitializedInCtor()
+        public static void InitializedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InitializedInCtorAndPropertyInitializer()
+        public static void InitializedInCtorAndPropertyInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox

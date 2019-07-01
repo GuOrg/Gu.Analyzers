@@ -4,12 +4,12 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0023StaticMemberOrderAnalyzer();
 
         [Test]
-        public void StaticFieldInitializedWithField()
+        public static void StaticFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConstFieldInitializedWithField()
+        public static void ConstFieldInitializedWithField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInitializedWithFuncUsingField()
+        public static void FieldInitializedWithFuncUsingField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInitializedWithStaticProperty()
+        public static void FieldInitializedWithStaticProperty()
         {
             var code = @"
 namespace RoslynSandbox
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExcludeNameof()
+        public static void ExcludeNameof()
         {
             var code = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UninitializedField()
+        public static void UninitializedField()
         {
             var code = @"
 namespace RoslynSandbox
@@ -104,7 +104,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UninitializedProperty()
+        public static void UninitializedProperty()
         {
             var code = @"
 namespace RoslynSandbox
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldInitializedWithExpressionBodyProperty()
+        public static void FieldInitializedWithExpressionBodyProperty()
         {
             var code = @"
 namespace RoslynSandbox
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DependencyPropertyRegisterReadOnly()
+        public static void DependencyPropertyRegisterReadOnly()
         {
             var code = @"
 namespace RoslynSandbox

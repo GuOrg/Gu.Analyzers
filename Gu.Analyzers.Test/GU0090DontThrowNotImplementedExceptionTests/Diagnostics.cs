@@ -4,13 +4,13 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly ExceptionAnalyzer Analyzer = new ExceptionAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0090");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0090DontThrowNotImplementedException.Descriptor);
 
         [Test]
-        public void ExceptionThrownInsideMethodBlock()
+        public static void ExceptionThrownInsideMethodBlock()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExceptionThrownInline()
+        public static void ExceptionThrownInline()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExceptionNullCoalescing()
+        public static void ExceptionNullCoalescing()
         {
             var testCode = @"
 namespace RoslynSandbox

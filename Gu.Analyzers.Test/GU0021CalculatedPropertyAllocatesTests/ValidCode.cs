@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
 
         [Test]
-        public void ArrowAdd()
+        public static void ArrowAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -38,7 +38,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArrowStruct()
+        public static void ArrowStruct()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExpressionBodyMethodIsNoError()
+        public static void ExpressionBodyMethodIsNoError()
         {
             var testCode = @"
 namespace RoslynSandbox

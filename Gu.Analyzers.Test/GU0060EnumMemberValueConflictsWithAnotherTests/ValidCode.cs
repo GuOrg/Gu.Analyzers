@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
 
         [Test]
-        public void ExplicitAlias()
+        public static void ExplicitAlias()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitBitwiseOrSum()
+        public static void ExplicitBitwiseOrSum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SequentialNonFlagEnum()
+        public static void SequentialNonFlagEnum()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AliasingEnumMembersNonFlag()
+        public static void AliasingEnumMembersNonFlag()
         {
             var testCode = @"
 namespace RoslynSandbox

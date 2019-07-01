@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
         private static readonly NonSerializedFix Fix = new NonSerializedFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0050");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0050IgnoreEventsWhenSerializing.DiagnosticId);
 
         [Test]
-        public void Message()
+        public static void Message()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Event()
+        public static void Event()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void EventWithAttribute()
+        public static void EventWithAttribute()
         {
             var attributeCode = @"
 namespace RoslynSandbox
@@ -191,7 +191,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void EventHandler()
+        public static void EventHandler()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -234,7 +234,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TwoEvents()
+        public static void TwoEvents()
         {
             var testCode = @"
 namespace RoslynSandbox

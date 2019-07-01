@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
         [TestCase("[Test(Author = \"Author\")]")]
         [TestCase("[TestAttribute]")]
         [TestCase("[TestAttribute()]")]
-        public void TestAttribute(string attribute)
+        public static void TestAttribute(string attribute)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 
         [TestCase("[TestCase(1)]")]
         [TestCase("[TestCase(1, Author = \"Author\")]")]
-        public void TestCaseAttribute(string attribute)
+        public static void TestCaseAttribute(string attribute)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestAndTestCaseAttribute()
+        public static void TestAndTestCaseAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -72,7 +72,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TestCaseSourceAttribute()
+        public static void TestCaseSourceAttribute()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1)]")]
         [TestCase("[TestCase(1, 2)]")]
         [TestCase("[TestCase(1, 2, 3)]")]
-        public void TestAndTestCaseParams(string testCase)
+        public static void TestAndTestCaseParams(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1)]")]
         [TestCase("[TestCase(1, 2)]")]
         [TestCase("[TestCase(1, 2, 3)]")]
-        public void TestCaseParams(string testCase)
+        public static void TestCaseParams(string testCase)
         {
             var testCode = @"
 namespace RoslynSandbox

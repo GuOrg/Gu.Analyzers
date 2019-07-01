@@ -5,14 +5,14 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0020SortProperties();
         private static readonly CodeFixProvider Fix = new SortPropertiesFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0020SortProperties.DiagnosticId);
 
         [Test]
-        public void MutableBeforeGetOnlySimple()
+        public static void MutableBeforeGetOnlySimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlySimpleWithDocs()
+        public static void MutableBeforeGetOnlySimpleWithDocs()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -78,7 +78,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExplicitImplementation()
+        public static void ExplicitImplementation()
         {
             var interfaceCode = @"
 namespace RoslynSandbox
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlyFirst()
+        public static void MutableBeforeGetOnlyFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -165,7 +165,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlyFirstWithNamespaces()
+        public static void MutableBeforeGetOnlyFirstWithNamespaces()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -220,7 +220,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlyLast()
+        public static void MutableBeforeGetOnlyLast()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -271,7 +271,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PrivateSetAfterPublicSet()
+        public static void PrivateSetAfterPublicSet()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -364,7 +364,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlyFirstWithInitializers()
+        public static void MutableBeforeGetOnlyFirstWithInitializers()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -415,7 +415,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MutableBeforeGetOnlyWithComments()
+        public static void MutableBeforeGetOnlyWithComments()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -478,7 +478,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ExpressionBodyBeforeGetOnly()
+        public static void ExpressionBodyBeforeGetOnly()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -515,7 +515,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CalculatedBeforeGetOnly()
+        public static void CalculatedBeforeGetOnly()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -564,7 +564,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IndexerBeforeMutable()
+        public static void IndexerBeforeMutable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -645,7 +645,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PublicSetBeforePrivateSetFirst()
+        public static void PublicSetBeforePrivateSetFirst()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -684,7 +684,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NestedClass()
+        public static void NestedClass()
         {
             var testCode = @"
 namespace RoslynSandbox
