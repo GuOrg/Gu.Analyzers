@@ -3,9 +3,9 @@
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
-    public class GU0011DontIgnoreReturnValueBenchmarks
+    public class GU0011DoNotIgnoreReturnValueBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DoNotIgnoreReturnValue());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnGuAnalyzersProject()

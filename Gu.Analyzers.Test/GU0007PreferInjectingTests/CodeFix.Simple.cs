@@ -1,11 +1,11 @@
-﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal static partial class CodeFix
     {
-        internal class Simple
+        internal static class Simple
         {
             private static readonly string BarCode = @"
 namespace RoslynSandbox
@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void WhenNotInjectingFieldInitialization()
+            public static void WhenNotInjectingFieldInitialization()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingChained()
+            public static void WhenNotInjectingChained()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingChainedNameCollision()
+            public static void WhenNotInjectingChainedNameCollision()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -138,7 +138,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingOptional()
+            public static void WhenNotInjectingOptional()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -171,7 +171,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingParams()
+            public static void WhenNotInjectingParams()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -204,7 +204,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingChainedGeneric()
+            public static void WhenNotInjectingChainedGeneric()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -254,7 +254,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingChainedGenericParameterName()
+            public static void WhenNotInjectingChainedGenericParameterName()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -300,7 +300,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingChainedNewWithInjectedArgument()
+            public static void WhenNotInjectingChainedNewWithInjectedArgument()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -363,7 +363,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UnsafeWhenNotInjectingChainedPassingInPropertyOfInjected()
+            public static void UnsafeWhenNotInjectingChainedPassingInPropertyOfInjected()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -428,7 +428,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UnsafeWhenNotInjectingChainedPropertyOnInjected()
+            public static void UnsafeWhenNotInjectingChainedPropertyOnInjected()
             {
                 var fooCode = @"
 namespace RoslynSandbox

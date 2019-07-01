@@ -5,14 +5,14 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0009UseNamedParametersForBooleans();
         private static readonly CodeFixProvider Fix = new NameArgumentsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0009");
 
         [Test]
-        public void UnnamedBooleanParameters()
+        public static void UnnamedBooleanParameters()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void HandlesAnAlias()
+        public static void HandlesAnAlias()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void HandlesAFullyQualifiedName()
+        public static void HandlesAFullyQualifiedName()
         {
             var testCode = @"
 namespace RoslynSandbox

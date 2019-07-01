@@ -28,7 +28,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0009UseNamedParametersForBooleansBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DontIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DontIgnoreReturnValue());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DoNotIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DoNotIgnoreReturnValue());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0020SortPropertiesBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0020SortProperties());
 
@@ -127,9 +127,9 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0011DontIgnoreReturnValue()
+        public void GU0011DoNotIgnoreReturnValue()
         {
-            GU0011DontIgnoreReturnValueBenchmark.Run();
+            GU0011DoNotIgnoreReturnValueBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

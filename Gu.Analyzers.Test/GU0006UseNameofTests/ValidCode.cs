@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
 
         [Test]
-        public void WhenThrowingArgumentException()
+        public static void WhenThrowingArgumentException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArgumentOutOfRangeException()
+        public static void ArgumentOutOfRangeException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresDebuggerDisplay()
+        public static void IgnoresDebuggerDisplay()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresTypeName()
+        public static void IgnoresTypeName()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresSameLocal()
+        public static void IgnoresSameLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenUsedInDeclaration()
+        public static void WhenUsedInDeclaration()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenLocalsNotVisible()
+        public static void WhenLocalsNotVisible()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -159,7 +159,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresNamespaceName()
+        public static void IgnoresNamespaceName()
         {
             var testCode = @"
 namespace RoslynSandbox

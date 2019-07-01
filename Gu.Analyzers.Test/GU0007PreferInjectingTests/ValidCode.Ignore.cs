@@ -5,10 +5,10 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal partial class ValidCode
     {
-        internal class Ignore
+        internal static class Ignore
         {
             [Test]
-            public void WhenPrivateCtor()
+            public static void WhenPrivateCtor()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenStatic()
+            public static void WhenStatic()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenMethodInjectedLocatorInStaticMethod()
+            public static void WhenMethodInjectedLocatorInStaticMethod()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
 
             [TestCase("int")]
             [TestCase("Abstract")]
-            public void WhenNewNotInjectable(string type)
+            public static void WhenNewNotInjectable(string type)
             {
                 var abstractCode = @"
 namespace RoslynSandbox
@@ -110,7 +110,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenParams()
+            public static void WhenParams()
             {
                 var abstractCode = @"
 namespace RoslynSandbox
@@ -152,7 +152,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NewDictionaryOfBarAndBar()
+            public static void NewDictionaryOfBarAndBar()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InLambda()
+            public static void InLambda()
             {
                 var fooCode = @"
 namespace RoslynSandbox

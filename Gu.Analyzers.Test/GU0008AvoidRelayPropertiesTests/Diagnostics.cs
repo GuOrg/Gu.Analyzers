@@ -3,14 +3,14 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0008");
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
-        public void WhenReturningPropertyOfInjectedField(string getter)
+        public static void WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
-        public void WhenReturningPropertyOfFieldExpressionBody(string body)
+        public static void WhenReturningPropertyOfFieldExpressionBody(string body)
         {
             var fooCode = @"
 namespace RoslynSandbox

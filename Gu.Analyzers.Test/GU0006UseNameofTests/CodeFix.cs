@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
+namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFix
+    internal static class CodeFix
     {
         private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
         private static readonly UseNameofFix Fix = new UseNameofFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0006");
 
         [Test]
-        public void WhenThrowingArgumentException()
+        public static void WhenThrowingArgumentException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenThrowingArgumentOutOfRangeException()
+        public static void WhenThrowingArgumentOutOfRangeException()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenRaisingPropertyChanged()
+        public static void WhenRaisingPropertyChanged()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenRaisingStaticPropertyChanged()
+        public static void WhenRaisingStaticPropertyChanged()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -248,7 +248,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenRaisingStaticPropertyChanged2()
+        public static void WhenRaisingStaticPropertyChanged2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -345,7 +345,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenStaticNameofInstance()
+        public static void WhenStaticNameofInstance()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -386,7 +386,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenStaticNameofInstance2()
+        public static void WhenStaticNameofInstance2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -417,7 +417,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenStaticNameofInstance3()
+        public static void WhenStaticNameofInstance3()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -456,7 +456,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenRaisingPropertyChangedUnderscoreNames()
+        public static void WhenRaisingPropertyChangedUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -543,7 +543,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DependencyProperty()
+        public static void DependencyProperty()
         {
             var testCode = @"
 namespace RoslynSandbox

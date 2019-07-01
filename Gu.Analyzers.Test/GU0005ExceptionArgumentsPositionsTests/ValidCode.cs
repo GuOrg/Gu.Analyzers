@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
 
         [Test]
-        public void ArgumentExceptionWithMessageAndNameof()
+        public static void ArgumentExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArgumentNullExceptionWithMessageAndNameof()
+        public static void ArgumentNullExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArgumentOutOfRangeExceptionWithMessageAndNameof()
+        public static void ArgumentOutOfRangeExceptionWithMessageAndNameof()
         {
             var testCode = @"
 namespace RoslynSandbox

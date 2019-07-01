@@ -1,11 +1,11 @@
-﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal static partial class CodeFix
     {
-        internal class Member
+        internal static class Member
         {
             private static readonly string BarCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void WhenNotInjectingFieldInitialization()
+            public static void WhenNotInjectingFieldInitialization()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -87,7 +87,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingFieldInitializationUnderscore()
+            public static void WhenNotInjectingFieldInitializationUnderscore()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -120,7 +120,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingFieldInitializationObject()
+            public static void WhenNotInjectingFieldInitializationObject()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -153,7 +153,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenNotInjectingFieldInitializationWithNameCollision()
+            public static void WhenNotInjectingFieldInitializationWithNameCollision()
             {
                 var enumCode = @"
 namespace RoslynSandbox
@@ -200,7 +200,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldInitializationAndBaseCall()
+            public static void FieldInitializationAndBaseCall()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -235,7 +235,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldInitializationAndBaseCallUnderscoreNames()
+            public static void FieldInitializationAndBaseCallUnderscoreNames()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -270,7 +270,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingMethodInjectedLocator()
+            public static void WhenUsingMethodInjectedLocator()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -310,7 +310,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInMethod()
+            public static void WhenUsingLocatorInMethod()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -355,7 +355,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInLamdaClosure()
+            public static void WhenUsingLocatorInLambdaClosure()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -394,7 +394,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInTwoMethods()
+            public static void WhenUsingLocatorInTwoMethods()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -449,7 +449,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInMethodUnderscoreNames()
+            public static void WhenUsingLocatorInMethodUnderscoreNames()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -494,7 +494,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInMethodAndBaseCall()
+            public static void WhenUsingLocatorInMethodAndBaseCall()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -541,7 +541,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingLocatorInStaticMethod()
+            public static void WhenUsingLocatorInStaticMethod()
             {
                 var fooCode = @"
 namespace RoslynSandbox

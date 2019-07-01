@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
 
         [Test]
-        public void UsesNamedParameter()
+        public static void UsesNamedParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingADefaultBooleanParameter()
+        public static void UsingADefaultBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NondeducedGenericBooleanParameter()
+        public static void NonDeducedGenericBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DeducedGenericBooleanParameter()
+        public static void DeducedGenericBooleanParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FunctionAcceptingABooleanVariable()
+        public static void FunctionAcceptingABooleanVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BooleanParamsArray()
+        public static void BooleanParamsArray()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -149,7 +149,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontWarnOnDisposePattern()
+        public static void DoNotWarnOnDisposePattern()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontWarnOnAssertAreEqual()
+        public static void DoNotWarnOnAssertAreEqual()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -207,7 +207,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontWarnOnConfigureAwait()
+        public static void DoNotWarnOnConfigureAwait()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -232,7 +232,7 @@ namespace RoslynSandbox
 
         [TestCase("SetValue")]
         [TestCase("SetCurrentValue")]
-        public void DontWarnOn(string method)
+        public static void DoNotWarnOn(string method)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -255,7 +255,7 @@ namespace RoslynSandbox
 
         [TestCase("textBox.SetBar(true)")]
         [TestCase("Foo.SetBar(textBox, true)")]
-        public void DontWarnOnAttachedPropertySetter(string method)
+        public static void DoNotWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
 namespace RoslynSandbox
@@ -302,7 +302,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontWarnInExpressionTree()
+        public static void DoNotWarnInExpressionTree()
         {
             var testCode = @"
 namespace RoslynSandbox

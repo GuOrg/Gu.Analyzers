@@ -3,13 +3,13 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class ValidCode
+    internal static class ValidCode
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
 
         [TestCase("public int Value { get; set; }")]
         [TestCase("public int Value { get; } = 1;")]
-        public void AutoProp(string property)
+        public static void AutoProp(string property)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -24,7 +24,7 @@ namespace RoslynSandbox
 
         [TestCase("this.value;")]
         [TestCase("value;")]
-        public void ExpressionBodyReturningField(string getter)
+        public static void ExpressionBodyReturningField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
 
         [TestCase("get { return this.value; }")]
         [TestCase("get { return value; }")]
-        public void WithBackingField(string getter)
+        public static void WithBackingField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
 
         [TestCase("return this.bar.Value;")]
         [TestCase("return bar.Value;")]
-        public void WhenReturningPropertyOfCreatedField(string getter)
+        public static void WhenReturningPropertyOfCreatedField(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -98,7 +98,7 @@ namespace RoslynSandbox
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
-        public void WhenReturningPropertyOfCreatedFieldExpressionBody(string getter)
+        public static void WhenReturningPropertyOfCreatedFieldExpressionBody(string getter)
         {
             var fooCode = @"
 namespace RoslynSandbox

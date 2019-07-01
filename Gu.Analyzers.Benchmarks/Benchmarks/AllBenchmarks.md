@@ -22,7 +22,7 @@ Frequency=3410073 Hz, Resolution=293.2489 ns, Timer=TSC
 |                                      GU0006UseNameof |  2,680.803 us |  53.1731 us |  49.7381 us |  2,675.603 us |           - |           - |           - |             65536 B |
 |                                GU0007PreferInjecting | 18,885.391 us | 370.6691 us | 364.0467 us | 18,791.826 us |           - |           - |           - |                   - |
 |                  GU0009UseNamedParametersForBooleans | 13,743.362 us | 225.8859 us | 211.2938 us | 13,706.158 us |           - |           - |           - |                   - |
-|                          GU0011DontIgnoreReturnValue |  9,138.828 us | 149.7263 us | 132.7285 us |  9,095.406 us |           - |           - |           - |             40960 B |
+|                          GU0011DoNotIgnoreReturnValue |  9,138.828 us | 149.7263 us | 132.7285 us |  9,095.406 us |           - |           - |           - |             40960 B |
 |                                 GU0020SortProperties |    433.710 us |   8.5785 us |  18.2814 us |    431.076 us |           - |           - |           - |                   - |
 |                                     GU0022UseGetOnly |      6.111 us |   0.1746 us |   0.4601 us |      6.158 us |           - |           - |           - |                   - |
 |                      GU0023StaticMemberOrderAnalyzer |    644.871 us |  12.7972 us |  13.6928 us |    644.561 us |           - |           - |           - |             24576 B |

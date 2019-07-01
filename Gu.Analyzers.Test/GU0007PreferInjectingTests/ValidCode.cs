@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    internal static partial class ValidCode
     {
         private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void WhenInjecting()
+        public static void WhenInjecting()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNotInjectingChained()
+        public static void WhenNotInjectingChained()
         {
             var fooCode = @"
 namespace RoslynSandbox

@@ -1,11 +1,11 @@
-namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class ValidCode
     {
-        private static readonly GU0011DontIgnoreReturnValue Analyzer = new GU0011DontIgnoreReturnValue();
+        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
 
         [Test]
         public void ChainedCtor()

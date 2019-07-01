@@ -8,7 +8,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0011DontIgnoreReturnValue : DiagnosticAnalyzer
+    internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "GU0011";
 

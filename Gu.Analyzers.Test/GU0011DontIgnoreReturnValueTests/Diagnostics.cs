@@ -1,17 +1,17 @@
-namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    internal static class Diagnostics
     {
-        private static readonly GU0011DontIgnoreReturnValue Analyzer = new GU0011DontIgnoreReturnValue();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0011DontIgnoreReturnValue.DiagnosticId);
+        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0011DoNotIgnoreReturnValue.DiagnosticId);
 
         [TestCase("ints.Select(x => x);")]
         [TestCase("ints.Select(x => x).Where(x => x > 1);")]
         [TestCase("ints.Where(x => x > 1);")]
-        public void Linq(string linq)
+        public static void Linq(string linq)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StringBuilderWriteLineToString()
+        public static void StringBuilderWriteLineToString()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
 
         [TestCase("Add(1)")]
         [TestCase("Remove(1)")]
-        public void ImmutableArray(string call)
+        public static void ImmutableArray(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 
         [TestCase("Add(1)")]
         [TestCase("Remove(1)")]
-        public void ImmutableList(string call)
+        public static void ImmutableList(string call)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
 
         [Explicit("Fix later.")]
         [Test]
-        public void MoqSetupNonVoidNoReturn()
+        public static void MoqSetupNonVoidNoReturn()
         {
             var testCode = @"
 namespace RoslynSandbox

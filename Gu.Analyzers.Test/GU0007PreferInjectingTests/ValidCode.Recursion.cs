@@ -5,10 +5,10 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal partial class ValidCode
     {
-        internal class Recursion
+        internal static class Recursion
         {
             [Test]
-            public void IgnoresRecursiveProperty()
+            public static void IgnoresRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -59,7 +59,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingRecursiveMethod()
+            public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
