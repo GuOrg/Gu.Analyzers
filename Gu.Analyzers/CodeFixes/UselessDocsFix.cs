@@ -135,9 +135,9 @@ namespace Gu.Analyzers
                         text = $"The type of the elements in <paramref name=\"{parameter.Identifier.Text}\"/>.";
                     }
                     else if (semanticModel.TryGetType(parameter.Type, cancellationToken, out var type) &&
-                             type.Interfaces.TrySingle(x => x.MetadataName == "IEnumerable`1", out var enumerable) &&
-                             enumerable.TypeParameters.TrySingle(out var tp) &&
-                             tp.Name == typeParameter.Identifier.Text)
+                             type is INamedTypeSymbol namedType &&
+                             namedType.IsGenericType &&
+                             type.Interfaces.TrySingle(x => x.MetadataName == "IEnumerable`1", out _))
                     {
                         if (text != null)
                         {

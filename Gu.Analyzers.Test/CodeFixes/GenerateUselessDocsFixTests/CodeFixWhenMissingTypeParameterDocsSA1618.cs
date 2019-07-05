@@ -118,6 +118,42 @@ namespace RoslynSandbox
             RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 
+        [Test]
+        public void Issue206()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Saves <paramref name=""item""/> as json.
+        /// </summary>
+        /// <param name=""fileName"">The file name.</param>
+        public static void Save<↓T>(string fileName, T item)
+        {
+        }
+        }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Saves <paramref name=""item""/> as json.
+        /// </summary>
+        /// <typeparam name=""T"">The type of <paramref name=""item""/>.</typeparam>
+        /// <param name=""fileName"">The file name.</param>
+        public static void Save<T>(string fileName, T item)
+        {
+        }
+        }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
         [TestCase("T[]")]
         [TestCase("List<T>")]
         [TestCase("System.Collections.Generic.List<T>")]
