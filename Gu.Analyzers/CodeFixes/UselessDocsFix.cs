@@ -42,7 +42,7 @@ namespace Gu.Analyzers
                                 text,
                                 diagnostic);
                         }
-                        else if(parameter.Type is PredefinedTypeSyntax)
+                        else if (parameter.Type is PredefinedTypeSyntax)
                         {
                             context.RegisterCodeFix(
                                 "Generate useless xml documentation for parameter.",
