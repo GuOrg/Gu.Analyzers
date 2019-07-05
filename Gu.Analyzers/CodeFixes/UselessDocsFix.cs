@@ -42,6 +42,16 @@ namespace Gu.Analyzers
                                 text,
                                 diagnostic);
                         }
+                        else if(parameter.Type is PredefinedTypeSyntax)
+                        {
+                            context.RegisterCodeFix(
+                                "Generate useless xml documentation for parameter.",
+                                (editor, _) => editor.ReplaceNode(
+                                    docs,
+                                    x => x.WithParamText(parameter.Identifier.ValueText, string.Empty)),
+                                nameof(UselessDocsFix),
+                                diagnostic);
+                        }
                         else
                         {
                             context.RegisterCodeFix(

@@ -133,8 +133,8 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, string ↓text) => builder;
+        /// <param name=""text"">The <see cref=""string""/>.</param>
+        public StringBuilder Meh(string text, StringBuilder ↓builder) => builder;
     }
 }";
 
@@ -148,9 +148,9 @@ namespace RoslynSandbox
         /// <summary>
         /// Does nothing
         /// </summary>
-        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         /// <param name=""text"">The <see cref=""string""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, string text) => builder;
+        /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
+        public StringBuilder Meh(string text, StringBuilder builder) => builder;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
@@ -171,7 +171,7 @@ namespace RoslynSandbox
         /// </summary>
         /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         /// <param name=""builder2"">The <see cref=""StringBuilder""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, string ↓text, StringBuilder builder2) => builder;
+        public StringBuilder Meh(StringBuilder builder, StringBuilder ↓text, StringBuilder builder2) => builder;
     }
 }";
 
@@ -186,9 +186,9 @@ namespace RoslynSandbox
         /// Does nothing
         /// </summary>
         /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
-        /// <param name=""text"">The <see cref=""string""/>.</param>
+        /// <param name=""text"">The <see cref=""StringBuilder""/>.</param>
         /// <param name=""builder2"">The <see cref=""StringBuilder""/>.</param>
-        public StringBuilder Meh(StringBuilder builder, string text, StringBuilder builder2) => builder;
+        public StringBuilder Meh(StringBuilder builder, StringBuilder text, StringBuilder builder2) => builder;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
@@ -241,6 +241,41 @@ namespace RoslynSandbox
         }
     }
 }";
+            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+        }
+
+        [TestCase("int")]
+        [TestCase("string")]
+        public void EmptyForPrimitiveTypes(string type)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Summary
+        /// </summary>
+        public static void M(string ↓text)
+        {
+        }
+    }
+}".AssertReplace("string", type);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        /// <summary>
+        /// Summary
+        /// </summary>
+        /// <param name=""text""></param>
+        public static void M(string text)
+        {
+        }
+    }
+}".AssertReplace("string", type);
             RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
 

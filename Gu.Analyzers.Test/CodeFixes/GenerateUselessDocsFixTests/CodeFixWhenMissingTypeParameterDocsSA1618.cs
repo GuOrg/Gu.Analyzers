@@ -133,7 +133,7 @@ namespace RoslynSandbox
         public static void Save<↓T>(string fileName, T item)
         {
         }
-        }
+    }
 }";
 
             var fixedCode = @"
@@ -149,7 +149,7 @@ namespace RoslynSandbox
         public static void Save<T>(string fileName, T item)
         {
         }
-        }
+    }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
         }
