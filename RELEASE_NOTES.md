@@ -1,3 +1,6 @@
+#### 1.5.3
+* BUGFIX: NRE in exception analyzer.
+
 #### 1.5.0
 * FEATURE: SplitStringRefactoring
 * FEATURE: MakeStaticFix

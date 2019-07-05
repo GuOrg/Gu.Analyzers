@@ -2,8 +2,7 @@
 developmentDependency true
 
 releasenotes
-  FEATURE: SplitStringRefactoring
-  FEATURE: MakeStaticFix
+  BUGFIX: NRE in exception analyzer.
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT
