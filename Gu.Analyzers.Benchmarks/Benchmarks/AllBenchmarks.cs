@@ -52,7 +52,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0072AllTypesShouldBeInternalBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0072AllTypesShouldBeInternal());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.Analyzers.ExceptionAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new ExceptionAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void ArgumentListAnalyzer()

@@ -1,7 +1,8 @@
-namespace Gu.Analyzers.Analyzers
+namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -39,9 +40,8 @@ namespace Gu.Analyzers.Analyzers
         private static void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)
             where TException : Exception
         {
-            var typeInfo = context.SemanticModel.GetTypeInfo(expressionSyntax);
-
-            if (typeInfo.Type.Name == typeof(TException).Name)
+            if (context.SemanticModel.TryGetType(expressionSyntax, context.CancellationToken, out var type) &&
+                type.Name == typeof(TException).Name)
             {
                 context.ReportDiagnostic(Diagnostic.Create(diagnosticDescriptor, expressionSyntax.GetLocation()));
             }
