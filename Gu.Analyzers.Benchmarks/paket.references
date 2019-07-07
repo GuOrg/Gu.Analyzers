@@ -1,9 +1,10 @@
 group Benchmarks
+  Microsoft.NET.Test.Sdk
+  NUnit
+  NUnit3TestAdapter
   BenchmarkDotNet.Diagnostics.Windows
   Microsoft.CodeAnalysis.CSharp.Workspaces
   Gu.Roslyn.Asserts
-  NUnit
-  NUnit3TestAdapter
 
 group Analyzers
   AsyncUsageAnalyzers
