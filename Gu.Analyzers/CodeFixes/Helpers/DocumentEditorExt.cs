@@ -21,14 +21,6 @@ namespace Gu.Analyzers
 
             private static readonly ThreadLocal<ClassDeclarationSyntax> CurrentClass = new ThreadLocal<ClassDeclarationSyntax>();
 
-            internal SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
-            {
-                CurrentClass.Value = classDeclaration;
-                var updated = this.Visit(node);
-                CurrentClass.Value = null;
-                return updated;
-            }
-
             public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
             {
                 // We only want to make the top level class sealed.
@@ -127,6 +119,14 @@ namespace Gu.Analyzers
                 }
 
                 return base.VisitMethodDeclaration(node);
+            }
+
+            internal SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
+            {
+                CurrentClass.Value = classDeclaration;
+                var updated = this.Visit(node);
+                CurrentClass.Value = null;
+                return updated;
             }
         }
     }
