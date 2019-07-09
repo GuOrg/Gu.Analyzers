@@ -114,18 +114,6 @@ namespace Gu.Analyzers
             /// </summary>
             internal IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
 
-            /// <summary>
-            /// Get a walker that has visited <paramref name="node"/>.
-            /// </summary>
-            /// <param name="node">The node.</param>
-            /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
-            /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-            /// <returns>A walker that has visited <paramref name="node"/>.</returns>
-            internal static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());
-            }
-
             public override void VisitParenthesizedLambdaExpression(ParenthesizedLambdaExpressionSyntax node)
             {
                 // don't walk lambda
@@ -141,6 +129,18 @@ namespace Gu.Analyzers
             {
                 this.identifierNames.Add(node);
                 base.VisitIdentifierName(node);
+            }
+
+            /// <summary>
+            /// Get a walker that has visited <paramref name="node"/>.
+            /// </summary>
+            /// <param name="node">The node.</param>
+            /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
+            /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+            /// <returns>A walker that has visited <paramref name="node"/>.</returns>
+            internal static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());
             }
 
             /// <inheritdoc />

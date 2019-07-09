@@ -343,16 +343,6 @@ namespace Gu.Analyzers
 
             internal IReadOnlyList<BinaryExpressionSyntax> BinaryExpressionSyntaxes => this.binaryExpressionSyntaxes;
 
-            internal static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                var walker = Borrow(() => new CtorWalker());
-                walker.semanticModel = semanticModel;
-                walker.cancellationToken = cancellationToken;
-                walker.AddReadOnlies(constructor);
-                walker.Visit(constructor);
-                return walker;
-            }
-
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
                 if (TryGetIdentifier(node.Left, out var identifierName))
@@ -410,6 +400,16 @@ namespace Gu.Analyzers
             {
                 this.binaryExpressionSyntaxes.Add(node);
                 base.VisitBinaryExpression(node);
+            }
+
+            internal static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                var walker = Borrow(() => new CtorWalker());
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
+                walker.AddReadOnlies(constructor);
+                walker.Visit(constructor);
+                return walker;
             }
 
             protected override void Clear()
