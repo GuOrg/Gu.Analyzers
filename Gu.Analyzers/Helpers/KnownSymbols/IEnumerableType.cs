@@ -7,7 +7,7 @@ namespace Gu.Analyzers
     {
         internal readonly QualifiedMethod GetEnumerator;
 
-        public IEnumerableType()
+        internal IEnumerableType()
             : base("System.Collections.IEnumerable")
         {
             this.GetEnumerator = new QualifiedMethod(this, nameof(this.GetEnumerator));

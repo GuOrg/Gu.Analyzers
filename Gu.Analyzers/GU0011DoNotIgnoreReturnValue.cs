@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0011";
+        internal const string DiagnosticId = "GU0011";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

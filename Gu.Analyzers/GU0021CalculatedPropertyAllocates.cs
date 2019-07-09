@@ -1,10 +1,10 @@
-﻿namespace Gu.Analyzers
+namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
     internal static class GU0021CalculatedPropertyAllocates
     {
-        public const string DiagnosticId = "GU0021";
+        internal const string DiagnosticId = "GU0021";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

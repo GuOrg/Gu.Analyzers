@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0061EnumMemberValueOutOfRange : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0061";
+        internal const string DiagnosticId = "GU0061";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

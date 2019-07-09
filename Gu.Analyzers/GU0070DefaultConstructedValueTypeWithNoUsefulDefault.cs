@@ -11,7 +11,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0070DefaultConstructedValueTypeWithNoUsefulDefault : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0070";
+        internal const string DiagnosticId = "GU0070";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

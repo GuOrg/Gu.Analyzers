@@ -10,9 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0072AllTypesShouldBeInternal : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0072";
+        internal const string DiagnosticId = "GU0072";
 
-        public static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "All types should be internal.",
             messageFormat: "All types should be internal.",
@@ -36,18 +36,12 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is TypeDeclarationSyntax typeDeclaration &&
+                context.ContainingSymbol is ITypeSymbol &&
+                typeDeclaration.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PublicKeyword), out var modifier))
             {
-                return;
-            }
-
-            if (context.Node is TypeDeclarationSyntax typeDeclaration &&
-                context.ContainingSymbol is ITypeSymbol)
-            {
-                if (typeDeclaration.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PublicKeyword), out var modifier))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, modifier.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, modifier.GetLocation()));
             }
         }
     }

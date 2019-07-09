@@ -271,7 +271,7 @@ namespace Gu.Analyzers
             private readonly SemanticModel semanticModel;
             private readonly CancellationToken cancellationToken;
 
-            public ReplaceNodes(
+            internal ReplaceNodes(
                 IdentifierNameSyntax identifierName,
                 SemanticModel semanticModel,
                 CancellationToken cancellationToken)

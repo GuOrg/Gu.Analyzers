@@ -11,7 +11,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0020SortProperties : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0020";
+        internal const string DiagnosticId = "GU0020";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

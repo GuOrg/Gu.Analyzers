@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0023";
+        internal const string DiagnosticId = "GU0023";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
@@ -112,7 +112,7 @@ namespace Gu.Analyzers
             /// <summary>
             /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
             /// </summary>
-            public IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
+            internal IReadOnlyList<IdentifierNameSyntax> IdentifierNames => this.identifierNames;
 
             /// <summary>
             /// Get a walker that has visited <paramref name="node"/>.
@@ -121,7 +121,7 @@ namespace Gu.Analyzers
             /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
             /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
             /// <returns>A walker that has visited <paramref name="node"/>.</returns>
-            public static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());
             }

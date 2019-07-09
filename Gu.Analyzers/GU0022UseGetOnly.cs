@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0022UseGetOnly : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0022";
+        internal const string DiagnosticId = "GU0022";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

@@ -4,7 +4,7 @@ namespace Gu.Analyzers
 
     internal static class GU0015DoNotAssignMoreThanOnce
     {
-        public const string DiagnosticId = "GU0015";
+        internal const string DiagnosticId = "GU0015";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

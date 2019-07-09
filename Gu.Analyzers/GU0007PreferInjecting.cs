@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0007PreferInjecting : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0007";
+        internal const string DiagnosticId = "GU0007";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

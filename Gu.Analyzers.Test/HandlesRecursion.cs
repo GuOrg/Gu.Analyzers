@@ -32,7 +32,7 @@ namespace RoslynSandbox
 {
     internal abstract class Foo
     {
-        public Foo()
+        internal Foo()
             : this()
         {
         }
@@ -54,7 +54,7 @@ namespace RoslynSandbox
 
     internal abstract class Foo
     {
-        public Foo()
+        internal Foo()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
@@ -68,9 +68,9 @@ namespace RoslynSandbox
 #pragma warning restore GU0015 // Don't assign same more than once.
         }
 
-        public int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
+        internal int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
-        public int RecursiveStatementBodyProperty
+        internal int RecursiveStatementBodyProperty
         {
             get
             {
@@ -78,21 +78,21 @@ namespace RoslynSandbox
             }
         }
 
-        public int RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
+        internal int RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
 
-        public int RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
+        internal int RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
 
-        public int RecursiveStatementBodyMethod()
+        internal int RecursiveStatementBodyMethod()
         {
             return this.RecursiveStatementBodyMethod();
         }
 
-        public int RecursiveStatementBodyMethod(int value)
+        internal int RecursiveStatementBodyMethod(int value)
         {
             return this.RecursiveStatementBodyMethod(value);
         }
 
-        public void Meh()
+        internal void Meh()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
@@ -140,7 +140,7 @@ namespace RoslynSandbox
     internal sealed class ValidationErrorToStringConverter : IValueConverter
     {
         /// <summary> Gets the default instance </summary>
-        public static readonly ValidationErrorToStringConverter Default = new ValidationErrorToStringConverter();
+        internal static readonly ValidationErrorToStringConverter Default = new ValidationErrorToStringConverter();
 
 #pragma warning disable GU0012
         /// <inheritdoc />

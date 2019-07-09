@@ -329,21 +329,21 @@ namespace Gu.Analyzers
             {
             }
 
-            public IReadOnlyList<ISymbol> Unassigned => this.unassigned;
+            internal IReadOnlyList<ISymbol> Unassigned => this.unassigned;
 
-            public IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
+            internal IReadOnlyList<AssignmentExpressionSyntax> Assignments => this.assignments;
 
-            public IReadOnlyList<ArgumentSyntax> Arguments => this.arguments;
+            internal IReadOnlyList<ArgumentSyntax> Arguments => this.arguments;
 
-            public IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
+            internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
 
-            public IReadOnlyList<MemberAccessExpressionSyntax> MemberAccesses => this.memberAccesses;
+            internal IReadOnlyList<MemberAccessExpressionSyntax> MemberAccesses => this.memberAccesses;
 
-            public IReadOnlyList<ConditionalAccessExpressionSyntax> ConditionalAccesses => this.conditionalAccesses;
+            internal IReadOnlyList<ConditionalAccessExpressionSyntax> ConditionalAccesses => this.conditionalAccesses;
 
-            public IReadOnlyList<BinaryExpressionSyntax> BinaryExpressionSyntaxes => this.binaryExpressionSyntaxes;
+            internal IReadOnlyList<BinaryExpressionSyntax> BinaryExpressionSyntaxes => this.binaryExpressionSyntaxes;
 
-            public static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static CtorWalker Borrow(ConstructorDeclarationSyntax constructor, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 var walker = Borrow(() => new CtorWalker());
                 walker.semanticModel = semanticModel;

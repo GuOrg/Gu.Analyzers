@@ -13,7 +13,9 @@ namespace Gu.Analyzers
     internal class MakeInternalFix : CodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0072AllTypesShouldBeInternal.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            GU0072AllTypesShouldBeInternal.DiagnosticId,
+            GU0073MemberShouldBeInternal.DiagnosticId);
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -35,7 +37,7 @@ namespace Gu.Analyzers
                                 context.Document.WithSyntaxRoot(
                                     syntaxRoot.ReplaceToken(
                                         token,
-                                        SyntaxFactory.Token(SyntaxKind.InternalKeyword)))),
+                                        SyntaxFactory.Token(SyntaxKind.InternalKeyword).WithTriviaFrom(token)))),
                             nameof(MakeInternalFix)),
                         diagnostic);
                 }

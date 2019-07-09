@@ -4,7 +4,7 @@ namespace Gu.Analyzers
 
     internal static class GU0024SealTypeWithDefaultMember
     {
-        public const string DiagnosticId = "GU0024";
+        internal const string DiagnosticId = "GU0024";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

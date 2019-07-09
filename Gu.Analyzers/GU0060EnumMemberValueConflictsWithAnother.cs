@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0060";
+        internal const string DiagnosticId = "GU0060";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

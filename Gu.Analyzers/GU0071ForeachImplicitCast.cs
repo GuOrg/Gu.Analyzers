@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0071ForeachImplicitCast : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0071";
+        internal const string DiagnosticId = "GU0071";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

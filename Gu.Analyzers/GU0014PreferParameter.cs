@@ -4,7 +4,7 @@ namespace Gu.Analyzers
 
     internal static class GU0014PreferParameter
     {
-        public const string DiagnosticId = "GU0014";
+        internal const string DiagnosticId = "GU0014";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

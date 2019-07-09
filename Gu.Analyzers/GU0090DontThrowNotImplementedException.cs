@@ -4,7 +4,7 @@ namespace Gu.Analyzers
 
     internal static class GU0090DontThrowNotImplementedException
     {
-        public const string DiagnosticId = "GU0090";
+        internal const string DiagnosticId = "GU0090";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

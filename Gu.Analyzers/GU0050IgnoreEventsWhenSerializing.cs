@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0050";
+        internal const string DiagnosticId = "GU0050";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

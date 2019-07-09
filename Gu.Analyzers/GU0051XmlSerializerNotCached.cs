@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0051XmlSerializerNotCached : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0051";
+        internal const string DiagnosticId = "GU0051";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

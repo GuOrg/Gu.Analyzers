@@ -4,7 +4,7 @@ namespace Gu.Analyzers
 
     internal static class GU0016PreferLambda
     {
-        public const string DiagnosticId = "GU0016";
+        internal const string DiagnosticId = "GU0016";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0052ExceptionShouldBeSerializable : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "GU0052";
+        internal const string DiagnosticId = "GU0052";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
