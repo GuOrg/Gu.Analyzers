@@ -5,12 +5,12 @@ namespace ValidCode
 
     internal struct Bar : IDisposable
     {
-        public Bar(Task task)
+        internal Bar(Task task)
         {
             this.Task = task;
         }
 
-        public Task Task { get; }
+        internal Task Task { get; }
 
         public void Dispose()
         {

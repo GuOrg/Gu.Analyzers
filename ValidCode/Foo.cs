@@ -5,7 +5,7 @@ namespace ValidCode
 
     internal sealed class Foo
     {
-        public Foo()
+        internal Foo()
         {
             using (new Bar(Task.Run(() => 1)))
             {

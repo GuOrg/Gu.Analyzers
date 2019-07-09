@@ -26,12 +26,12 @@ namespace ValidCode
 
     internal class FooOut
     {
-        public static bool TryGetStream(out Stream stream)
+        internal static bool TryGetStream(out Stream stream)
         {
             return TryGetStreamCore(out stream);
         }
 
-        public void Bar()
+        internal void Bar()
         {
             IDisposable disposable;
             using (disposable = new Disposable())
@@ -39,7 +39,7 @@ namespace ValidCode
             }
         }
 
-        public void Baz()
+        internal void Baz()
         {
             Stream disposable;
             if (TryGetStreamCore(out disposable))

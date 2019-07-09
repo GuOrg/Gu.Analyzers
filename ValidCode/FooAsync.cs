@@ -6,7 +6,7 @@ namespace ValidCode
 
     internal static class FooAsync
     {
-        public static async Task<string> Bar1Async()
+        internal static async Task<string> Bar1Async()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -17,7 +17,7 @@ namespace ValidCode
             }
         }
 
-        public static async Task<string> Bar2Async()
+        internal static async Task<string> Bar2Async()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {

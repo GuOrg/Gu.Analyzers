@@ -10,12 +10,12 @@ namespace ValidCode
         private readonly IDisposable subscription;
         private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
 
-        public RxFoo(int no)
+        internal RxFoo(int no)
             : this(Create(no))
         {
         }
 
-        public RxFoo(IObservable<object> observable)
+        internal RxFoo(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ => { });
             this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });

@@ -7,12 +7,12 @@ namespace ValidCode
     {
         private readonly string path;
 
-        public Exceptions(string text)
+        internal Exceptions(string text)
         {
             this.path = text ?? throw new System.ArgumentNullException(nameof(text));
         }
 
-        public void M()
+        internal void M()
         {
             try
             {

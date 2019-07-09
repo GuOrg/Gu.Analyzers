@@ -22,7 +22,7 @@ namespace ValidCode
         [TestCase(int.MaxValue)]
         [TestCase(double.MaxValue)]
         [TestCase(double.NaN)]
-        public void WithDouble(double value)
+        internal void WithDouble(double value)
         {
             Assert.AreEqual(value, 1* value);
         }

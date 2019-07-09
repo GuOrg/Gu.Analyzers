@@ -7,7 +7,7 @@ namespace ValidCode
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal class Foo1 : IDisposable
+    internal class Foo1 : IDisposable, INotifyPropertyChanged
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
@@ -17,7 +17,7 @@ namespace ValidCode
 
         private bool isDirty;
 
-        public Foo1(IDisposable disposable)
+        internal Foo1(IDisposable disposable)
         {
             this.subscription.Disposable = File.OpenRead(string.Empty);
             this.disposable = Bar(disposable);
@@ -44,17 +44,17 @@ namespace ValidCode
 
         private event PropertyChangedEventHandler PropertyChangedCore;
 
-        public IDisposable Disposable => this.subscription.Disposable;
+        internal IDisposable Disposable => this.subscription.Disposable;
 
 #pragma warning disable IDISP012 // Property should not return created disposable.
 #pragma warning disable GU0021 // Calculated property allocates reference type.
-        public IDisposable CreateDisposableProperty => new Disposable();
+        internal IDisposable CreateDisposableProperty => new Disposable();
 #pragma warning restore GU0021 // Calculated property allocates reference type.
 #pragma warning restore IDISP012 // Property should not return created disposable.
 
-        public string Text => this.AddAndReturnToString();
+        internal string Text => this.AddAndReturnToString();
 
-        public bool IsDirty
+        internal bool IsDirty
         {
             get
             {
@@ -83,7 +83,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable CreateDisposable() => new Disposable();
+        internal IDisposable CreateDisposable() => new Disposable();
 
         internal string AddAndReturnToString()
         {

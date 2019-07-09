@@ -5,12 +5,12 @@ namespace ValidCode
 
     internal class Disposable : IDisposable
     {
-        public Disposable(string meh)
+        internal Disposable(string meh)
             : this()
         {
         }
 
-        public Disposable()
+        internal Disposable()
         {
         }
 

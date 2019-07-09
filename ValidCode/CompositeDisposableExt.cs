@@ -6,7 +6,7 @@ namespace ValidCode
 
     internal static class CompositeDisposableExt
     {
-        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+        internal static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
             where T : IDisposable
         {
             if (item != null)

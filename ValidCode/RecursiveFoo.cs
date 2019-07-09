@@ -27,7 +27,7 @@ namespace ValidCode
         private IDisposable bar1;
         private IDisposable bar2;
 
-        public RecursiveFoo()
+        internal RecursiveFoo()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
@@ -41,17 +41,17 @@ namespace ValidCode
 #pragma warning restore GU0015 // Don't assign same more than once.
         }
 
-        public IDisposable RecursiveProperty => this.RecursiveProperty;
+        internal IDisposable RecursiveProperty => this.RecursiveProperty;
 
-        public int Value1 => this.Value1;
+        internal int Value1 => this.Value1;
 
-        public int Value2 => this.Value2;
+        internal int Value2 => this.Value2;
 
-        public int Value3 => this.Value1;
+        internal int Value3 => this.Value1;
 
-        public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
+        internal IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
-        public IDisposable RecursiveStatementBodyProperty
+        internal IDisposable RecursiveStatementBodyProperty
         {
             get
             {
@@ -59,7 +59,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable Value4
+        internal IDisposable Value4
         {
             get
             {
@@ -77,7 +77,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable Value5
+        internal IDisposable Value5
         {
             get => this.Value5;
             set
@@ -91,7 +91,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable Value6
+        internal IDisposable Value6
         {
             get => this.Value5;
             set
@@ -105,7 +105,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable Bar1
+        internal IDisposable Bar1
         {
             get
             {
@@ -128,7 +128,7 @@ namespace ValidCode
             }
         }
 
-        public IDisposable Bar2
+        internal IDisposable Bar2
         {
             get
             {
@@ -151,23 +151,23 @@ namespace ValidCode
             }
         }
 
-        public static bool RecursiveOut(out IDisposable value)
+        internal static bool RecursiveOut(out IDisposable value)
         {
             return RecursiveOut(out value);
         }
 
-        public static bool RecursiveOut(int foo, out IDisposable value)
+        internal static bool RecursiveOut(int foo, out IDisposable value)
         {
             return RecursiveOut(2, out value);
         }
 
-        public static bool RecursiveOut(double foo, out IDisposable value)
+        internal static bool RecursiveOut(double foo, out IDisposable value)
         {
             value = null;
             return RecursiveOut(3.0, out value);
         }
 
-        public static bool RecursiveOut(string foo, out IDisposable value)
+        internal static bool RecursiveOut(string foo, out IDisposable value)
         {
             if (foo == null)
             {
@@ -178,20 +178,20 @@ namespace ValidCode
             return true;
         }
 
-        public static bool RecursiveRef(ref IDisposable value)
+        internal static bool RecursiveRef(ref IDisposable value)
         {
             return RecursiveRef(ref value);
         }
 
-        public Disposable RecursiveMethod() => this.RecursiveMethod();
+        internal Disposable RecursiveMethod() => this.RecursiveMethod();
 
-        public void NotUsingRecursive()
+        internal void NotUsingRecursive()
         {
             var item1 = this.RecursiveProperty;
             var item2 = this.RecursiveMethod();
         }
 
-        public void UsingRecursive()
+        internal void UsingRecursive()
         {
             using (var item = new Disposable())
             {
@@ -214,21 +214,21 @@ namespace ValidCode
             }
         }
 
-        public IDisposable RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
+        internal IDisposable RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
 
-        public IDisposable RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
+        internal IDisposable RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
 
-        public IDisposable RecursiveStatementBodyMethod()
+        internal IDisposable RecursiveStatementBodyMethod()
         {
             return this.RecursiveStatementBodyMethod();
         }
 
-        public IDisposable RecursiveStatementBodyMethod(int value)
+        internal IDisposable RecursiveStatementBodyMethod(int value)
         {
             return this.RecursiveStatementBodyMethod(value);
         }
 
-        public void Meh()
+        internal void Meh()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
