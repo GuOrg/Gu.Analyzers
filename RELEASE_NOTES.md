@@ -1,3 +1,6 @@
+#### 1.5.4
+* FEATURE: Member of internal class should be internal, analyzer + fix.
+
 #### 1.5.3
 * BUGFIX: NRE in exception analyzer.
 
