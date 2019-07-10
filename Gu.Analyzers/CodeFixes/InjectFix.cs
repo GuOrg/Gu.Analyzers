@@ -112,6 +112,11 @@ namespace Gu.Analyzers
 
         private static string ParameterName(ParameterListSyntax parameterList, ExpressionSyntax expression, string typeName)
         {
+            while (expression.Parent is MemberAccessExpressionSyntax memberAccess)
+            {
+                expression = memberAccess;
+            }
+
             if (expression.Parent is AssignmentExpressionSyntax assignment &&
                 assignment.Right.Contains(expression))
             {

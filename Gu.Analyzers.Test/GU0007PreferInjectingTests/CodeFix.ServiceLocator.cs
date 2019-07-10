@@ -54,18 +54,18 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public static void WhenNotInjectingFieldInitialization()
+            public static void AssigningThisFieldInCtor()
             {
                 var before = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly Bar value;
 
         public Foo(ServiceLocator locator)
         {
-            this.bar = locator.↓Bar;
+            this.value = locator.↓Bar;
         }
     }
 }";
@@ -75,11 +75,11 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly Bar value;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public Foo(ServiceLocator locator, Bar value)
         {
-            this.bar = bar;
+            this.value = value;
         }
     }
 }";
@@ -87,18 +87,18 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void WhenNotInjectingFieldInitializationUnderscore()
+            public static void AssigningUnderscoreFieldInCtor()
             {
                 var before = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar _bar;
+        private readonly Bar _value;
 
         public Foo(ServiceLocator locator)
         {
-            _bar = locator.↓Bar;
+            _value = locator.↓Bar;
         }
     }
 }";
@@ -108,11 +108,11 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Bar _bar;
+        private readonly Bar _value;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public Foo(ServiceLocator locator, Bar value)
         {
-            _bar = bar;
+            _value = value;
         }
     }
 }";
