@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public static void WhenAssigningFieldWithObjectCreation()
+            public static void WhenAssigningThisFieldWithObjectCreation()
             {
                 var before = @"
 namespace RoslynSandbox
@@ -46,6 +46,108 @@ namespace RoslynSandbox
         {
             this.bar = bar;
         }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+            }
+
+            [Test]
+            public static void WhenAssigningUnderscoreFieldWithObjectCreation()
+            {
+                var before = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar _bar;
+
+        public Foo()
+        {
+            _bar = ↓new Bar();
+        }
+    }
+}";
+
+                var after = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar _bar;
+
+        public Foo(Bar bar)
+        {
+            _bar = bar;
+        }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+            }
+
+            [Test]
+            public static void WhenAssigningThisPropertyWithObjectCreation()
+            {
+                var before = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            this.Bar = ↓new Bar();
+        }
+
+        public Bar Bar { get; }
+    }
+}";
+
+                var after = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(Bar bar)
+        {
+            this.Bar = bar;
+        }
+
+        public Bar Bar { get; }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+            }
+
+            [Test]
+            public static void WhenAssigningPropertyWithObjectCreation()
+            {
+                var before = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            Bar = ↓new Bar();
+        }
+
+        public Bar Bar { get; }
+    }
+}";
+
+                var after = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(Bar bar)
+        {
+            Bar = bar;
+        }
+
+        public Bar Bar { get; }
     }
 }";
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);

@@ -118,9 +118,9 @@ namespace Gu.Analyzers
                 switch (assignment.Left)
                 {
                     case MemberAccessExpressionSyntax memberAccess:
-                        return UniqueName(memberAccess.Name.Identifier.ValueText.TrimStart('_'));
+                        return UniqueName(memberAccess.Name.Identifier.ValueText.TrimStart('_').ToFirstCharLower());
                     case IdentifierNameSyntax identifierName:
-                        return UniqueName(identifierName.Identifier.ValueText.TrimStart('_'));
+                        return UniqueName(identifierName.Identifier.ValueText.TrimStart('_').ToFirstCharLower());
                     default:
                         throw new NotSupportedException("Could not figure out parameter name from assignment.");
                 }
