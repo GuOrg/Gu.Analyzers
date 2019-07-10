@@ -295,7 +295,27 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            return false;
+            return type.TryFindSingleMember<ISymbol>(x => IsMatch(x), out _);
+
+            bool IsMatch(ISymbol candidate)
+            {
+                if (candidate.IsStatic)
+                {
+                    if (FieldOrProperty.TryCreate(candidate, out var fieldOrProperty))
+                    {
+                        return Equals(fieldOrProperty.Type, type);
+                    }
+
+                    if (candidate is IMethodSymbol method &&
+                        method.MethodKind == MethodKind.Ordinary &&
+                        Equals(method.ReturnType, type))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }
