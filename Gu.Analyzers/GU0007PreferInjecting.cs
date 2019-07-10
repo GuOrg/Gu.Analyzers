@@ -17,7 +17,7 @@ namespace Gu.Analyzers
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Prefer injecting.",
-            messageFormat: "Prefer injecting.",
+            messageFormat: "Prefer injecting {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
@@ -106,7 +106,7 @@ namespace Gu.Analyzers
             }
         }
 
-        internal static ITypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static INamedTypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
             if (symbol == null ||
@@ -121,10 +121,10 @@ namespace Gu.Analyzers
                     !property.Type.IsValueType &&
                     AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
                 {
-                    return memberType;
+                    return memberType as INamedTypeSymbol;
                 }
 
-                return property.Type;
+                return property.Type as INamedTypeSymbol;
             }
 
             if (symbol is IFieldSymbol field)
@@ -133,10 +133,10 @@ namespace Gu.Analyzers
                     !field.Type.IsValueType &&
                     AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
                 {
-                    return memberType;
+                    return memberType as INamedTypeSymbol;
                 }
 
-                return field.Type;
+                return field.Type as INamedTypeSymbol;
             }
 
             return null;
@@ -187,17 +187,23 @@ namespace Gu.Analyzers
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(objectCreation, out _) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
-                context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) is IMethodSymbol ctor &&
-                IsInjectionType(ctor.ContainingType))
+                context.SemanticModel.TryGetNamedType(objectCreation, context.CancellationToken, out var createdType) &&
+                IsInjectionType(createdType))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+                var typeName = createdType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptor,
+                        objectCreation.GetLocation(),
+                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName),
+                        typeName));
             }
         }
 
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                !context.ContainingSymbol.IsStatic && 
+                !context.ContainingSymbol.IsStatic &&
                 context.Node is MemberAccessExpressionSyntax memberAccess &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(memberAccess, out _))
@@ -228,7 +234,13 @@ namespace Gu.Analyzers
 
                 if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) != Injectable.No)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, memberAccess.Name.GetLocation()));
+                    var typeName = memberType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptor,
+                            memberAccess.Name.GetLocation(),
+                            ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName),
+                            typeName));
                 }
             }
         }

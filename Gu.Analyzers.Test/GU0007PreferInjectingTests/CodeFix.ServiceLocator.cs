@@ -56,7 +56,7 @@ namespace RoslynSandbox
             [Test]
             public static void WhenNotInjectingFieldInitialization()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -70,7 +70,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -83,13 +83,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenNotInjectingFieldInitializationUnderscore()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -103,7 +103,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -116,13 +116,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenNotInjectingFieldInitializationObject()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -136,7 +136,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -149,7 +149,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
@@ -163,7 +163,7 @@ namespace RoslynSandbox
         Bar
     }
 }";
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -180,7 +180,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -196,13 +196,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, enumCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, enumCode, before }, after);
             }
 
             [Test]
             public static void FieldInitializationAndBaseCall()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -217,7 +217,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -231,13 +231,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after);
             }
 
             [Test]
             public static void FieldInitializationAndBaseCallUnderscoreNames()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -252,7 +252,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -266,13 +266,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingMethodInjectedLocator()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -288,7 +288,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -306,13 +306,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInMethod()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -331,7 +331,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -351,13 +351,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInLambdaClosure()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -374,7 +374,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -390,13 +390,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInTwoMethods()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -420,7 +420,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -445,13 +445,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInMethodUnderscoreNames()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -470,7 +470,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -490,13 +490,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, fooCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInMethodAndBaseCall()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -516,7 +516,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -537,13 +537,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after);
             }
 
             [Test]
             public static void WhenUsingLocatorInStaticMethod()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -563,7 +563,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class Foo : FooBase
@@ -582,7 +582,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, fooCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after);
             }
         }
     }

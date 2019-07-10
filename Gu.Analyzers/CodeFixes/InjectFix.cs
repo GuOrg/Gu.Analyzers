@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
@@ -34,30 +35,24 @@ namespace Gu.Analyzers
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node))
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node) &&
+                    diagnostic.Properties.TryGetValue(nameof(INamedTypeSymbol), out var typeName))
                 {
-                    if (node is ObjectCreationExpressionSyntax objectCreation &&
-                        semanticModel.TryGetType(objectCreation, context.CancellationToken, out var createdType))
+                    if (node is ObjectCreationExpressionSyntax objectCreation)
                     {
-                        var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(createdType)))
-                                                           .WithType(objectCreation.Type);
                         context.RegisterCodeFix(
                             CodeAction.Create(
-                                "Inject",
-                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
+                                "Inject.",
+                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, typeName),
                                 nameof(InjectFix)),
                             diagnostic);
                     }
-                    else if (node is IdentifierNameSyntax identifierName &&
-                             identifierName.Parent is MemberAccessExpressionSyntax memberAccess)
+                    else if (node is IdentifierNameSyntax identifierName)
                     {
-                        var type = GU0007PreferInjecting.MemberType(memberAccess, semanticModel, context.CancellationToken);
-                        var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
-                                                           .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
                         context.RegisterCodeFix(
                             CodeAction.Create(
-                                "Inject UNSAFE",
-                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, parameterSyntax),
+                                "Inject UNSAFE.",
+                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, typeName),
                                 nameof(InjectFix)),
                             diagnostic);
                     }
@@ -65,13 +60,19 @@ namespace Gu.Analyzers
             }
         }
 
-        private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
+        private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, string typeName)
         {
             if (Inject.TryFindConstructor(expression, out var ctor))
             {
                 var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                                  .ConfigureAwait(false);
-                parameterSyntax = UniqueName(ctor.ParameterList, parameterSyntax);
+                var type = SyntaxFactory.ParseTypeName(typeName);
+                var parameterSyntax = SyntaxFactory.Parameter(
+                    attributeLists: default,
+                    modifiers: default,
+                    type: type,
+                    identifier: SyntaxFactory.Identifier(ParameterName(ctor.ParameterList, expression, typeName)),
+                    @default: default);
                 if (expression is ObjectCreationExpressionSyntax)
                 {
                     editor.ReplaceNode(expression, SyntaxFactory.IdentifierName(parameterSyntax.Identifier));
@@ -130,45 +131,45 @@ namespace Gu.Analyzers
             return context.Document;
         }
 
-        private static ParameterSyntax UniqueName(ParameterListSyntax parameterList, ParameterSyntax parameter)
+        private static string ParameterName(ParameterListSyntax parameterList, ExpressionSyntax expression, string typeName)
         {
-            if (parameterList != null)
+            if (expression.Parent is AssignmentExpressionSyntax assignment &&
+                assignment.Right.Contains(expression))
             {
-                foreach (var p in parameterList.Parameters)
+                switch (assignment.Left)
                 {
-                    if (p.Identifier.ValueText == parameter.Identifier.ValueText)
-                    {
-                        return UniqueName(
-                            parameterList,
-                            parameter.WithIdentifier(SyntaxFactory.Identifier(parameter.Identifier.ValueText + "_")));
-                    }
+                    case MemberAccessExpressionSyntax memberAccess:
+                        return UniqueName(memberAccess.Name.Identifier.ValueText.TrimStart('_'));
+                    case IdentifierNameSyntax identifierName:
+                        return UniqueName(identifierName.Identifier.ValueText.TrimStart('_'));
+                    default:
+                        throw new NotSupportedException("Could not figure out parameter name from assignment.");
                 }
             }
 
-            return parameter;
-        }
-
-        private static string ParameterName(ITypeSymbol type)
-        {
-            if (type is INamedTypeSymbol namedType &&
-                namedType.IsGenericType)
+            var index = typeName.IndexOf('<');
+            if (index > 0)
             {
-                var definition = namedType.OriginalDefinition;
-                if (definition?.TypeParameters.Length == 1)
+                return ParameterName(parameterList, expression, typeName.Substring(0, index));
+            }
+
+            return UniqueName(typeName.ToFirstCharLower());
+
+            string UniqueName(string candidate)
+            {
+                if (parameterList != null)
                 {
-                    var parameter = definition.TypeParameters[0];
-                    foreach (var constraintType in parameter.ConstraintTypes)
+                    foreach (var p in parameterList.Parameters)
                     {
-                        if (type.Name.Contains(constraintType.Name))
+                        if (p.Identifier.ValueText == candidate)
                         {
-                            return type.Name.Replace(constraintType.Name, namedType.TypeArguments[0].Name)
-                                       .ToFirstCharLower();
+                            return UniqueName(candidate + "_");
                         }
                     }
                 }
-            }
 
-            return type.Name.ToFirstCharLower();
+                return candidate;
+            }
         }
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
