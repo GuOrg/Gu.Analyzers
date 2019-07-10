@@ -30,7 +30,7 @@ namespace Gu.Analyzers
                     diagnostic.Properties.TryGetValue(nameof(IdentifierNameSyntax), out var name))
                 {
                     context.RegisterCodeFix(
-                        $"Use parameter {name}.",
+                        $"Use nameof({name}).",
                         (editor, _) => editor.ReplaceNode(
                             argument.Expression,
                             x => CreateNode(x).WithTriviaFrom(x)),
