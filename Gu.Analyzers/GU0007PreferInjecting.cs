@@ -77,7 +77,7 @@ namespace Gu.Analyzers
             switch (expression)
             {
                 case IdentifierNameSyntax identifierName:
-                    return TryFindInjectConstructor(identifierName, out _)
+                    return Inject.TryFindConstructor(identifierName, out _)
                         ? Injectable.Safe
                         : Injectable.No;
                 case ObjectCreationExpressionSyntax nestedObjectCreation:
@@ -142,14 +142,6 @@ namespace Gu.Analyzers
             return null;
         }
 
-        internal static bool TryFindInjectConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
-        {
-            ctor = null;
-            return node.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration) &&
-                   classDeclaration.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword),out ctor) &&
-                   !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);
-        }
-
         internal static bool IsRootValid(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (MemberPath.TryFindRoot(memberAccess, out var root))
@@ -197,7 +189,7 @@ namespace Gu.Analyzers
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 !context.ContainingSymbol.IsStatic &&
-                TryFindInjectConstructor(objectCreation, out _) &&
+                Inject.TryFindConstructor(objectCreation, out _) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
                 context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) is IMethodSymbol ctor &&
                 IsInjectionType(ctor.ContainingType))
@@ -216,7 +208,7 @@ namespace Gu.Analyzers
 
             if (context.Node is MemberAccessExpressionSyntax memberAccess &&
                 !context.ContainingSymbol.IsStatic &&
-                TryFindInjectConstructor(memberAccess, out _))
+                Inject.TryFindConstructor(memberAccess, out _))
             {
                 if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
                     assignment.Left == memberAccess)

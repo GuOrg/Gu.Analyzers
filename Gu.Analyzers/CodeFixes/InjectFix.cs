@@ -100,7 +100,7 @@ namespace Gu.Analyzers
 
         private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, ParameterSyntax parameterSyntax)
         {
-            if (GU0007PreferInjecting.TryFindInjectConstructor(expression, out var ctor))
+            if (Inject.TryFindConstructor(expression, out var ctor))
             {
                 var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                                  .ConfigureAwait(false);
