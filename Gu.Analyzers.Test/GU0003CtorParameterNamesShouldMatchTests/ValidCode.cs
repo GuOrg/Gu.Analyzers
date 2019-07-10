@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
         [Test]
         public static void ConstructorSettingProperties()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -33,13 +33,13 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConstructorSettingPropertiesStruct()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public struct Foo
@@ -61,13 +61,13 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ChainedConstructorSettingProperties()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -94,7 +94,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace RoslynSandbox
         [Test]
         public static void ConstructorSettingField()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -159,13 +159,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConstructorSettingFieldPrefixedByUnderscore()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -184,13 +184,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoresWhenSettingTwoProperties()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -206,7 +206,7 @@ namespace RoslynSandbox
         public int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -275,7 +275,7 @@ namespace RoslynSandbox
         [Test]
         public static void IgnoresIdCaps()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -288,13 +288,13 @@ namespace RoslynSandbox
         public int ID { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoresTupleCreate()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -311,13 +311,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoresNumbered()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo : Bar
@@ -338,13 +338,13 @@ namespace RoslynSandbox
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoredWhenAssigningWeakReferenceTarget()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -360,13 +360,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenUsingParameterAsTwoArguments()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -386,7 +386,58 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ThrowExpressionNameofOther()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string sq;
+
+        public Foo(string s1, string s2)
+        {
+            this.sq = s1 ?? throw new ArgumentNullException(nameof(s2));
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void Nullchecks()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        private readonly string s1;
+        private readonly string s2;
+
+        public C(string s1, string s2)
+        {
+            if (s2 == null)
+            {
+                throw new System.ArgumentNullException(nameof(s1));
+            }
+
+            this.s1 = s1 ?? throw new System.ArgumentNullException(nameof(s2));
+            this.s2 = s2 + ""abc"";
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }
