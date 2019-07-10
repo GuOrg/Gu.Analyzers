@@ -412,7 +412,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void Nullchecks()
+        public static void NullChecksAndThrowingForWrong()
         {
             var code = @"
 namespace RoslynSandbox

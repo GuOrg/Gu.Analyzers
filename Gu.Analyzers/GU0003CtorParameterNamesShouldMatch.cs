@@ -8,8 +8,8 @@ namespace Gu.Analyzers
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Name the parameters to match the assigned members.",
-            messageFormat: "Name the parameters to match the assigned members.",
+            title: "Name the parameter to match the assigned member.",
+            messageFormat: "Name the parameter to match the assigned member.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,

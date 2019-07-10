@@ -10,9 +10,9 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Rename;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RenameConstructorArgumentsFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RenameConstructorParameterFix))]
     [Shared]
-    internal class RenameConstructorArgumentsFix : CodeFixProvider
+    internal class RenameConstructorParameterFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
@@ -35,7 +35,7 @@ namespace Gu.Analyzers
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
-                            "Rename parameter",
+                            $"Rename to '{name}'",
                             cancellationToken => Renamer.RenameSymbolAsync(
                                 context.Document.Project.Solution,
                                 parameter,
