@@ -11,6 +11,7 @@ namespace Gu.Analyzers
         {
             ctor = null;
             return node.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration) &&
+                   !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                    classDeclaration.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ctor) &&
                    !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);
         }

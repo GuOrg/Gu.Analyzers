@@ -181,13 +181,9 @@ namespace Gu.Analyzers
 
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis() ||
-                context.ContainingSymbol.IsStatic)
-            {
-                return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+            if (!context.IsExcludedFromAnalysis() &&
+                !context.ContainingSymbol.IsStatic &&
+                context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(objectCreation, out _) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
@@ -200,13 +196,9 @@ namespace Gu.Analyzers
 
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis() ||
-                context.ContainingSymbol.IsStatic)
-            {
-                return;
-            }
-
-            if (context.Node is MemberAccessExpressionSyntax memberAccess &&
+            if (!context.IsExcludedFromAnalysis() &&
+                !context.ContainingSymbol.IsStatic && 
+                context.Node is MemberAccessExpressionSyntax memberAccess &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(memberAccess, out _))
             {
