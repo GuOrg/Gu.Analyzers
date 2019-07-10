@@ -77,7 +77,7 @@ namespace Gu.Analyzers
             switch (expression)
             {
                 case IdentifierNameSyntax identifierName:
-                    return TrySingleConstructor(identifierName, out _)
+                    return TryFindInjectConstructor(identifierName, out _)
                         ? Injectable.Safe
                         : Injectable.No;
                 case ObjectCreationExpressionSyntax nestedObjectCreation:
@@ -142,22 +142,12 @@ namespace Gu.Analyzers
             return null;
         }
 
-        internal static bool TrySingleConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
+        internal static bool TryFindInjectConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
         {
             ctor = null;
-            var classDeclaration = node.FirstAncestor<ClassDeclarationSyntax>();
-            if (classDeclaration == null)
-            {
-                return false;
-            }
-
-            if (classDeclaration.Members.TrySingle(x => x is ConstructorDeclarationSyntax, out var single))
-            {
-                ctor = (ConstructorDeclarationSyntax)single;
-                return true;
-            }
-
-            return false;
+            return node.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration) &&
+                   classDeclaration.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword),out ctor) &&
+                   !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);
         }
 
         internal static bool IsRootValid(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -207,8 +197,7 @@ namespace Gu.Analyzers
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 !context.ContainingSymbol.IsStatic &&
-                TrySingleConstructor(objectCreation, out var contextCtor) &&
-                !contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword) &&
+                TryFindInjectConstructor(objectCreation, out _) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
                 context.SemanticModel.GetSymbolSafe(objectCreation, context.CancellationToken) is IMethodSymbol ctor &&
                 IsInjectionType(ctor.ContainingType))
@@ -227,8 +216,7 @@ namespace Gu.Analyzers
 
             if (context.Node is MemberAccessExpressionSyntax memberAccess &&
                 !context.ContainingSymbol.IsStatic &&
-                TrySingleConstructor(memberAccess, out var contextCtor) &&
-                !contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                TryFindInjectConstructor(memberAccess, out _))
             {
                 if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
                     assignment.Left == memberAccess)
