@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public static void WhenNotInjectingFieldInitialization()
+            public static void WhenAssigningFieldWithObjectCreation()
             {
                 var before = @"
 namespace RoslynSandbox

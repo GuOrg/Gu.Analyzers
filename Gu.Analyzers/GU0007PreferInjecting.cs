@@ -37,104 +37,6 @@ namespace Gu.Analyzers
             context.RegisterSyntaxNodeAction(c => HandleMemberAccess(c), SyntaxKind.SimpleMemberAccessExpression);
         }
 
-        internal static Inject.Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (objectCreation?.ArgumentList == null)
-            {
-                return Inject.Injectable.No;
-            }
-
-            var injectable = Inject.Injectable.Safe;
-            foreach (var argument in objectCreation.ArgumentList.Arguments)
-            {
-                var temp = IsInjectable(argument.Expression, semanticModel, cancellationToken);
-                switch (temp)
-                {
-                    case Inject.Injectable.No:
-                        return Inject.Injectable.No;
-                    case Inject.Injectable.Safe:
-                        break;
-                    case Inject.Injectable.Unsafe:
-                        injectable = Inject.Injectable.Unsafe;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return injectable;
-        }
-
-        internal static Inject.Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            switch (expression)
-            {
-                case IdentifierNameSyntax identifierName:
-                    return Inject.TryFindConstructor(identifierName, out _)
-                        ? Inject.Injectable.Safe
-                        : Inject.Injectable.No;
-                case ObjectCreationExpressionSyntax nestedObjectCreation:
-                    return CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Inject.Injectable.No ? Inject.Injectable.No : Inject.Injectable.Safe;
-                case MemberAccessExpressionSyntax memberAccess:
-                    if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
-                        assignment.Left == expression)
-                    {
-                        return Inject.Injectable.No;
-                    }
-
-                    if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
-                        semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
-                    {
-                        switch (rootSymbol)
-                        {
-                            case IParameterSymbol _:
-                            case IFieldSymbol _:
-                            case IPropertySymbol _:
-                                return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
-                        }
-                    }
-                    return Inject.Injectable.No;
-                default:
-                    return Inject.Injectable.No;
-            }
-        }
-
-        internal static INamedTypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
-            if (symbol == null ||
-                symbol.IsStatic)
-            {
-                return null;
-            }
-
-            if (symbol is IPropertySymbol property)
-            {
-                if (!property.Type.IsSealed &&
-                    !property.Type.IsValueType &&
-                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
-                {
-                    return memberType as INamedTypeSymbol;
-                }
-
-                return property.Type as INamedTypeSymbol;
-            }
-
-            if (symbol is IFieldSymbol field)
-            {
-                if (!field.Type.IsSealed &&
-                    !field.Type.IsValueType &&
-                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
-                {
-                    return memberType as INamedTypeSymbol;
-                }
-
-                return field.Type as INamedTypeSymbol;
-            }
-
-            return null;
-        }
-
         internal static bool IsRootValid(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (MemberPath.TryFindRoot(memberAccess, out var root))
@@ -202,19 +104,9 @@ namespace Gu.Analyzers
                 context.Node is MemberAccessExpressionSyntax memberAccess &&
                 memberAccess.Expression?.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) == false &&
                 !context.ContainingSymbol.IsStatic &&
-                Inject.TryFindConstructor(memberAccess, out _))
+                Inject.TryFindConstructor(memberAccess, out _) &&
+                IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken))
             {
-                if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
-                    assignment.Left == memberAccess)
-                {
-                    return;
-                }
-
-                if (!IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken))
-                {
-                    return;
-                }
-
                 var memberType = MemberType(memberAccess, context.SemanticModel, context.CancellationToken);
                 if (memberType == null ||
                     !IsInjectionType(memberType))
@@ -235,6 +127,104 @@ namespace Gu.Analyzers
                             typeName));
                 }
             }
+        }
+
+        private static Inject.Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (objectCreation?.ArgumentList == null)
+            {
+                return Inject.Injectable.No;
+            }
+
+            var injectable = Inject.Injectable.Safe;
+            foreach (var argument in objectCreation.ArgumentList.Arguments)
+            {
+                var temp = IsInjectable(argument.Expression, semanticModel, cancellationToken);
+                switch (temp)
+                {
+                    case Inject.Injectable.No:
+                        return Inject.Injectable.No;
+                    case Inject.Injectable.Safe:
+                        break;
+                    case Inject.Injectable.Unsafe:
+                        injectable = Inject.Injectable.Unsafe;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return injectable;
+        }
+
+        private static Inject.Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            switch (expression)
+            {
+                case IdentifierNameSyntax identifierName:
+                    return Inject.TryFindConstructor(identifierName, out _)
+                        ? Inject.Injectable.Safe
+                        : Inject.Injectable.No;
+                case ObjectCreationExpressionSyntax nestedObjectCreation:
+                    return CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Inject.Injectable.No ? Inject.Injectable.No : Inject.Injectable.Safe;
+                case MemberAccessExpressionSyntax memberAccess:
+                    if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
+                        assignment.Left == expression)
+                    {
+                        return Inject.Injectable.No;
+                    }
+
+                    if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
+                        semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
+                    {
+                        switch (rootSymbol)
+                        {
+                            case IParameterSymbol _:
+                            case IFieldSymbol _:
+                            case IPropertySymbol _:
+                                return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                        }
+                    }
+                    return Inject.Injectable.No;
+                default:
+                    return Inject.Injectable.No;
+            }
+        }
+
+        private static INamedTypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            if (symbol == null ||
+                symbol.IsStatic)
+            {
+                return null;
+            }
+
+            if (symbol is IPropertySymbol property)
+            {
+                if (!property.Type.IsSealed &&
+                    !property.Type.IsValueType &&
+                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
+                {
+                    return memberType as INamedTypeSymbol;
+                }
+
+                return property.Type as INamedTypeSymbol;
+            }
+
+            if (symbol is IFieldSymbol field)
+            {
+                if (!field.Type.IsSealed &&
+                    !field.Type.IsValueType &&
+                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
+                {
+                    return memberType as INamedTypeSymbol;
+                }
+
+                return field.Type as INamedTypeSymbol;
+            }
+
+            return null;
         }
 
         private static bool AssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
