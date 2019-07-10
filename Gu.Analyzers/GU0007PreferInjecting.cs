@@ -199,6 +199,7 @@ namespace Gu.Analyzers
                                 return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
                         }
                     }
+
                     return Inject.Injectable.No;
                 default:
                     return Inject.Injectable.No;
@@ -208,14 +209,12 @@ namespace Gu.Analyzers
         private static bool TryGetMemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol result)
         {
             if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol) &&
-                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty))
+                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
+                fieldOrProperty.Type.IsReferenceType)
             {
-                if (!fieldOrProperty.Type.IsSealed &&
-                    !fieldOrProperty.Type.IsValueType &&
-                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
+                if (TryFindAssignedType(symbol, semanticModel, cancellationToken, out result))
                 {
-                    result = memberType as INamedTypeSymbol;
-                    return result != null;
+                    return true;
                 }
 
                 result = fieldOrProperty.Type as INamedTypeSymbol;
@@ -226,7 +225,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool AssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
+        private static bool TryFindAssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol memberType)
         {
             foreach (var reference in symbol.DeclaringSyntaxReferences)
             {
@@ -242,8 +241,7 @@ namespace Gu.Analyzers
                             p => p.Identifier.ValueText == identifier.Identifier.ValueText,
                             out var parameter))
                     {
-                        memberType = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken)?.Type;
-                        return true;
+                        return semanticModel.TryGetNamedType(parameter, cancellationToken, out memberType);
                     }
                 }
             }
