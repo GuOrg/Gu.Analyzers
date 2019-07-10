@@ -7,6 +7,13 @@ namespace Gu.Analyzers
 
     internal static class Inject
     {
+        internal enum Injectable
+        {
+            No,
+            Safe,
+            Unsafe,
+        }
+
         internal static bool TryFindConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
         {
             ctor = null;
@@ -15,6 +22,5 @@ namespace Gu.Analyzers
                    classDeclaration.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ctor) &&
                    !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);
         }
-
     }
 }

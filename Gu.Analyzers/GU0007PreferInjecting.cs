@@ -24,13 +24,6 @@ namespace Gu.Analyzers
             description: "Prefer injecting.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 
-        internal enum Injectable
-        {
-            No,
-            Safe,
-            Unsafe,
-        }
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
             ImmutableArray.Create(Descriptor);
@@ -44,25 +37,25 @@ namespace Gu.Analyzers
             context.RegisterSyntaxNodeAction(c => HandleMemberAccess(c), SyntaxKind.SimpleMemberAccessExpression);
         }
 
-        internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Inject.Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (objectCreation?.ArgumentList == null)
             {
-                return Injectable.No;
+                return Inject.Injectable.No;
             }
 
-            var injectable = Injectable.Safe;
+            var injectable = Inject.Injectable.Safe;
             foreach (var argument in objectCreation.ArgumentList.Arguments)
             {
                 var temp = IsInjectable(argument.Expression, semanticModel, cancellationToken);
                 switch (temp)
                 {
-                    case Injectable.No:
-                        return Injectable.No;
-                    case Injectable.Safe:
+                    case Inject.Injectable.No:
+                        return Inject.Injectable.No;
+                    case Inject.Injectable.Safe:
                         break;
-                    case Injectable.Unsafe:
-                        injectable = Injectable.Unsafe;
+                    case Inject.Injectable.Unsafe:
+                        injectable = Inject.Injectable.Unsafe;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
@@ -72,21 +65,21 @@ namespace Gu.Analyzers
             return injectable;
         }
 
-        internal static Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Inject.Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (expression)
             {
                 case IdentifierNameSyntax identifierName:
                     return Inject.TryFindConstructor(identifierName, out _)
-                        ? Injectable.Safe
-                        : Injectable.No;
+                        ? Inject.Injectable.Safe
+                        : Inject.Injectable.No;
                 case ObjectCreationExpressionSyntax nestedObjectCreation:
-                    return CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Injectable.No ? Injectable.No : Injectable.Safe;
+                    return CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Inject.Injectable.No ? Inject.Injectable.No : Inject.Injectable.Safe;
                 case MemberAccessExpressionSyntax memberAccess:
                     if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
                         assignment.Left == expression)
                     {
-                        return Injectable.No;
+                        return Inject.Injectable.No;
                     }
 
                     if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
@@ -100,9 +93,9 @@ namespace Gu.Analyzers
                                 return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
                         }
                     }
-                    return Injectable.No;
+                    return Inject.Injectable.No;
                 default:
-                    return Injectable.No;
+                    return Inject.Injectable.No;
             }
         }
 
@@ -186,7 +179,8 @@ namespace Gu.Analyzers
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(objectCreation, out _) &&
-                CanInject(objectCreation, context.SemanticModel, context.CancellationToken) == Injectable.Safe &&
+                CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
+                injectable != Inject.Injectable.No &&
                 context.SemanticModel.TryGetNamedType(objectCreation, context.CancellationToken, out var createdType) &&
                 IsInjectionType(createdType))
             {
@@ -195,7 +189,8 @@ namespace Gu.Analyzers
                     Diagnostic.Create(
                         Descriptor,
                         objectCreation.GetLocation(),
-                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName),
+                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
+                                                                 .Add(nameof(Inject.Injectable), injectable.ToString()),
                         typeName));
             }
         }
@@ -232,14 +227,16 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) != Injectable.No)
+                if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) is var injectable &&
+                    injectable != Inject.Injectable.No)
                 {
                     var typeName = memberType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
                     context.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptor,
                             memberAccess.Name.GetLocation(),
-                            ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName),
+                            ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
+                                                                     .Add(nameof(Inject.Injectable), injectable.ToString()),
                             typeName));
                 }
             }

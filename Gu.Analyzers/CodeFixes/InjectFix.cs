@@ -36,26 +36,15 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node) &&
-                    diagnostic.Properties.TryGetValue(nameof(INamedTypeSymbol), out var typeName))
+                    diagnostic.Properties.TryGetValue(nameof(INamedTypeSymbol), out var typeName) &&
+                    diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {
-                    if (node is ObjectCreationExpressionSyntax objectCreation)
-                    {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Inject.",
-                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, typeName),
-                                nameof(InjectFix)),
-                            diagnostic);
-                    }
-                    else if (node is IdentifierNameSyntax identifierName)
-                    {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Inject UNSAFE.",
-                                cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, typeName),
-                                nameof(InjectFix)),
-                            diagnostic);
-                    }
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLower() : injectable.ToUpper())}.",
+                            cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, node, typeName),
+                            nameof(InjectFix)),
+                        diagnostic);
                 }
             }
         }

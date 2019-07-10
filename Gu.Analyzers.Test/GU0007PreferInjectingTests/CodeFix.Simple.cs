@@ -49,7 +49,7 @@ namespace RoslynSandbox
     }
 }";
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
