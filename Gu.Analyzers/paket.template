@@ -2,7 +2,8 @@
 developmentDependency true
 
 releasenotes
-  FEATURE: Member of internal class should be internal, analyzer + fix.
+  FEATURE: GU0007 handle singletons.
+  BUGFIX GU0012: ignore out parameters.
 
 projectUrl https://github.com/GuOrg/Gu.Analyzers
 licenseUrl http://opensource.org/licenses/MIT

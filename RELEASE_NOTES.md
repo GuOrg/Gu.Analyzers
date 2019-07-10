@@ -1,3 +1,7 @@
+#### 1.5.5
+* FEATURE: GU0007 handle singletons.
+* BUGFIX GU0012: ignore out parameters.
+
 #### 1.5.4
 * FEATURE: Member of internal class should be internal, analyzer + fix.
 
