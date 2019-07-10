@@ -216,6 +216,26 @@ namespace RoslynSandbox
 
                 RoslynAssert.Valid(Analyzer, code, BarCode);
             }
+
+            [Test]
+            public static void WhenAssigningWithObjectInitializer()
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar bar;
+
+        public Foo()
+        {
+            this.bar = new Bar { Baz = 1 };
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, code, WithMutableProperty);
+            }
         }
     }
 }

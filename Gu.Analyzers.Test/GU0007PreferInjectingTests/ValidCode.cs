@@ -18,6 +18,15 @@ namespace RoslynSandbox
     }
 }";
 
+        private static readonly string WithMutableProperty = @"
+namespace RoslynSandbox
+{
+    public class Bar
+    {
+        public int Baz { get; set; }
+    }
+}";
+
         private static readonly string LocatorCode = @"
 namespace RoslynSandbox
 {
