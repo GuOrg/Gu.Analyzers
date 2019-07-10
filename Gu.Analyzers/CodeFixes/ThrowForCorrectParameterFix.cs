@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0013CheckNameInThrow.DiagnosticId);
+            GU0013TrowForCorrectParameter.DiagnosticId);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -26,23 +27,30 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument) &&
-                    diagnostic.Properties.TryGetValue("Name", out var name))
+                    diagnostic.Properties.TryGetValue(nameof(IdentifierNameSyntax), out var name))
                 {
                     context.RegisterCodeFix(
-                        "Use correct parameter name.",
+                        $"Use parameter {name}.",
                         (editor, _) => editor.ReplaceNode(
                             argument.Expression,
-                            CreateNode()),
+                            x => CreateNode(x).WithTriviaFrom(x)),
                         this.GetType(),
                         diagnostic);
 
-                    ExpressionSyntax CreateNode()
+                    ExpressionSyntax CreateNode(ExpressionSyntax old)
                     {
-                        return argument.Parent is ArgumentListSyntax argumentList &&
-                               argumentList.Parent is InvocationExpressionSyntax invocation &&
-                               invocation.IsNameOf()
-                            ? SyntaxFactory.IdentifierName(name)
-                            : SyntaxFactory.ParseExpression($"nameof({name})");
+                        switch (old)
+                        {
+                            case LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression):
+                                return SyntaxFactory.ParseExpression($"nameof({name})");
+                            case IdentifierNameSyntax identifierName when identifierName.Parent is ArgumentSyntax candidate &&
+                                                                          candidate.Parent is ArgumentListSyntax argumentList &&
+                                                                          argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                                          invocation.IsNameOf():
+                                return identifierName.WithIdentifier(SyntaxFactory.Identifier(name));
+                            default:
+                                throw new InvalidOperationException("Failed updating parameter name.");
+                        }
                     }
                 }
             }

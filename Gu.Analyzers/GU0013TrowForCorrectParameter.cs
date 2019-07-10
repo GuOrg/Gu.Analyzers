@@ -2,18 +2,18 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class GU0013CheckNameInThrow
+    internal static class GU0013TrowForCorrectParameter
     {
         internal const string DiagnosticId = "GU0013";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Use correct parameter name.",
-            messageFormat: "Use correct parameter name.",
+            title: "Throw for correct parameter.",
+            messageFormat: "Throw for correct parameter.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Use correct parameter name.",
+            description: "Throw for correct parameter.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }

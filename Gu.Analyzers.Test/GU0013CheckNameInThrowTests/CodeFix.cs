@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly ThrowForCorrectParameterFix Fix = new ThrowForCorrectParameterFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0013CheckNameInThrow.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0013TrowForCorrectParameter.Descriptor);
 
         [Test]
         public static void ThrowExpressionNameofWrong()
@@ -43,7 +43,44 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use correct parameter name.");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use parameter bar.");
+        }
+
+        [Test]
+        public static void ThrowExpressionNameofOther()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string sq;
+
+        public Foo(string s1, string s2)
+        {
+            this.sq = s1 ?? throw new ArgumentNullException(nameof(↓s2));
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private readonly string sq;
+
+        public Foo(string s1, string s2)
+        {
+            this.sq = s1 ?? throw new ArgumentNullException(nameof(s1));
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use parameter s1.");
         }
 
         [Test]
@@ -80,7 +117,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use correct parameter name.");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode, fixTitle: "Use parameter bar.");
         }
     }
 }
