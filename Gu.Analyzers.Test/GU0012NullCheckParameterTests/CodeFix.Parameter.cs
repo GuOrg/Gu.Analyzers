@@ -21,30 +21,30 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string ↓text)
+        public C(string ↓text)
         {
             this.text = text;
         }
     }
-}".AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public C", $"{access} C");
 
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new System.ArgumentNullException(nameof(text));
         }
     }
-}".AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public C", $"{access} C");
 
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
@@ -57,11 +57,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string ↓text)
+        public C(string ↓text)
         {
             this.text = text;
         }
@@ -73,11 +73,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new ArgumentNullException(nameof(text));
         }
@@ -92,11 +92,11 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly int bar;
 
-        public Foo(string ↓text)
+        public C(string ↓text)
         {
             this.bar = Bar(text);
         }
@@ -108,11 +108,11 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly int bar;
 
-        public Foo(string text)
+        public C(string text)
         {
             if (text == null)
             {
@@ -134,9 +134,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
         }
     }
@@ -145,9 +145,9 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             if (text == null)
             {
@@ -165,9 +165,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string s1, string ↓s2)
+        public C(string s1, string ↓s2)
         {
             if (s1 == null)
             {
@@ -180,9 +180,9 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             if (s1 == null)
             {
@@ -205,9 +205,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string ↓s1, string s2)
+        public C(string ↓s1, string s2)
         {
             if (s2 == null)
             {
@@ -220,9 +220,9 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             if (s1 == null)
             {
@@ -245,9 +245,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string ↓s1, string ↓s2)
+        public C(string ↓s1, string ↓s2)
         {
         }
     }
@@ -256,9 +256,9 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             if (s1 == null)
             {
@@ -273,6 +273,41 @@ namespace RoslynSandbox
     }
 }";
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public static void OutParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public sealed class C
+    {
+        private readonly string s1;
+
+        public C(string ↓s1, out string s2)
+        {
+            this.s1 = s1;
+            s2 = s1;
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    public sealed class C
+    {
+        private readonly string s1;
+
+        public C(string s1, out string s2)
+        {
+            this.s1 = s1 ?? throw new System.ArgumentNullException(nameof(s1));
+            s2 = s1;
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

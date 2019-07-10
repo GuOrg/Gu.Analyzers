@@ -22,16 +22,13 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ParameterSyntax parameterSyntax &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ParameterSyntax parameterSyntax &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
                 method.TryFindParameter(parameterSyntax.Identifier.ValueText, out var parameter) &&
                 parameter.Type.IsReferenceType &&
+                parameter.RefKind != RefKind.Out &&
                 !parameter.HasExplicitDefaultValue &&
                 parameterSyntax.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&

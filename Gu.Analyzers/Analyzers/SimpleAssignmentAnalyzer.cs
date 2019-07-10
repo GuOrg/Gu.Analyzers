@@ -26,12 +26,8 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is AssignmentExpressionSyntax assignment &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is AssignmentExpressionSyntax assignment &&
                 context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left))
             {
                 if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right) &&

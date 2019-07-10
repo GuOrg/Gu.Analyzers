@@ -16,72 +16,111 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             [TestCase("protected")]
             public static void ConstructorFullyQualified(string access)
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = ↓text;
         }
     }
-}".AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public C", $"{access} C");
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new System.ArgumentNullException(nameof(text));
         }
     }
-}".AssertReplace("public Foo", $"{access} Foo");
+}".AssertReplace("public C", $"{access} C");
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void PublicCtor()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = ↓text;
         }
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new ArgumentNullException(nameof(text));
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
+
+            [Test]
+            public static void PublicCtorOutParameter()
+            {
+                var before = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        private readonly string text;
+
+        public C(string text, out string result)
+        {
+            this.text = ↓text;
+            result = string.Empty;
+        }
+    }
+}";
+
+                var after = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        private readonly string text;
+
+        public C(string text, out string result)
+        {
+            this.text = text ?? throw new ArgumentNullException(nameof(text));
+            result = string.Empty;
+        }
+    }
+}";
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
         }
     }

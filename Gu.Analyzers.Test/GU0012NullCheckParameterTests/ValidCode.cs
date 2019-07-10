@@ -19,11 +19,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        private Foo(string text)
+        private C(string text)
         {
             this.text = text;
         }
@@ -40,11 +40,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text = null)
+        public C(string text = null)
         {
             this.text = text;
         }
@@ -61,13 +61,33 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly int i;
 
-        public Foo(int i)
+        public C(int i)
         {
             this.i = i;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public static void WhenOutParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        public bool M(out string text)
+        {
+            text = string.Empty;
+            return true;
         }
     }
 }";
@@ -82,11 +102,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new ArgumentNullException(nameof(text));
         }
@@ -103,11 +123,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             this.text = text ?? throw new ArgumentNullException(nameof(text));
@@ -128,11 +148,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             if (text == null)
             {
