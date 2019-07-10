@@ -35,69 +35,64 @@ namespace Gu.Analyzers
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing)
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node))
                 {
-                    continue;
-                }
-
-                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true);
-                if (node is ObjectCreationExpressionSyntax objectCreation)
-                {
-                    var type = (ITypeSymbol)semanticModel.GetSymbolSafe(objectCreation, context.CancellationToken)?.ContainingSymbol;
-                    if (type == null)
+                    if (node is ObjectCreationExpressionSyntax objectCreation)
                     {
-                        continue;
-                    }
-
-                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
-                                                       .WithType(objectCreation.Type);
-                    switch (GU0007PreferInjecting.CanInject(objectCreation, semanticModel, context.CancellationToken))
-                    {
-                        case GU0007PreferInjecting.Injectable.No:
+                        var type = (ITypeSymbol)semanticModel.GetSymbolSafe(objectCreation, context.CancellationToken)?.ContainingSymbol;
+                        if (type == null)
+                        {
                             continue;
-                        case GU0007PreferInjecting.Injectable.Safe:
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Inject",
-                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
-                                    nameof(InjectFix)),
-                                diagnostic);
-                            break;
-                        case GU0007PreferInjecting.Injectable.Unsafe:
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Inject UNSAFE",
-                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
-                                    nameof(InjectFix)),
-                                diagnostic);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
+                        }
 
-                if (node is IdentifierNameSyntax identifierName &&
-                    identifierName.Parent is MemberAccessExpressionSyntax memberAccess)
-                {
-                    var type = GU0007PreferInjecting.MemberType(memberAccess, semanticModel, context.CancellationToken);
-                    var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
-                                                       .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
-                    switch (GU0007PreferInjecting.IsInjectable(identifierName, semanticModel, context.CancellationToken))
+                        var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
+                                                           .WithType(objectCreation.Type);
+                        switch (GU0007PreferInjecting.CanInject(objectCreation, semanticModel, context.CancellationToken))
+                        {
+                            case GU0007PreferInjecting.Injectable.No:
+                                continue;
+                            case GU0007PreferInjecting.Injectable.Safe:
+                                context.RegisterCodeFix(
+                                    CodeAction.Create(
+                                        "Inject",
+                                        cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
+                                        nameof(InjectFix)),
+                                    diagnostic);
+                                break;
+                            case GU0007PreferInjecting.Injectable.Unsafe:
+                                context.RegisterCodeFix(
+                                    CodeAction.Create(
+                                        "Inject UNSAFE",
+                                        cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, objectCreation, parameterSyntax),
+                                        nameof(InjectFix)),
+                                    diagnostic);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                    else if (node is IdentifierNameSyntax identifierName &&
+                        identifierName.Parent is MemberAccessExpressionSyntax memberAccess)
                     {
-                        case GU0007PreferInjecting.Injectable.No:
-                            continue;
-                        case GU0007PreferInjecting.Injectable.Safe:
-                        case GU0007PreferInjecting.Injectable.Unsafe:
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Inject UNSAFE",
-                                    cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, parameterSyntax),
-                                    nameof(InjectFix)),
-                                diagnostic);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        var type = GU0007PreferInjecting.MemberType(memberAccess, semanticModel, context.CancellationToken);
+                        var parameterSyntax = SyntaxFactory.Parameter(SyntaxFactory.Identifier(ParameterName(type)))
+                                                           .WithType(SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
+                        switch (GU0007PreferInjecting.IsInjectable(identifierName, semanticModel, context.CancellationToken))
+                        {
+                            case GU0007PreferInjecting.Injectable.No:
+                                continue;
+                            case GU0007PreferInjecting.Injectable.Safe:
+                            case GU0007PreferInjecting.Injectable.Unsafe:
+                                context.RegisterCodeFix(
+                                    CodeAction.Create(
+                                        "Inject UNSAFE",
+                                        cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, identifierName, parameterSyntax),
+                                        nameof(InjectFix)),
+                                    diagnostic);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
                     }
                 }
             }
