@@ -120,39 +120,6 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void WhenNotInjectingFieldInitializationObject()
-            {
-                var before = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        private readonly object bar;
-
-        public Foo(ServiceLocator locator)
-        {
-            this.bar = locator.↓BarObject;
-        }
-    }
-}";
-
-                var after = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        private readonly object bar;
-
-        public Foo(ServiceLocator locator, Bar bar)
-        {
-            this.bar = bar;
-        }
-    }
-}";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
-            }
-
-            [Test]
             public static void WhenNotInjectingFieldInitializationWithNameCollision()
             {
                 var enumCode = @"

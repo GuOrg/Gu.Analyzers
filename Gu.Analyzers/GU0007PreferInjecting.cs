@@ -193,6 +193,8 @@ namespace Gu.Analyzers
                     {
                         switch (rootSymbol)
                         {
+                            case INamedTypeSymbol type:
+                                return IsInjectable(type) ? Inject.Injectable.Safe : Inject.Injectable.No;
                             case IParameterSymbol _:
                             case IFieldSymbol _:
                             case IPropertySymbol _:
