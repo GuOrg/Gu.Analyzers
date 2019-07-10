@@ -128,20 +128,18 @@ namespace Gu.Analyzers
                 Inject.TryFindConstructor(memberAccess, out _) &&
                 IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken) &&
                 TryGetMemberType(memberAccess, context.SemanticModel, context.CancellationToken, out var memberType) &&
-                IsInjectable(memberType))
+                IsInjectable(memberType) &&
+                IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) is var injectable &&
+                injectable != Inject.Injectable.No)
             {
-                if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) is var injectable &&
-                    injectable != Inject.Injectable.No)
-                {
-                    var typeName = memberType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptor,
-                            memberAccess.Name.GetLocation(),
-                            ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
-                                                                     .Add(nameof(Inject.Injectable), injectable.ToString()),
-                            typeName));
-                }
+                var typeName = memberType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptor,
+                        memberAccess.Name.GetLocation(),
+                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
+                                                           .Add(nameof(Inject.Injectable), injectable.ToString()),
+                        typeName));
             }
         }
 
@@ -209,39 +207,18 @@ namespace Gu.Analyzers
 
         private static bool TryGetMemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol result)
         {
-            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
-            if (symbol == null ||
-                symbol.IsStatic)
+            if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol) &&
+                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty))
             {
-                result = null;
-                return false;
-            }
-
-            if (symbol is IPropertySymbol property)
-            {
-                if (!property.Type.IsSealed &&
-                    !property.Type.IsValueType &&
+                if (!fieldOrProperty.Type.IsSealed &&
+                    !fieldOrProperty.Type.IsValueType &&
                     AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
                 {
                     result = memberType as INamedTypeSymbol;
                     return result != null;
                 }
 
-                result = property.Type as INamedTypeSymbol;
-                return result != null;
-            }
-
-            if (symbol is IFieldSymbol field)
-            {
-                if (!field.Type.IsSealed &&
-                    !field.Type.IsValueType &&
-                    AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
-                {
-                    result = memberType as INamedTypeSymbol;
-                    return result != null;
-                }
-
-                result = field.Type as INamedTypeSymbol;
+                result = fieldOrProperty.Type as INamedTypeSymbol;
                 return result != null;
             }
 
