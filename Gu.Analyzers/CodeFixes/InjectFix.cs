@@ -10,7 +10,6 @@ namespace Gu.Analyzers
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,21 +17,19 @@ namespace Gu.Analyzers
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(InjectFix))]
     [Shared]
-    internal class InjectFix : CodeFixProvider
+    internal class InjectFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0007PreferInjecting.DiagnosticId);
 
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
         /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
 
-            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                             .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node) &&
@@ -40,21 +37,18 @@ namespace Gu.Analyzers
                     diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {
                     context.RegisterCodeFix(
-                        CodeAction.Create(
-                            $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLower() : injectable.ToUpper())}.",
-                            cancellationToken => ApplyFixAsync(context, semanticModel, cancellationToken, node, typeName),
-                            nameof(InjectFix)),
+                        $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLower() : injectable.ToUpper())}.",
+                        (editor, cancellationToken) => Fix(editor, cancellationToken, node, typeName),
+                        nameof(InjectFix),
                         diagnostic);
                 }
             }
         }
 
-        private static async Task<Document> ApplyFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression, string typeName)
+        private static void Fix(DocumentEditor editor, CancellationToken cancellationToken, ExpressionSyntax expression, string typeName)
         {
             if (Inject.TryFindConstructor(expression, out var ctor))
             {
-                var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
-                                                 .ConfigureAwait(false);
                 var type = SyntaxFactory.ParseTypeName(typeName);
                 var parameterSyntax = SyntaxFactory.Parameter(
                     attributeLists: default,
@@ -69,10 +63,10 @@ namespace Gu.Analyzers
                 else if (expression is IdentifierNameSyntax identifierName &&
                          expression.Parent is MemberAccessExpressionSyntax)
                 {
-                    var replaceNodes = new ReplaceNodes(identifierName, semanticModel, cancellationToken).Nodes;
+                    var replaceNodes = new ReplaceNodes(identifierName, editor.SemanticModel, cancellationToken).Nodes;
                     if (replaceNodes.Count == 0)
                     {
-                        return context.Document;
+                        return;
                     }
 
                     ExpressionSyntax fieldAccess = null;
@@ -95,7 +89,7 @@ namespace Gu.Analyzers
                 }
                 else
                 {
-                    return context.Document;
+                    return;
                 }
 
                 if (ctor.ParameterList == null)
@@ -113,11 +107,7 @@ namespace Gu.Analyzers
                         editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
                     }
                 }
-
-                return editor.GetChangedDocument();
             }
-
-            return context.Document;
         }
 
         private static string ParameterName(ParameterListSyntax parameterList, ExpressionSyntax expression, string typeName)
