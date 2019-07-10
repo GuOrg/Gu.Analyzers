@@ -84,7 +84,7 @@ namespace Gu.Analyzers
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
                 injectable != Inject.Injectable.No &&
                 context.SemanticModel.TryGetNamedType(objectCreation, context.CancellationToken, out var createdType) &&
-                IsInjectionType(createdType) &&
+                IsInjectable(createdType) &&
                 !CreatesMany())
             {
                 var typeName = createdType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
@@ -130,7 +130,7 @@ namespace Gu.Analyzers
             {
                 var memberType = MemberType(memberAccess, context.SemanticModel, context.CancellationToken);
                 if (memberType == null ||
-                    !IsInjectionType(memberType))
+                    !IsInjectable(memberType))
                 {
                     return;
                 }
@@ -274,31 +274,20 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsInjectionType(ITypeSymbol type)
+        private static bool IsInjectable(INamedTypeSymbol type)
         {
             if (type?.ContainingNamespace == null ||
                 type.IsValueType ||
                 type.IsStatic ||
+                type.IsAbstract ||
                 type.DeclaringSyntaxReferences.Length == 0)
             {
                 return false;
             }
 
-            if (type is INamedTypeSymbol namedType)
+            if (type.Constructors.TrySingle(x => !x.IsStatic, out var ctor))
             {
-                if (namedType.Constructors.Length != 1)
-                {
-                    return false;
-                }
-
-                var ctor = namedType.Constructors[0];
-                if (ctor.Parameters.Length == 0)
-                {
-                    return true;
-                }
-
-                if (ctor.Parameters[ctor.Parameters.Length - 1]
-                        .IsParams)
+                if (ctor.Parameters.TryFirst(x => !IsInjectable(x.Type as INamedTypeSymbol), out _))
                 {
                     return false;
                 }
