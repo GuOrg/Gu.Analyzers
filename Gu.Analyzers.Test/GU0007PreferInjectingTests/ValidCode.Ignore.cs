@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
             [Test]
             public static void WhenPrivateCtor()
             {
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -23,13 +23,13 @@ namespace RoslynSandbox
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, fooCode, BarCode);
+                RoslynAssert.Valid(Analyzer, code, BarCode);
             }
 
             [Test]
             public static void WhenStatic()
             {
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public static class Foo
@@ -43,13 +43,13 @@ namespace RoslynSandbox
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, fooCode, BarCode);
+                RoslynAssert.Valid(Analyzer, code, BarCode);
             }
 
             [Test]
             public static void WhenMethodInjectedLocatorInStaticMethod()
             {
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, LocatorCode, BarCode, fooCode);
+                RoslynAssert.Valid(Analyzer, LocatorCode, BarCode, code);
             }
 
             [TestCase("int")]
@@ -93,7 +93,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("int", type);
 
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -106,7 +106,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("default(int)", $"default({type})");
-                RoslynAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
+                RoslynAssert.Valid(Analyzer, abstractCode, barCode, code);
             }
 
             [Test]
@@ -134,7 +134,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -148,13 +148,13 @@ namespace RoslynSandbox
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, abstractCode, barCode, fooCode);
+                RoslynAssert.Valid(Analyzer, abstractCode, barCode, code);
             }
 
             [Test]
             public static void NewDictionaryOfBarAndBar()
             {
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -170,13 +170,13 @@ namespace RoslynSandbox
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, BarCode, fooCode);
+                RoslynAssert.Valid(Analyzer, BarCode, code);
             }
 
             [Test]
             public static void InLambda()
             {
-                var fooCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Linq;
@@ -192,7 +192,29 @@ namespace RoslynSandbox
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, BarCode, LocatorCode, fooCode);
+                RoslynAssert.Valid(Analyzer, BarCode, LocatorCode, code);
+            }
+
+            [Test]
+            public static void WhenAssigningTwoFieldWithObjectCreations()
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Bar bar1;
+        private readonly Bar bar2;
+
+        public Foo()
+        {
+            this.bar1 = new Bar();
+            this.bar2 = new Bar();
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, code, BarCode);
             }
         }
     }

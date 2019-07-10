@@ -84,7 +84,8 @@ namespace Gu.Analyzers
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
                 injectable != Inject.Injectable.No &&
                 context.SemanticModel.TryGetNamedType(objectCreation, context.CancellationToken, out var createdType) &&
-                IsInjectionType(createdType))
+                IsInjectionType(createdType) &&
+                !CreatesMany())
             {
                 var typeName = createdType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
                 context.ReportDiagnostic(
@@ -94,6 +95,26 @@ namespace Gu.Analyzers
                         ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
                                                                  .Add(nameof(Inject.Injectable), injectable.ToString()),
                         typeName));
+            }
+
+            bool CreatesMany()
+            {
+                if (objectCreation.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration))
+                {
+                    using (var walker = ObjectCreationWalker.BorrowAndVisit(classDeclaration))
+                    {
+                        foreach (var creation in walker.ObjectCreations)
+                        {
+                            if (!ReferenceEquals(creation, objectCreation) &&
+                                creation.Type.IsEquivalentTo(objectCreation.Type))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
             }
         }
 
