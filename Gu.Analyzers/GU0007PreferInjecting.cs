@@ -200,17 +200,12 @@ namespace Gu.Analyzers
             if (!context.IsExcludedFromAnalysis() &&
                 !context.ContainingSymbol.IsStatic &&
                 context.Node is MemberAccessExpressionSyntax memberAccess &&
+                memberAccess.Expression?.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) == false &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(memberAccess, out _))
             {
                 if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
                     assignment.Left == memberAccess)
-                {
-                    return;
-                }
-
-                if (memberAccess.Expression is ThisExpressionSyntax ||
-                    memberAccess.Expression is BaseExpressionSyntax)
                 {
                     return;
                 }
