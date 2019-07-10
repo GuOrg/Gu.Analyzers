@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, mehCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, mehCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, testCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, testCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -168,7 +168,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -201,7 +201,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -251,7 +251,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, mehCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, mehCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -297,7 +297,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, moduleCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, moduleCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -360,11 +360,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, testCode }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, testCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
-            public static void UnsafeWhenNotInjectingChainedPassingInPropertyOfInjected()
+            public static void ChainedPassingInPropertyOfInjected()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -425,11 +425,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
-            public static void UnsafeWhenNotInjectingChainedPropertyOnInjected()
+            public static void ChainedPropertyOnInjected()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -489,7 +489,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, after, fixTitle: "Inject safe.");
             }
         }
     }
