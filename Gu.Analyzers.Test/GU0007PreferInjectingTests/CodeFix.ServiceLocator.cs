@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal static partial class CodeFix
     {
-        internal static class Member
+        internal static class ServiceLocator
         {
             private static readonly string BarCode = @"
 namespace RoslynSandbox

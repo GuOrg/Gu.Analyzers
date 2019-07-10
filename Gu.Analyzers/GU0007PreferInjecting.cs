@@ -46,9 +46,9 @@ namespace Gu.Analyzers
 
         internal static Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (objectCreation?.ArgumentList?.Arguments.Any() != true)
+            if (objectCreation?.ArgumentList == null)
             {
-                return Injectable.Safe;
+                return Injectable.No;
             }
 
             var injectable = Injectable.Safe;
@@ -74,62 +74,36 @@ namespace Gu.Analyzers
 
         internal static Injectable IsInjectable(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var identifierName = expression as IdentifierNameSyntax;
-            if (identifierName?.Identifier != null)
+            switch (expression)
             {
-                var identifier = identifierName.Identifier.ValueText;
-                if (identifier == null)
-                {
-                    return Injectable.No;
-                }
-
-                if (!TrySingleConstructor(expression, out var ctor))
-                {
-                    return Injectable.No;
-                }
-
-                if (ctor?.Modifiers.Any(SyntaxKind.StaticKeyword) != false)
-                {
-                    return Injectable.No;
-                }
-
-                return Injectable.Safe;
-            }
-
-            if (expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
-                    assignment.Left == expression)
-                {
-                    return Injectable.No;
-                }
-
-                if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
-                    semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
-                {
-                    switch (rootSymbol)
+                case IdentifierNameSyntax identifierName:
+                    return TrySingleConstructor(identifierName, out _)
+                        ? Injectable.Safe
+                        : Injectable.No;
+                case ObjectCreationExpressionSyntax nestedObjectCreation:
+                    return CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Injectable.No ? Injectable.No : Injectable.Safe;
+                case MemberAccessExpressionSyntax memberAccess:
+                    if (memberAccess.Parent is AssignmentExpressionSyntax assignment &&
+                        assignment.Left == expression)
                     {
-                        case IParameterSymbol _:
-                        case IFieldSymbol _:
-                        case IPropertySymbol _:
-                            return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                        return Injectable.No;
                     }
-                }
 
-                return Injectable.No;
-            }
-
-            if (expression is ObjectCreationExpressionSyntax nestedObjectCreation)
-            {
-                if (CanInject(nestedObjectCreation, semanticModel, cancellationToken) == Injectable.No)
-                {
+                    if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
+                        semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
+                    {
+                        switch (rootSymbol)
+                        {
+                            case IParameterSymbol _:
+                            case IFieldSymbol _:
+                            case IPropertySymbol _:
+                                return IsInjectable(memberAccess.Name, semanticModel, cancellationToken);
+                        }
+                    }
                     return Injectable.No;
-                }
-
-                return Injectable.Safe;
+                default:
+                    return Injectable.No;
             }
-
-            return Injectable.No;
         }
 
         internal static ITypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
