@@ -126,15 +126,10 @@ namespace Gu.Analyzers
                 memberAccess.Expression?.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) == false &&
                 !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(memberAccess, out _) &&
-                IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken))
+                IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken) &&
+                TryGetMemberType(memberAccess, context.SemanticModel, context.CancellationToken, out var memberType) &&
+                IsInjectable(memberType))
             {
-                var memberType = MemberType(memberAccess, context.SemanticModel, context.CancellationToken);
-                if (memberType == null ||
-                    !IsInjectable(memberType))
-                {
-                    return;
-                }
-
                 if (IsInjectable(memberAccess, context.SemanticModel, context.CancellationToken) is var injectable &&
                     injectable != Inject.Injectable.No)
                 {
@@ -212,13 +207,14 @@ namespace Gu.Analyzers
             }
         }
 
-        private static INamedTypeSymbol MemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool TryGetMemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol result)
         {
             var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
             if (symbol == null ||
                 symbol.IsStatic)
             {
-                return null;
+                result = null;
+                return false;
             }
 
             if (symbol is IPropertySymbol property)
@@ -227,10 +223,12 @@ namespace Gu.Analyzers
                     !property.Type.IsValueType &&
                     AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
                 {
-                    return memberType as INamedTypeSymbol;
+                    result = memberType as INamedTypeSymbol;
+                    return result != null;
                 }
 
-                return property.Type as INamedTypeSymbol;
+                result = property.Type as INamedTypeSymbol;
+                return result != null;
             }
 
             if (symbol is IFieldSymbol field)
@@ -239,13 +237,16 @@ namespace Gu.Analyzers
                     !field.Type.IsValueType &&
                     AssignedType(symbol, semanticModel, cancellationToken, out var memberType))
                 {
-                    return memberType as INamedTypeSymbol;
+                    result = memberType as INamedTypeSymbol;
+                    return result != null;
                 }
 
-                return field.Type as INamedTypeSymbol;
+                result = field.Type as INamedTypeSymbol;
+                return result != null;
             }
 
-            return null;
+            result = null;
+            return false;
         }
 
         private static bool AssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out ITypeSymbol memberType)
