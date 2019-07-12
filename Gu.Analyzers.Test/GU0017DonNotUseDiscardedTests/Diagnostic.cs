@@ -15,7 +15,6 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         [TestCase("Console.WriteLine(↓_);")]
         public static void Local(string statement)
         {
-            var _ = 1;
             var code = @"
 namespace RoslynSandbox
 {
