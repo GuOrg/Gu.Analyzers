@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
             [Test]
             public static void IgnoresRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -27,13 +27,13 @@ namespace RoslynSandbox
         public IDisposable RecursiveProperty => RecursiveProperty;
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -55,13 +55,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -82,13 +82,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenDisposingRecursiveMethod()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("this.bar.Value;", getter);
-            var barCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Bar
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
         }
 
         [TestCase("this.bar.Value;")]
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         public int Value => ↓this.bar.Value;
     }
 }".AssertReplace("this.bar.Value;", body);
-            var barCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Bar
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, barCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
         [Test]
         public static void SimpleAssign()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -28,13 +28,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void AssignWithExpression()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public int Square { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         [Test]
         public static void SecondAssignmentWithExpression()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -105,7 +105,7 @@ namespace RoslynSandbox
         public int Bar { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         [Test]
         public static void UsedBeforeAssign()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -151,13 +151,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void AssignInIfElse()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -177,13 +177,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ParameterAsArgument()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -200,13 +200,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreNameof()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -223,13 +223,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreWhenSideEffect()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -244,13 +244,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreWhenAssignedWithAddition()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -265,13 +265,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreMutableInLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -288,7 +288,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]

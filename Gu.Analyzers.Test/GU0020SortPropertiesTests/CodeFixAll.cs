@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         [Test]
         public static void WhenMutableBeforeGetOnlyFirst()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -27,7 +27,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -41,13 +41,13 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void WhenAMess()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -62,7 +62,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -76,13 +76,13 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void WhenAMess1WithDocs()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -109,7 +109,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -135,13 +135,13 @@ namespace RoslynSandbox
         public int A { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void PreservesDocumentOrder()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -156,7 +156,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -170,7 +170,7 @@ namespace RoslynSandbox
         public int C { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

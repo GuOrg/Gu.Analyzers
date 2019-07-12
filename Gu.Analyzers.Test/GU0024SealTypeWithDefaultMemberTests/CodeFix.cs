@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
         [Test]
         public static void Field()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class ↓Foo
@@ -22,7 +22,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -30,13 +30,13 @@ namespace RoslynSandbox
         public static readonly Foo Default = new Foo();
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");
         }
 
         [Test]
         public static void Property()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class ↓Foo
@@ -45,7 +45,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static Foo Default { get; } = new Foo();
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");
         }
     }
 }

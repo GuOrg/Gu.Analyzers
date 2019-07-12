@@ -47,7 +47,7 @@ namespace RoslynSandbox
         [Test]
         public static void WhenInjecting()
         {
-            var fooCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, BarCode);
+            RoslynAssert.Valid(Analyzer, code, BarCode);
         }
 
         [Test]

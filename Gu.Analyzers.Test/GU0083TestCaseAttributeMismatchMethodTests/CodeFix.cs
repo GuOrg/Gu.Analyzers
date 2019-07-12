@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
         [Test]
         public static void SingleArgument()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -27,7 +27,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [TestCase("[TestCase(\"a\", ↓1, null)]")]
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         [Test]
         public static void TestCaseAttribute_IfMultipleParametersAreWrong()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         [Test]
         public static void WrongArrayType()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -133,7 +133,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -146,13 +146,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void DoubleToInt()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -165,7 +165,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -178,13 +178,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void TestCaseParams()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -198,7 +198,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

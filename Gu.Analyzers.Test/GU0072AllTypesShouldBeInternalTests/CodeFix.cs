@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
         [Test]
         public static void Class()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     ↓public class Foo
@@ -20,20 +20,20 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     internal class Foo
     {
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void Struct()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     ↓public struct Foo
@@ -41,14 +41,14 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     internal struct Foo
     {
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

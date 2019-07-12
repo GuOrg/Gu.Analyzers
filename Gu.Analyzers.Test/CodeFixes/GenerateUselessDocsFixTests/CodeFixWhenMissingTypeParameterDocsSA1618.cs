@@ -17,7 +17,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
         [Test]
         public void ForFirstParameterWhenSummaryOnly()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -31,7 +31,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -45,13 +45,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
         [Test]
         public void ForFirstParameterWhenSummaryAndParam()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -66,7 +66,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -81,13 +81,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
         [Test]
         public void ForManyParameters()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -101,7 +101,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -115,13 +115,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
         [Test]
         public void Issue206()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -136,7 +136,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -151,7 +151,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
         [TestCase("T[]")]
@@ -159,7 +159,7 @@ namespace RoslynSandbox
         [TestCase("System.Collections.Generic.List<T>")]
         public void ForEnumerableParameter(string type)
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -176,7 +176,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("T[]", type);
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -193,7 +193,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("T[]", type);
-            RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]

@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         [Test]
         public static void ArrowAdd()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -34,13 +34,13 @@ namespace RoslynSandbox
         public int Sum => this.A + this.B + this.C + this.D;
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ArrowStruct()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public struct Foo
@@ -64,13 +64,13 @@ namespace RoslynSandbox
         public Foo Sum => new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ExpressionBodyMethodIsNoError()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -95,7 +95,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

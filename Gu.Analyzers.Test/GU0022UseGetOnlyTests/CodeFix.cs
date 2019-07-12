@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         [Test]
         public static void InitializedInCtor()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -37,7 +37,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -59,13 +59,13 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void InitializedInCtorAndPropertyInitializer()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -88,7 +88,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

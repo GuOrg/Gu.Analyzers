@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
         [Test]
         public static void SingleArgument()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -24,13 +24,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SingleArgumentWithAndWithoutAuthor()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -44,13 +44,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SingleArgumentWithAuthor()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -64,13 +64,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void Arrays()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -84,13 +84,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoubleAndInt()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -104,13 +104,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoubleAndIntMaxValue()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -126,13 +126,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoubleMaxValueAndMinValue()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -148,13 +148,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TestCaseParams()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -168,13 +168,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TwoEnumsSameTypes()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -189,13 +189,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TwoEnumsDifferentTypes()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

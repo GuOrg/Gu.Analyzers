@@ -9,13 +9,14 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0017DonNotUseDiscarded.Descriptor);
 
-        [TestCase("↓_ + 3")]
-        [TestCase("↓_++")]
-        [TestCase("↓_.ToString()")]
-        [TestCase("Console.WriteLine(↓_)")]
-        public static void Local(string expression)
+        [TestCase("var o = ↓_ + 3;")]
+        [TestCase("var o = ↓_++;")]
+        [TestCase("var o = ↓_.ToString();")]
+        [TestCase("Console.WriteLine(↓_);")]
+        public static void Local(string statement)
         {
-            var testCode = @"
+            var _ = 1;
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,17 +26,17 @@ namespace RoslynSandbox
         public C()
         {
             var _ = 1;
-            _ = ↓_ + 3;
+            var o = ↓_ + 3;
         }
     }
-}".AssertReplace("↓_ + 3", expression);
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+}".AssertReplace("var o = ↓_ + 3;", statement);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void OneParameterLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -47,17 +48,17 @@ namespace RoslynSandbox
         public C()
         {
             Observable.Never<Unit>()
-                      .Subscribe(_ => _.ToString());
+                      .Subscribe(_ => ↓_.ToString());
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void TwoParameterLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -70,7 +71,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

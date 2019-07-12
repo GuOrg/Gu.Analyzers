@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         [TestCase("internal class Nested { }")]
         public static void InternalClass(string member)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -29,7 +29,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("internal readonly int I;", member);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("public readonly int F;")]
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         [TestCase("public void M() { }")]
         public static void PublicClass(string member)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -50,13 +50,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace("public readonly int I;", member);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InterfaceEvent()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -72,13 +72,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ExplicitInterfaceEvent()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -100,13 +100,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void OverridingEvent()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -122,13 +122,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InterfaceProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     internal class C : IC
@@ -142,13 +142,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ExplicitInterfaceProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     internal class C : IC
@@ -162,13 +162,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void OverridingProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     internal class C : Abstract
@@ -182,13 +182,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InterfaceMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -199,13 +199,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void GenericInterfaceMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -220,7 +220,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

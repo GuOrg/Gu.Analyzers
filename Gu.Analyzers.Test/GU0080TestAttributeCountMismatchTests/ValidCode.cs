@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
         [TestCase("[TestAttribute()]")]
         public static void TestAttribute(string attribute)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -27,14 +27,14 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[Test]", attribute);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("[TestCase(1)]")]
         [TestCase("[TestCase(1, Author = \"Author\")]")]
         public static void TestCaseAttribute(string attribute)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -48,13 +48,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(1)]", attribute);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TestAndTestCaseAttribute()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -68,13 +68,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TestCaseSourceAttribute()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("[TestCase(1)]")]
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1, 2, 3)]")]
         public static void TestAndTestCaseParams(string testCase)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -112,7 +112,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(1, 2, 3)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("[TestCase(1)]")]
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1, 2, 3)]")]
         public static void TestCaseParams(string testCase)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -134,7 +134,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(1, 2, 3)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

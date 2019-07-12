@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
         [Test]
         public static void BitShiftWithinRange()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -23,13 +23,13 @@ namespace RoslynSandbox
         Good = 1<<30
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoNotAnalyzeLong()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -42,13 +42,13 @@ namespace RoslynSandbox
         Bad = 1<<31
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StandardEnum()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         C,		
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

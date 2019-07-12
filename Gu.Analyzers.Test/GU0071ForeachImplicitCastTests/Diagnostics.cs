@@ -33,7 +33,7 @@ namespace RoslynSandbox
         [Test]
         public static void GenericCollectionWithACast()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -49,13 +49,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void GenericCollectionWithAnExplicitImplementation()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections;
@@ -86,13 +86,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void Array()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -108,13 +108,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void DuckTypedEnumerable()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -122,7 +122,7 @@ namespace RoslynSandbox
 
     class Lol
     {
-        IEnumerator<IEnumerable<char>> GetEnumerator()
+        public IEnumerator<IEnumerable<char>> GetEnumerator()
         {
             yield return string.Empty;
         }
@@ -138,7 +138,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

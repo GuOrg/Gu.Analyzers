@@ -176,7 +176,7 @@ namespace RoslynSandbox
         [Test]
         public static void BaseConstructorCall()
         {
-            var fooCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Bar : Foo
@@ -221,7 +221,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
         }
 
         [Test]
@@ -317,7 +317,7 @@ namespace RoslynSandbox
         [Test]
         public static void WhenBaseIsParams()
         {
-            var fooCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Bar : Foo
@@ -356,7 +356,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
         }
 
         [Test]
@@ -407,7 +407,7 @@ namespace RoslynSandbox
         [Test]
         public static void WhenAssignAndBaseCall()
         {
-            var fooCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public class Bar : Foo
@@ -446,7 +446,7 @@ namespace RoslynSandbox
         public int A { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
         }
     }
 }

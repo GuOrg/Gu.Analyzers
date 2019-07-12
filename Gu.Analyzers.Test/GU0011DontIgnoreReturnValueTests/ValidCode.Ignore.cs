@@ -11,9 +11,9 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
             [TestCase("stringBuilder.AppendLine(\"test\");")]
             [TestCase("stringBuilder.Append(\"test\");")]
             [TestCase("stringBuilder.Clear();")]
-            public static void StringBuilder(string code)
+            public static void StringBuilder(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Text;
@@ -26,15 +26,15 @@ namespace RoslynSandbox
             stringBuilder.AppendLine(""test"");
         }
     }
-}".AssertReplace("stringBuilder.AppendLine(\"test\");", code);
+}".AssertReplace("stringBuilder.AppendLine(\"test\");", expression);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void StringBuilderAppendChained()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Text;
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
@@ -109,7 +109,7 @@ namespace RoslynSandbox
             [Test]
             public static void WhenReturningThis()
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -125,7 +125,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
@@ -163,7 +163,7 @@ namespace RoslynSandbox
             [TestCase("this.ints.Remove(1);")]
             public static void HashSet(string operation)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -179,7 +179,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.ints.Add(1);", operation);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("this.ints.Add(1);")]
@@ -187,7 +187,7 @@ namespace RoslynSandbox
             [TestCase("this.ints.Remove(1);")]
             public static void IList(string operation)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Collections;
@@ -204,7 +204,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.ints.Add(1);", operation);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("ints.Add(1);")]
@@ -212,7 +212,7 @@ namespace RoslynSandbox
             [TestCase("ints.RemoveAll(x => x > 2);")]
             public static void ListOfInt(string operation)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -226,13 +226,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace("ints.RemoveAll(x => x > 2);", operation);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("map.TryAdd(1, 1);")]
             public static void ConcurrentDictionary(string operation)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -246,13 +246,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace("map.TryAdd(1, 1);", operation);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)")]
-            public static void MoqSetupReturns(string code)
+            public static void MoqSetupReturns(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -268,15 +268,15 @@ namespace RoslynSandbox
             mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null);
         }
     }
-}".AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", code);
+}".AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", expression);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("mock.Setup(x => x.Bar())")]
             public static void MoqSetupVoid(string setup)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using Moq;
@@ -296,7 +296,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("mock.Setup(x => x.Bar())", setup);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("this.Bind<Foo>().To<Foo>()")]
@@ -304,7 +304,7 @@ namespace RoslynSandbox
             [TestCase("this.Bind<Foo>().ToMethod(x => new Foo())")]
             public static void NinjectFluent(string bind)
             {
-                var testCode = @"
+                var code = @"
 namespace RoslynSandbox
 {
     using Ninject.Modules;
@@ -318,7 +318,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.Bind<Foo>().To<Foo>()", bind);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]

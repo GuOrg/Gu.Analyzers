@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
         [Test]
         public static void UsesNamedParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -29,13 +29,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingADefaultBooleanParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -54,13 +54,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void NonDeducedGenericBooleanParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -75,13 +75,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DeducedGenericBooleanParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -95,13 +95,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void FunctionAcceptingABooleanVariable()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -120,13 +120,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void BooleanParamsArray()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -145,13 +145,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoNotWarnOnDisposePattern()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -183,13 +183,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoNotWarnOnAssertAreEqual()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -203,13 +203,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DoNotWarnOnConfigureAwait()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Threading.Tasks;
@@ -227,14 +227,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("SetValue")]
         [TestCase("SetCurrentValue")]
         public static void DoNotWarnOn(string method)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Windows.Controls;
@@ -250,7 +250,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("SetValue", method);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("textBox.SetBar(true)")]
@@ -304,7 +304,7 @@ namespace RoslynSandbox
         [Test]
         public static void DoNotWarnInExpressionTree()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -324,7 +324,7 @@ namespace RoslynSandbox
         private static bool Id(bool self) => self;
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
         [TestCase("public int Value { get; } = 1;")]
         public static void AutoProp(string property)
         {
-            var fooCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -19,14 +19,14 @@ namespace RoslynSandbox
         public int Value { get; set; }
     }
 }".AssertReplace("public int Value { get; set; }", property);
-            RoslynAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("this.value;")]
         [TestCase("value;")]
         public static void ExpressionBodyReturningField(string getter)
         {
-            var fooCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -36,14 +36,14 @@ namespace RoslynSandbox
         public int Value => this.value;
     }
 }".AssertReplace("this.value;", getter);
-            RoslynAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("get { return this.value; }")]
         [TestCase("get { return value; }")]
         public static void WithBackingField(string getter)
         {
-            var fooCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("get { return this.value; }", getter);
-            RoslynAssert.Valid(Analyzer, fooCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("return this.bar.Value;")]

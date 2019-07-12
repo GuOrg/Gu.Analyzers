@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
         [Test]
         public static void ImplicitValueSharing()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -29,15 +29,15 @@ namespace RoslynSandbox
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
                 diagnosticId: "GU0060",
                 message: "Enum member value conflicts with another.",
-                code: testCode,
-                cleanedSources: out testCode);
-            RoslynAssert.Diagnostics(Analyzer, expectedDiagnostic, testCode);
+                code: code,
+                cleanedSources: out code);
+            RoslynAssert.Diagnostics(Analyzer, expectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharing()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -50,13 +50,13 @@ namespace RoslynSandbox
         ↓Bad = 2
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharingWithBitwiseSum()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -69,13 +69,13 @@ namespace RoslynSandbox
         ↓Bad = 3
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharingDifferentBases()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -92,13 +92,13 @@ namespace RoslynSandbox
         ↓Bad = 0x0F
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharingBitshifts()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -112,13 +112,13 @@ namespace RoslynSandbox
         ↓Bad = 1 << 2
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharingNonFlag()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -131,13 +131,13 @@ namespace RoslynSandbox
         ↓Bad = 2
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExplicitValueSharingPartial()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         ↓Bad = A | 2
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

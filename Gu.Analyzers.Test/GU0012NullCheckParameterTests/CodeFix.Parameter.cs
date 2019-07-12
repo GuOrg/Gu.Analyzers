@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             [TestCase("protected")]
             public static void SimpleAssignFullyQualified(string access)
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -32,7 +32,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("public C", $"{access} C");
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -46,13 +46,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace("public C", $"{access} C");
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void SimpleAssignWhenUsingExists()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -68,7 +68,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -83,13 +83,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void PassAsArgument()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -105,7 +105,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -125,13 +125,13 @@ namespace RoslynSandbox
         private int Bar(string text) => text.Length;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void WhenNotUsed()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -142,7 +142,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -156,13 +156,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void AfterOtherParameter()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -177,7 +177,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -196,13 +196,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void BeforeOtherParameter()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -217,7 +217,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -236,13 +236,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void FixAll()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -253,7 +253,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -272,13 +272,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
             public static void OutParameter()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -293,7 +293,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     public sealed class C
@@ -307,7 +307,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
         [Test]
         public static void Rethrowing()
         {
-            var testCode = @"
+            var code = @"
 namespace ValidCode
 {
     using System;
@@ -59,7 +59,7 @@ namespace ValidCode
     }
 }
 ";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

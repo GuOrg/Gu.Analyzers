@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         [Test]
         public static void DiscardSymbol()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class C
@@ -22,13 +22,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void Local()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class C
@@ -39,14 +39,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("out _")]
         [TestCase("out var _")]
         public static void Out(string arg)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class C
@@ -57,13 +57,13 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("out _", arg);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void OneParameterLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -79,13 +79,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TwoParameterLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

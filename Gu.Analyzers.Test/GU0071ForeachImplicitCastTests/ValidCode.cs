@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
         [TestCase("IEnumerable<IEnumerable<char>>")]
         public static void VarInAForeach(string type)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -28,13 +28,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ExplicitTypeMatchesInAForeach()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         [Test]
         public static void ExplicitTypeWhenLoopingRegexMatches()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Text.RegularExpressions;
@@ -117,13 +117,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DuckTypedEnumerable()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -147,13 +147,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void NonGenericIEnumerable()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections;
@@ -168,7 +168,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

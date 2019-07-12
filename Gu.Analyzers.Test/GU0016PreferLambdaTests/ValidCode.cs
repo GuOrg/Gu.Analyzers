@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
         [Test]
         public static void LinqWhereStaticMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -28,7 +28,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

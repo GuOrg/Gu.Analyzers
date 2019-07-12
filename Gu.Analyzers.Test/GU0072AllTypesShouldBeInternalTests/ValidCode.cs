@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
         [TestCase("internal struct Foo")]
         public static void SimpleType(string signature)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("internal class Foo", signature);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("internal class Bar")]
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         [TestCase("private struct Bar")]
         public static void NestedType(string signature)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -45,7 +45,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("private class Bar", signature);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         [TestCase(@"throw new ArgumentNullException(""Meh"", ↓nameof(o));", @"throw new ArgumentNullException(nameof(o), ""Meh"");")]
         public static void WhenThrowing(string error, string @fixed)
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -30,7 +30,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -44,13 +44,13 @@ namespace RoslynSandbox
     }
 }".AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void AliasedInside()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using Meh = System.ArgumentException;
@@ -64,7 +64,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using Meh = System.ArgumentException;
@@ -77,13 +77,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void AliasedOutside()
         {
-            var testCode = @"
+            var before = @"
 using Meh = System.ArgumentException;
 namespace RoslynSandbox
 {
@@ -96,7 +96,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 using Meh = System.ArgumentException;
 namespace RoslynSandbox
 {
@@ -108,7 +108,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

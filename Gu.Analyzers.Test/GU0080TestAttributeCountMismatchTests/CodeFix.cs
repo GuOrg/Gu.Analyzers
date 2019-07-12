@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
         [TestCase("string text, int index, bool value")]
         public static void TestAttributeAndParameter(string parameters)
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -28,7 +28,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("string text", parameters);
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -41,13 +41,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void TestCaseAttributeAndParameter()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -61,7 +61,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [TestCase("int i, int j")]
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         [TestCase("string i,string j, int k, int l")]
         public static void TestCaseAttributeAndTooManyParameters(string parameters)
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -97,7 +97,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("int i, int j", parameters);
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -111,13 +111,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void TestCaseParams()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

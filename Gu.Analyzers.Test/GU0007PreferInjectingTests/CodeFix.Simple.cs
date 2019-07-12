@@ -21,7 +21,7 @@ namespace RoslynSandbox
             [Test]
             public static void WhenAssigningThisFieldWithObjectCreation()
             {
-                var before = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -48,14 +48,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenAssigningUnderscoreFieldWithObjectCreation()
             {
-                var before = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -82,14 +82,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenAssigningThisPropertyWithObjectCreation()
             {
-                var before = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -116,14 +116,14 @@ namespace RoslynSandbox
         public Bar Bar { get; }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenAssigningPropertyWithObjectCreation()
             {
-                var before = @"
+                var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -150,8 +150,8 @@ namespace RoslynSandbox
         public Bar Bar { get; }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -171,7 +171,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var mehCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Meh : Foo
@@ -194,7 +194,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, mehCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -214,7 +214,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Meh : Foo
@@ -237,13 +237,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, testCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenNotInjectingOptional()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -270,13 +270,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenNotInjectingParams()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -303,7 +303,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, testCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -330,7 +330,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var mehCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Meh : Foo
@@ -353,13 +353,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, mehCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenNotInjectingChainedGenericParameterName()
             {
-                var fooCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -399,7 +399,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, moduleCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, moduleCode }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -439,7 +439,7 @@ namespace RoslynSandbox
     {
     }
 }";
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Meh : Foo
@@ -462,7 +462,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, testCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -503,7 +503,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var mehCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     public class Meh : Foo
@@ -526,7 +526,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, mehCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, before }, after, fixTitle: "Inject safe.");
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
         [Test]
         public static void ExceptionThrownInsideMethodBlock()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     class Foo
@@ -22,13 +22,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExceptionThrownInline()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     class Foo
@@ -36,13 +36,13 @@ namespace RoslynSandbox
         int Method() => throw new System.NotImplementedException();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExceptionNullCoalescing()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     class Foo
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

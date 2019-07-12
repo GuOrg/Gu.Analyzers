@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.Refactorings
         [Test]
         public static void StartingWithNewLine()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -24,7 +24,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var title = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -66,13 +66,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.NoRefactoring(Refactoring, code, fixedCode);
+            RoslynAssert.NoRefactoring(Refactoring, code, title);
         }
 
         [Test]
         public static void StartingAndEndingWithNewLine()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -84,7 +84,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -97,13 +97,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
         public static void OneCarriageReturnNewLine()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -115,7 +115,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -128,13 +128,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
         public static void OneCarriageReturnNewLineAndEndingWithCarriageReturnNewLine()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -146,7 +146,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -159,13 +159,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
         public static void TwoCarriageReturnNewLines()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -177,7 +177,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -191,13 +191,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
         public static void TwoCarriageReturnNewLinesAndEndingWithCarriageReturnNewLine()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -209,7 +209,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -223,13 +223,13 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
 
         [Test]
         public static void TwoNewLinesEndingWithNewline()
         {
-            var code = @"
+            var before = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -241,7 +241,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     public static class C
@@ -255,7 +255,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, code, fixedCode);
+            RoslynAssert.Refactoring(Refactoring, before, after);
         }
     }
 }

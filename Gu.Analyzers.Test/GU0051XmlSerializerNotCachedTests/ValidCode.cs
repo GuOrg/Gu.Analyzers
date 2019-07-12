@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
         [Test]
         public static void NoCreationsOfTheSerializer()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -28,13 +28,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CachedStaticReadonlyInitializedInlineXmlSerializer()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -54,13 +54,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -85,13 +85,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CachedStaticInitializedInlineXmlSerializer()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -111,14 +111,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), ""rootNode"")")]
         [TestCase(@"new XmlSerializer(typeof(Foo))")]
-        public static void NonLeakyConstructor(string code)
+        public static void NonLeakyConstructor(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -135,9 +135,9 @@ namespace RoslynSandbox
             }
         }
     }
-}".AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

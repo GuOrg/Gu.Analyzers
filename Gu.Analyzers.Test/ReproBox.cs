@@ -34,7 +34,7 @@ namespace Gu.Analyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -42,7 +42,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(analyzer, testCode);
+            RoslynAssert.Valid(analyzer, code);
         }
     }
 }

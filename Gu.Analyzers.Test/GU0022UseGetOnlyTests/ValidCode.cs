@@ -23,7 +23,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         [TestCaseSource(nameof(TestCases))]
         public static void UpdatedInMethodThis(TestCase data)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -38,13 +38,13 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCaseSource(nameof(TestCases))]
         public static void UpdatedInMethodUnderscoreNames(TestCase data)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -59,13 +59,13 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCaseSource(nameof(TestCases))]
         public static void UpdatingOtherInstanceInCtor(TestCase data)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -80,13 +80,13 @@ namespace RoslynSandbox
 }".AssertReplace("A = a;", data.Update)
   .AssertReplace("int", data.Type);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UpdatedInLambdaInCtor()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         public int A { get; private set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -161,7 +161,7 @@ namespace RoslynSandbox
         [Test]
         public static void OtherInstanceObjectInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -174,13 +174,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SideEffectStaticMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -193,13 +193,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SideEffectStaticMethodPrivateProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -212,13 +212,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void AssignedInSetOnlyWithTernary()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo<T>
@@ -232,13 +232,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ExplicitImplementation()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     interface IFoo
@@ -257,7 +257,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         internal class TestCase

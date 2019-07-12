@@ -33,7 +33,7 @@ namespace RoslynSandbox
         [Test]
         public static void StringBuilderWriteLineToString()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Text;
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [TestCase("Add(1)")]
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         [Test]
         public static void MoqSetupNonVoidNoReturn()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
         [Test]
         public static void TestCaseAttribute()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -24,13 +24,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TestCaseAttributeWithAuthor()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("[TestCase(1)]")]
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         [TestCase("[TestCase(1, 2, 3)]")]
         public static void TestCaseParams(string testCase)
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -66,7 +66,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("[TestCase(1, 2)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

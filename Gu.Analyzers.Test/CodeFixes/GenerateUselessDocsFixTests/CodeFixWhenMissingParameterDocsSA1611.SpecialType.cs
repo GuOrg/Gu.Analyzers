@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
             [Test]
             public void StandardTextForCancellationToken()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System.Threading;
@@ -26,7 +26,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System.Threading;
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, testCode, fixedCode, fixTitle: "Generate standard xml documentation for parameter.");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Generate standard xml documentation for parameter.");
             }
         }
     }

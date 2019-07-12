@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
         [Test]
         public static void WhenSealedWithProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -19,13 +19,13 @@ namespace RoslynSandbox
         public static Foo Default { get; } = new Foo();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenSealedWithField()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -33,20 +33,20 @@ namespace RoslynSandbox
         public static readonly Foo Default = new Foo();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenNoDefaultField()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     public class Foo
     {
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

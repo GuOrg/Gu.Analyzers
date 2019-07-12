@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
         [Test]
         public static void WhenNoAttribute()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,13 +25,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ExtendedNoAttribute()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -39,8 +39,8 @@ namespace RoslynSandbox
     [Serializable]
     public class FooException : Exception
     {
-        public FooException()
-        : base(string.Empty)
+        public FooException(string text)
+            : base(text)
         {
         }
     }
@@ -48,12 +48,12 @@ namespace RoslynSandbox
     public class ↓BarException : FooException
     {
         public BarException()
-        : base(string.Empty)
+            : base(string.Empty)
         {
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }
