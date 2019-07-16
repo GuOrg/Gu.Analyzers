@@ -22,7 +22,7 @@ namespace N
 {
     using System.Threading;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -39,7 +39,7 @@ namespace N
 {
     using System.Threading;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing

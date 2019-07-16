@@ -22,7 +22,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -36,7 +36,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -56,7 +56,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -71,7 +71,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -92,7 +92,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -107,7 +107,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -128,7 +128,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -143,7 +143,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -164,7 +164,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing
@@ -180,7 +180,7 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
         /// <summary>
         /// Does nothing

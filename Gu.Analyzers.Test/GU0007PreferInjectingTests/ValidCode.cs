@@ -50,11 +50,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C(Bar bar)
         {
             this.bar = bar;
         }
@@ -69,11 +69,11 @@ namespace N
             var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C1(Bar bar)
         {
             this.bar = bar;
         }
@@ -96,7 +96,7 @@ namespace N
             var mehCode = @"
 namespace N
 {
-    public class Meh : Foo
+    public class Meh : C1
     {
         public Meh()
            : base(new Bar(1))

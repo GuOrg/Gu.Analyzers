@@ -13,11 +13,11 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private Bar bar = new Bar();
 
-        private Foo()
+        private C()
         {
         }
     }
@@ -32,11 +32,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    public static class Foo
+    public static class C
     {
         private static Bar bar;
 
-        static Foo()
+        static C()
         {
             bar = new Bar();
         }
@@ -52,9 +52,9 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -82,11 +82,11 @@ namespace N
                 var barCode = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         private readonly int value;
 
-        public Bar(int value)
+        public C2(int value)
         {
             this.value = value;
         }
@@ -98,11 +98,11 @@ namespace N
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
         public Foo()
         {
-            bar = new Bar(default(int));
+            bar = new C2(default(int));
         }
     }
 }".AssertReplace("default(int)", $"default({type})");
@@ -123,11 +123,11 @@ namespace N
                 var barCode = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         private readonly Baz[] values;
 
-        public Bar(params Baz[] values)
+        public C2(params Baz[] values)
         {
             this.values = values;
         }
@@ -139,11 +139,11 @@ namespace N
 {
     public class Foo
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
         public Foo()
         {
-            bar = new Bar();
+            bar = new C2();
         }
     }
 }";
@@ -159,11 +159,11 @@ namespace N
 {
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         private readonly Dictionary<Bar, Bar> bar;
 
-        public Foo()
+        public C()
         {
             this.bar = new Dictionary<Bar, Bar>();
         }
@@ -181,11 +181,11 @@ namespace N
 {
     using System.Linq;
 
-    public class Foo
+    public class C
     {
         private ServiceLocator bar;
 
-        public Foo()
+        public C()
         {
             this.bar = new ServiceLocator[0].FirstOrDefault(x => x.Bar != null);
         }
@@ -201,12 +201,12 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar1;
         private readonly Bar bar2;
 
-        public Foo()
+        public C()
         {
             this.bar1 = new Bar();
             this.bar2 = new Bar();
@@ -223,11 +223,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo()
+        public C()
         {
             this.bar = new Bar { Baz = 1 };
         }

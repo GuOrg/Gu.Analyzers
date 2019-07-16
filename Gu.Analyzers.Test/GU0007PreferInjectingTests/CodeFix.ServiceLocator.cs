@@ -5,9 +5,9 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal static partial class CodeFix
     {
-        internal static class ServiceLocator
+        internal static class ServiceLocatorTests
         {
-            private const string BarCode = @"
+            private const string Bar = @"
 namespace N
 {
     public class Bar
@@ -22,21 +22,21 @@ namespace N
     }
 }";
 
-            private const string FooBaseCode = @"
+            private const string AbstractC = @"
 namespace N
 {
-    public abstract class FooBase
+    public abstract class AbstractC
     {
         private readonly Bar bar;
 
-        protected FooBase(Bar bar)
+        protected AbstractC(Bar bar)
         {
             this.bar = bar;
         }
     }
 }";
 
-            private static readonly string LocatorCode = @"
+            private static readonly string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator
@@ -59,11 +59,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar value;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
         {
             this.value = locator.↓Bar;
         }
@@ -73,17 +73,17 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar value;
 
-        public Foo(ServiceLocator locator, Bar value)
+        public C(ServiceLocator locator, Bar value)
         {
             this.value = value;
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -92,11 +92,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar _value;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
         {
             _value = locator.↓Bar;
         }
@@ -106,17 +106,17 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar _value;
 
-        public Foo(ServiceLocator locator, Bar value)
+        public C(ServiceLocator locator, Bar value)
         {
             _value = value;
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -133,11 +133,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator, Meh meh)
+        public C(ServiceLocator locator, Meh meh)
         {
             this.bar = locator.↓Bar;
             if (meh == Meh.Bar)
@@ -150,11 +150,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator, Meh meh, Bar bar)
+        public C(ServiceLocator locator, Meh meh, Bar bar)
         {
             this.bar = bar;
             if (meh == Meh.Bar)
@@ -163,7 +163,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, enumCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, enumCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -172,11 +172,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
             : base(locator.↓Bar)
         {
             this.bar = locator.↓Bar;
@@ -187,18 +187,18 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
             : base(bar)
         {
             this.bar = bar;
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -207,11 +207,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar _bar;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
             : base(locator.↓Bar)
         {
             _bar = locator.↓Bar;
@@ -222,18 +222,18 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar _bar;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
             : base(bar)
         {
             _bar = bar;
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -242,9 +242,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -258,11 +258,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C(Bar bar)
         {
             this.bar = bar;
         }
@@ -273,7 +273,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -282,11 +282,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
         {
             this.locator = locator;
         }
@@ -301,12 +301,12 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
         {
             this.bar = bar;
             this.locator = locator;
@@ -318,7 +318,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -330,11 +330,11 @@ namespace N
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Foo
+    public class C
     {
         private readonly ServiceLocator locator;
 
-        public Foo(IEnumerable<ServiceLocator> bars, ServiceLocator locator)
+        public C(IEnumerable<ServiceLocator> bars, ServiceLocator locator)
         {
             this.locator = bars.First(x => x.Bar == locator.↓Bar);
         }
@@ -347,17 +347,17 @@ namespace N
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Foo
+    public class C
     {
         private readonly ServiceLocator locator;
 
-        public Foo(IEnumerable<ServiceLocator> bars, ServiceLocator locator, Bar bar)
+        public C(IEnumerable<ServiceLocator> bars, ServiceLocator locator, Bar bar)
         {
             this.locator = bars.First(x => x.Bar == bar);
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -366,11 +366,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
         {
             this.locator = locator;
         }
@@ -390,12 +390,12 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
         {
             this.bar = bar;
             this.locator = locator;
@@ -412,7 +412,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -421,11 +421,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly ServiceLocator _locator;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
         {
             _locator = locator;
         }
@@ -440,12 +440,12 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar _bar;
         private readonly ServiceLocator _locator;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
         {
             _bar = bar;
             _locator = locator;
@@ -457,7 +457,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -466,11 +466,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
             : base(locator.↓Bar)
         {
             this.locator = locator;
@@ -486,12 +486,12 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar bar;
         private readonly ServiceLocator locator;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
             : base(bar)
         {
             this.bar = bar;
@@ -504,7 +504,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -513,11 +513,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator)
+        public C(ServiceLocator locator)
             : base(locator.↓Bar)
         {
             this.bar = locator.↓Bar;
@@ -533,11 +533,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Bar bar;
 
-        public Foo(ServiceLocator locator, Bar bar)
+        public C(ServiceLocator locator, Bar bar)
             : base(bar)
         {
             this.bar = bar;
@@ -549,7 +549,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, LocatorCode, FooBaseCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
             }
         }
     }

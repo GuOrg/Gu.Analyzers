@@ -20,14 +20,14 @@ namespace N
     }
 }";
 
-            private const string FooBase = @"
+            private const string AbstractC = @"
 namespace N
 {
-    public abstract class FooBase
+    public abstract class AbstractC
     {
         private readonly Singleton singleton;
 
-        protected FooBase(Singleton singleton)
+        protected AbstractC(Singleton singleton)
         {
             this.singleton = singleton;
         }
@@ -40,11 +40,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton value;
 
-        public Foo()
+        public C()
         {
             this.value = Singleton.↓Instance;
         }
@@ -54,11 +54,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton value;
 
-        public Foo(Singleton value)
+        public C(Singleton value)
         {
             this.value = value;
         }
@@ -73,11 +73,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton _value;
 
-        public Foo()
+        public C()
         {
             _value = Singleton.↓Instance;
         }
@@ -87,11 +87,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton _value;
 
-        public Foo(Singleton value)
+        public C(Singleton value)
         {
             _value = value;
         }
@@ -106,11 +106,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly object bar;
 
-        public Foo()
+        public C()
         {
             this.bar = Singleton.↓Instance;
         }
@@ -120,11 +120,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly object bar;
 
-        public Foo(Singleton bar)
+        public C(Singleton bar)
         {
             this.bar = bar;
         }
@@ -139,11 +139,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Singleton singleton;
 
-        public Foo()
+        public C()
             : base(Singleton.↓Instance)
         {
             this.singleton = Singleton.↓Instance;
@@ -154,18 +154,18 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo : FooBase
+    public class C : AbstractC
     {
         private readonly Singleton singleton;
 
-        public Foo(Singleton singleton)
+        public C(Singleton singleton)
             : base(singleton)
         {
             this.singleton = singleton;
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { FooBase, Singleton, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { AbstractC, Singleton, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -174,9 +174,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -190,11 +190,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton singleton;
 
-        public Foo(Singleton singleton)
+        public C(Singleton singleton)
         {
             this.singleton = singleton;
         }
@@ -214,9 +214,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -227,11 +227,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton singleton;
 
-        public Foo(Singleton singleton)
+        public C(Singleton singleton)
         {
             this.singleton = singleton;
         }
@@ -249,7 +249,7 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public string M()
         {
@@ -261,11 +261,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Singleton singleton;
 
-        public Foo(Singleton singleton)
+        public C(Singleton singleton)
         {
             this.singleton = singleton;
         }
