@@ -354,12 +354,12 @@ namespace N
     {
         public int Value { get; set; }
 
-        public static void Bar()
+        public static void M()
         {
-            Bar(↓""Value"");
+            M(↓""Value"");
         }
 
-        public static void Bar(string meh)
+        public static void M(string meh)
         {
         }
     }
@@ -372,12 +372,12 @@ namespace N
     {
         public int Value { get; set; }
 
-        public static void Bar()
+        public static void M()
         {
-            Bar(nameof(Value));
+            M(nameof(Value));
         }
 
-        public static void Bar(string meh)
+        public static void M(string meh)
         {
         }
     }
@@ -393,11 +393,11 @@ namespace N
 {
     public class C
     {
-        public static readonly string Name = Bar(↓""Value"");
+        public static readonly string Name = M(↓""Value"");
 
         public int Value { get; set; }
 
-        public static string Bar(string meh) => meh;
+        public static string M(string meh) => meh;
     }
 }";
 
@@ -406,11 +406,11 @@ namespace N
 {
     public class C
     {
-        public static readonly string Name = Bar(nameof(Value));
+        public static readonly string Name = M(nameof(Value));
 
         public int Value { get; set; }
 
-        public static string Bar(string meh) => meh;
+        public static string M(string meh) => meh;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);

@@ -41,12 +41,12 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int value1;
         private readonly int value2;
 
-        public Foo(int value1, int value2)
+        public C(int value1, int value2)
         {
             this.value1 = value1;
             this.value2 = value2;
@@ -62,7 +62,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
@@ -81,13 +81,13 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
-        public Foo Clone()
+        public C Clone()
         {
-            return new Foo { A = A };
+            return new C { A = A };
         }
     }
 }";

@@ -21,7 +21,7 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
         {
@@ -42,7 +42,7 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
         {
@@ -70,7 +70,7 @@ namespace N
     using System.Xml.Serialization;
     using Alias = System.Boolean;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, Alias useFluffyBuns)
         {
@@ -92,7 +92,7 @@ namespace N
     using System.Xml.Serialization;
     using Alias = System.Boolean;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, Alias useFluffyBuns)
         {
@@ -119,7 +119,7 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, System.Boolean useFluffyBuns)
         {
@@ -140,7 +140,7 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, System.Boolean useFluffyBuns)
         {

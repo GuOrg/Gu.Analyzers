@@ -16,7 +16,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
         {
@@ -41,7 +41,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns = true)
         {
@@ -66,7 +66,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Another()
         {
@@ -87,7 +87,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Another()
         {
@@ -107,7 +107,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
         {
@@ -132,7 +132,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         public void Floof(params bool[] useFluffyBuns)
         {
@@ -157,7 +157,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed = false;
@@ -194,7 +194,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class CTests
     {
         [Test]
         public void Bar()
@@ -214,7 +214,7 @@ namespace N
 {
     using System.Threading.Tasks;
 
-    public class FooTests
+    public class CTests
     {
         public void Bar()
         {
@@ -240,7 +240,7 @@ namespace N
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -253,8 +253,8 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase("textBox.SetBar(true)")]
-        [TestCase("Foo.SetBar(textBox, true)")]
+        [TestCase("textBox.SetM(true)")]
+        [TestCase("Foo.SetM(textBox, true)")]
         public static void DoNotWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
@@ -265,20 +265,20 @@ namespace N
 
     public static class Foo
     {
-        public static readonly DependencyProperty BarProperty = DependencyProperty.RegisterAttached(
-            ""Bar"",
+        public static readonly DependencyProperty MProperty = DependencyProperty.RegisterAttached(
+            ""M"",
             typeof(bool),
             typeof(Foo),
             new PropertyMetadata(default(bool)));
 
-        public static void SetBar(this DependencyObject element, bool value)
+        public static void SetM(this DependencyObject element, bool value)
         {
-            element.SetValue(BarProperty, value);
+            element.SetValue(MProperty, value);
         }
 
-        public static bool GetBar(DependencyObject element)
+        public static bool GetM(DependencyObject element)
         {
-            return (bool)element.GetValue(BarProperty);
+            return (bool)element.GetValue(MProperty);
         }
     }
 }";
@@ -293,10 +293,10 @@ namespace N
         public void Meh()
         {
             var textBox = new TextBox();
-            textBox.SetBar(true);
+            textBox.SetM(true);
         }
     }
-}".AssertReplace("textBox.SetBar(true)", method);
+}".AssertReplace("textBox.SetM(true)", method);
 
             RoslynAssert.Valid(Analyzer, apCode, testCode);
         }
@@ -310,7 +310,7 @@ namespace N
     using System;
     using System.Linq.Expressions;
 
-    internal class Foo
+    internal class C
     {
         public void Bar()
         {

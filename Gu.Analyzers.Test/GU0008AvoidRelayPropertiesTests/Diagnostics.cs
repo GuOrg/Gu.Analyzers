@@ -12,14 +12,14 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
         [TestCase("bar.Value;")]
         public static void WhenReturningPropertyOfInjectedField(string getter)
         {
-            var fooCode = @"
+            var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
-        public Foo(Bar bar)
+        public C1(C2 bar)
         {
             this.bar = bar;
         }
@@ -33,29 +33,29 @@ namespace N
         }
     }
 }".AssertReplace("this.bar.Value;", getter);
-            var code = @"
+            var C2 = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, C2);
         }
 
         [TestCase("this.bar.Value;")]
         [TestCase("bar.Value;")]
         public static void WhenReturningPropertyOfFieldExpressionBody(string body)
         {
-            var fooCode = @"
+            var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
-        public Foo(Bar bar)
+        public C1(C2 bar)
         {
             this.bar = bar;
         }
@@ -63,15 +63,15 @@ namespace N
         public int Value => ↓this.bar.Value;
     }
 }".AssertReplace("this.bar.Value;", body);
-            var code = @"
+            var C2 = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, C2);
         }
     }
 }

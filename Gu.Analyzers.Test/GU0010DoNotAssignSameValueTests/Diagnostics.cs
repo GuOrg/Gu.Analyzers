@@ -17,11 +17,11 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
-        private void Bar()
+        private void M()
         {
             ↓this.A = this.A;
         }
@@ -37,11 +37,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
-        private void Bar()
+        private void M()
         {
             ↓this.A = this.A;
         }

@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int Value { get; set; }
     }
@@ -29,7 +29,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int value = 2;
 
@@ -46,7 +46,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private int value;
 
@@ -67,11 +67,11 @@ namespace N
             var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C1(Bar bar)
         {
             this.bar = new Bar();
         }
@@ -103,11 +103,11 @@ namespace N
             var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C1(Bar bar)
         {
             this.bar = new Bar();
         }
