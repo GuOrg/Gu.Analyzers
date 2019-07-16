@@ -118,5 +118,6 @@
   <Rules AnalyzerId="Gu.Roslyn.Asserts.Analyzers" RuleNamespace="Gu.Roslyn.Asserts.Analyzers">
     <Rule Id="GURA01" Action="Info" />
     <Rule Id="GURA03" Action="Info" />
+    <Rule Id="GURA09" Action="Warning" />
   </Rules>
 </RuleSet>

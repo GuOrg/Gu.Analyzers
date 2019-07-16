@@ -17,7 +17,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(object value)
         {
@@ -34,7 +34,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(object value)
         {
@@ -56,7 +56,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(StringComparison value)
         {
@@ -74,7 +74,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(StringComparison value)
         {
@@ -98,7 +98,7 @@ namespace N
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    public class Foo : INotifyPropertyChanged
+    public class C : INotifyPropertyChanged
     {
         private int value;
 
@@ -139,7 +139,7 @@ namespace N
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    public class Foo : INotifyPropertyChanged
+    public class C : INotifyPropertyChanged
     {
         private int value;
 
@@ -185,7 +185,7 @@ namespace N
     using System;
     using System.ComponentModel;
 
-    public static class Foo
+    public static class C
     {
         private static string name;
 
@@ -218,7 +218,7 @@ namespace N
     using System;
     using System.ComponentModel;
 
-    public static class Foo
+    public static class C
     {
         private static string name;
 
@@ -256,7 +256,7 @@ namespace N
     using System;
     using System.ComponentModel;
 
-    public class Foo
+    public class C
     {
         private static string name;
         private int value;
@@ -302,7 +302,7 @@ namespace N
     using System;
     using System.ComponentModel;
 
-    public class Foo
+    public class C
     {
         private static string name;
         private int value;
@@ -350,7 +350,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int Value { get; set; }
 
@@ -368,7 +368,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int Value { get; set; }
 
@@ -391,7 +391,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly string Name = Bar(↓""Value"");
 
@@ -404,7 +404,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly string Name = Bar(nameof(Value));
 
@@ -422,7 +422,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly string Name = string.Format(↓""Value"");
 
@@ -439,7 +439,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly string Name = string.Format(nameof(Value));
 
@@ -464,7 +464,7 @@ namespace N
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    public class Foo : INotifyPropertyChanged
+    public class C : INotifyPropertyChanged
     {
         private int _value;
 
@@ -505,7 +505,7 @@ namespace N
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    public class Foo : INotifyPropertyChanged
+    public class C : INotifyPropertyChanged
     {
         private int _value;
 
@@ -551,12 +551,12 @@ namespace N
     using System.Windows;
     using System.Windows.Controls;
 
-    public class FooControl : Control
+    public class CControl : Control
     {
         public static readonly DependencyProperty BarProperty = DependencyProperty.Register(
             ↓""Bar"",
             typeof(int),
-            typeof(FooControl),
+            typeof(CControl),
             new PropertyMetadata(default(int)));
 
         public int Bar
@@ -573,12 +573,12 @@ namespace N
     using System.Windows;
     using System.Windows.Controls;
 
-    public class FooControl : Control
+    public class CControl : Control
     {
         public static readonly DependencyProperty BarProperty = DependencyProperty.Register(
             nameof(Bar),
             typeof(int),
-            typeof(FooControl),
+            typeof(CControl),
             new PropertyMetadata(default(int)));
 
         public int Bar

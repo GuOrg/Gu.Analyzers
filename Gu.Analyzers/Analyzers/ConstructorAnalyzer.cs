@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -122,7 +123,11 @@ namespace Gu.Analyzers
 
                     if (walker.Unassigned.Count > 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0004AssignAllReadOnlyMembers.Descriptor, constructorDeclaration.Identifier.GetLocation(), string.Join(Environment.NewLine, walker.Unassigned)));
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                GU0004AssignAllReadOnlyMembers.Descriptor,
+                                constructorDeclaration.Identifier.GetLocation(),
+                                string.Join(Environment.NewLine, walker.Unassigned.Select(x => x.ToDisplayString()))));
                     }
                 }
             }

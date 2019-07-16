@@ -15,7 +15,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(object value)
         {
@@ -37,7 +37,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Meh(StringComparison value)
         {
@@ -59,7 +59,7 @@ namespace N
 namespace N
 {
     [System.Diagnostics.DebuggerDisplay(""{Name}"")]
-    public class Foo
+    public class C
     {
         public string Name { get; }
     }
@@ -75,7 +75,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Bar()
         {
@@ -99,9 +99,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var text = ""text"";
         }
@@ -116,9 +116,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var text = Id(""text"");
         }
@@ -135,9 +135,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             {
                 var text = string.Empty;
@@ -166,7 +166,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Bar()
         {

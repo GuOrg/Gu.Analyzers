@@ -14,9 +14,9 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public ↓Foo(int a)
+        public ↓C(int a)
         {
             this.A = a;
         }
@@ -28,7 +28,7 @@ namespace N
 }";
 
             var message = "The following readonly members are not assigned:\r\n" +
-                          "N.Foo.B";
+                          "N.C.B";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), code);
         }
 
@@ -38,9 +38,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public ↓Foo(int a)
+        public ↓C(int a)
         {
             this.A = a;
         }
@@ -98,12 +98,12 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
 
-        public ↓Foo(int a)
+        public ↓C(int a)
         {
             this.a = a;
         }
@@ -119,9 +119,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        static ↓Foo()
+        static ↓C()
         {
             A = 1;
         }
@@ -140,13 +140,13 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int A;
 
         public static readonly int B;
 
-        static ↓Foo()
+        static ↓C()
         {
             A = 1;
         }

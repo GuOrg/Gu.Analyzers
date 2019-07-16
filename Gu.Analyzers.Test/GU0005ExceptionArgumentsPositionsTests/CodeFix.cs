@@ -21,9 +21,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new ArgumentException(↓nameof(o), ""message"");
         }
@@ -35,9 +35,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new ArgumentException(""message"", nameof(o));
         }
@@ -55,9 +55,9 @@ namespace N
 {
     using Meh = System.ArgumentException;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new Meh(↓nameof(o), ""message"");
         }
@@ -69,9 +69,9 @@ namespace N
 {
     using Meh = System.ArgumentException;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new Meh(""message"", nameof(o));
         }
@@ -87,9 +87,9 @@ namespace N
 using Meh = System.ArgumentException;
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new Meh(↓nameof(o), ""message"");
         }
@@ -100,9 +100,9 @@ namespace N
 using Meh = System.ArgumentException;
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new Meh(""message"", nameof(o));
         }

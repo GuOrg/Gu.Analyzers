@@ -13,9 +13,9 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.A = a;
             this.B = b;
@@ -57,9 +57,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        static Foo()
+        static C()
         {
             A = 1;
             B = 2;
@@ -79,12 +79,12 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
 
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.a = a;
             this.b = b;
@@ -100,11 +100,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
 
-        public Foo()
+        public C()
         {
             Meh(ref this.a);
         }
@@ -124,11 +124,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
 
-        public Foo()
+        public C()
         {
             Meh(out this.a);
         }
@@ -148,17 +148,17 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
         
-        public Foo()
+        public C()
             : this(1, 2)
         {
         }
      
-        private Foo(int a, int b)
+        private C(int a, int b)
         {
             this.a = a;
             this.b = b;
@@ -174,11 +174,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a = 1;
         
-        public Foo()
+        public C()
         {
         }
      
@@ -194,13 +194,13 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int A;
 
         public static readonly int B;
 
-        static Foo()
+        static C()
         {
             A = 1;
             B = 2;
@@ -216,16 +216,16 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int A;
 
         public static readonly int B;
 
-        static Foo()
+        static C()
         {
-            Foo.A = 1;
-            Foo.B = 2;
+            C.A = 1;
+            C.B = 2;
         }
     }
 }";
@@ -238,13 +238,13 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int A;
 
         public static readonly int B = 2;
 
-        static Foo()
+        static C()
         {
             A = 1;
         }
@@ -260,12 +260,12 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private bool disposed;
 
-        public Foo(int a)
+        public C(int a)
         {
             this.a = a;
         }
@@ -280,9 +280,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a)
+        public C(int a)
         {
             this.A = a;
         }
@@ -301,12 +301,12 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int defaultValue = 5;
 
-        public Foo(int a)
+        public C(int a)
         {
             this.a = a;
         }
@@ -321,9 +321,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a)
+        public C(int a)
         {
             this.A = a;
         }
@@ -342,9 +342,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public abstract class Foo
+    public abstract class C
     {
-        protected Foo(int value)
+        protected C(int value)
         {
             this.Value = value;
         }
@@ -363,9 +363,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public abstract class Foo
+    public abstract class C
     {
-        protected Foo(int value)
+        protected C(int value)
         {
             this.Value = value;
         }
@@ -384,11 +384,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int value;
 
-        public Foo(int value)
+        public C(int value)
         {
             this.value = value;
         }
@@ -411,11 +411,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int value;
 
-        public Foo(int value)
+        public C(int value)
         {
             this.value = value;
         }

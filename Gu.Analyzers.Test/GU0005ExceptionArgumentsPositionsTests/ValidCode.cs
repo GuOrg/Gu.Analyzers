@@ -15,9 +15,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new ArgumentException(""message"", nameof(o));
         }
@@ -34,9 +34,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new ArgumentNullException(nameof(o), ""message"");
         }
@@ -53,9 +53,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(object o)
+        public C(object o)
         {
             throw new ArgumentOutOfRangeException(nameof(o), ""message"");
         }
