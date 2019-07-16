@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         internal static class Simple
         {
-            private static readonly string BarCode = @"
+            private static readonly string Bar = @"
 namespace N
 {
     public class Bar
@@ -21,7 +21,7 @@ namespace N
             [Test]
             public static void WhenAssigningThisFieldWithObjectCreation()
             {
-                var code = @"
+                var before = @"
 namespace N
 {
     public class Foo
@@ -48,8 +48,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, Bar);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -82,8 +82,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, Bar);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -116,8 +116,8 @@ namespace N
         public Bar Bar { get; }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, Bar);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -150,8 +150,8 @@ namespace N
         public Bar Bar { get; }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, BarCode);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, BarCode }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, Bar);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -194,7 +194,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, Bar, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -237,7 +237,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, BarCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, Bar, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -270,7 +270,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -303,7 +303,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { BarCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]

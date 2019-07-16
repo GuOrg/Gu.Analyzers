@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         internal static class ServiceLocator
         {
-            private static readonly string BarCode = @"
+            private const string BarCode = @"
 namespace N
 {
     public class Bar
@@ -22,7 +22,7 @@ namespace N
     }
 }";
 
-            private static readonly string FooBaseCode = @"
+            private const string FooBaseCode = @"
 namespace N
 {
     public abstract class FooBase
