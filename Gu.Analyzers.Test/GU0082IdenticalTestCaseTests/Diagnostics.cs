@@ -18,7 +18,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(1, 2)]
         [↓TestCase(1, 2)]
@@ -38,7 +38,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(1, 2)]
         [↓TestCase(1, 2, Author = ""Author"")]
@@ -58,7 +58,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(1, 2, Author = ""Author"")]
         [↓TestCase(1, 2, Author = ""Author"")]
@@ -120,7 +120,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(new[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 })]
@@ -141,7 +141,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(new int[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 })]
@@ -161,7 +161,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(new[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
@@ -181,7 +181,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]

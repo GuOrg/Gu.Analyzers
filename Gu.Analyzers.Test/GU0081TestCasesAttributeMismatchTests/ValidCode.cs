@@ -15,7 +15,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         [TestCase(2)]
@@ -35,7 +35,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, Author = ""Author"")]
         [TestCase(2, Author = ""Author"")]

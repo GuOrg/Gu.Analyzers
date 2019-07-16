@@ -18,7 +18,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [Test]
         public void Test()
@@ -39,7 +39,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         public void Test(int i)
@@ -59,7 +59,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [Test]
         [TestCase(1)]
@@ -79,7 +79,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         private static readonly int[] TestCases = { 1, 2, 3 };
 

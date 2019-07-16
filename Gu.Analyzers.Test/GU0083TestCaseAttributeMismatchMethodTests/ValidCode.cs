@@ -15,7 +15,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, 2, ""3"")]
         public void Test(int x, int y, string str)
@@ -37,7 +37,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(""x"", ""y"", null)]
         public void Test(string x, string y, string z)
@@ -57,7 +57,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(null)]
         public void Test(int? obj)
@@ -76,7 +76,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, 2, ""3"", Author=""Author"")]
         public void Test(int x, int y, string str)
@@ -95,7 +95,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, 2, null, Author=""Author"")]
         public void Test(int x, int y, string str)
@@ -114,7 +114,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(new int[] { 3, 5 })]
         public void Test(int[] array)
@@ -133,7 +133,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(new int[] { 3, 5 }, new string[] { ""hello"" })]
         public void Test(int[] array, string[] stringArray)
@@ -152,7 +152,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         public void Test(object obj)
@@ -172,7 +172,7 @@ namespace N
     using System;
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         [TestCase(1.0)]
@@ -193,7 +193,7 @@ namespace N
     using System;
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(StringComparison.CurrentCulture)]
         public void Test(StringComparison stringComparison)
@@ -213,7 +213,7 @@ namespace N
     using System;
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(""abc"", StringComparison.CurrentCulture)]
         public void Test(string text, StringComparison stringComparison)
@@ -232,7 +232,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         public void Test(double d)
@@ -251,7 +251,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(short.MinValue)]
         public void Test(int d)
@@ -270,7 +270,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         public void Test(short s)

@@ -18,7 +18,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(↓1)]
         public void Test(string str)
@@ -32,7 +32,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1)]
         public void Test(int str)
@@ -54,7 +54,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(""x"", ""y"", null)]
         public void Test(string x, string y, string z)
@@ -74,7 +74,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, ↓2)]
         public void Test(int i, string str)
@@ -87,7 +87,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1, 2)]
         public void Test(int i, int str)
@@ -106,7 +106,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(↓null)]
         public void Test(int obj)
@@ -125,7 +125,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(↓new double[] {3, 5})]
         public void Test(int[] array)
@@ -138,7 +138,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(new double[] {3, 5})]
         public void Test(double[] array)
@@ -157,7 +157,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(↓1.0)]
         public void Test(int i)
@@ -170,7 +170,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class FooTests
+    public class C
     {
         [TestCase(1.0)]
         public void Test(double i)
