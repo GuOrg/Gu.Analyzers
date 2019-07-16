@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
             public static void IgnoresRecursiveProperty()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -34,7 +34,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -62,7 +62,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

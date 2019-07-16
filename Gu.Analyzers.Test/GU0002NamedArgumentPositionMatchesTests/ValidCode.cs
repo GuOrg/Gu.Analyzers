@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
         public static void ConstructorCallWithTwoArguments(string call)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithNamedArgumentsOnSameRow()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -105,7 +105,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithArgumentsOnSameRow()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void IgnoresStringFormat()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Globalization;
 
@@ -203,7 +203,7 @@ namespace RoslynSandbox
         public static void IgnoresWhendifferentTypes()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -241,7 +241,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenInExpressionTree()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq.Expressions;

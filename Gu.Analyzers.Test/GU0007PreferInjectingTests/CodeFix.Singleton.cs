@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     internal static partial class CodeFix
     {
         private const string SingletonCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Singleton
     {
@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
         private static readonly string FooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class FooBase
     {
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void AssigningThisFieldInCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -50,7 +50,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static void AssigningUnderscoreFieldInCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -83,7 +83,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         public static void WhenNotInjectingFieldInitializationObject()
         {
             var before = @"
-        namespace RoslynSandbox
+        namespace N
         {
             public class Foo
             {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         }";
 
             var after = @"
-        namespace RoslynSandbox
+        namespace N
         {
             public class Foo
             {
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         public static void FieldInitializationAndBaseCall()
         {
             var before = @"
-        namespace RoslynSandbox
+        namespace N
         {
             public class Foo : FooBase
             {
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         }";
 
             var after = @"
-        namespace RoslynSandbox
+        namespace N
         {
             public class Foo : FooBase
             {
@@ -170,7 +170,7 @@ namespace RoslynSandbox
         public static void UsingInMethodWhenCtorExists()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -186,7 +186,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         public static void UsingInMethodExpressionBodyWhenCtorExists()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -223,7 +223,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -245,7 +245,7 @@ namespace RoslynSandbox
         public static void UsingInMethodWhenNoCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -257,7 +257,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

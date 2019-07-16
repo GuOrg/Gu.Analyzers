@@ -17,7 +17,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         public static void WhenThrowing(string error, string @fixed)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -31,7 +31,7 @@ namespace RoslynSandbox
 }".AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         public static void AliasedInside()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using Meh = System.ArgumentException;
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using Meh = System.ArgumentException;
 
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         {
             var before = @"
 using Meh = System.ArgumentException;
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -98,7 +98,7 @@ namespace RoslynSandbox
 
             var after = @"
 using Meh = System.ArgumentException;
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

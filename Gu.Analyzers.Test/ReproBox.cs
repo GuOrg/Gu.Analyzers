@@ -35,7 +35,7 @@ namespace Gu.Analyzers.Test
         public void Repro(DiagnosticAnalyzer analyzer)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {

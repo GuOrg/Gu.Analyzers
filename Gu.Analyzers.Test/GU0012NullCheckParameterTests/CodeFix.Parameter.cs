@@ -19,7 +19,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             public static void SimpleAssignFullyQualified(string access)
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }".AssertReplace("public C", $"{access} C");
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             public static void SimpleAssignWhenUsingExists()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -69,7 +69,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             public static void PassAsArgument()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -106,7 +106,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             public static void WhenNotUsed()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -143,7 +143,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -163,7 +163,7 @@ namespace RoslynSandbox
             public static void AfterOtherParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -178,7 +178,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -203,7 +203,7 @@ namespace RoslynSandbox
             public static void BeforeOtherParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -218,7 +218,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -243,7 +243,7 @@ namespace RoslynSandbox
             public static void FixAll()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -254,7 +254,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -279,7 +279,7 @@ namespace RoslynSandbox
             public static void OutParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -294,7 +294,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {

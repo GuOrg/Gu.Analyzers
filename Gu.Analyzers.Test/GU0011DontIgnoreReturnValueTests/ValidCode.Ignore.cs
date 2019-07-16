@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
             public static void StringBuilder(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
             public static void StringBuilderAppendChained()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -55,7 +55,7 @@ namespace RoslynSandbox
             public static void WhenReturningSameInstance()
             {
                 var ensureCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Diagnostics;
@@ -93,7 +93,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -110,7 +110,7 @@ namespace RoslynSandbox
             public static void WhenReturningThis()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             public static void WhenExtensionMethodReturningThis()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal static class Bar
     {
@@ -143,7 +143,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -164,7 +164,7 @@ namespace RoslynSandbox
             public static void HashSet(string operation)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -188,7 +188,7 @@ namespace RoslynSandbox
             public static void IList(string operation)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -213,7 +213,7 @@ namespace RoslynSandbox
             public static void ListOfInt(string operation)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -233,7 +233,7 @@ namespace RoslynSandbox
             public static void ConcurrentDictionary(string operation)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
 
@@ -253,7 +253,7 @@ namespace RoslynSandbox
             public static void MoqSetupReturns(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Moq;
@@ -277,7 +277,7 @@ namespace RoslynSandbox
             public static void MoqSetupVoid(string setup)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using Moq;
 
@@ -305,7 +305,7 @@ namespace RoslynSandbox
             public static void NinjectFluent(string bind)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using Ninject.Modules;
 
@@ -325,7 +325,7 @@ namespace RoslynSandbox
             public static void DocumentEditorExtensionMethod()
             {
                 var extCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
@@ -343,7 +343,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;

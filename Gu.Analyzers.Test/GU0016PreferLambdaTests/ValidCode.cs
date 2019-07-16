@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
         public static void LinqWhereStaticMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;

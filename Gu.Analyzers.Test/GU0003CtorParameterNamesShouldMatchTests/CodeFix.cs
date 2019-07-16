@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
         public static void Message()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingProperties()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         public static void ChainedConstructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -144,7 +144,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void BaseConstructorCall()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -188,7 +188,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -211,7 +211,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -228,7 +228,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFields()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -248,7 +248,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -273,7 +273,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFieldsPrefixedWithUnderscore()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -293,7 +293,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -318,7 +318,7 @@ namespace RoslynSandbox
         public static void WhenBaseIsParams()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -329,7 +329,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -346,7 +346,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -363,7 +363,7 @@ namespace RoslynSandbox
         public static void WhenSettingPropertyAndChained()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -383,7 +383,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -408,7 +408,7 @@ namespace RoslynSandbox
         public static void WhenAssignAndBaseCall()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -422,7 +422,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -433,7 +433,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {

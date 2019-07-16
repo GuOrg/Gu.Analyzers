@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
         public static void WhenNoBaseClass()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
 public class Foo
 {
@@ -25,7 +25,7 @@ public class Foo
         public static void WhenSerializable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         public static void WhenSerializableAndObsoleteSameList()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         public static void WhenSerializableAndObsoleteDifferentLists()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         public static void ExtendedWithAttribute()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     

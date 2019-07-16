@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
         public static void DefaultValueForGuidCreatedWithDefaultValueExpression()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void GuidCreatedWithGuidNewGuid()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

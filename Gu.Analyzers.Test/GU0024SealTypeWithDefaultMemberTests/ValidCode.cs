@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
         public static void WhenSealedWithProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         public static void WhenSealedWithField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         public static void WhenNoDefaultField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

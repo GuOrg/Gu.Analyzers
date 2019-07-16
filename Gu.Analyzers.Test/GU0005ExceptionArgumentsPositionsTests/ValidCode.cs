@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
         public static void ArgumentExceptionWithMessageAndNameof()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void ArgumentNullExceptionWithMessageAndNameof()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void ArgumentOutOfRangeExceptionWithMessageAndNameof()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

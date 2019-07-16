@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
         public static void BitShiftOutOfRange()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
         public static void AutoProp(string property)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         public static void ExpressionBodyReturningField(string getter)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         public static void WithBackingField(string getter)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         public static void WhenReturningPropertyOfCreatedField(string getter)
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -86,7 +86,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("return this.bar.Value;", getter);
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -101,7 +101,7 @@ namespace RoslynSandbox
         public static void WhenReturningPropertyOfCreatedFieldExpressionBody(string getter)
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.bar.Value;", getter);
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {

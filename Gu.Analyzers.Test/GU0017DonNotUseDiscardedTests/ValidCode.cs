@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         public static void DiscardSymbol()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         public static void Local()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         public static void Out(string arg)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         public static void OneParameterLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive;
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         public static void TwoParameterLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

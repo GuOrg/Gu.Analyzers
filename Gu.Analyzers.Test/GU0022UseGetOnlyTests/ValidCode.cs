@@ -24,7 +24,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         public static void UpdatedInMethodThis(TestCase data)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         public static void UpdatedInMethodUnderscoreNames(TestCase data)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -66,7 +66,7 @@ namespace RoslynSandbox
         public static void UpdatingOtherInstanceInCtor(TestCase data)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         public static void UpdatedInLambdaInCtor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         public static void DifferentProperties()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public interface IFoo
     {
@@ -118,7 +118,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IFoo
     {
@@ -162,7 +162,7 @@ namespace RoslynSandbox
         public static void OtherInstanceObjectInitializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -181,7 +181,7 @@ namespace RoslynSandbox
         public static void SideEffectStaticMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -200,7 +200,7 @@ namespace RoslynSandbox
         public static void SideEffectStaticMethodPrivateProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -219,7 +219,7 @@ namespace RoslynSandbox
         public static void AssignedInSetOnlyWithTernary()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo<T>
         where T : struct 
@@ -239,7 +239,7 @@ namespace RoslynSandbox
         public static void ExplicitImplementation()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IFoo
     {

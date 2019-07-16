@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
 
         private static readonly string BarCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
         private static readonly string WithMutableProperty = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
         private static readonly string LocatorCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class ServiceLocator
     {
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         public static void WhenInjecting()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void WhenNotInjectingChained()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -80,7 +80,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -94,7 +94,7 @@ namespace RoslynSandbox
 }";
 
             var mehCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {

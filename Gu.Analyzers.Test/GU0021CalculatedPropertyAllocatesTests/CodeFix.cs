@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -38,7 +38,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -94,7 +94,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -125,7 +125,7 @@ namespace RoslynSandbox
         public static void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -153,7 +153,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -184,7 +184,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -209,7 +209,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -240,7 +240,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromReadOnlyFields()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -262,7 +262,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -290,7 +290,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -312,7 +312,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -340,7 +340,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeEmptyCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -353,7 +353,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -372,7 +372,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeLambdaUsingMutableCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -390,7 +390,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -414,7 +414,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeMethodGroup()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -434,7 +434,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -460,7 +460,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromMutablePropertyNoFix1()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -485,7 +485,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -516,7 +516,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromMutablePropertyNoFix2()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -541,7 +541,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -572,7 +572,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromMutableFieldNoFix()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -594,7 +594,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -622,7 +622,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -644,7 +644,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -672,7 +672,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -700,7 +700,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -734,7 +734,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromSecondLevelNoFix1()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -762,7 +762,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -796,7 +796,7 @@ namespace RoslynSandbox
         public static void AllocatingReferenceTypeFromSecondLevelNoFix2()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -824,7 +824,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

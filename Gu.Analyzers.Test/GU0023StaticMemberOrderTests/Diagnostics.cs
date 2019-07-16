@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
         public static void Message()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -21,14 +21,14 @@ namespace RoslynSandbox
         public static readonly int Value2 = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'RoslynSandbox.Foo.Value2' must be declared before 'RoslynSandbox.Foo.Value1'"), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'N.Foo.Value2' must be declared before 'N.Foo.Value1'"), code);
         }
 
         [Test]
         public static void StaticFieldInitializedWithField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         public static void ConstFieldInitializedWithField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         public static void PropertyInitializedWithProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         public static void FieldInitializedWithFieldViaMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -94,7 +94,7 @@ namespace RoslynSandbox
         public static void DefaultFieldUsingStaticField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {

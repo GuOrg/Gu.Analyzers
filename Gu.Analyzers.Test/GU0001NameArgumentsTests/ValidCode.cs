@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
         public static void ConstructorCallWithTwoArguments(string call)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithNamedArgumentsOnSameRow()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithArgumentsOnSameRow()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -175,7 +175,7 @@ namespace RoslynSandbox
         public static void IgnoresStringFormat()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Globalization;
 
@@ -201,7 +201,7 @@ namespace RoslynSandbox
         public static void IgnoresTuple()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -225,7 +225,7 @@ namespace RoslynSandbox
         public static void ImmutableArrayCreate()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Immutable;
 
@@ -249,7 +249,7 @@ namespace RoslynSandbox
         public static void IgnoresParams()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Foo
     {
@@ -277,7 +277,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenDifferentTypes()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -315,7 +315,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenInExpressionTree()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq.Expressions;

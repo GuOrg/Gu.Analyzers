@@ -22,7 +22,7 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         public static void InternalClass(string member)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }".AssertReplace("readonly int F;", member);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

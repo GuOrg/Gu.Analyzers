@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public static void WithCustomEvent()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void GetOnlies()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         public static void ExplicitImplementationGetOnly()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -72,7 +72,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public static void ExplicitImplementationGetOnlyIndexer()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -97,7 +97,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         public static void ExplicitGetSetIndexerAndGetOnlyIndexer()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -122,7 +122,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -142,7 +142,7 @@ namespace RoslynSandbox
         public static void ExplicitGetSetIndexerAndGetSetIndexer()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -151,7 +151,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void ExplicitImplementationCalculatedBeforeGetSet()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -186,7 +186,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -202,7 +202,7 @@ namespace RoslynSandbox
         public static void Mutables()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void NotifyingMutables()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -321,7 +321,7 @@ namespace RoslynSandbox
         public static void MutablesBySetter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -349,7 +349,7 @@ namespace RoslynSandbox
         public static void ExpressionBodies()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -376,7 +376,7 @@ namespace RoslynSandbox
         public static void Calculated()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -417,7 +417,7 @@ namespace RoslynSandbox
         public static void InternalBeforePublicIndexer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -433,7 +433,7 @@ namespace RoslynSandbox
         public static void StaticBeforeInstance()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -454,7 +454,7 @@ namespace RoslynSandbox
         public static void StaticGetOnlyBeforeCalculated()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -470,7 +470,7 @@ namespace RoslynSandbox
         public static void PublicBeforeProtectedStatic()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -491,7 +491,7 @@ namespace RoslynSandbox
         public static void PublicInitializedWithProtectedStatic()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -507,7 +507,7 @@ namespace RoslynSandbox
         public static void Realistic()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

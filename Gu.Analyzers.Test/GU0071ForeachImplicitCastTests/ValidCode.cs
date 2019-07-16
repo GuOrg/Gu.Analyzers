@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
         public static void VarInAForeach(string type)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void ExplicitTypeMatchesInAForeach()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         public static void MultipleIEnumerableInterfaces()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         public static void ExplicitTypeWhenLoopingRegexMatches()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text.RegularExpressions;
 
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         public static void DuckTypedEnumerable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         public static void NonGenericIEnumerable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections;
 

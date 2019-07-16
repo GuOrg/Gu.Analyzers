@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
         public void ForFirstParameterWhenSummaryOnly()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public void ForFirstParameterWhenSummaryAndParam()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -67,7 +67,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public void ForManyParameters()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -102,7 +102,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -122,7 +122,7 @@ namespace RoslynSandbox
         public void Issue206()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -137,7 +137,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         public void ForEnumerableParameter(string type)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -177,7 +177,7 @@ namespace RoslynSandbox
 }".AssertReplace("T[]", type);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 

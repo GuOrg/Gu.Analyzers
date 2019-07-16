@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
         public static void TestCaseAttributeAndParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void WithAndWithoutAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         public static void WithAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         public static void Enum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         public static void StringAndEnum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         public static void Arrays()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         public static void ArraysWithAndWithoutExplicitTypeSpecification()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         public static void ArraysWithAndWithoutAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void ArraysWithAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         public static void TestCaseParams()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

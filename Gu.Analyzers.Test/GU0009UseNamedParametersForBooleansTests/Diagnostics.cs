@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
         public static void UnnamedBooleanParameters()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         public static void HandlesAnAlias()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -85,7 +85,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         public static void HandlesAFullyQualifiedName()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -134,7 +134,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

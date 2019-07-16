@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
         public static void UselessDefaultGuid()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         public static void UselessDefaultDateTime()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

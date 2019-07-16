@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
         public static void ArrowAdd()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         public static void ArrowStruct()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public static void ExpressionBodyMethodIsNoError()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

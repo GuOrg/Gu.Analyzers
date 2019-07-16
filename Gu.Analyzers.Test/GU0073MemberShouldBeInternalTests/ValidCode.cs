@@ -19,7 +19,7 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         public static void InternalClass(string member)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         public static void PublicClass(string member)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         public static void InterfaceEvent()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         public static void ExplicitInterfaceEvent()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         public static void OverridingEvent()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -129,7 +129,7 @@ namespace RoslynSandbox
         public static void InterfaceProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C : IC
     {
@@ -149,7 +149,7 @@ namespace RoslynSandbox
         public static void ExplicitInterfaceProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C : IC
     {
@@ -169,7 +169,7 @@ namespace RoslynSandbox
         public static void OverridingProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C : Abstract
     {
@@ -189,7 +189,7 @@ namespace RoslynSandbox
         public static void InterfaceMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -206,7 +206,7 @@ namespace RoslynSandbox
         public static void GenericInterfaceMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections;

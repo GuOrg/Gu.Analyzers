@@ -16,7 +16,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
         public static void Local(string statement)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void OneParameterLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive;
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         public static void TwoParameterLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

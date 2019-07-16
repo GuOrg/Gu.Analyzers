@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         public static void ConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         public static void Increment()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         public static void ObjectInitializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void ObjectInitializerStruct()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         public static void SetSameMemberOnOtherInstance(string after)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         public static void SetSameMemberOnOtherInstance2()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         public static void SetSameMemberOnOtherInstanceRecursive()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

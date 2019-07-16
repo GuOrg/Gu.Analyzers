@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         public static void SetPropertyToSelf(string before, string after)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void SetPropertyToSelfWithThis()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

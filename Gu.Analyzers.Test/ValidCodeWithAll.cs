@@ -83,7 +83,7 @@ namespace Gu.Analyzers.Test
         public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var syntaxErrorCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

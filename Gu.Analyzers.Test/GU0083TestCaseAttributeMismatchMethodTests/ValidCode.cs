@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
         public static void NoAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static void NullArgument(string testCase)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static void ArgumentIsNullAndParameterIsNullableInt()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -72,7 +72,7 @@ namespace RoslynSandbox
         public static void WithAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -91,7 +91,7 @@ namespace RoslynSandbox
         public static void NullArgumentWithAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         public static void ArrayOfInts()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -129,7 +129,7 @@ namespace RoslynSandbox
         public static void ArraysOfDifferentTypes()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -148,7 +148,7 @@ namespace RoslynSandbox
         public static void ParameterOfTypeObject()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -167,7 +167,7 @@ namespace RoslynSandbox
         public static void ParameterOfInterfaceType()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;
@@ -188,7 +188,7 @@ namespace RoslynSandbox
         public static void StringComparison()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;
@@ -208,7 +208,7 @@ namespace RoslynSandbox
         public static void StringAndStringComparison()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;
@@ -228,7 +228,7 @@ namespace RoslynSandbox
         public static void IntToDouble()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -247,7 +247,7 @@ namespace RoslynSandbox
         public static void ShortToInt()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -266,7 +266,7 @@ namespace RoslynSandbox
         public static void IntToShort()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -285,7 +285,7 @@ namespace RoslynSandbox
         public static void TestCaseParams()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -308,7 +308,7 @@ namespace RoslynSandbox
         public static void GenericFixtureWithTestCase(string constraints)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using NUnit.Framework;

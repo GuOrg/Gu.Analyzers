@@ -17,7 +17,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
             public static void ConstructorFullyQualified(string access)
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -31,7 +31,7 @@ namespace RoslynSandbox
 }".AssertReplace("public C", $"{access} C");
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -51,7 +51,7 @@ namespace RoslynSandbox
             public static void PublicCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -67,7 +67,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -88,7 +88,7 @@ namespace RoslynSandbox
             public static void PublicCtorOutParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -105,7 +105,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

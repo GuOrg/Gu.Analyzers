@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
         public static void Message()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         public static void Constructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -86,7 +86,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         public static void ConstructorInArrayInitializer()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -159,7 +159,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -200,7 +200,7 @@ namespace RoslynSandbox
         public static void ConstructorInFunc()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -234,7 +234,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -274,7 +274,7 @@ namespace RoslynSandbox
         public static void ConstructorIgnoredIfAnyNamed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

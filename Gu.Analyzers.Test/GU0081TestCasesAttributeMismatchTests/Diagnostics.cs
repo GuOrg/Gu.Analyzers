@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
         public static void TestCaseAttributeAndParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         public static void TestCaseAttributeWithAuthor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public static void TestCaseParams()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

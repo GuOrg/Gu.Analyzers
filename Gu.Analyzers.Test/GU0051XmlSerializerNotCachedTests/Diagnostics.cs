@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
         public static void TrivialConstructionUnsaved()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static void TrivialConstructionUnsavedFullyQualified()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         public static void LocalVariable(string code)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

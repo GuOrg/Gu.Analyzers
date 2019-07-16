@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
         public static void ImplicitValueSharing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -38,7 +38,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharingWithBitwiseSum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharingDifferentBases()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharingBitshifts()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharingNonFlag()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -138,7 +138,7 @@ namespace RoslynSandbox
         public static void ExplicitValueSharingPartial()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

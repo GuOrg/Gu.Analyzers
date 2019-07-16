@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
         public static void SimpleAssign()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void AssignWithExpression()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         public static void AssignedTwiceWithDifferent()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         public static void SecondAssignmentWithExpression()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -112,7 +112,7 @@ namespace RoslynSandbox
         public static void SecondAssignmentWithExpressionRepro()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -138,7 +138,7 @@ namespace RoslynSandbox
         public static void UsedBeforeAssign()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -158,7 +158,7 @@ namespace RoslynSandbox
         public static void AssignInIfElse()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -184,7 +184,7 @@ namespace RoslynSandbox
         public static void ParameterAsArgument()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -207,7 +207,7 @@ namespace RoslynSandbox
         public static void IgnoreNameof()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void IgnoreWhenSideEffect()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -251,7 +251,7 @@ namespace RoslynSandbox
         public static void IgnoreWhenAssignedWithAddition()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -272,7 +272,7 @@ namespace RoslynSandbox
         public static void IgnoreMutableInLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -295,7 +295,7 @@ namespace RoslynSandbox
         public static void BaseConstructorCall()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -318,7 +318,7 @@ namespace RoslynSandbox
 }";
 
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -335,7 +335,7 @@ namespace RoslynSandbox
         public static void BaseConstructorCallSimple()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -349,7 +349,7 @@ namespace RoslynSandbox
 }";
 
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {

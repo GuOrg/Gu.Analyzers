@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
         public static void WhenAccessingFieldProperty()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         public static void WhenAccessingFieldElvisProperty()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -65,7 +65,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         public static void WhenAccessingFieldMethod()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -100,7 +100,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         public static void WhenUsingPropertyProperty()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -135,7 +135,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         public static void WhenUsingPropertyMethod()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -170,7 +170,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -190,7 +190,7 @@ namespace RoslynSandbox
         public static void WhenPassingFieldAsArgument()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -207,7 +207,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -229,7 +229,7 @@ namespace RoslynSandbox
         public static void WhenPassingFieldAsArgumentWhitespace()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -247,7 +247,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -270,7 +270,7 @@ namespace RoslynSandbox
         public static void WhenPassingUnderscoreFieldAsArgumentWhitespace()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -288,7 +288,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -311,7 +311,7 @@ namespace RoslynSandbox
         public static void WhenPassingUnderscoreFieldAsArgument()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -328,7 +328,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -350,7 +350,7 @@ namespace RoslynSandbox
         public static void GetOnlyInLambda()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -367,7 +367,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -389,7 +389,7 @@ namespace RoslynSandbox
         public static void LeftFieldInMultiplication()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -404,7 +404,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -424,7 +424,7 @@ namespace RoslynSandbox
         public static void RightFieldInMultiplication()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -439,7 +439,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

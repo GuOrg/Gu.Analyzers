@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
         public static void UsesNamedParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void UsingADefaultBooleanParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         public static void NonDeducedGenericBooleanParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         public static void DeducedGenericBooleanParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         public static void FunctionAcceptingABooleanVariable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -127,7 +127,7 @@ namespace RoslynSandbox
         public static void BooleanParamsArray()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -152,7 +152,7 @@ namespace RoslynSandbox
         public static void DoNotWarnOnDisposePattern()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -190,7 +190,7 @@ namespace RoslynSandbox
         public static void DoNotWarnOnAssertAreEqual()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         public static void DoNotWarnOnConfigureAwait()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -235,7 +235,7 @@ namespace RoslynSandbox
         public static void DoNotWarnOn(string method)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
@@ -258,7 +258,7 @@ namespace RoslynSandbox
         public static void DoNotWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows;
     using System.Windows.Controls;
@@ -283,7 +283,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
     using System.Windows.Controls.Primitives;
@@ -305,7 +305,7 @@ namespace RoslynSandbox
         public static void DoNotWarnInExpressionTree()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq.Expressions;

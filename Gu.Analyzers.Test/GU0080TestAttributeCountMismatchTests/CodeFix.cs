@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
         public static void TestAttributeAndParameter(string parameters)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -29,7 +29,7 @@ namespace RoslynSandbox
 }".AssertReplace("string text", parameters);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         public static void TestCaseAttributeAndParameter()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -62,7 +62,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -84,7 +84,7 @@ namespace RoslynSandbox
         public static void TestCaseAttributeAndTooManyParameters(string parameters)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
 }".AssertReplace("int i, int j", parameters);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         public static void TestCaseParams()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

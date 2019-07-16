@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
         public static void WhenThrowingArgumentException()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public static void WhenThrowingArgumentOutOfRangeException()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -70,7 +70,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         public static void WhenRaisingPropertyChanged()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -134,7 +134,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -180,7 +180,7 @@ namespace RoslynSandbox
         public static void WhenRaisingStaticPropertyChanged()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -213,7 +213,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -251,7 +251,7 @@ namespace RoslynSandbox
         public static void WhenRaisingStaticPropertyChanged2()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -297,7 +297,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -348,7 +348,7 @@ namespace RoslynSandbox
         public static void WhenStaticNameofInstance()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -366,7 +366,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -389,7 +389,7 @@ namespace RoslynSandbox
         public static void WhenStaticNameofInstance2()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -402,7 +402,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -420,7 +420,7 @@ namespace RoslynSandbox
         public static void WhenStaticNameofInstance3()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -437,7 +437,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -459,7 +459,7 @@ namespace RoslynSandbox
         public static void WhenRaisingPropertyChangedUnderscoreNames()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -500,7 +500,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -546,7 +546,7 @@ namespace RoslynSandbox
         public static void DependencyProperty()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows;
     using System.Windows.Controls;
@@ -568,7 +568,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows;
     using System.Windows.Controls;

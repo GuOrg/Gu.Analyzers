@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
         public static void SingleArgument()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         public static void NullArgument(string testCase)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -70,7 +70,7 @@ namespace RoslynSandbox
         public static void TestCaseAttribute_IfMultipleParametersAreWrong()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -83,7 +83,7 @@ namespace RoslynSandbox
     }
 }";
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         public static void ArgumentIsNullAndParameterIsInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         public static void WrongArrayType()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -134,7 +134,7 @@ namespace RoslynSandbox
     }
 }";
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -153,7 +153,7 @@ namespace RoslynSandbox
         public static void DoubleToInt()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -166,7 +166,7 @@ namespace RoslynSandbox
     }
 }";
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -185,7 +185,7 @@ namespace RoslynSandbox
         public static void TestCaseParams()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -199,7 +199,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

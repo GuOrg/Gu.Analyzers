@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
         public static void SimpleAssign()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static void AssignInIfElse()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void IgnoreMutableInLambda()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         public static void IgnoreOutParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -106,7 +106,7 @@ namespace RoslynSandbox
         public static void IgnoreOutParameterIfReturn()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         public static void IgnoreObjectInitializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -161,7 +161,7 @@ namespace RoslynSandbox
         public static void DifferentInstances()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -185,7 +185,7 @@ namespace RoslynSandbox
         public static void Enum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -215,7 +215,7 @@ namespace RoslynSandbox
         public static void Boolean()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -239,7 +239,7 @@ namespace RoslynSandbox
         public static void WhenUsingTheValueStringReplace()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -259,7 +259,7 @@ namespace RoslynSandbox
         public static void WhenUsingTheValue1()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -286,7 +286,7 @@ namespace RoslynSandbox
         public static void WhenUsingTheValue2()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

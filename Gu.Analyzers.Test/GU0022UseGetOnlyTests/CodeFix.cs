@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
         public static void InitializedInCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -38,7 +38,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -66,7 +66,7 @@ namespace RoslynSandbox
         public static void InitializedInCtorAndPropertyInitializer()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -89,7 +89,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

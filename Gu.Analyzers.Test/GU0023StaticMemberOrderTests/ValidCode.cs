@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
         public static void StaticFieldInitializedWithField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         public static void ConstFieldInitializedWithField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         public static void FieldInitializedWithFuncUsingField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -62,7 +62,7 @@ namespace RoslynSandbox
         public static void FieldInitializedWithStaticProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
         public static void ExcludeNameof()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         public static void UninitializedField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         public static void UninitializedProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         public static void FieldInitializedWithExpressionBodyProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         public static void DependencyPropertyRegisterReadOnly()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows;
     using System.Windows.Controls;

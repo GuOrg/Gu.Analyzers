@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
         public static void TestAttribute(string attribute)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void TestCaseAttribute(string attribute)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         public static void TestAndTestCaseAttribute()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         public static void TestCaseSourceAttribute()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void TestAndTestCaseParams(string testCase)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         public static void TestCaseParams(string testCase)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

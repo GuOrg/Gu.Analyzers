@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
         public static void FieldInConstructor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void PropertyInConstructor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void FieldInMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

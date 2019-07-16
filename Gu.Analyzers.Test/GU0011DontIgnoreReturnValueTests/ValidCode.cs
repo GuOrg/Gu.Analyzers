@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
         public static void ChainedCtor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static void RealisticClass()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         public static void Using()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading;
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         public static void RealisticExtensionMethodClass()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -214,7 +214,7 @@ namespace RoslynSandbox
         public static void VoidMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         public static void VoidMethodWithReturn()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -259,7 +259,7 @@ namespace RoslynSandbox
         public static void StaticVoidMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -281,7 +281,7 @@ namespace RoslynSandbox
         public static void StaticVoidMethodWithReturn()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -304,7 +304,7 @@ namespace RoslynSandbox
         public static void IfTry()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -331,7 +331,7 @@ namespace RoslynSandbox
         public static void WhenThrowing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -350,7 +350,7 @@ namespace RoslynSandbox
         public static void WhenInvocationInExpressionBody()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -369,7 +369,7 @@ namespace RoslynSandbox
         public static void WhenNewInExpressionBody()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

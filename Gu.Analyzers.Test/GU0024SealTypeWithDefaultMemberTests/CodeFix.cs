@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
         public static void Field()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class ↓Foo
     {
@@ -23,7 +23,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static void Property()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class ↓Foo
     {
@@ -46,7 +46,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {

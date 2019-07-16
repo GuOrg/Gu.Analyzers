@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
         public static void ExplicitDouble(string type)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class A
     {
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void GenericCollectionWithACast()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void GenericCollectionWithAnExplicitImplementation()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         public static void Array()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         public static void DuckTypedEnumerable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

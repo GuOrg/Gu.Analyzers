@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
         public static void Linq(string linq)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Linq;
     class Foo
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void StringBuilderWriteLineToString()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
     public class Foo
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void ImmutableArray(string call)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Immutable;
 
@@ -77,7 +77,7 @@ namespace RoslynSandbox
         public static void ImmutableList(string call)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Immutable;
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void MoqSetupNonVoidNoReturn()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Moq;

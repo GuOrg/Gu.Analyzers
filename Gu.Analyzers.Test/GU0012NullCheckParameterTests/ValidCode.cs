@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
         public static void WhenPrivate()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void WhenDefaultValue()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
         public static void WhenValueType()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
         public static void WhenOutParameter()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void WhenThrowing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         public static void WhenThrowingOnLineAbove()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -144,7 +144,7 @@ namespace RoslynSandbox
         public static void WhenOldStyleNullCheckAbove(string check)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

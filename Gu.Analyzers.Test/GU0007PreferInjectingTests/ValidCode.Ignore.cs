@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
             public static void WhenPrivateCtor()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -30,7 +30,7 @@ namespace RoslynSandbox
             public static void WhenStatic()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Foo
     {
@@ -50,7 +50,7 @@ namespace RoslynSandbox
             public static void WhenMethodInjectedLocatorInStaticMethod()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -72,7 +72,7 @@ namespace RoslynSandbox
             public static void WhenNewNotInjectable(string type)
             {
                 var abstractCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class Abstract
     {
@@ -80,7 +80,7 @@ namespace RoslynSandbox
 }";
 
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -94,7 +94,7 @@ namespace RoslynSandbox
 }".AssertReplace("int", type);
 
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -113,7 +113,7 @@ namespace RoslynSandbox
             public static void WhenParams()
             {
                 var abstractCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Baz
     {
@@ -121,7 +121,7 @@ namespace RoslynSandbox
 }";
 
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -135,7 +135,7 @@ namespace RoslynSandbox
 }";
 
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -155,7 +155,7 @@ namespace RoslynSandbox
             public static void NewDictionaryOfBarAndBar()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -177,7 +177,7 @@ namespace RoslynSandbox
             public static void InLambda()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Linq;
 
@@ -199,7 +199,7 @@ namespace RoslynSandbox
             public static void WhenAssigningTwoFieldWithObjectCreations()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -221,7 +221,7 @@ namespace RoslynSandbox
             public static void WhenAssigningWithObjectInitializer()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

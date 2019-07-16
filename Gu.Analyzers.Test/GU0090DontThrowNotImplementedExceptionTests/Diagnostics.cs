@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
         public static void ExceptionThrownInsideMethodBlock()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     class Foo
     {
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         public static void ExceptionThrownInline()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     class Foo
     {
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         public static void ExceptionNullCoalescing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     class Foo
     {

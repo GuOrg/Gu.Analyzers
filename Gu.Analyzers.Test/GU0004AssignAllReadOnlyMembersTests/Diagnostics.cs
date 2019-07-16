@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
         public static void Message()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
             var message = "The following readonly members are not assigned:\r\n" +
-                          "RoslynSandbox.Foo.B";
+                          "N.Foo.B";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), code);
         }
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void NotSettingGetOnlyProperty()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         public static void NotSettingGetOnlyPropertyInOneCtor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -96,7 +96,7 @@ namespace RoslynSandbox
         public static void NotSettingReadOnlyField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         public static void StaticConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -138,7 +138,7 @@ namespace RoslynSandbox
         public static void StaticConstructorNotSettingField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

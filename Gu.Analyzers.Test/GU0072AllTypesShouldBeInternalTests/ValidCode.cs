@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
         public static void SimpleType(string signature)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static void NestedType(string signature)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 

@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
         public static void WhenPrivate()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         public static void WhenDefaultValue()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static void WhenValueType()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         public static void WhenThrowing()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

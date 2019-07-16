@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.Refactorings
         public static void StartingWithNewLine()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -25,7 +25,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         public static void NoFixWhenEndingWithNewLine()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -55,7 +55,7 @@ namespace RoslynSandbox
 }";
 
             var title = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -73,7 +73,7 @@ namespace RoslynSandbox
         public static void StartingAndEndingWithNewLine()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -85,7 +85,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
         public static void OneCarriageReturnNewLine()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         public static void OneCarriageReturnNewLineAndEndingWithCarriageReturnNewLine()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -147,7 +147,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -166,7 +166,7 @@ namespace RoslynSandbox
         public static void TwoCarriageReturnNewLines()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -178,7 +178,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -198,7 +198,7 @@ namespace RoslynSandbox
         public static void TwoCarriageReturnNewLinesAndEndingWithCarriageReturnNewLine()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -210,7 +210,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void TwoNewLinesEndingWithNewline()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -242,7 +242,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {

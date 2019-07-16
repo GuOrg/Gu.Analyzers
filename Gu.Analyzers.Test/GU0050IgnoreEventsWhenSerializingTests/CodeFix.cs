@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
         public static void Message()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void Event()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -79,7 +79,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         public static void EventWithAttribute()
         {
             var attributeCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -125,7 +125,7 @@ namespace RoslynSandbox
     }
 }";
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -194,7 +194,7 @@ namespace RoslynSandbox
         public static void EventHandler()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -212,7 +212,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -237,7 +237,7 @@ namespace RoslynSandbox
         public static void TwoEvents()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -269,7 +269,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

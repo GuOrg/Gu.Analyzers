@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public static void WhenMutableBeforeGetOnlyFirst()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         public static void WhenAMess()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -63,7 +63,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         public static void WhenAMess1WithDocs()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -110,7 +110,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -142,7 +142,7 @@ namespace RoslynSandbox
         public static void PreservesDocumentOrder()
         {
             var before = @"
-namespace RoslynSandbox
+namespace Ns
 {
     public class Foo
     {
@@ -157,7 +157,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace Ns
 {
     public class Foo
     {

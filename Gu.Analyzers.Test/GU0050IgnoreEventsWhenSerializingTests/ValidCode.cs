@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
         public static void IgnoredEvent()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         public static void IgnoredEventSimple()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         public static void IgnoredEventHandler()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         public static void NotSerializable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

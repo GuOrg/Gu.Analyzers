@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
         public void ForFirstParameterWhenSummaryOnly()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public void ForFirstParameterWhenSummaryAndTypeParam()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -67,7 +67,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public void ForFirstParameter()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -103,7 +103,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         public void ForLastParameter()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -139,7 +139,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         public void ForMiddleParameter()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -176,7 +176,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -198,7 +198,7 @@ namespace RoslynSandbox
         public void ForGenericParameter()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -220,7 +220,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
@@ -249,7 +249,7 @@ namespace RoslynSandbox
         public void EmptyForPrimitiveTypes(string type)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -263,7 +263,7 @@ namespace RoslynSandbox
 }".AssertReplace("string", type);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {

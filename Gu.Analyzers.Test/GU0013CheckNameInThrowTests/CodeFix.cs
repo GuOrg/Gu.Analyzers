@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
         public static void ThrowExpressionNameofWrong()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -29,7 +29,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         public static void ThrowExpressionNameofOther()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -66,7 +66,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         public static void ThrowExpressionStringLiteral()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -103,7 +103,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

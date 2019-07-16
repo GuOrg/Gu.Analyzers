@@ -28,7 +28,7 @@ namespace Gu.Analyzers.Test
         public void CtorCallingSelf(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal abstract class Foo
     {
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         public void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -130,7 +130,7 @@ namespace RoslynSandbox
      }
 }";
             var converterCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Globalization;
@@ -179,7 +179,7 @@ namespace RoslynSandbox
         public async Task InSetAndRaise(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
-namespace RoslynSandbox.Core
+namespace N.Core
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -201,9 +201,9 @@ namespace RoslynSandbox.Core
 }";
 
             var testCode = @"
-namespace RoslynSandbox.Client
+namespace N.Client
 {
-    internal class Foo : RoslynSandbox.Core.ViewModelBase
+    internal class Foo : N.Core.ViewModelBase
     {
         private int value2;
 
@@ -223,7 +223,7 @@ namespace RoslynSandbox.Client
         public async Task InOnPropertyChanged(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
-namespace RoslynSandbox.Core
+namespace N.Core
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
@@ -240,9 +240,9 @@ namespace RoslynSandbox.Core
 }";
 
             var testCode = @"
-namespace RoslynSandbox.Client
+namespace N.Client
 {
-    internal class Foo : RoslynSandbox.Core.ViewModelBase
+    internal class Foo : N.Core.ViewModelBase
     {
         private int value2;
 
@@ -275,7 +275,7 @@ namespace RoslynSandbox.Client
         public async Task InProperty(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;

@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
         public static void Class()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     ↓public class Foo
     {
@@ -21,7 +21,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class Foo
     {
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void Struct()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     ↓public struct Foo
     {
@@ -42,7 +42,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     internal struct Foo
     {

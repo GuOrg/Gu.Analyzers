@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
         public static void WhenReturningPropertyOfInjectedField(string getter)
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -34,7 +34,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.bar.Value;", getter);
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void WhenReturningPropertyOfFieldExpressionBody(string body)
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -64,7 +64,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("this.bar.Value;", body);
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {

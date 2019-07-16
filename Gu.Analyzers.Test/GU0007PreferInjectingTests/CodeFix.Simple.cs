@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         internal static class Simple
         {
             private static readonly string BarCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -22,7 +22,7 @@ namespace RoslynSandbox
             public static void WhenAssigningThisFieldWithObjectCreation()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -56,7 +56,7 @@ namespace RoslynSandbox
             public static void WhenAssigningUnderscoreFieldWithObjectCreation()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -70,7 +70,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             public static void WhenAssigningThisPropertyWithObjectCreation()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -124,7 +124,7 @@ namespace RoslynSandbox
             public static void WhenAssigningPropertyWithObjectCreation()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -138,7 +138,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -158,7 +158,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingChained()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -172,7 +172,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -184,7 +184,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -201,7 +201,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingChainedNameCollision()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -215,7 +215,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -227,7 +227,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -244,7 +244,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingOptional()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -258,7 +258,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -277,7 +277,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingParams()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -291,7 +291,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -310,7 +310,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingChainedGeneric()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -323,7 +323,7 @@ namespace RoslynSandbox
     }
 }";
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar<T>
     {
@@ -331,7 +331,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -343,7 +343,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -360,7 +360,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingChainedGenericParameterName()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -374,7 +374,7 @@ namespace RoslynSandbox
 }";
 
                 var moduleCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class IsModuleReady<TModule>
         where TModule : Module
@@ -387,7 +387,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -406,7 +406,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingChainedNewWithInjectedArgument()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -419,7 +419,7 @@ namespace RoslynSandbox
     }
 }";
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -433,14 +433,14 @@ namespace RoslynSandbox
 }";
 
                 var bazCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Baz
     {
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -452,7 +452,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -469,7 +469,7 @@ namespace RoslynSandbox
             public static void ChainedPropertyOnInjected()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -482,7 +482,7 @@ namespace RoslynSandbox
     }
 }";
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -490,7 +490,7 @@ namespace RoslynSandbox
 }";
 
                 var bazCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Baz
     {
@@ -504,7 +504,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {
@@ -516,7 +516,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh : Foo
     {

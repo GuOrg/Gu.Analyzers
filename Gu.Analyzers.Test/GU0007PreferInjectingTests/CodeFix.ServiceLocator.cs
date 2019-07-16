@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
         internal static class ServiceLocator
         {
             private static readonly string BarCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar
     {
@@ -23,7 +23,7 @@ namespace RoslynSandbox
 }";
 
             private static readonly string FooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class FooBase
     {
@@ -37,7 +37,7 @@ namespace RoslynSandbox
 }";
 
             private static readonly string LocatorCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class ServiceLocator
     {
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             public static void AssigningThisFieldInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             public static void AssigningUnderscoreFieldInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -123,7 +123,7 @@ namespace RoslynSandbox
             public static void WhenNotInjectingFieldInitializationWithNameCollision()
             {
                 var enumCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public enum Meh
     {
@@ -131,7 +131,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -148,7 +148,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -170,7 +170,7 @@ namespace RoslynSandbox
             public static void FieldInitializationAndBaseCall()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -185,7 +185,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -205,7 +205,7 @@ namespace RoslynSandbox
             public static void FieldInitializationAndBaseCallUnderscoreNames()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -220,7 +220,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -240,7 +240,7 @@ namespace RoslynSandbox
             public static void WhenUsingMethodInjectedLocator()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -256,7 +256,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -280,7 +280,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -299,7 +299,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -325,7 +325,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInLambdaClosure()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -342,7 +342,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -364,7 +364,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInTwoMethods()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -388,7 +388,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -419,7 +419,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInMethodUnderscoreNames()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -438,7 +438,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -464,7 +464,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInMethodAndBaseCall()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -484,7 +484,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -511,7 +511,7 @@ namespace RoslynSandbox
             public static void WhenUsingLocatorInStaticMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {
@@ -531,7 +531,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : FooBase
     {

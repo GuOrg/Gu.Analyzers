@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
         public static void BitShiftWithinRange()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void DoNotAnalyzeLong()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void StandardEnum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
         public static void ConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingPropertiesStruct()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         public static void ChainedConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -101,7 +101,7 @@ namespace RoslynSandbox
         public static void BaseConstructorCall()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -124,7 +124,7 @@ namespace RoslynSandbox
 }";
 
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -141,7 +141,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -166,7 +166,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFieldPrefixedByUnderscore()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -191,7 +191,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenSettingTwoProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -213,7 +213,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenBaseIsParams()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -224,7 +224,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -243,7 +243,7 @@ namespace RoslynSandbox
         public static void IgnoresWhenBaseIsParams2()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Bar : Foo
     {
@@ -254,7 +254,7 @@ namespace RoslynSandbox
     }
 }";
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -276,7 +276,7 @@ namespace RoslynSandbox
         public static void IgnoresIdCaps()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -295,7 +295,7 @@ namespace RoslynSandbox
         public static void IgnoresTupleCreate()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -318,7 +318,7 @@ namespace RoslynSandbox
         public static void IgnoresNumbered()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : Bar
     {
@@ -345,7 +345,7 @@ namespace RoslynSandbox
         public static void IgnoredWhenAssigningWeakReferenceTarget()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -367,7 +367,7 @@ namespace RoslynSandbox
         public static void WhenUsingParameterAsTwoArguments()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -393,7 +393,7 @@ namespace RoslynSandbox
         public static void ThrowExpressionNameofOther()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -415,7 +415,7 @@ namespace RoslynSandbox
         public static void NullChecksAndThrowingForWrong()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

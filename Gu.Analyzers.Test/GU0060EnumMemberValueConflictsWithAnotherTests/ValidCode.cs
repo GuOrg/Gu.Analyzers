@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
         public static void ExplicitAlias()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void ExplicitBitwiseOrSum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void SequentialNonFlagEnum()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         public static void AliasingEnumMembersNonFlag()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

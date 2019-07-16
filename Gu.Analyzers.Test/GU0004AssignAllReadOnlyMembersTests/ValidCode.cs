@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
         public static void ConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingPropertiesStruct()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public struct Foo
     {
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         public static void StaticConstructorSettingProperties()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -77,7 +77,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingAllFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFieldRef()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -122,7 +122,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingFieldOut()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -146,7 +146,7 @@ namespace RoslynSandbox
         public static void ChainedConstructorSettingAllFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -172,7 +172,7 @@ namespace RoslynSandbox
         public static void WhenNoUninitializedFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -192,7 +192,7 @@ namespace RoslynSandbox
         public static void StaticConstructorSettingFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -214,7 +214,7 @@ namespace RoslynSandbox
         public static void StaticConstructorSettingQualifiedFields()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         public static void StaticConstructorSettingUninitializedField()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -258,7 +258,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingReadonlyFieldIgnoringMutable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -278,7 +278,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingPropertiesIgnoringMutable()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -299,7 +299,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingReadonlyFieldIgnoringInitialized()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -319,7 +319,7 @@ namespace RoslynSandbox
         public static void ConstructorSettingPropertiesIgnoringInitialized()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -340,7 +340,7 @@ namespace RoslynSandbox
         public static void IgnoreAbstract()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class Foo
     {
@@ -361,7 +361,7 @@ namespace RoslynSandbox
         public static void IgnoreIndexer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class Foo
     {
@@ -382,7 +382,7 @@ namespace RoslynSandbox
         public static void IgnoreCalculatedStatementBody()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -409,7 +409,7 @@ namespace RoslynSandbox
         public static void IgnoreCalculatedExpressionBody()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {

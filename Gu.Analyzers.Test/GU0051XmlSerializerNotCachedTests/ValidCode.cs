@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
         public static void NoCreationsOfTheSerializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void CachedStaticReadonlyInitializedInlineXmlSerializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         public static void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         public static void CachedStaticInitializedInlineXmlSerializer()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         public static void NonLeakyConstructor(string expression)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

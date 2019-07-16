@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
         public static void MutableBeforeGetOnlySimple()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -26,7 +26,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlySimpleWithDocs()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -59,7 +59,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         public static void ExplicitImplementation()
         {
             var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     interface IValue
     {
@@ -90,7 +90,7 @@ namespace RoslynSandbox
 }";
 
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -101,7 +101,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo : IValue
     {
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlyFirst()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -140,7 +140,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -168,7 +168,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlyFirstWithNamespaces()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -193,7 +193,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -223,7 +223,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlyLast()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -246,7 +246,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -274,7 +274,7 @@ namespace RoslynSandbox
         public static void PrivateSetAfterPublicSet()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -318,7 +318,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -367,7 +367,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlyFirstWithInitializers()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -390,7 +390,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -418,7 +418,7 @@ namespace RoslynSandbox
         public static void MutableBeforeGetOnlyWithComments()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -447,7 +447,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -481,7 +481,7 @@ namespace RoslynSandbox
         public static void ExpressionBodyBeforeGetOnly()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -497,7 +497,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -518,7 +518,7 @@ namespace RoslynSandbox
         public static void CalculatedBeforeGetOnly()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -540,7 +540,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -567,7 +567,7 @@ namespace RoslynSandbox
         public static void IndexerBeforeMutable()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections;
@@ -605,7 +605,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections;
@@ -648,7 +648,7 @@ namespace RoslynSandbox
         public static void PublicSetBeforePrivateSetFirst()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -665,7 +665,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Foo
     {
@@ -687,7 +687,7 @@ namespace RoslynSandbox
         public static void NestedClass()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {
@@ -711,7 +711,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Foo
     {

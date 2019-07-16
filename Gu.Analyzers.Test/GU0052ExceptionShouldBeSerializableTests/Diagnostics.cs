@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
         public static void WhenNoAttribute()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         public static void ExtendedNoAttribute()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     

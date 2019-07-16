@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
         public static void LinqWhereStaticMethod()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         public static void LinqWhereStaticMethodWhenNameCollision()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -72,7 +72,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         public static void EventHandler()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -113,7 +113,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

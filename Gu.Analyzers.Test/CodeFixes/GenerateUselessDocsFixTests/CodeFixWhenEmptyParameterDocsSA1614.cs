@@ -18,7 +18,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
         public void StandardTextForCancellationTokenWhenEmpty()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading;
 
