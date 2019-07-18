@@ -15,30 +15,30 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        ↓public int A { get; set; }
+        ↓public int P1 { get; set; }
 
-        public int B { get; }
+        public int P2 { get; }
 
-        public int C { get; }
+        public int P3 { get; }
 
-        public int D { get; }
+        public int P4 { get; }
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public int B { get; }
+        public int P2 { get; }
 
-        public int C { get; }
+        public int P3 { get; }
 
-        public int D { get; }
+        public int P4 { get; }
 
-        public int A { get; set; }
+        public int P1 { get; set; }
     }
 }";
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -50,30 +50,30 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        ↓public int A { get; set; }
+        ↓public int P1 { get; set; }
 
-        ↓public int B { get; private set; }
+        ↓public int P2 { get; private set; }
 
-        public int C { get; }
+        public int P3 { get; }
 
-        public int D => C;
+        public int P4 => P3;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public int C { get; }
+        public int P3 { get; }
 
-        public int D => C;
+        public int P4 => P3;
 
-        public int B { get; private set; }
+        public int P2 { get; private set; }
 
-        public int A { get; set; }
+        public int P1 { get; set; }
     }
 }";
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -85,54 +85,54 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         /// <summary>
-        /// Docs for A
+        /// Docs for P1
         /// </summary>
-        ↓public int A { get; set; }
+        ↓public int P1 { get; set; }
 
         /// <summary>
-        /// Docs for B
+        /// Docs for P2
         /// </summary>
-        ↓public int B { get; private set; }
+        ↓public int P2 { get; private set; }
 
         /// <summary>
-        /// Docs for C
+        /// Docs for P3
         /// </summary>
-        public int C { get; }
+        public int P3 { get; }
 
         /// <summary>
-        /// Docs for D
+        /// Docs for P4
         /// </summary>
-        public int D => C;
+        public int P4 => P3;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         /// <summary>
-        /// Docs for C
+        /// Docs for P3
         /// </summary>
-        public int C { get; }
+        public int P3 { get; }
 
         /// <summary>
-        /// Docs for D
+        /// Docs for P4
         /// </summary>
-        public int D => C;
+        public int P4 => P3;
 
         /// <summary>
-        /// Docs for B
+        /// Docs for P2
         /// </summary>
-        public int B { get; private set; }
+        public int P2 { get; private set; }
 
         /// <summary>
-        /// Docs for A
+        /// Docs for P1
         /// </summary>
-        public int A { get; set; }
+        public int P1 { get; set; }
     }
 }";
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -142,32 +142,32 @@ namespace N
         public static void PreservesDocumentOrder()
         {
             var before = @"
-namespace Ns
+namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        ↓public int A { get; set; }
+        ↓public int P1 { get; set; }
 
-        public int B { get; private set; }
+        public int P2 { get; private set; }
 
-        ↓public int C { get; set; }
+        ↓public int P3 { get; set; }
 
-        public int D { get; private set; }
+        public int P4 { get; private set; }
     }
 }";
 
             var after = @"
-namespace Ns
+namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public int B { get; private set; }
+        public int P2 { get; private set; }
 
-        public int D { get; private set; }
+        public int P4 { get; private set; }
 
-        public int A { get; set; }
+        public int P1 { get; set; }
 
-        public int C { get; set; }
+        public int P3 { get; set; }
     }
 }";
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
