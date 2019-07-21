@@ -13,7 +13,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0005ExceptionArgumentsPositions.Descriptor,
+            Descriptors.GU0005ExceptionArgumentsPositions,
             GU0013TrowForCorrectParameter.Descriptor);
 
         /// <inheritdoc/>
@@ -66,7 +66,7 @@ namespace Gu.Analyzers
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
-                            GU0005ExceptionArgumentsPositions.Descriptor,
+                            Descriptors.GU0005ExceptionArgumentsPositions,
                             argument.GetLocation()));
                 }
             }

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 

@@ -17,7 +17,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0003CtorParameterNamesShouldMatch,
-            GU0004AssignAllReadOnlyMembers.Descriptor,
+            Descriptors.GU0004AssignAllReadOnlyMembers,
             GU0014PreferParameter.Descriptor);
 
         /// <inheritdoc/>
@@ -125,7 +125,7 @@ namespace Gu.Analyzers
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(
-                                GU0004AssignAllReadOnlyMembers.Descriptor,
+                                Descriptors.GU0004AssignAllReadOnlyMembers,
                                 constructorDeclaration.Identifier.GetLocation(),
                                 string.Join(Environment.NewLine, walker.Unassigned.Select(x => x.ToDisplayString()))));
                     }

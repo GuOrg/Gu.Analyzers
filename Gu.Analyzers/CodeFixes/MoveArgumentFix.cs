@@ -19,7 +19,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0002NamedArgumentPositionMatches.Id,
-            GU0005ExceptionArgumentsPositions.Descriptor.Id);
+            Descriptors.GU0005ExceptionArgumentsPositions.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -49,7 +49,7 @@ namespace Gu.Analyzers
                         diagnostic);
                 }
 
-                if (diagnostic.Id == GU0005ExceptionArgumentsPositions.Descriptor.Id)
+                if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id)
                 {
                     var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     context.RegisterCodeFix(

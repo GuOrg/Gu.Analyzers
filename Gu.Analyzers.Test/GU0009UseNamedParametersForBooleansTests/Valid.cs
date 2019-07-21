@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
 

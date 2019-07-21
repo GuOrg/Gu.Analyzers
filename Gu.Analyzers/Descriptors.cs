@@ -31,6 +31,24 @@ namespace Gu.Analyzers
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: "Name the constructor parameters to match the assigned member.");
 
+        internal static readonly DiagnosticDescriptor GU0004AssignAllReadOnlyMembers = Descriptors.Create(
+            id: "GU0004",
+            title: "Assign all readonly members.",
+            messageFormat: "The following readonly members are not assigned:\r\n{0}",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "Assign all readonly members.");
+
+        internal static readonly DiagnosticDescriptor GU0005ExceptionArgumentsPositions = Descriptors.Create(
+            id: "GU0005",
+            title: "Use correct argument positions.",
+            messageFormat: "Use correct argument positions.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "Use correct position for name and message.");
+
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="T:Microsoft.CodeAnalysis.Diagnostic" />.
         /// NOTE: For localizable <paramref name="title" />, <paramref name="description" /> and/or <paramref name="messageFormat" />,

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static partial class ValidCode
+    internal static partial class Valid
     {
         private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
 
