@@ -44,7 +44,8 @@ namespace Gu.Analyzers
                 !ImplementsInterface())
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(Descriptors.GU0073MemberShouldBeInternal,
+                    Diagnostic.Create(
+                        Descriptors.GU0073MemberShouldBeInternal,
                         keyword.GetLocation(),
                         memberSymbol.ToDisplayString(),
                         memberSymbol.ContainingType.ToDisplayString()));

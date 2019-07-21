@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
+namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;

@@ -176,23 +176,12 @@ namespace N
         [Test]
         public static void BaseConstructorCall()
         {
-            var before = @"
+            var c1 = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C1
     {
-        public Bar(int ↓a1, int b, int c, int d)
-            : base(a1, b, c, d)
-        {
-        }
-    }
-}";
-            var barCode = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
+        public C1(int a, int b, int c, int d)
         {
             this.A = a;
             this.B = b;
@@ -210,18 +199,30 @@ namespace N
     }
 }";
 
+            var before = @"
+namespace N
+{
+    public class C2 : C1
+    {
+        public C2(int ↓a1, int b, int c, int d)
+            : base(a1, b, c, d)
+        {
+        }
+    }
+}";
+
             var after = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int a, int b, int c, int d)
+        public C2(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
         }
 
         [Test]
@@ -230,14 +231,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
         private readonly int c;
         private readonly int d;
 
-        public Foo(int ↓a1, int b, int c, int d)
+        public C(int ↓a1, int b, int c, int d)
         {
             this.a = a1;
             this.b = b;
@@ -250,14 +251,14 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
         private readonly int c;
         private readonly int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
@@ -275,14 +276,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int _a;
         private readonly int _b;
         private readonly int _c;
         private readonly int _d;
 
-        public Foo(int ↓a1, int b, int c, int d)
+        public C(int ↓a1, int b, int c, int d)
         {
             _a = a1;
             _b = b;
@@ -295,14 +296,14 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int _a;
         private readonly int _b;
         private readonly int _c;
         private readonly int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
@@ -317,23 +318,12 @@ namespace N
         [Test]
         public static void WhenBaseIsParams()
         {
-            var before = @"
+            var c1 = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C1
     {
-        public Bar(int ↓a1, int b, int c, int d)
-            : base(a1, b, c, d)
-        {
-        }
-    }
-}";
-            var barCode = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, params int[] values)
+        public C1(int a, params int[] values)
         {
             this.A = a;
             this.Values = values;
@@ -345,18 +335,30 @@ namespace N
     }
 }";
 
+            var before = @"
+namespace N
+{
+    public class C2 : C1
+    {
+        public C2(int ↓a1, int b, int c, int d)
+            : base(a1, b, c, d)
+        {
+        }
+    }
+}";
+
             var after = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int a, int b, int c, int d)
+        public C2(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
         }
 
         [Test]
@@ -365,15 +367,15 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int ↓a1)
+        public C(int ↓a1)
             :this(a1, 1)
         {
             this.B = a1;
         }
 
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.B = 0;
         }
@@ -385,15 +387,15 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
             :this(b, 1)
         {
             this.B = b;
         }
 
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.B = 0;
         }
@@ -407,12 +409,23 @@ namespace N
         [Test]
         public static void WhenAssignAndBaseCall()
         {
+            var c1 = @"
+namespace N
+{
+    public class C1
+    {
+        public C1(int b)
+        {
+        }
+    }
+}";
+
             var before = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int ↓x)
+        public C2(int ↓x)
             : base(x)
         {
             this.A = x;
@@ -421,23 +434,13 @@ namespace N
         public int A { get; }
     }
 }";
-            var barCode = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int b)
-        {
-        }
-    }
-}";
 
             var after = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int a)
+        public C2(int a)
             : base(a)
         {
             this.A = a;
@@ -446,7 +449,7 @@ namespace N
         public int A { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, barCode }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
         }
     }
 }

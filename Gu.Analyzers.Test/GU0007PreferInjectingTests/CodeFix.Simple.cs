@@ -246,11 +246,11 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(int value = 1)
+        public C(int value = 1)
         {
             this.bar = ↓new Bar();
         }
@@ -260,11 +260,11 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar, int value = 1)
+        public C(Bar bar, int value = 1)
         {
             this.bar = bar;
         }

@@ -1,14 +1,15 @@
-namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
+        [TestCase("new Foo(a, b: b)")]
         public static void ConstructorCallWithTwoArguments(string call)
         {
             var code = @"
@@ -38,6 +39,7 @@ namespace N
 
         [TestCase("new Foo(a, b)")]
         [TestCase("new Foo(a: a, b: b)")]
+        [TestCase("new Foo(a, b: b)")]
         public static void ConstructorCallWithTwoArgumentsStruct(string call)
         {
             var code = @"
@@ -198,83 +200,7 @@ namespace N
         }
 
         [Test]
-        public static void IgnoresTuple()
-        {
-            var code = @"
-namespace N
-{
-    using System;
-
-    public static class Foo
-    {
-        private static Tuple<int,int,int,int> Bar(int a, int b, int c, int d)
-        {
-            return Tuple.Create(
-                a,
-                b,
-                c,
-                d);
-        }
-    }
-}";
-
-            RoslynAssert.Valid(Analyzer, code);
-        }
-
-        [Test]
-        public static void ImmutableArrayCreate()
-        {
-            var code = @"
-namespace N
-{
-    using System.Collections.Immutable;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            var ints = ImmutableArray.Create(
-                1,
-                2,
-                3,
-                4);
-        }
-    }
-}";
-
-            RoslynAssert.Valid(Analyzer, code);
-        }
-
-        [Test]
-        public static void IgnoresParams()
-        {
-            var code = @"
-namespace N
-{
-    public static class Foo
-    {
-        public static void Bar(params int[] args)
-        {
-        }
-
-        public static void Meh()
-        {
-            Bar(
-                1,
-                2,
-                3,
-                4,
-                5,
-                6);
-        }
-    }
-}";
-
-            RoslynAssert.Valid(Analyzer, code);
-        }
-
-        [Test]
-        public static void IgnoresWhenDifferentTypes()
+        public static void IgnoresWhendifferentTypes()
         {
             var code = @"
 namespace N

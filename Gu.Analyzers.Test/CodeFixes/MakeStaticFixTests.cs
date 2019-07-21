@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.CodeFixes
         {
             var before = @"public static class C
 {
-    public void M()
+    public void ↓M()
     {
     }
 }";

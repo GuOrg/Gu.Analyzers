@@ -1,10 +1,10 @@
-namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
+namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static class ValidCode
+    public static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ExceptionAnalyzer();
 
@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
         public static void Rethrowing()
         {
             var code = @"
-namespace ValidCode
+namespace N
 {
     using System;
     using System.IO;

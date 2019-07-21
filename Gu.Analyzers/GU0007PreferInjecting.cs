@@ -77,7 +77,8 @@ namespace Gu.Analyzers
             {
                 var typeName = createdType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
                 context.ReportDiagnostic(
-                    Diagnostic.Create(Descriptors.GU0007PreferInjecting,
+                    Diagnostic.Create(
+                        Descriptors.GU0007PreferInjecting,
                         objectCreation.GetLocation(),
                         ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
                                                                  .Add(nameof(Inject.Injectable), injectable.ToString()),
