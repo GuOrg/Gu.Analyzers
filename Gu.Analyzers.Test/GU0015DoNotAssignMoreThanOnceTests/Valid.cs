@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
 
@@ -16,11 +16,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly int value;
 
-        public Foo(int value)
+        public C(int value)
         {
             this.value = value;
         }
@@ -35,11 +35,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int value;
 
-        public Foo(int value)
+        public C(int value)
         {
             if (value < 0)
             {
@@ -63,9 +63,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int value)
+        public C(int value)
         {
             this.Value = value;
             System.Console.CancelKeyPress += (_, __) => Console.WriteLine(this.Value);
@@ -84,7 +84,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static bool TryGet(int i, out string text)
         {
@@ -108,7 +108,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static bool TryGet(int i, out string text)
         {
@@ -139,9 +139,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo()
+        public C1()
         {
             var bar1 = new Bar { Value = 1 };
             var bar2 = new Bar { Value = 1 };
@@ -163,9 +163,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo(Bar bar1, Bar bar2)
+        public C1(Bar bar1, Bar bar2)
         {
             bar1.Value = 1;
             bar2.Value = 3;
@@ -189,7 +189,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Run()
         {
@@ -219,7 +219,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public void Run()
         {
@@ -241,7 +241,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static string Bar(string text)
         {
@@ -261,7 +261,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int Value1 { get; }
 
@@ -288,9 +288,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int value1, int value2)
+        public C(int value1, int value2)
         {
             this.Value1 = value1;
             this.Value2 = value2;
@@ -300,17 +300,17 @@ namespace N
 
         public int Value2 { get; }
 
-        public static bool operator ==(Foo left, Foo right)
+        public static bool operator ==(C left, C right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(Foo left, Foo right)
+        public static bool operator !=(C left, C right)
         {
             return !Equals(left, right);
         }
 
-        protected bool Equals(Foo other)
+        protected bool Equals(C other)
         {
             return this.Value1 == other.Value1 && this.Value2 == other.Value2;
         }
@@ -332,7 +332,7 @@ namespace N
                 return false;
             }
 
-            return this.Equals((Foo)obj);
+            return this.Equals((C)obj);
         }
 
         public override int GetHashCode()

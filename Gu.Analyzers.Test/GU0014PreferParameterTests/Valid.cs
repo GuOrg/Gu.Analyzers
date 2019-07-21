@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.GU0014PreferParameter;
@@ -18,11 +18,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
         }
@@ -39,9 +39,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int value)
+        public C(int value)
         {
             this.Square = value * value;
             if (this.Square > 10)
@@ -64,9 +64,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int value1, int value2)
+        public C(int value1, int value2)
         {
             this.Bar = value1;
             this.Bar = value2;
@@ -90,9 +90,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int bar)
+        public C(int bar)
         {
             this.Bar = bar;
             this.Bar = bar * 2;
@@ -116,9 +116,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int value1, int value2)
+        public C(int value1, int value2)
         {
             this.Bar = value1;
             this.Bar = value2 * 2;
@@ -140,11 +140,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             var temp = this.text;
             this.text = text;
@@ -160,11 +160,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             if (text == null)
             {
@@ -186,11 +186,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = Meh(text.ToString());
@@ -209,9 +209,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             var name = Id(nameof(this.Text));
@@ -232,9 +232,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text.ToLower();
             var temp = this.Text;
@@ -253,9 +253,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int value)
+        public C(int value)
         {
             this.Value = value + 1;
             var temp = this.Value;
@@ -276,9 +276,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             System.Console.CancelKeyPress += (_, __) => Console.WriteLine(this.Text);
@@ -297,9 +297,9 @@ namespace N
             var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo(int a, int b, int c, int d)
+        public C1(int a, int b, int c, int d)
         {
             this.A = a;
             this.B = b;
@@ -320,7 +320,7 @@ namespace N
             var barCode = @"
 namespace N
 {
-    public class Bar : Foo
+    public class Bar : C1
     {
         public Bar(int a, int b, int c, int d)
             : base(a, b, c, d)
@@ -337,9 +337,9 @@ namespace N
             var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo(int a)
+        public C1(int a)
         {
             this.A = a;
         }
@@ -351,7 +351,7 @@ namespace N
             var barCode = @"
 namespace N
 {
-    public class Bar : Foo
+    public class Bar : C1
     {
         public Bar(int a)
             : base(a)

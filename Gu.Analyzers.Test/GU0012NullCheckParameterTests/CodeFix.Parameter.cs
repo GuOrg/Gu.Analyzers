@@ -136,7 +136,7 @@ namespace N
 {
     public class C
     {
-        public C(string text)
+        public C(string ↓text)
         {
         }
     }

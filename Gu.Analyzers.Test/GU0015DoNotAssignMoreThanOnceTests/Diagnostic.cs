@@ -15,11 +15,11 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             ↓this.text = text;
@@ -36,9 +36,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             ↓this.Text = text;
@@ -58,11 +58,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             ↓this.text = text;

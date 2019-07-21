@@ -17,13 +17,13 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string bar;
 
-        public Foo(string bar)
+        public C(string bar)
         {
-            this.bar = bar ?? throw new ArgumentNullException(nameof(↓Foo));
+            this.bar = bar ?? throw new ArgumentNullException(nameof(↓C));
         }
     }
 }";
@@ -33,11 +33,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string bar;
 
-        public Foo(string bar)
+        public C(string bar)
         {
             this.bar = bar ?? throw new ArgumentNullException(nameof(bar));
         }
@@ -54,11 +54,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string sq;
 
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             this.sq = s1 ?? throw new ArgumentNullException(nameof(↓s2));
         }
@@ -70,11 +70,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string sq;
 
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             this.sq = s1 ?? throw new ArgumentNullException(nameof(s1));
         }
@@ -91,13 +91,13 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string bar;
 
-        public Foo(string bar)
+        public C(string bar)
         {
-            this.bar = bar ?? throw new ArgumentNullException(↓""Foo"");
+            this.bar = bar ?? throw new ArgumentNullException(↓""C"");
         }
     }
 }";
@@ -107,11 +107,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string bar;
 
-        public Foo(string bar)
+        public C(string bar)
         {
             this.bar = bar ?? throw new ArgumentNullException(nameof(bar));
         }
