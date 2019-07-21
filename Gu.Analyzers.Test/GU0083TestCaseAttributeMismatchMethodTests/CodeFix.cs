@@ -189,7 +189,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2, ↓3.0)]
         public void Test(int i, int j, params int[] ints)
@@ -203,7 +203,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2, 3.0)]
         public void Test(int i, int j, params double[] ints)

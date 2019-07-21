@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
             var code = @"
 namespace N
 {
-    class Foo
+    class C
     {
         void Method()
         {
@@ -31,7 +31,7 @@ namespace N
             var code = @"
 namespace N
 {
-    class Foo
+    class C
     {
         int Method() => throw new System.NotImplementedException();
     }
@@ -45,7 +45,7 @@ namespace N
             var code = @"
 namespace N
 {
-    class Foo
+    class C
     {
         void Method()
         {

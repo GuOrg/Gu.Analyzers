@@ -315,7 +315,7 @@ namespace N
 
     [TestFixture(typeof(int))]
     [TestFixture(typeof(double))]
-    public class Foo<T>
+    public class C<T>
         where T : struct, IComparable<T>, IComparable
     {
         [TestCase(1)]

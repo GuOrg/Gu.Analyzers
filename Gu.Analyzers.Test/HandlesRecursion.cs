@@ -52,9 +52,9 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    internal abstract class Foo
+    internal abstract class C
     {
-        internal Foo()
+        internal C()
         {
 #pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
