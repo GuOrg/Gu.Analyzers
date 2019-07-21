@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
         [Test]
         public static void SingleArgument()

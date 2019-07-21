@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0009UseNamedParametersForBooleans();
         private static readonly CodeFixProvider Fix = new NameArgumentsFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0009UseNamedParametersForBooleans.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans);
 
         [Test]
         public static void UnnamedBooleanParameters()

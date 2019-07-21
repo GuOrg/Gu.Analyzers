@@ -14,7 +14,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0005ExceptionArgumentsPositions,
-            GU0013TrowForCorrectParameter.Descriptor);
+            Descriptors.GU0013TrowForCorrectParameter);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -45,7 +45,7 @@ namespace Gu.Analyzers
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
-                            GU0013TrowForCorrectParameter.Descriptor,
+                            Descriptors.GU0013TrowForCorrectParameter,
                             GetLocation(),
                             ImmutableDictionary<string, string>.Empty.Add(nameof(IdentifierNameSyntax), identifierName.Identifier.ValueText)));
 

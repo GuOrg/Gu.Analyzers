@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ParameterAnalyzer();
             private static readonly CodeFixProvider Fix = new NullCheckParameterFix();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0012NullCheckParameter.Descriptor);
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
 
             [TestCase("public")]
             [TestCase("internal")]

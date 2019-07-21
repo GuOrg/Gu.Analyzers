@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
     internal static class Diagnostics
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0081TestCasesAttributeMismatch);
 
         [Test]
         public static void TestCaseAttributeAndParameter()

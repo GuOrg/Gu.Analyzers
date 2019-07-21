@@ -12,18 +12,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0007PreferInjecting : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0007",
-            title: "Prefer injecting.",
-            messageFormat: "Prefer injecting {0}.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
-            description: "Prefer injecting.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0007PreferInjecting);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -86,8 +77,7 @@ namespace Gu.Analyzers
             {
                 var typeName = createdType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
                 context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptor,
+                    Diagnostic.Create(Descriptors.GU0007PreferInjecting,
                         objectCreation.GetLocation(),
                         ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
                                                                  .Add(nameof(Inject.Injectable), injectable.ToString()),
@@ -131,8 +121,7 @@ namespace Gu.Analyzers
             {
                 var typeName = memberType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart);
                 context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptor,
+                    Diagnostic.Create(Descriptors.GU0007PreferInjecting,
                         memberAccess.Name.GetLocation(),
                         ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
                                                            .Add(nameof(Inject.Injectable), injectable.ToString()),

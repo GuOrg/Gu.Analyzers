@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0072AllTypesShouldBeInternal : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0072",
-            title: "All types should be internal.",
-            messageFormat: "All types should be internal.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
-            description: "All types should be internal.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0072AllTypesShouldBeInternal);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -38,7 +29,7 @@ namespace Gu.Analyzers
                 context.ContainingSymbol is ITypeSymbol &&
                 typeDeclaration.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PublicKeyword), out var modifier))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, modifier.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal, modifier.GetLocation()));
             }
         }
     }

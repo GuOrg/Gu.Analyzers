@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCodeWithAll
+    internal class ValidAll
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()

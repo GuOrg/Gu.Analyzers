@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0052ExceptionShouldBeSerializable : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0052",
-            title: "Mark exception with [Serializable].",
-            messageFormat: "Mark exception with [Serializable].",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Mark exception with [Serializable].");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0052ExceptionShouldBeSerializable);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -43,7 +34,7 @@ namespace Gu.Analyzers
                 type.IsAssignableTo(KnownSymbol.Exception, context.Compilation) &&
                 !Attribute.TryFind(classDeclaration, KnownSymbol.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, classDeclaration.Identifier.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0052ExceptionShouldBeSerializable, classDeclaration.Identifier.GetLocation()));
             }
         }
     }

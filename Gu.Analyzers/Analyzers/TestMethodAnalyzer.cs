@@ -15,10 +15,10 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0080TestAttributeCountMismatch.Descriptor,
-            GU0081TestCasesAttributeMismatch.Descriptor,
-            GU0082IdenticalTestCase.Descriptor,
-            GU0083TestCaseAttributeMismatchMethod.Descriptor);
+            Descriptors.GU0080TestAttributeCountMismatch,
+            Descriptors.GU0081TestCasesAttributeMismatch,
+            Descriptors.GU0082IdenticalTestCase,
+            Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -43,13 +43,13 @@ namespace Gu.Analyzers
                 if (TrySingleTestAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out var attribute) &&
                     testMethod.Parameters.Length > 0)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch, parameterList.GetLocation(), parameterList, attribute));
                 }
 
                 if (TrySingleTestCaseAttribute(methodDeclaration, context.SemanticModel, context.CancellationToken, out attribute) &&
                     !CountMatches(testMethod, attribute))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor, parameterList.GetLocation(), parameterList, attribute));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch, parameterList.GetLocation(), parameterList, attribute));
                 }
 
                 foreach (var attributeList in methodDeclaration.AttributeLists)
@@ -60,17 +60,17 @@ namespace Gu.Analyzers
                         {
                             if (!CountMatches(testMethod, candidate))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(GU0081TestCasesAttributeMismatch.Descriptor, candidate.GetLocation(), parameterList, attribute));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0081TestCasesAttributeMismatch, candidate.GetLocation(), parameterList, attribute));
                             }
 
                             if (TryFindIdentical(methodDeclaration, candidate, context, out _))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(GU0082IdenticalTestCase.Descriptor, candidate.GetLocation(), candidate));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0082IdenticalTestCase, candidate.GetLocation(), candidate));
                             }
 
                             if (TryGetFirstMismatch(testMethod, candidate, context, out var argument))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(GU0083TestCaseAttributeMismatchMethod.Descriptor, argument.GetLocation(), candidate, parameterList));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod, argument.GetLocation(), candidate, parameterList));
                             }
                         }
                     }

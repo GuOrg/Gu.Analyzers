@@ -11,7 +11,7 @@ namespace Gu.Analyzers
     internal class ParameterAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0012NullCheckParameter.Descriptor);
+            Descriptors.GU0012NullCheckParameter);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -34,7 +34,7 @@ namespace Gu.Analyzers
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                 !NullCheck.IsChecked(parameter, methodDeclaration, context.SemanticModel, context.CancellationToken))
             {
-                context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, parameterSyntax.Identifier.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, parameterSyntax.Identifier.GetLocation()));
             }
         }
     }

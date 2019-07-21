@@ -12,16 +12,7 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0023",
-            title: "Static members that initialize with other static members depend on document order.",
-            messageFormat: "Member '{0}' must be declared before '{1}'",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
-            description: "Static members that initialize with other static members depend on document order.");
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0023StaticMemberOrder);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -40,14 +31,14 @@ namespace Gu.Analyzers
                     variable.Initializer.Value is ExpressionSyntax fieldValue &&
                     IsInitializedWithUninitialized(fieldValue, context, out var other))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldValue.GetLocation(), other.Symbol, context.ContainingSymbol));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, fieldValue.GetLocation(), other.Symbol, context.ContainingSymbol));
                 }
 
                 if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
                     propertyDeclaration.Initializer?.Value is ExpressionSyntax propertyValue &&
                     IsInitializedWithUninitialized(propertyValue, context, out other))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, propertyValue.GetLocation(), other.Symbol, context.ContainingSymbol));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, propertyValue.GetLocation(), other.Symbol, context.ContainingSymbol));
                 }
             }
         }

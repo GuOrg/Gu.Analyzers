@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly CodeFixProvider Fix = new UseParameterFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0014PreferParameter.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0014PreferParameter);
 
         [Test]
         public static void WhenAccessingFieldProperty()

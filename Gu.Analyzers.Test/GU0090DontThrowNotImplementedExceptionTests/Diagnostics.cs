@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0090DontThrowNotImplementedExceptionTests
     internal static class Diagnostics
     {
         private static readonly ExceptionAnalyzer Analyzer = new ExceptionAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0090DontThrowNotImplementedException.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0090DoNotThrowNotImplementedException);
 
         [Test]
         public static void ExceptionThrownInsideMethodBlock()

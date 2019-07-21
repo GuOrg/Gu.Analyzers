@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0051XmlSerializerNotCached : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0051",
-            title: "Cache the XmlSerializer.",
-            messageFormat: "The serializer is not cached.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "This constructor loads assemblies in non-GC memory, which may cause memory leaks.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0051XmlSerializerNotCached);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -65,7 +56,7 @@ namespace Gu.Analyzers
                         }
                     }
 
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0051XmlSerializerNotCached, assignment.GetLocation()));
                     return;
                 }
 
@@ -85,11 +76,11 @@ namespace Gu.Analyzers
                 var variableDeclaration = objectCreation.FirstAncestor<VariableDeclarationSyntax>();
                 if (variableDeclaration != null)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0051XmlSerializerNotCached, variableDeclaration.GetLocation()));
                     return;
                 }
 
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0051XmlSerializerNotCached, objectCreation.GetLocation()));
             }
         }
 

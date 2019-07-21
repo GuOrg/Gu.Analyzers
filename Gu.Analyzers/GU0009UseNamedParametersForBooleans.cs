@@ -10,17 +10,8 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0009UseNamedParametersForBooleans : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0009",
-            title: "Name the boolean parameter.",
-            messageFormat: "The boolean parameter is not named.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "The unnamed boolean parameters aren't obvious about their purpose. Consider naming the boolean argument for clarity.");
-
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0009UseNamedParametersForBooleans);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -75,7 +66,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, argumentSyntax.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans, argumentSyntax.GetLocation()));
             }
         }
 

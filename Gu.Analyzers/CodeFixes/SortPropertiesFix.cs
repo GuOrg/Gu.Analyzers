@@ -17,7 +17,7 @@ namespace Gu.Analyzers
     internal class SortPropertiesFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0020SortProperties.Descriptor.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(Descriptors.GU0020SortProperties.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

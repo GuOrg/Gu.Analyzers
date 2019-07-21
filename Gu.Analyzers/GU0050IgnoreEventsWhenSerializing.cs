@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0050",
-            title: "Ignore events when serializing.",
-            messageFormat: "Ignore events when serializing.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Ignore events when serializing.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0050IgnoreEventsWhenSerializing);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -44,7 +35,7 @@ namespace Gu.Analyzers
                 HasSerializableAttribute(eventSymbol.ContainingType) &&
                 !Attribute.TryFind(eventFieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, eventFieldDeclaration.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing, eventFieldDeclaration.GetLocation()));
             }
         }
 
@@ -61,7 +52,7 @@ namespace Gu.Analyzers
                 HasSerializableAttribute(field.ContainingType) &&
                 !Attribute.TryFind(fieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, fieldDeclaration.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing, fieldDeclaration.GetLocation()));
             }
         }
 

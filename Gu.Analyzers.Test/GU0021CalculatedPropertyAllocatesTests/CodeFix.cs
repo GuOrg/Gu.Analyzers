@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
         private static readonly UseGetOnlyFix Fix = new UseGetOnlyFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates);
 
         [Test]
         public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()

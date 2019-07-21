@@ -11,7 +11,7 @@ namespace Gu.Analyzers
     internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0017DonNotUseDiscarded.Descriptor);
+            Descriptors.GU0017DoNotUseDiscarded);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -27,7 +27,7 @@ namespace Gu.Analyzers
                 name.Identifier.ValueText == "_" &&
                 IsUsed(name))
             {
-                context.ReportDiagnostic(Diagnostic.Create(GU0017DonNotUseDiscarded.Descriptor, name.Identifier.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0017DoNotUseDiscarded, name.Identifier.GetLocation()));
             }
 
             bool IsUsed(IdentifierNameSyntax candidate)

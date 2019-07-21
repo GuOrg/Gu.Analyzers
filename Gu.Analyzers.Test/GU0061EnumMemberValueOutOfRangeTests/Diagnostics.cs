@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
     internal static class Diagnostics
     {
         private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new GU0061EnumMemberValueOutOfRange();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0061EnumMemberValueOutOfRange.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0061EnumMemberValueOutOfRange);
 
         [Test]
         public static void BitShiftOutOfRange()

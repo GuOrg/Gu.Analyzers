@@ -12,18 +12,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0060",
-            title: "Enum member value conflict.",
-            messageFormat: "Enum member value conflicts with another.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -116,7 +107,7 @@ namespace Gu.Analyzers
                     var value = UnboxUMaxInt(symbol.ConstantValue);
                     if (notDerivedFromOther && enumValuesSet.Contains(value))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
                     }
 
                     enumValuesSet.Add(value);
@@ -135,7 +126,7 @@ namespace Gu.Analyzers
                 var value = UnboxUMaxInt(symbol.ConstantValue);
                 if (notDerivedFromOther && (bitSumOfLiterals & value) != 0)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, enumMember.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
                 }
 
                 bitSumOfLiterals |= value;

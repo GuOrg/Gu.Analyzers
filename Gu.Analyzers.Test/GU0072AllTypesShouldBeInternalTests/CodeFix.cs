@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
         private static readonly MakeInternalFix Fix = new MakeInternalFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0072AllTypesShouldBeInternal.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal);
 
         [Test]
         public static void Class()

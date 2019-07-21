@@ -20,7 +20,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0001NameArguments.Id,
-            GU0009UseNamedParametersForBooleans.Descriptor.Id);
+            Descriptors.GU0009UseNamedParametersForBooleans.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -48,7 +48,7 @@ namespace Gu.Analyzers
                         this.GetType(),
                         diagnostic);
                 }
-                else if (diagnostic.Id == GU0009UseNamedParametersForBooleans.Descriptor.Id &&
+                else if (diagnostic.Id == Descriptors.GU0009UseNamedParametersForBooleans.Id &&
                          syntaxRoot.TryFindNode<ArgumentSyntax>(diagnostic, out var boolArgument) &&
                          boolArgument.Parent is ArgumentListSyntax argumentList &&
                          !HasAnyNamedArgument(argumentList) &&

@@ -64,7 +64,7 @@ namespace N
         [TestCase("return bar.Value;")]
         public static void WhenReturningPropertyOfCreatedField(string getter)
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -85,7 +85,7 @@ namespace N
         }
     }
 }".AssertReplace("return this.bar.Value;", getter);
-            var barCode = @"
+            var bar = @"
 namespace N
 {
     public class Bar
@@ -93,7 +93,7 @@ namespace N
         public int Value { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, c1, bar);
         }
 
         [TestCase("this.bar.Value;")]

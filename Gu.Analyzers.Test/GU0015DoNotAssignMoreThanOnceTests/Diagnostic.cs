@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
     internal static class Diagnostic
     {
         private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0015DoNotAssignMoreThanOnce.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce);
 
         [Test]
         public static void FieldInConstructor()

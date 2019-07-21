@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0073MemberShouldBeInternal : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0073",
-            title: "Member of non-public type should be internal.",
-            messageFormat: "Member {0} of non-public type {1} should be internal.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: true,
-            description: "Member of non-public type should be internal.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0073MemberShouldBeInternal);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -53,8 +44,7 @@ namespace Gu.Analyzers
                 !ImplementsInterface())
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptor,
+                    Diagnostic.Create(Descriptors.GU0073MemberShouldBeInternal,
                         keyword.GetLocation(),
                         memberSymbol.ToDisplayString(),
                         memberSymbol.ContainingType.ToDisplayString()));

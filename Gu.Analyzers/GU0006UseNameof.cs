@@ -12,17 +12,8 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0006UseNameof : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0006",
-            title: "Use nameof.",
-            messageFormat: "Use nameof.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Use nameof.");
-
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0006UseNameof);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -48,7 +39,7 @@ namespace Gu.Analyzers
                     switch (symbol)
                     {
                         case IParameterSymbol _:
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0006UseNameof, literal.GetLocation()));
                             break;
                         case IFieldSymbol _:
                         case IEventSymbol _:
@@ -56,17 +47,17 @@ namespace Gu.Analyzers
                         case IMethodSymbol _:
                             if (symbol.IsStatic)
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0006UseNameof, literal.GetLocation()));
                             }
                             else
                             {
                                 var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation(), properties));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0006UseNameof, literal.GetLocation(), properties));
                             }
 
                             break;
                         case ILocalSymbol local when IsVisible(literal, local, context.CancellationToken):
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, literal.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0006UseNameof, literal.GetLocation()));
                             break;
                     }
                 }

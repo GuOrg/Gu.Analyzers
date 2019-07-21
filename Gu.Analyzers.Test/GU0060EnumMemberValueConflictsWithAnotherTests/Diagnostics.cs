@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
     internal static class Diagnostics
     {
         private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0060EnumMemberValueConflictsWithAnother.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
         [Test]
         public static void ImplicitValueSharing()

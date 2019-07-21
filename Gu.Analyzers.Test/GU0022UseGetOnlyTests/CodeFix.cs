@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0022UseGetOnly();
         private static readonly CodeFixProvider Fix = new UseGetOnlyFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0022UseGetOnly.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0022UseGetOnly);
 
         [Test]
         public static void InitializedInCtor()

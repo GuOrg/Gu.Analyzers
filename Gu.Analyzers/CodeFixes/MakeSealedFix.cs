@@ -13,7 +13,7 @@ namespace Gu.Analyzers
     internal class MakeSealedFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0024SealTypeWithDefaultMember.Descriptor.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(Descriptors.GU0024SealTypeWithDefaultMember.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

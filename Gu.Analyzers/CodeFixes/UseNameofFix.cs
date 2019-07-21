@@ -17,7 +17,7 @@ namespace Gu.Analyzers
     internal class UseNameofFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(GU0006UseNameof.Descriptor.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(Descriptors.GU0006UseNameof.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

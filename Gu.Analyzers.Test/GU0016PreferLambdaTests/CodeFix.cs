@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodGroupAnalyzer();
         private static readonly CodeFixProvider Fix = new UseLambdaFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0016PreferLambda.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0016PreferLambda);
 
         [Test]
         public static void LinqWhereStaticMethod()

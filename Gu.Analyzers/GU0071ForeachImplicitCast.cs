@@ -12,18 +12,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0071ForeachImplicitCast : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0071",
-            title: "Implicit casting done by the foreach",
-            messageFormat: "Implicit cast done by the foreach",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "If an explicit type is used, the compiler inserts a cast. This was possibly useful in the pre-generic C# 1.0 era, but now it's a misfeature");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0071ForeachImplicitCast);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -44,7 +35,7 @@ namespace Gu.Analyzers
                !forEachStatement.Type.IsVar &&
                EnumeratorTypeMatchesTheVariableType(context, forEachStatement) == false)
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, forEachStatement.Type.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0071ForeachImplicitCast, forEachStatement.Type.GetLocation()));
             }
         }
 

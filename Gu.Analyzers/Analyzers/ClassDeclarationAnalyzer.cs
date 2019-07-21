@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0024SealTypeWithDefaultMember.Descriptor);
+            Descriptors.GU0024SealTypeWithDefaultMember);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -41,7 +41,7 @@ namespace Gu.Analyzers
                         property.IsGetOnly() &&
                         IsInitializedWithContainingType(property.Initializer, context))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0024SealTypeWithDefaultMember.Descriptor, classDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember, classDeclaration.Identifier.GetLocation()));
                         return;
                     }
 
@@ -52,7 +52,7 @@ namespace Gu.Analyzers
                             declaration.Variables.TrySingle(out var variable) &&
                              IsInitializedWithContainingType(variable.Initializer, context))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(GU0024SealTypeWithDefaultMember.Descriptor, classDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember, classDeclaration.Identifier.GetLocation()));
                         return;
                     }
                 }

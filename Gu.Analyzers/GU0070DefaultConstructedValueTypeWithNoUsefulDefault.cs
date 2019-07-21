@@ -11,16 +11,6 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0070DefaultConstructedValueTypeWithNoUsefulDefault : DiagnosticAnalyzer
     {
-
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0070",
-            title: "Default-constructed value type with no useful default",
-            messageFormat: "Default constructed value type was created, which is likely not what was intended.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Types declared with struct must have a default constructor, even if there is no semantically sensible default value for that type. Examples include System.Guid and System.DateTime.");
-
         private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
         {
             KnownSymbol.Guid,
@@ -29,7 +19,7 @@ namespace Gu.Analyzers
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0070DefaultConstructedValueTypeWithNoUsefulDefault);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -47,7 +37,7 @@ namespace Gu.Analyzers
                 objectCreation.ArgumentList.Arguments.Count == 0 &&
                 IsTheCreatedTypeKnownForHavingNoUsefulDefault(context, objectCreation, out _))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, objectCreation.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0070DefaultConstructedValueTypeWithNoUsefulDefault, objectCreation.GetLocation()));
             }
         }
 

@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
     internal static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0052ExceptionShouldBeSerializable();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0052ExceptionShouldBeSerializable.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0052ExceptionShouldBeSerializable);
 
         [Test]
         public static void WhenNoAttribute()

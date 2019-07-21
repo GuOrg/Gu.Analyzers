@@ -2,7 +2,7 @@ using Gu.Roslyn.Asserts;
 
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
-[assembly: TransitiveMetadataReferences(typeof(Gu.Analyzers.Test.ValidCodeWithAll))]
+[assembly: TransitiveMetadataReferences(typeof(Gu.Analyzers.Test.ValidAll))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Concurrency.DispatcherScheduler))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),

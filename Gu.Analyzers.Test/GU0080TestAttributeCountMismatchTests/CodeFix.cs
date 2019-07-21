@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0080TestAttributeCountMismatch.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch);
 
         [TestCase("string text")]
         [TestCase("string text, int index, bool value")]

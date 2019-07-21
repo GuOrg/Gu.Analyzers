@@ -13,8 +13,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0008AvoidRelayProperties.Descriptor,
-            GU0021CalculatedPropertyAllocates.Descriptor);
+            Descriptors.GU0008AvoidRelayProperties,
+            Descriptors.GU0021CalculatedPropertyAllocates);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -40,12 +40,12 @@ namespace Gu.Analyzers
                     property.SetMethod == null &&
                     returnValue is ObjectCreationExpressionSyntax)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0021CalculatedPropertyAllocates.Descriptor, returnValue.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
                 }
                 else if (returnValue is MemberAccessExpressionSyntax memberAccess &&
                          IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0008AvoidRelayProperties.Descriptor, memberAccess.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0008AvoidRelayProperties, memberAccess.GetLocation()));
                 }
             }
         }

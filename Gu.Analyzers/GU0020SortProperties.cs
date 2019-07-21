@@ -11,18 +11,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0020SortProperties : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0020",
-            title: "Sort properties.",
-            messageFormat: "Move property.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Sort properties by StyleCop rules then by mutability.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0020SortProperties);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -49,7 +40,7 @@ namespace Gu.Analyzers
                 {
                     if (MemberDeclarationComparer.Compare(propertyDeclaration, after) > 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0020SortProperties, context.Node.GetLocation()));
                     }
                 }
             }

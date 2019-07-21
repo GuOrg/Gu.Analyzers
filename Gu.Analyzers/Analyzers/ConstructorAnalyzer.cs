@@ -18,7 +18,7 @@ namespace Gu.Analyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0003CtorParameterNamesShouldMatch,
             Descriptors.GU0004AssignAllReadOnlyMembers,
-            GU0014PreferParameter.Descriptor);
+            Descriptors.GU0014PreferParameter);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -71,7 +71,7 @@ namespace Gu.Analyzers
                                         if (ShouldUseParameter(context, leftSymbol, argument.Expression))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, argument.Expression.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, argument.Expression.GetLocation(), properties));
                                         }
                                     }
 
@@ -80,7 +80,7 @@ namespace Gu.Analyzers
                                         if (ShouldUseParameter(context, leftSymbol, invocation.Expression))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, invocation.Expression.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, invocation.Expression.GetLocation(), properties));
                                         }
                                     }
 
@@ -89,7 +89,7 @@ namespace Gu.Analyzers
                                         if (ShouldUseParameter(context, leftSymbol, memberAccess.Expression))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, memberAccess.Expression.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, memberAccess.Expression.GetLocation(), properties));
                                         }
                                     }
 
@@ -98,7 +98,7 @@ namespace Gu.Analyzers
                                         if (ShouldUseParameter(context, leftSymbol, conditionalAccess.Expression))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, conditionalAccess.Expression.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, conditionalAccess.Expression.GetLocation(), properties));
                                         }
                                     }
 
@@ -107,13 +107,13 @@ namespace Gu.Analyzers
                                         if (ShouldUseParameter(context, leftSymbol, binaryExpression.Left))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Left.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, binaryExpression.Left.GetLocation(), properties));
                                         }
 
                                         if (ShouldUseParameter(context, leftSymbol, binaryExpression.Right))
                                         {
                                             var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", parameter.Identifier.ValueText), });
-                                            context.ReportDiagnostic(Diagnostic.Create(GU0014PreferParameter.Descriptor, binaryExpression.Right.GetLocation(), properties));
+                                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0014PreferParameter, binaryExpression.Right.GetLocation(), properties));
                                         }
                                     }
                                 }

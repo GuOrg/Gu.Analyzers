@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     internal class ExceptionAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(GU0090DontThrowNotImplementedException.Descriptor);
+            ImmutableArray.Create(Descriptors.GU0090DoNotThrowNotImplementedException);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -34,7 +34,7 @@ namespace Gu.Analyzers
                 expressionSyntax = throwExpressionSyntax.Expression;
             }
 
-            FindException<NotImplementedException>(context, expressionSyntax, GU0090DontThrowNotImplementedException.Descriptor);
+            FindException<NotImplementedException>(context, expressionSyntax, Descriptors.GU0090DoNotThrowNotImplementedException);
         }
 
         private static void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)

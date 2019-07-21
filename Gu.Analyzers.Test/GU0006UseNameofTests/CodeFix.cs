@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
     {
         private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
         private static readonly UseNameofFix Fix = new UseNameofFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0006UseNameof.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0006UseNameof);
 
         [Test]
         public static void WhenThrowingArgumentException()

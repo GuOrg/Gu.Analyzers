@@ -18,8 +18,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0080TestAttributeCountMismatch.Descriptor.Id,
-            GU0083TestCaseAttributeMismatchMethod.Descriptor.Id);
+            Descriptors.GU0080TestAttributeCountMismatch.Id,
+            Descriptors.GU0083TestCaseAttributeMismatchMethod.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

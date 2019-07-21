@@ -17,7 +17,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0013TrowForCorrectParameter.Descriptor.Id);
+            Descriptors.GU0013TrowForCorrectParameter.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

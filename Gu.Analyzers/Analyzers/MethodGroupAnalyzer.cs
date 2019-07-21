@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0016PreferLambda.Descriptor);
+            Descriptors.GU0016PreferLambda);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -32,13 +32,13 @@ namespace Gu.Analyzers
             switch (context.Node)
             {
                 case ArgumentSyntax argument when IsMethodGroup(argument.Expression, context):
-                    context.ReportDiagnostic(Diagnostic.Create(GU0016PreferLambda.Descriptor, argument.Expression.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0016PreferLambda, argument.Expression.GetLocation()));
                     break;
                 case AssignmentExpressionSyntax assignment when
                      assignment.IsKind(SyntaxKind.AddAssignmentExpression) &&
                      IsMethodGroup(assignment.Right, context):
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0016PreferLambda.Descriptor, assignment.Right.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0016PreferLambda, assignment.Right.GetLocation()));
                     break;
                 }
             }

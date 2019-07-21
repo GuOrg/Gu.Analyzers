@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0011",
-            title: "Don't ignore the return value.",
-            messageFormat: "Don't ignore the return value.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Don't ignore the return value.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0011DoNotIgnoreReturnValue);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -42,7 +33,7 @@ namespace Gu.Analyzers
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 IsIgnored(objectCreation))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue, context.Node.GetLocation()));
             }
         }
 
@@ -57,7 +48,7 @@ namespace Gu.Analyzers
                 IsIgnored(invocation) &&
                 !CanIgnore(invocation, context))
             {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue, context.Node.GetLocation()));
             }
         }
 

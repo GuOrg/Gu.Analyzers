@@ -23,7 +23,7 @@ namespace Gu.Analyzers
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
-            ImmutableArray.Create(GU0050IgnoreEventsWhenSerializing.Descriptor.Id);
+            ImmutableArray.Create(Descriptors.GU0050IgnoreEventsWhenSerializing.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

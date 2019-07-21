@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly ThrowForCorrectParameterFix Fix = new ThrowForCorrectParameterFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0013TrowForCorrectParameter.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0013TrowForCorrectParameter);
 
         [Test]
         public static void ThrowExpressionNameofWrong()

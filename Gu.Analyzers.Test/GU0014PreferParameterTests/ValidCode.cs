@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
     internal static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly DiagnosticDescriptor Descriptor = GU0014PreferParameter.Descriptor;
+        private static readonly DiagnosticDescriptor Descriptor = Descriptors.GU0014PreferParameter;
 
         [Test]
         public static void SimpleAssign()

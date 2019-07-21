@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
     internal static class Diagnostic
     {
         private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0017DonNotUseDiscarded.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0017DoNotUseDiscarded);
 
         [TestCase("var o = ↓_ + 3;")]
         [TestCase("var o = ↓_++;")]

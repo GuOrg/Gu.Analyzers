@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
 
@@ -242,7 +242,7 @@ namespace N
         [Test]
         public static void IgnoresWhenBaseIsParams2()
         {
-            var fooCode = @"
+            var bar = @"
 namespace N
 {
     public class Bar : Foo
@@ -253,7 +253,7 @@ namespace N
         }
     }
 }";
-            var barCode = @"
+            var foo = @"
 namespace N
 {
     public class Foo
@@ -269,7 +269,7 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, bar, foo);
         }
 
         [Test]
@@ -278,9 +278,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int id)
+        public C(int id)
         {
             this.ID = id;
         }
@@ -299,9 +299,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var tuple = Tuple.Create(
                 1,
@@ -320,17 +320,17 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo : Bar
+    public class C1 : C2
     {
-        public Foo(int x, int y, int z)
+        public C1(int x, int y, int z)
             : base(x, y, z)
         {
         }
     }
 
-    public class Bar
+    public class C2
     {
-        public Bar(int value1, int value2, int value3)
+        public C2(int value1, int value2, int value3)
         {
             this.Values = new int[] { value1, value2, value3 };
         }
@@ -350,11 +350,11 @@ namespace N
     using System;
     using System.Text;
 
-    public class Foo
+    public class C
     {
         private readonly WeakReference wr = new WeakReference(null);
 
-        public Foo(StringBuilder builder)
+        public C(StringBuilder builder)
         {
             this.wr.Target = builder;
         }
@@ -369,17 +369,17 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
         private readonly int a;
         private readonly int b;
 
-        public Foo(int x)
+        public C(int x)
             : this(x, x)
         {
         }
 
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.a = a;
             this.b = b;
@@ -397,11 +397,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string sq;
 
-        public Foo(string s1, string s2)
+        public C(string s1, string s2)
         {
             this.sq = s1 ?? throw new ArgumentNullException(nameof(s2));
         }

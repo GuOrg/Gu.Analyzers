@@ -12,9 +12,9 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0010DoNotAssignSameValue.Descriptor,
-            GU0012NullCheckParameter.Descriptor,
-            GU0015DoNotAssignMoreThanOnce.Descriptor);
+            Descriptors.GU0010DoNotAssignSameValue,
+            Descriptors.GU0012NullCheckParameter,
+            Descriptors.GU0015DoNotAssignMoreThanOnce);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -35,7 +35,7 @@ namespace Gu.Analyzers
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
                     left.Equals(right))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0010DoNotAssignSameValue.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0010DoNotAssignSameValue, assignment.GetLocation()));
                 }
 
                 if (assignment.Right is IdentifierNameSyntax identifier &&
@@ -46,12 +46,12 @@ namespace Gu.Analyzers
                     !parameter.HasExplicitDefaultValue &&
                     !NullCheck.IsChecked(parameter, assignment.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0012NullCheckParameter.Descriptor, assignment.Right.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, assignment.Right.GetLocation()));
                 }
 
                 if (IsRedundantAssignment(left, assignment, context))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0015DoNotAssignMoreThanOnce.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce, assignment.GetLocation()));
                 }
             }
         }

@@ -10,18 +10,9 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0022UseGetOnly : DiagnosticAnalyzer
     {
-        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
-            id: "GU0022",
-            title: "Use get-only.",
-            messageFormat: "Use get-only.",
-            category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Use get-only.");
-
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptor);
+            ImmutableArray.Create(Descriptors.GU0022UseGetOnly);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -56,7 +47,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, setter.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0022UseGetOnly, setter.GetLocation()));
             }
         }
 

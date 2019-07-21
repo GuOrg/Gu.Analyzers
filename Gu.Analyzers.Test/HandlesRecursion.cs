@@ -46,7 +46,7 @@ namespace N
         [TestCaseSource(nameof(AllAnalyzers))]
         public void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
-            var testCode = @"
+            var c = @"
 namespace N
 {
     using System;
@@ -129,7 +129,7 @@ namespace N
         }
      }
 }";
-            var converterCode = @"
+            var converter = @"
 namespace N
 {
     using System;
@@ -172,7 +172,7 @@ namespace N
 #pragma warning restore GU0012
     }
 }";
-            RoslynAssert.Valid(analyzer, testCode, converterCode);
+            RoslynAssert.Valid(analyzer, c, converter);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
