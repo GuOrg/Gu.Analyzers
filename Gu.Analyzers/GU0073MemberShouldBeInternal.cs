@@ -10,17 +10,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0073MemberShouldBeInternal : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0073";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0073",
             title: "Member of non-public type should be internal.",
             messageFormat: "Member {0} of non-public type {1} should be internal.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Member of non-public type should be internal.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Member of non-public type should be internal.");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

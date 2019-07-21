@@ -4,16 +4,13 @@ namespace Gu.Analyzers
 
     internal static class GU0012NullCheckParameter
     {
-        internal const string DiagnosticId = "GU0012";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0012",
             title: "Check if parameter is null.",
             messageFormat: "Check if parameter is null.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Check if parameter is null.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Check if parameter is null.");
     }
 }

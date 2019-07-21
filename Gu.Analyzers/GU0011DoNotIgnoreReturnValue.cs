@@ -10,17 +10,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0011";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0011",
             title: "Don't ignore the return value.",
             messageFormat: "Don't ignore the return value.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Don't ignore the return value.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Don't ignore the return value.");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

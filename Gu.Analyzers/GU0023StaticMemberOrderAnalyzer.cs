@@ -12,17 +12,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0023";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0023",
             title: "Static members that initialize with other static members depend on document order.",
             messageFormat: "Member '{0}' must be declared before '{1}'",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Static members that initialize with other static members depend on document order.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Static members that initialize with other static members depend on document order.");
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
 

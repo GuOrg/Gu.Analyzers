@@ -2,7 +2,7 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static partial class Descriptors
+    internal static class Descriptors
     {
         internal static readonly DiagnosticDescriptor GU0001NameArguments = Create(
             id: "GU0001",
@@ -45,7 +45,7 @@ namespace Gu.Analyzers
         /// <param name="isEnabledByDefault">True if the diagnostic is enabled by default.</param>
         /// <param name="description">An optional longer description of the diagnostic.</param>
         /// <param name="customTags">Optional custom tags for the diagnostic. See <see cref="T:Microsoft.CodeAnalysis.WellKnownDiagnosticTags" /> for some well known tags.</param>
-        private static DiagnosticDescriptor Create(
+        internal static DiagnosticDescriptor Create(
           string id,
           string title,
           string messageFormat,

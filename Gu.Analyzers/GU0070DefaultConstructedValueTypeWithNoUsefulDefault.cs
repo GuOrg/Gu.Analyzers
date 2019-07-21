@@ -11,17 +11,15 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0070DefaultConstructedValueTypeWithNoUsefulDefault : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0070";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0070",
             title: "Default-constructed value type with no useful default",
             messageFormat: "Default constructed value type was created, which is likely not what was intended.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Types declared with struct must have a default constructor, even if there is no semantically sensible default value for that type. Examples include System.Guid and System.DateTime.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Types declared with struct must have a default constructor, even if there is no semantically sensible default value for that type. Examples include System.Guid and System.DateTime.");
 
         private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
         {

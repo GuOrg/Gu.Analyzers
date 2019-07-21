@@ -11,17 +11,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0020SortProperties : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0020";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0020",
             title: "Sort properties.",
             messageFormat: "Move property.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Sort properties by StyleCop rules then by mutability.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Sort properties by StyleCop rules then by mutability.");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

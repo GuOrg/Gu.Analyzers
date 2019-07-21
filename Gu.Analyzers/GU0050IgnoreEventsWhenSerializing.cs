@@ -10,17 +10,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0050IgnoreEventsWhenSerializing : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0050";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0050",
             title: "Ignore events when serializing.",
             messageFormat: "Ignore events when serializing.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Ignore events when serializing.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Ignore events when serializing.");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

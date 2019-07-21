@@ -12,17 +12,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0007PreferInjecting : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0007";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0007",
             title: "Prefer injecting.",
             messageFormat: "Prefer injecting {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
-            description: "Prefer injecting.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Prefer injecting.");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

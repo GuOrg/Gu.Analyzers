@@ -10,17 +10,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0061EnumMemberValueOutOfRange : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0061";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0061",
             title: "Enum member value out of range.",
             messageFormat: "Enum member value will overflow",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "The enum member value will overflow at runtime. Probably not intended. Change enum type to long (int is default)",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "The enum member value will overflow at runtime. Probably not intended. Change enum type to long (int is default)");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

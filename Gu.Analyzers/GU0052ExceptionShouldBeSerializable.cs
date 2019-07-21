@@ -10,17 +10,14 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0052ExceptionShouldBeSerializable : DiagnosticAnalyzer
     {
-        internal const string DiagnosticId = "GU0052";
-
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
-            id: DiagnosticId,
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
+            id: "GU0052",
             title: "Mark exception with [Serializable].",
             messageFormat: "Mark exception with [Serializable].",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Mark exception with [Serializable].",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Mark exception with [Serializable].");
 
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
