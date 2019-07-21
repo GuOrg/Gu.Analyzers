@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
 
-        private static readonly string BarCode = @"
+        private static readonly string Bar = @"
 namespace N
 {
     public class Bar
@@ -27,7 +27,7 @@ namespace N
     }
 }";
 
-        private static readonly string LocatorCode = @"
+        private static readonly string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator
@@ -60,7 +60,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, BarCode);
+            RoslynAssert.Valid(Analyzer, code, Bar);
         }
 
         [Test]

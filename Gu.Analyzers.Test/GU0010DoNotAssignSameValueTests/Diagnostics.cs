@@ -8,11 +8,11 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
         private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0010DoNotAssignSameValue.Descriptor);
 
-        [TestCase("this.A = this.A;", "this.A = this.A;")]
-        [TestCase("this.A = this.A;", "this.A = A;")]
-        [TestCase("this.A = this.A;", "A = A;")]
-        [TestCase("this.A = this.A;", "A = this.A;")]
-        public static void SetPropertyToSelf(string before, string after)
+        [TestCase("this.A = this.A;")]
+        [TestCase("this.A = A;")]
+        [TestCase("A = A;")]
+        [TestCase("A = this.A;")]
+        public static void AssignToToSelf(string statement)
         {
             var code = @"
 namespace N
@@ -26,7 +26,7 @@ namespace N
             ↓this.A = this.A;
         }
     }
-}";
+}".AssertReplace("this.A = this.A;", statement);
 
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Assigning made to same, did you mean to assign something else?"), code);
         }

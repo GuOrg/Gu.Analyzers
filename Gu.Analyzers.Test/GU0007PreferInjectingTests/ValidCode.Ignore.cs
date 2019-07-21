@@ -23,7 +23,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, BarCode);
+                RoslynAssert.Valid(Analyzer, code, Bar);
             }
 
             [Test]
@@ -43,7 +43,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, BarCode);
+                RoslynAssert.Valid(Analyzer, code, Bar);
             }
 
             [Test]
@@ -64,7 +64,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, LocatorCode, BarCode, code);
+                RoslynAssert.Valid(Analyzer, ServiceLocator, Bar, code);
             }
 
             [TestCase("int")]
@@ -79,7 +79,7 @@ namespace N
     }
 }";
 
-                var barCode = @"
+                var c2 = @"
 namespace N
 {
     public class C2
@@ -96,17 +96,17 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly C2 bar;
 
-        public Foo()
+        public C1()
         {
             bar = new C2(default(int));
         }
     }
 }".AssertReplace("default(int)", $"default({type})");
-                RoslynAssert.Valid(Analyzer, abstractCode, barCode, code);
+                RoslynAssert.Valid(Analyzer, abstractCode, c2, code);
             }
 
             [Test]
@@ -170,7 +170,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, BarCode, code);
+                RoslynAssert.Valid(Analyzer, Bar, code);
             }
 
             [Test]
@@ -192,7 +192,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, BarCode, LocatorCode, code);
+                RoslynAssert.Valid(Analyzer, Bar, ServiceLocator, code);
             }
 
             [Test]
@@ -214,7 +214,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, BarCode);
+                RoslynAssert.Valid(Analyzer, code, Bar);
             }
 
             [Test]
