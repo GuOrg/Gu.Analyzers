@@ -18,7 +18,7 @@ namespace N
     public class C
     {
         [TestCase(1, 2, ""3"")]
-        public void Test(int x, int y, string str)
+        public void M(int x, int y, string str)
         {
         }
     }
@@ -40,7 +40,7 @@ namespace N
     public class C
     {
         [TestCase(""x"", ""y"", null)]
-        public void Test(string x, string y, string z)
+        public void M(string x, string y, string z)
         {
         }
     }
@@ -60,7 +60,7 @@ namespace N
     public class C
     {
         [TestCase(null)]
-        public void Test(int? obj)
+        public void M(int? obj)
         {
         }
     }
@@ -79,7 +79,7 @@ namespace N
     public class C
     {
         [TestCase(1, 2, ""3"", Author=""Author"")]
-        public void Test(int x, int y, string str)
+        public void M(int x, int y, string str)
         {
         }
     }
@@ -98,7 +98,7 @@ namespace N
     public class C
     {
         [TestCase(1, 2, null, Author=""Author"")]
-        public void Test(int x, int y, string str)
+        public void M(int x, int y, string str)
         {
         }
     }
@@ -117,7 +117,7 @@ namespace N
     public class C
     {
         [TestCase(new int[] { 3, 5 })]
-        public void Test(int[] array)
+        public void M(int[] array)
         {
         }
     }
@@ -136,7 +136,7 @@ namespace N
     public class C
     {
         [TestCase(new int[] { 3, 5 }, new string[] { ""hello"" })]
-        public void Test(int[] array, string[] stringArray)
+        public void M(int[] array, string[] stringArray)
         {
         }
     }
@@ -155,7 +155,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(object obj)
+        public void M(object obj)
         {
         }
     }
@@ -176,7 +176,7 @@ namespace N
     {
         [TestCase(1)]
         [TestCase(1.0)]
-        public void Test(IFormattable obj)
+        public void M(IFormattable obj)
         {
         }
     }
@@ -196,7 +196,7 @@ namespace N
     public class C
     {
         [TestCase(StringComparison.CurrentCulture)]
-        public void Test(StringComparison stringComparison)
+        public void M(StringComparison stringComparison)
         {
         }
     }
@@ -216,7 +216,7 @@ namespace N
     public class C
     {
         [TestCase(""abc"", StringComparison.CurrentCulture)]
-        public void Test(string text, StringComparison stringComparison)
+        public void M(string text, StringComparison stringComparison)
         {
         }
     }
@@ -235,7 +235,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(double d)
+        public void M(double d)
         {
         }
     }
@@ -254,7 +254,7 @@ namespace N
     public class C
     {
         [TestCase(short.MinValue)]
-        public void Test(int d)
+        public void M(int d)
         {
         }
     }
@@ -273,7 +273,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(short s)
+        public void M(short s)
         {
         }
     }
@@ -293,7 +293,7 @@ namespace N
     {
         [TestCase(1, 2)]
         [TestCase(1, 2, 3)]
-        public void Test(int i, params int[] ints)
+        public void M(int i, params int[] ints)
         {
         }
     }
@@ -319,7 +319,7 @@ namespace N
         where T : struct, IComparable<T>, IComparable
     {
         [TestCase(1)]
-        public void Test(T value)
+        public void M(T value)
         {
         }
     }

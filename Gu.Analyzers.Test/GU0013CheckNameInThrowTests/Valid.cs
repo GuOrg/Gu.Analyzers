@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
 
@@ -15,11 +15,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        private Foo(string text)
+        private C(string text)
         {
             this.text = text;
         }
@@ -36,11 +36,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text = null)
+        public C(string text = null)
         {
             this.text = text;
         }
@@ -57,11 +57,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly int i;
 
-        public Foo(int i)
+        public C(int i)
         {
             this.i = i;
         }
@@ -78,11 +78,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text ?? throw new ArgumentNullException(nameof(text));
         }

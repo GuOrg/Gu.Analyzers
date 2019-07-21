@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
@@ -19,7 +19,7 @@ namespace N
     {
         [TestCase(1)]
         [TestCase(2)]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -39,7 +39,7 @@ namespace N
     {
         [TestCase(1)]
         [TestCase(2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -59,7 +59,7 @@ namespace N
     {
         [TestCase(1, Author = ""Author"")]
         [TestCase(2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -79,7 +79,7 @@ namespace N
     {
         [TestCase(new[] { 1, 2 })]
         [TestCase(new[] { 3, 4 })]
-        public void Test(int[] xs)
+        public void M(int[] xs)
         {
         }
     }
@@ -99,7 +99,7 @@ namespace N
     {
         [TestCase(1)]
         [TestCase(1.0)]
-        public void Test(object obj)
+        public void M(object obj)
         {
         }
     }
@@ -159,11 +159,11 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2)]
         [TestCase(1, 2, 3)]
-        public void Test(int i, params int[] ints)
+        public void M(int i, params int[] ints)
         {
         }
     }

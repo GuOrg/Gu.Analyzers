@@ -306,9 +306,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M()
         {
             int value;
             if(Try(out value))
@@ -335,9 +335,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo Bar()
+        public C M()
         {
             throw new Exception();
         }
@@ -352,14 +352,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo Bar()
+        public C M1()
         {
             return this;
         }
 
-        public void Meh() => Bar();
+        public void M2() => M1();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -371,9 +371,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public void Meh() => new Foo();
+        public void M() => new C();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);

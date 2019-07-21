@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
 
@@ -19,7 +19,7 @@ namespace N
     {
         [TestCase(1)]
         [TestCase(2)]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -39,7 +39,7 @@ namespace N
     {
         [TestCase(1, Author = ""Author"")]
         [TestCase(2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -57,10 +57,10 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2)]
-        public void Test(int i, params int[] ints)
+        public void M(int i, params int[] ints)
         {
         }
     }

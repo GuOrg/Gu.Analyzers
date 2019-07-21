@@ -18,9 +18,9 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var stringBuilder = new StringBuilder();
             stringBuilder.AppendLine(""test"");
@@ -39,9 +39,9 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var sb = new StringBuilder();
             sb.Append(""1"").Append(""2"");
@@ -54,7 +54,7 @@ namespace N
             [Test]
             public static void WhenReturningSameInstance()
             {
-                var ensureCode = @"
+                var ensure = @"
 namespace N
 {
     using System;
@@ -92,18 +92,18 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             Ensure.NotNull(text, nameof(text));
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, ensureCode, testCode);
+                RoslynAssert.Valid(Analyzer, ensure, code);
             }
 
             [Test]
@@ -112,16 +112,16 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo Bar()
+        public C M1()
         {
             return this;
         }
 
-        public void Meh()
+        public void M2()
         {
-            Bar();
+            M1();
         }
     }
 }";
@@ -134,7 +134,7 @@ namespace N
                 var barCode = @"
 namespace N
 {
-    internal static class Bar
+    internal static class C2
     {
         internal static T Id<T>(this T value)
         {
@@ -145,11 +145,11 @@ namespace N
                 var testCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private Foo()
+        private C1()
         {
-            var meh =1;
+            var meh = 1;
             meh.Id();
         }
     }
@@ -168,11 +168,11 @@ namespace N
 {
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly HashSet<int> ints = new HashSet<int>();
 
-        public Foo()
+        public C()
         {
             this.ints.Add(1);
         }
@@ -193,11 +193,11 @@ namespace N
     using System.Collections;
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IList ints = new List<int>();
 
-        public Foo()
+        public C()
         {
             this.ints.Add(1);
         }
@@ -217,9 +217,9 @@ namespace N
 {
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
-        public Foo(List<int> ints)
+        public C(List<int> ints)
         {
             ints.RemoveAll(x => x > 2);
         }
@@ -237,9 +237,9 @@ namespace N
 {
     using System.Collections.Concurrent;
 
-    public class Foo
+    public class C
     {
-        public Foo(ConcurrentDictionary<int, int> map)
+        public C(ConcurrentDictionary<int, int> map)
         {
             map.TryAdd(1, 1);
         }
@@ -259,10 +259,10 @@ namespace N
     using Moq;
     using NUnit.Framework;
 
-    public class Foo
+    public class C
     {
         [Test]
-        public void Test()
+        public void M()
         {
             var mock = new Mock<IFormatProvider>();
             mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null);
@@ -273,7 +273,7 @@ namespace N
                 RoslynAssert.Valid(Analyzer, code);
             }
 
-            [TestCase("mock.Setup(x => x.Bar())")]
+            [TestCase("mock.Setup(x => x.M())")]
             public static void MoqSetupVoid(string setup)
             {
                 var code = @"
@@ -286,22 +286,22 @@ namespace N
         public Foo()
         {
             var mock = new Mock<IFoo>();
-            mock.Setup(x => x.Bar());
+            mock.Setup(x => x.M());
         }
     }
 
     public interface IFoo
     {
-        void Bar();
+        void M();
     }
-}".AssertReplace("mock.Setup(x => x.Bar())", setup);
+}".AssertReplace("mock.Setup(x => x.M())", setup);
 
                 RoslynAssert.Valid(Analyzer, code);
             }
 
-            [TestCase("this.Bind<Foo>().To<Foo>()")]
-            [TestCase("this.Bind<Foo>().To<Foo>().InSingletonScope()")]
-            [TestCase("this.Bind<Foo>().ToMethod(x => new Foo())")]
+            [TestCase("this.Bind<C>().To<C>()")]
+            [TestCase("this.Bind<C>().To<C>().InSingletonScope()")]
+            [TestCase("this.Bind<C>().ToMethod(x => new C())")]
             public static void NinjectFluent(string bind)
             {
                 var code = @"
@@ -309,14 +309,14 @@ namespace N
 {
     using Ninject.Modules;
 
-    public sealed class Foo : NinjectModule
+    public sealed class C : NinjectModule
     {
         public override void Load()
         {
-            this.Bind<Foo>().To<Foo>();
+            this.Bind<C>().To<C>();
         }
     }
-}".AssertReplace("this.Bind<Foo>().To<Foo>()", bind);
+}".AssertReplace("this.Bind<C>().To<C>()", bind);
 
                 RoslynAssert.Valid(Analyzer, code);
             }
@@ -350,7 +350,7 @@ namespace N
 
     internal sealed class C
     {
-        public void Bar(DocumentEditor editor, UsingDirectiveSyntax directive)
+        public void M(DocumentEditor editor, UsingDirectiveSyntax directive)
         {
             editor.AddUsing(directive);
         }

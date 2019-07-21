@@ -20,7 +20,7 @@ namespace N
     {
         [TestCase(1)]
         [↓TestCase(1, 2)]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -40,7 +40,7 @@ namespace N
     {
         [TestCase(1, Author = ""Author"")]
         [↓TestCase(1, 2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -60,7 +60,7 @@ namespace N
     {
         [TestCase(1, 2, 3)]
         [↓TestCase(1)]
-        public void Test(int i, int j, params int[] ints)
+        public void M(int i, int j, params int[] ints)
         {
         }
     }

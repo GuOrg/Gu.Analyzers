@@ -17,11 +17,11 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = ↓this.text.Length;
@@ -32,11 +32,11 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = text.Length;
@@ -52,11 +52,11 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = ↓this.text?.Length;
@@ -67,11 +67,11 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = text?.Length;
@@ -87,11 +87,11 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = ↓this.text.ToString();
@@ -102,11 +102,11 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
             var length = text.ToString();
@@ -122,9 +122,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             var length = ↓this.Text.Length;
@@ -137,9 +137,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             var length = text.Length;
@@ -157,9 +157,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             var length = ↓this.Text.ToString();
@@ -172,9 +172,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             var length = text.ToString();
@@ -192,34 +192,34 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
-            var length = Meh(↓this.text);
+            var length = M(↓this.text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
-            var length = Meh(text);
+            var length = M(text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -231,36 +231,36 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
-            var length = Meh(
+            var length = M(
                 ↓this.text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string text;
 
-        public Foo(string text)
+        public C(string text)
         {
             this.text = text;
-            var length = Meh(
+            var length = M(
                 text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -272,36 +272,36 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string _text;
 
-        public Foo(string text)
+        public C(string text)
         {
             _text = text;
-            var length = Meh(
+            var length = M(
                 ↓_text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string _text;
 
-        public Foo(string text)
+        public C(string text)
         {
             _text = text;
-            var length = Meh(
+            var length = M(
                 text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -313,34 +313,34 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string _text;
 
-        public Foo(string text)
+        public C(string text)
         {
             _text = text;
-            var length = Meh(↓_text);
+            var length = M(↓_text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly string _text;
 
-        public Foo(string text)
+        public C(string text)
         {
             _text = text;
-            var length = Meh(text);
+            var length = M(text);
         }
 
-        private int Meh(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -354,9 +354,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             System.Console.CancelKeyPress += (_, __) => Console.WriteLine(↓this.Text);
@@ -371,9 +371,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(string text)
+        public C(string text)
         {
             this.Text = text;
             System.Console.CancelKeyPress += (_, __) => Console.WriteLine(text);
@@ -391,11 +391,11 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int n;
 
-        public Foo(int n)
+        public C(int n)
         {
             this.n = n;
             var square = ↓this.n * n;
@@ -406,11 +406,11 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int n;
 
-        public Foo(int n)
+        public C(int n)
         {
             this.n = n;
             var square = n * n;
@@ -426,11 +426,11 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int n;
 
-        public Foo(int n)
+        public C(int n)
         {
             this.n = n;
             var square = n * ↓this.n;
@@ -441,11 +441,11 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int n;
 
-        public Foo(int n)
+        public C(int n)
         {
             this.n = n;
             var square = n * n;

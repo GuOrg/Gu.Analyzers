@@ -16,7 +16,7 @@ namespace N
 {
     class C
     {
-        void Method()
+        void M()
         {
             throw new System.NotImplementedException();
         }
@@ -33,7 +33,7 @@ namespace N
 {
     class C
     {
-        int Method() => throw new System.NotImplementedException();
+        int M() => throw new System.NotImplementedException();
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
@@ -47,7 +47,7 @@ namespace N
 {
     class C
     {
-        void Method()
+        void M()
         {
             int? integer = null;
             

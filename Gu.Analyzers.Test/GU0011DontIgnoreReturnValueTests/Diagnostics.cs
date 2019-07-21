@@ -17,9 +17,10 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 namespace N
 {
     using System.Linq;
-    class Foo
+
+    class C
     {
-        void Bar()
+        void M()
         {
             var ints = new[] { 1, 2, 3 };
             ↓ints.Select(x => x);
@@ -37,11 +38,11 @@ namespace N
 namespace N
 {
     using System.Text;
-    public class Foo
+    public class C
     {
         private int value;
 
-        public void Bar()
+        public void M()
         {
             var sb = new StringBuilder();
             ↓sb.AppendLine(""test"").ToString();
@@ -60,9 +61,9 @@ namespace N
 {
     using System.Collections.Immutable;
 
-    class Foo
+    class C
     {
-        public Foo(ImmutableArray<int> values)
+        public C(ImmutableArray<int> values)
         {
             ↓values.Add(1);
         }
@@ -81,9 +82,9 @@ namespace N
 {
     using System.Collections.Immutable;
 
-    class Foo
+    class C
     {
-        public Foo(ImmutableList<int> values)
+        public C(ImmutableList<int> values)
         {
             ↓values.Add(1);
         }
@@ -104,10 +105,10 @@ namespace N
     using Moq;
     using NUnit.Framework;
 
-    public class Foo
+    public class C
     {
         [Test]
-        public void Test()
+        public void M()
         {
             var mock = new Mock<IFormatProvider>();
             ↓mock.Setup(x => x.GetFormat(It.IsAny<Type>()));

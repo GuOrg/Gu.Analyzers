@@ -22,7 +22,7 @@ namespace N
     {
         [↓TestCase(1, 2)]
         [↓TestCase(1, 2)]
-        public void Test(int i, int j)
+        public void M(int i, int j)
         {
         }
     }
@@ -42,7 +42,7 @@ namespace N
     {
         [↓TestCase(1, 2)]
         [↓TestCase(1, 2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -62,7 +62,7 @@ namespace N
     {
         [↓TestCase(1, 2, Author = ""Author"")]
         [↓TestCase(1, 2, Author = ""Author"")]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -83,7 +83,7 @@ namespace N
     {
         [↓TestCase(StringComparison.Ordinal)]
         [↓TestCase(StringComparison.Ordinal)]
-        public void Test(StringComparison stringComparison)
+        public void M(StringComparison stringComparison)
         {
         }
     }
@@ -104,7 +104,7 @@ namespace N
     {
         [↓TestCase(""1"", StringComparison.Ordinal)]
         [↓TestCase(""1"", StringComparison.Ordinal)]
-        public void Test(string text, StringComparison stringComparison)
+        public void M(string text, StringComparison stringComparison)
         {
         }
     }
@@ -124,7 +124,7 @@ namespace N
     {
         [↓TestCase(new[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 })]
-        public void Test(int[] xs)
+        public void M(int[] xs)
         {
         }
     }
@@ -145,7 +145,7 @@ namespace N
     {
         [↓TestCase(new int[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 })]
-        public void Test(int[] xs)
+        public void M(int[] xs)
         {
         }
     }
@@ -165,7 +165,7 @@ namespace N
     {
         [↓TestCase(new[] { 1, 2 })]
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
-        public void Test(int[] xs)
+        public void M(int[] xs)
         {
         }
     }
@@ -185,7 +185,7 @@ namespace N
     {
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
         [↓TestCase(new[] { 1, 2 }, Author = ""Author"")]
-        public void Test(int[] xs)
+        public void M(int[] xs)
         {
         }
     }
@@ -206,7 +206,7 @@ namespace N
         [↓TestCase(1, 2, 3)]
         [↓TestCase(1, 2, 3)]
         [TestCase(1)]
-        public void Test(int i, int j, params int[] ints)
+        public void M(int i, int j, params int[] ints)
         {
         }
     }

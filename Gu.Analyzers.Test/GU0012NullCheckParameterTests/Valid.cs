@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 
     [TestFixture(typeof(SimpleAssignmentAnalyzer))]
     [TestFixture(typeof(ParameterAnalyzer))]
-    internal static class ValidCode<T>
+    internal static class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();

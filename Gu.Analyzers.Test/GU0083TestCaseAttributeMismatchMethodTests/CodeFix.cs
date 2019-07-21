@@ -21,7 +21,7 @@ namespace N
     public class C
     {
         [TestCase(↓1)]
-        public void Test(string str)
+        public void M(string str)
         {
         }
     }
@@ -35,7 +35,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(int str)
+        public void M(int str)
         {
         }
     }
@@ -57,7 +57,7 @@ namespace N
     public class C
     {
         [TestCase(""x"", ""y"", null)]
-        public void Test(string x, string y, string z)
+        public void M(string x, string y, string z)
         {
         }
     }
@@ -77,7 +77,7 @@ namespace N
     public class C
     {
         [TestCase(1, ↓2)]
-        public void Test(int i, string str)
+        public void M(int i, string str)
         {
         }
     }
@@ -90,7 +90,7 @@ namespace N
     public class C
     {
         [TestCase(1, 2)]
-        public void Test(int i, int str)
+        public void M(int i, int str)
         {
         }
     }
@@ -109,7 +109,7 @@ namespace N
     public class C
     {
         [TestCase(↓null)]
-        public void Test(int obj)
+        public void M(int obj)
         {
         }
     }
@@ -128,7 +128,7 @@ namespace N
     public class C
     {
         [TestCase(↓new double[] {3, 5})]
-        public void Test(int[] array)
+        public void M(int[] array)
         {
         }
     }
@@ -141,7 +141,7 @@ namespace N
     public class C
     {
         [TestCase(new double[] {3, 5})]
-        public void Test(double[] array)
+        public void M(double[] array)
         {
         }
     }
@@ -160,7 +160,7 @@ namespace N
     public class C
     {
         [TestCase(↓1.0)]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -173,7 +173,7 @@ namespace N
     public class C
     {
         [TestCase(1.0)]
-        public void Test(double i)
+        public void M(double i)
         {
         }
     }
@@ -192,7 +192,7 @@ namespace N
     class C
     {
         [TestCase(1, 2, ↓3.0)]
-        public void Test(int i, int j, params int[] ints)
+        public void M(int i, int j, params int[] ints)
         {
         }
     }
@@ -206,7 +206,7 @@ namespace N
     class C
     {
         [TestCase(1, 2, 3.0)]
-        public void Test(int i, int j, params double[] ints)
+        public void M(int i, int j, params double[] ints)
         {
         }
     }

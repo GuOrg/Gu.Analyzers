@@ -22,7 +22,7 @@ namespace N
     public class C
     {
         [Test]
-        public void Test↓(string text)
+        public void M↓(string text)
         {
         }
     }
@@ -36,7 +36,7 @@ namespace N
     public class C
     {
         [Test]
-        public void Test()
+        public void M()
         {
         }
     }
@@ -55,7 +55,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test↓()
+        public void M↓()
         {
         }
     }
@@ -69,7 +69,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(int arg0)
+        public void M(int arg0)
         {
         }
     }
@@ -91,7 +91,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test↓(int i, int j)
+        public void M↓(int i, int j)
         {
         }
     }
@@ -105,7 +105,7 @@ namespace N
     public class C
     {
         [TestCase(1)]
-        public void Test(int i)
+        public void M(int i)
         {
         }
     }
@@ -122,10 +122,10 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1)]
-        public void Test↓(int i, int j, params int[] ints)
+        public void M↓(int i, int j, params int[] ints)
         {
         }
     }

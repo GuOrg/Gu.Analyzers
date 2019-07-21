@@ -17,7 +17,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓\na"";
         }
@@ -29,7 +29,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""\n"" +
                        ""a"";
@@ -47,7 +47,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\n"";
         }
@@ -59,7 +59,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""\n"" +
                        ""a"";
@@ -77,7 +77,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓\na\n"";
         }
@@ -89,7 +89,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""\n"" +
                        ""a\n"";
@@ -108,7 +108,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\r\nb"";
         }
@@ -120,7 +120,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""a\r\n"" +
                        ""b"";
@@ -139,7 +139,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\r\nb\r\n"";
         }
@@ -151,7 +151,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""a\r\n"" +
                        ""b\r\n"";
@@ -170,7 +170,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\r\nb\r\nc"";
         }
@@ -182,7 +182,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""a\r\n"" +
                        ""b\r\n"" +
@@ -202,7 +202,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\r\nb\r\nc\r\n"";
         }
@@ -214,7 +214,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""a\r\n"" +
                        ""b\r\n"" +
@@ -234,7 +234,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""↓a\nb\nc\n"";
         }
@@ -246,7 +246,7 @@ namespace N
 {
     public static class C
     {
-        public static void Test()
+        public static void M()
         {
             var text = ""a\n"" +
                        ""b\n"" +
