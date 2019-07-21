@@ -368,7 +368,7 @@ namespace Gu.Analyzers
 
         private static bool TryGetArrayExpressions(ExpressionSyntax expression, out SeparatedSyntaxList<ExpressionSyntax> expressions)
         {
-            expressions = default(SeparatedSyntaxList<ExpressionSyntax>);
+            expressions = default;
             if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreation &&
                 implicitArrayCreation.Initializer != null)
             {

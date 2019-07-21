@@ -63,7 +63,7 @@ namespace Gu.Analyzers
         {
             if (testCase.ArgumentList is null)
             {
-                parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+                parameters = default;
                 return true;
             }
 
@@ -74,7 +74,7 @@ namespace Gu.Analyzers
             {
                 if (argumentList.Arguments.Count == 0)
                 {
-                    parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+                    parameters = default;
                     return true;
                 }
 
@@ -103,8 +103,8 @@ namespace Gu.Analyzers
                     }
 
                     return SyntaxFactory.Parameter(
-                        default(SyntaxList<AttributeListSyntax>),
-                        default(SyntaxTokenList),
+                        default,
+                        default,
                         SyntaxFactory.ParseTypeName(
                             semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
                                          .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart)),
@@ -113,7 +113,7 @@ namespace Gu.Analyzers
                 }
             }
 
-            parameters = default(SeparatedSyntaxList<ParameterSyntax>);
+            parameters = default;
             return false;
         }
 

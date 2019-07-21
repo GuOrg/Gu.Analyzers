@@ -89,7 +89,7 @@ namespace N
             [Test]
             public static void WhenAssigningThisPropertyWithObjectCreation()
             {
-                var code = @"
+                var before = @"
 namespace N
 {
     public class Foo
@@ -116,8 +116,8 @@ namespace N
         public Bar Bar { get; }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, Bar);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, Bar }, after, fixTitle: "Inject safe.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar.");
+                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]

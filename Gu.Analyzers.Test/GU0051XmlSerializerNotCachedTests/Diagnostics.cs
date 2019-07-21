@@ -56,19 +56,19 @@ namespace N
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
-        [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
-        public static void LocalVariable(string code)
+        [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
+        public static void LocalVariable(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -76,9 +76,9 @@ namespace N
             }
         }
     }
-}".AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]

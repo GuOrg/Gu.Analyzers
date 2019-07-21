@@ -66,7 +66,7 @@ namespace N
         [Test]
         public static void WhenNotInjectingChained()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -79,7 +79,7 @@ namespace N
         }
     }
 }";
-            var barCode = @"
+            var bar = @"
 namespace N
 {
     public class Bar
@@ -93,7 +93,7 @@ namespace N
     }
 }";
 
-            var mehCode = @"
+            var meh = @"
 namespace N
 {
     public class Meh : C1
@@ -104,7 +104,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode, mehCode);
+            RoslynAssert.Valid(Analyzer, c1, bar, meh);
         }
     }
 }

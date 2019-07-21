@@ -342,13 +342,13 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var c = @"
 namespace N
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         public void Bar(DocumentEditor editor, UsingDirectiveSyntax directive)
         {
@@ -356,7 +356,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, extCode, testCode);
+                RoslynAssert.Valid(Analyzer, extCode, c);
             }
         }
     }

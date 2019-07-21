@@ -100,7 +100,7 @@ namespace N
         [Test]
         public static void BaseConstructorCall()
         {
-            var fooCode = @"
+            var foo = @"
 namespace N
 {
     public class Foo
@@ -123,7 +123,7 @@ namespace N
     }
 }";
 
-            var barCode = @"
+            var bar = @"
 namespace N
 {
     public class Bar : Foo
@@ -134,7 +134,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, foo, bar);
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace N
         [Test]
         public static void IgnoresWhenBaseIsParams()
         {
-            var fooCode = @"
+            var bar = @"
 namespace N
 {
     public class Bar : Foo
@@ -223,7 +223,7 @@ namespace N
         }
     }
 }";
-            var barCode = @"
+            var foo = @"
 namespace N
 {
     public class Foo
@@ -236,7 +236,7 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, bar, foo);
         }
 
         [Test]
