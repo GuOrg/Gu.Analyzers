@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
         private static readonly NameArgumentsFix Fix = new NameArgumentsFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0001NameArguments.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
 
         [Test]
         public static void Message()

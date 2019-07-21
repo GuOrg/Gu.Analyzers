@@ -19,7 +19,7 @@ namespace Gu.Analyzers
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0001NameArguments.Descriptor.Id,
+            Descriptors.GU0001NameArguments.Id,
             GU0009UseNamedParametersForBooleans.Descriptor.Id);
 
         /// <inheritdoc/>
@@ -37,7 +37,7 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                if (diagnostic.Id == GU0001NameArguments.Descriptor.Id &&
+                if (diagnostic.Id == Descriptors.GU0001NameArguments.Id &&
                     syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
                     !HasAnyNamedArgument(arguments) &&
                     semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol method))
