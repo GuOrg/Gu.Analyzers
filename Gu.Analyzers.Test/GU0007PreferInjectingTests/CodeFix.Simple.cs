@@ -92,9 +92,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             this.Bar = ↓new Bar();
         }
@@ -106,9 +106,9 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(Bar bar)
+        public C(Bar bar)
         {
             this.Bar = bar;
         }
@@ -126,9 +126,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Bar = ↓new Bar();
         }
@@ -140,9 +140,9 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(Bar bar)
+        public C(Bar bar)
         {
             Bar = bar;
         }
@@ -157,14 +157,14 @@ namespace N
             [Test]
             public static void WhenNotInjectingChained()
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly Bar bar;
 
-        public Foo(Bar bar)
+        public C1(Bar bar)
         {
             this.bar = bar;
         }
@@ -174,9 +174,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh()
+        public C3()
            : base(↓new Bar())
         {
         }
@@ -186,15 +186,15 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh(Bar bar)
+        public C3(Bar bar)
            : base(bar)
         {
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, Bar, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, Bar, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -217,9 +217,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : Foo
     {
-        public Meh(int bar)
+        public C3(int bar)
            : base(bar, ↓new Bar())
         {
         }
@@ -229,9 +229,9 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : Foo
     {
-        public Meh(int bar, Bar bar_)
+        public C3(int bar, Bar bar_)
            : base(bar, bar_)
         {
         }
@@ -312,20 +312,20 @@ namespace N
                 var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private readonly Bar<int> bar;
+        private readonly C2<int> c2;
 
-        public Foo(Bar<int> bar)
+        public C1(C2<int> c2)
         {
-            this.bar = bar;
+            this.c2 = c2;
         }
     }
 }";
                 var barCode = @"
 namespace N
 {
-    public class Bar<T>
+    public class C2<T>
     {
     }
 }";
@@ -333,10 +333,10 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh()
-           : base(↓new Bar<int>())
+        public C3()
+           : base(↓new C2<int>())
         {
         }
     }
@@ -345,10 +345,10 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh(Bar<int> bar)
-           : base(bar)
+        public C3(C2<int> c2)
+           : base(c2)
         {
         }
     }
@@ -362,13 +362,13 @@ namespace N
                 var before = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        private readonly IsModuleReady<FooModule> isFooReady;
+        private readonly IsModuleReady<CModule> isCReady;
 
-        public Foo()
+        public C()
         {
-            this.isFooReady = ↓new IsModuleReady<FooModule>();
+            this.isCReady = ↓new IsModuleReady<CModule>();
         }
     }
 }";
@@ -383,19 +383,19 @@ namespace N
 
     public abstract class Module { }
 
-    public class FooModule : Module { }
+    public class CModule : Module { }
 }";
 
                 var after = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        private readonly IsModuleReady<FooModule> isFooReady;
+        private readonly IsModuleReady<CModule> isCReady;
 
-        public Foo(IsModuleReady<FooModule> isFooReady)
+        public C(IsModuleReady<CModule> isCReady)
         {
-            this.isFooReady = isFooReady;
+            this.isCReady = isCReady;
         }
     }
 }";
@@ -405,27 +405,27 @@ namespace N
             [Test]
             public static void WhenNotInjectingChainedNewWithInjectedArgument()
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
-        public Foo(Bar bar)
+        public C1(C2 bar)
         {
             this.bar = bar;
         }
     }
 }";
-                var barCode = @"
+                var c2 = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         private readonly Baz baz;
 
-        public Bar(Baz baz)
+        public C2(Baz baz)
         {
             this.baz = baz;
         }
@@ -442,10 +442,10 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh(Baz baz)
-           : base(↓new Bar(baz))
+        public C3(Baz baz)
+           : base(↓new C2(baz))
         {
         }
     }
@@ -454,15 +454,15 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : C1
     {
-        public Meh(Baz baz, Bar bar)
-           : base(bar)
+        public C3(Baz baz, C2 c2)
+           : base(c2)
         {
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, bazCode, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -506,9 +506,9 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : Foo
     {
-        public Meh(Baz baz)
+        public C3(Baz baz)
            : base(baz.↓Bar)
         {
         }
@@ -518,9 +518,9 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Meh : Foo
+    public class C3 : Foo
     {
-        public Meh(Baz baz, Bar bar)
+        public C3(Baz baz, Bar bar)
            : base(bar)
         {
         }

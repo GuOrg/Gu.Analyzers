@@ -7,17 +7,17 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
-        [TestCase("new Foo(a, b)")]
-        [TestCase("new Foo(a: a, b: b)")]
-        [TestCase("new Foo(a, b: b)")]
+        [TestCase("new C(a, b)")]
+        [TestCase("new C(a: a, b: b)")]
+        [TestCase("new C(a, b: b)")]
         public static void ConstructorCallWithTwoArguments(string call)
         {
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.A = a;
             this.B = b;
@@ -27,12 +27,12 @@ namespace N
 
         public int B { get; }
 
-        private Foo Create(int a, int b)
+        private C Create(int a, int b)
         {
-            return new Foo(a, b);
+            return new C(a, b);
         }
     }
-}".AssertReplace("new Foo(a, b)", call);
+}".AssertReplace("new C(a, b)", call);
 
             RoslynAssert.Valid(Analyzer, code);
         }

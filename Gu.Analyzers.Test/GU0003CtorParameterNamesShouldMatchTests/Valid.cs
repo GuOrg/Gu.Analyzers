@@ -245,9 +245,9 @@ namespace N
             var bar = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int a, int b, int c, int d)
+        public C2(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
@@ -256,9 +256,9 @@ namespace N
             var foo = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo(int a, params int[] values)
+        public C1(int a, params int[] values)
         {
             this.A = a;
             this.Values = values;

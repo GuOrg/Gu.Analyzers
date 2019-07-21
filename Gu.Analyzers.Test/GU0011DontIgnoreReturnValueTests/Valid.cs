@@ -15,14 +15,14 @@ namespace N
 {
     using System.Text;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
             : this(new StringBuilder())
         {
         }
 
-        private Foo(StringBuilder builder)
+        private C(StringBuilder builder)
         {
             this.Builder = builder;
         }
@@ -39,16 +39,16 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int Value { get; set; }
     
-        private void Bar()
+        private void M1()
         {
-            Meh();
+            M2();
         }
 
-        private void Meh()
+        private void M2()
         {
         }
     }
@@ -68,7 +68,7 @@ namespace N
     using System.Threading.Tasks;
 
 
-    public static class Foo
+    public static class C
     {
         public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
         {
@@ -216,14 +216,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M1()
         {
-            Meh();
+            M2();
         }
 
-        private void Meh()
+        private void M2()
         {
         }
     }
@@ -238,14 +238,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M1()
         {
-            Meh();
+            M2();
         }
 
-        private void Meh()
+        private void M2()
         {
             return;
         }
@@ -261,14 +261,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static void Meh()
+        private static void M2()
         {
         }
     }
@@ -283,14 +283,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static void Meh()
+        private static void M2()
         {
             return;
         }

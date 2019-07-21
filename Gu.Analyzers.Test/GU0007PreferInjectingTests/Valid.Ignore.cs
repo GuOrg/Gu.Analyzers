@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    internal partial class Valid
     {
         internal static class Ignore
         {

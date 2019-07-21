@@ -194,10 +194,10 @@ namespace N
 {
     using NUnit.Framework;
 
-    public class CTests
+    public class C
     {
         [Test]
-        public void Bar()
+        public void M()
         {
             Assert.AreEqual(true, true);
         }
@@ -214,9 +214,9 @@ namespace N
 {
     using System.Threading.Tasks;
 
-    public class CTests
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Task<int> a = null;
             Task b = null;
@@ -242,7 +242,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var textBox = new TextBox();
             textBox.SetValue(TextBoxBase.IsReadOnlyProperty, true);
@@ -254,7 +254,7 @@ namespace N
         }
 
         [TestCase("textBox.SetM(true)")]
-        [TestCase("Foo.SetM(textBox, true)")]
+        [TestCase("C.SetM(textBox, true)")]
         public static void DoNotWarnOnAttachedPropertySetter(string method)
         {
             var apCode = @"
@@ -263,12 +263,12 @@ namespace N
     using System.Windows;
     using System.Windows.Controls;
 
-    public static class Foo
+    public static class C
     {
         public static readonly DependencyProperty MProperty = DependencyProperty.RegisterAttached(
             ""M"",
             typeof(bool),
-            typeof(Foo),
+            typeof(C),
             new PropertyMetadata(default(bool)));
 
         public static void SetM(this DependencyObject element, bool value)

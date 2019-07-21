@@ -17,7 +17,7 @@ namespace N
 
     public class C
     {
-        public void Meh(object value)
+        public void M(object value)
         {
             if (value == null)
             {
@@ -39,7 +39,7 @@ namespace N
 
     public class C
     {
-        public void Meh(StringComparison value)
+        public void M(StringComparison value)
         {
             switch (value)
             {
@@ -77,12 +77,12 @@ namespace N
 
     public class C
     {
-        public void Bar()
+        public void M()
         {
-            this.Meh(""Exception"");
+            this.M(""Exception"");
         }
 
-        public void Meh(string value)
+        public void M(string value)
         {
             throw new ArgumentException(nameof(value), value);
         }
@@ -168,12 +168,12 @@ namespace N
 
     public class C
     {
-        public void Bar()
+        public void M()
         {
-            this.Meh(""Test"");
+            this.M(""Test"");
         }
 
-        public void Meh(string value)
+        public void M(string value)
         {
             throw new ArgumentException(nameof(value), value);
         }

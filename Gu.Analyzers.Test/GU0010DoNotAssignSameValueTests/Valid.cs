@@ -113,24 +113,24 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase("foo.A = this.A;")]
-        [TestCase("foo.A = A;")]
+        [TestCase("c.A = this.A;")]
+        [TestCase("c.A = A;")]
         public static void SetSameMemberOnOtherInstance(string after)
         {
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
-        public void Meh()
+        public void M()
         {
-            var foo = new Foo();
-            foo.A = A;
+            var c = new C();
+            c.A = A;
         }
     }
-}".AssertReplace("foo.A = A;", after);
+}".AssertReplace("c.A = A;", after);
 
             RoslynAssert.Valid(Analyzer, code);
         }
@@ -141,15 +141,15 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
-        public void Meh()
+        public void M()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
-            foo1.A = foo2.A;
+            var c1 = new C();
+            var c2 = new C();
+            c1.A = c2.A;
         }
     }
 }";
@@ -162,15 +162,15 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo Next { get; private set; }
+        public C Next { get; private set; }
 
-        public void Meh()
+        public void M()
         {
-            var foo1 = new Foo();
-            var foo2 = new Foo();
-            foo1.Next.Next = foo2.Next.Next;
+            var c1 = new C();
+            var c2 = new C();
+            c1.Next.Next = c2.Next.Next;
         }
     }
 }";

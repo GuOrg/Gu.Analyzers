@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    internal partial class Valid
     {
         internal static class Recursion
         {
@@ -15,11 +15,11 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly IDisposable meh1;
 
-        public Foo()
+        public C()
         {
             this.meh1 = this.RecursiveProperty;
         }
@@ -38,11 +38,11 @@ namespace N
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -66,11 +66,11 @@ namespace N
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -93,7 +93,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveMethod() => RecursiveMethod();
 
