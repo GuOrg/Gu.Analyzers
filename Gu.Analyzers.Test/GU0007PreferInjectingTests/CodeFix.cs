@@ -8,6 +8,6 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0007PreferInjecting();
         private static readonly CodeFixProvider Fix = new InjectFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0007PreferInjecting.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0007PreferInjecting.Descriptor);
     }
 }

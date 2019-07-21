@@ -55,14 +55,14 @@ namespace N
             [Test]
             public static void WhenAssigningUnderscoreFieldWithObjectCreation()
             {
-                var code = @"
+                var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar _bar;
 
-        public Foo()
+        public C()
         {
             _bar = ↓new Bar();
         }
@@ -72,18 +72,18 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly Bar _bar;
 
-        public Foo(Bar bar)
+        public C(Bar bar)
         {
             _bar = bar;
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), code, Bar);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { code, Bar }, after, fixTitle: "Inject safe.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar.");
+                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
             [Test]

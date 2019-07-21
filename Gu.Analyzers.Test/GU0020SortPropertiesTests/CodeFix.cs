@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0020SortProperties();
         private static readonly CodeFixProvider Fix = new SortPropertiesFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0020SortProperties.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0020SortProperties.Descriptor);
 
         [Test]
         public static void MutableBeforeGetOnlySimple()

@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
     internal static class Diagnostics
     {
         private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0011DoNotIgnoreReturnValue.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0011DoNotIgnoreReturnValue.Descriptor);
 
         [TestCase("ints.Select(x => x);")]
         [TestCase("ints.Select(x => x).Where(x => x > 1);")]

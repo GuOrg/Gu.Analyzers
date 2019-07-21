@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0051";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Cache the XmlSerializer.",
             messageFormat: "The serializer is not cached.",

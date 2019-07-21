@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
     internal static class Diagnostics
     {
         private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0070DefaultConstructedValueTypeWithNoUsefulDefault.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0070DefaultConstructedValueTypeWithNoUsefulDefault.Descriptor);
 
         [Test]
         public static void UselessDefaultGuid()

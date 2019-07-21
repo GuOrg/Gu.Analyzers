@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0052";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Mark exception with [Serializable].",
             messageFormat: "Mark exception with [Serializable].",

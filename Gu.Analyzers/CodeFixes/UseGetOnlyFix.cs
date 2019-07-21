@@ -26,8 +26,8 @@ namespace Gu.Analyzers
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0021CalculatedPropertyAllocates.DiagnosticId,
-            GU0022UseGetOnly.DiagnosticId);
+            GU0021CalculatedPropertyAllocates.Descriptor.Id,
+            GU0022UseGetOnly.Descriptor.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -45,7 +45,7 @@ namespace Gu.Analyzers
                 }
 
                 var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (diagnostic.Id == GU0021CalculatedPropertyAllocates.DiagnosticId)
+                if (diagnostic.Id == GU0021CalculatedPropertyAllocates.Descriptor.Id)
                 {
                     if (syntaxNode is ObjectCreationExpressionSyntax objectCreation)
                     {
@@ -65,7 +65,7 @@ namespace Gu.Analyzers
                         }
                     }
                 }
-                else if (diagnostic.Id == GU0022UseGetOnly.DiagnosticId)
+                else if (diagnostic.Id == GU0022UseGetOnly.Descriptor.Id)
                 {
                     var setter = syntaxNode.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
                     if (setter != null)

@@ -14,7 +14,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0071";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Implicit casting done by the foreach",
             messageFormat: "Implicit cast done by the foreach",

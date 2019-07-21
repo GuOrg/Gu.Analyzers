@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
     {
         private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
         private static readonly NonSerializedFix Fix = new NonSerializedFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0050IgnoreEventsWhenSerializing.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0050IgnoreEventsWhenSerializing.Descriptor);
 
         [Test]
         public static void Message()

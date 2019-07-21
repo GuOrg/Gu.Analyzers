@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
     internal static class Diagnostics
     {
         private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0051XmlSerializerNotCached.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0051XmlSerializerNotCached.Descriptor);
 
         [Test]
         public static void TrivialConstructionUnsaved()

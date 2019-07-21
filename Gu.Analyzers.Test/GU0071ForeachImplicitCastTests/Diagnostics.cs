@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
     internal static class Diagnostics
     {
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0071ForeachImplicitCast.DiagnosticId);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0071ForeachImplicitCast.Descriptor);
 
         [TestCase("int[]")]
         [TestCase("System.Collections.Generic.List<int>")]

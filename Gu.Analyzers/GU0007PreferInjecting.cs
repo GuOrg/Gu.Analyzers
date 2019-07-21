@@ -14,7 +14,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0007";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Prefer injecting.",
             messageFormat: "Prefer injecting {0}.",

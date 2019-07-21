@@ -14,7 +14,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0060";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Enum member value conflict.",
             messageFormat: "Enum member value conflicts with another.",

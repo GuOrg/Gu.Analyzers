@@ -18,8 +18,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0002NamedArgumentPositionMatches.DiagnosticId,
-            GU0005ExceptionArgumentsPositions.DiagnosticId);
+            GU0002NamedArgumentPositionMatches.Descriptor.Id,
+            GU0005ExceptionArgumentsPositions.Descriptor.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -34,7 +34,7 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                if (diagnostic.Id == GU0002NamedArgumentPositionMatches.DiagnosticId)
+                if (diagnostic.Id == GU0002NamedArgumentPositionMatches.Descriptor.Id)
                 {
                     var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     if (!HasWhitespaceTriviaOnly(arguments))
@@ -49,7 +49,7 @@ namespace Gu.Analyzers
                         diagnostic);
                 }
 
-                if (diagnostic.Id == GU0005ExceptionArgumentsPositions.DiagnosticId)
+                if (diagnostic.Id == GU0005ExceptionArgumentsPositions.Descriptor.Id)
                 {
                     var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     context.RegisterCodeFix(

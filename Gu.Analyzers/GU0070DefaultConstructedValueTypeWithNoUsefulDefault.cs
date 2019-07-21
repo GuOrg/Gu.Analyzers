@@ -13,7 +13,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0070";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Default-constructed value type with no useful default",
             messageFormat: "Default constructed value type was created, which is likely not what was intended.",

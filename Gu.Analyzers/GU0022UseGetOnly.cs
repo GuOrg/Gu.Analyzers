@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0022";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Use get-only.",
             messageFormat: "Use get-only.",

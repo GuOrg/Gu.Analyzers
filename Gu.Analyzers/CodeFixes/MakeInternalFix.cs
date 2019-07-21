@@ -14,8 +14,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0072AllTypesShouldBeInternal.DiagnosticId,
-            GU0073MemberShouldBeInternal.DiagnosticId);
+            GU0072AllTypesShouldBeInternal.Descriptor.Id,
+            GU0073MemberShouldBeInternal.Descriptor.Id);
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

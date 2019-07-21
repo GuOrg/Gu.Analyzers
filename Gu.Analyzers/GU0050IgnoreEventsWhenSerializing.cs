@@ -12,7 +12,7 @@ namespace Gu.Analyzers
     {
         internal const string DiagnosticId = "GU0050";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Ignore events when serializing.",
             messageFormat: "Ignore events when serializing.",
