@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
 
@@ -62,7 +62,7 @@ namespace N
     using System.Collections;
     using System.Collections.Generic;
 
-    class Foo : IEnumerable<IEnumerable<char>>, IEnumerable<int>
+    class C : IEnumerable<IEnumerable<char>>, IEnumerable<int>
     {
         IEnumerator<int> IEnumerable<int>.GetEnumerator()
         {
@@ -88,7 +88,7 @@ namespace N
     {
         public void F()
         {
-            foreach(int a in new Foo())
+            foreach(int a in new C())
             {
             }
         }
@@ -107,9 +107,9 @@ namespace N
 {
     using System.Text.RegularExpressions;
 
-    class Foo
+    class C
     {
-        public Foo()
+        public C()
         {
             foreach (Match match in Regex.Matches(string.Empty, string.Empty))
             {
@@ -129,7 +129,7 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    class Foo
+    class C
     {
         public IEnumerator<int> GetEnumerator()
         {
@@ -141,7 +141,7 @@ namespace N
     {
         public void F()
         {
-            foreach(int a in new Foo())
+            foreach(int a in new C())
             {
             }
         }
@@ -158,9 +158,9 @@ namespace N
 {
     using System.Collections;
 
-    class Foo<T>
+    class C<T>
     {
-        private void Bar(IEnumerable enumerable)
+        private void M(IEnumerable enumerable)
         {
             foreach (T item in enumerable)
             {

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
 

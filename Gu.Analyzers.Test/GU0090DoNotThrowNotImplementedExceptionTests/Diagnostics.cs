@@ -18,7 +18,7 @@ namespace N
     {
         void M()
         {
-            throw new System.NotImplementedException();
+            throw ↓new System.NotImplementedException();
         }
     }
 }";
@@ -33,7 +33,7 @@ namespace N
 {
     class C
     {
-        int M() => throw new System.NotImplementedException();
+        int M() => throw ↓new System.NotImplementedException();
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
@@ -51,7 +51,7 @@ namespace N
         {
             int? integer = null;
             
-            int nonNull = integer ?? throw new System.NotImplementedException();
+            int nonNull = integer ?? throw ↓new System.NotImplementedException();
         }
     }
 }";

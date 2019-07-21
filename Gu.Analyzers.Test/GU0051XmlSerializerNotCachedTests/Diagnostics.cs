@@ -18,13 +18,13 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
-                ↓new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+                ↓new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
             }
         }
     }
@@ -42,13 +42,13 @@ namespace N
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
-                ↓new System.Xml.Serialization.XmlSerializer(typeof(Foo), new System.Xml.Serialization.XmlRootAttribute(""rootNode""));
+                ↓new System.Xml.Serialization.XmlSerializer(typeof(C), new System.Xml.Serialization.XmlRootAttribute(""rootNode""));
             }
         }
     }
@@ -81,7 +81,7 @@ namespace N
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
-        [TestCase(@"new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""))")]
+        [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
         public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
         {
             var testCode = @"
@@ -91,11 +91,11 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         private static XmlSerializer serializer;
     
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {

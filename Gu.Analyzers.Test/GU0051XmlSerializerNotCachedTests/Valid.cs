@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
 
@@ -17,9 +17,9 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -41,11 +41,11 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -67,16 +67,16 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
         private static readonly XmlSerializer serializer;
 
-        static Foo()
+        static C()
         {
-            serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+            serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
         }
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -98,11 +98,11 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(Foo), new XmlRootAttribute(""rootNode""));
+        private static readonly XmlSerializer serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -114,8 +114,8 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase(@"new XmlSerializer(typeof(Foo), ""rootNode"")")]
-        [TestCase(@"new XmlSerializer(typeof(Foo))")]
+        [TestCase(@"new XmlSerializer(typeof(C), ""rootNode"")")]
+        [TestCase(@"new XmlSerializer(typeof(C))")]
         public static void NonLeakyConstructor(string expression)
         {
             var code = @"
@@ -125,9 +125,9 @@ namespace N
     using System.Collections.Generic;
     using System.Xml.Serialization;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             for(int i = 0; i < 100; ++i)
             {

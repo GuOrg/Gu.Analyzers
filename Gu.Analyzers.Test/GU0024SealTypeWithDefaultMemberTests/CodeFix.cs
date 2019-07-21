@@ -16,18 +16,18 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
             var before = @"
 namespace N
 {
-    public class ↓Foo
+    public class ↓C
     {
-        public static readonly Foo Default = new Foo();
+        public static readonly C Default = new C();
     }
 }";
 
             var after = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public static readonly Foo Default = new Foo();
+        public static readonly C Default = new C();
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");
@@ -39,18 +39,18 @@ namespace N
             var before = @"
 namespace N
 {
-    public class ↓Foo
+    public class ↓C
     {
-        public static Foo Default { get; } = new Foo();
+        public static C Default { get; } = new C();
     }
 }";
 
             var after = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public static Foo Default { get; } = new Foo();
+        public static C Default { get; } = new C();
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");

@@ -7,8 +7,8 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
     {
         private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
 
-        [TestCase("internal class Foo")]
-        [TestCase("internal struct Foo")]
+        [TestCase("internal class C")]
+        [TestCase("internal struct S")]
         public static void SimpleType(string signature)
         {
             var code = @"
@@ -16,20 +16,20 @@ namespace N
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
     }
-}".AssertReplace("internal class Foo", signature);
+}".AssertReplace("internal class C", signature);
 
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase("internal class Bar")]
-        [TestCase("protected class Bar")]
-        [TestCase("private class Bar")]
-        [TestCase("internal struct Bar")]
-        [TestCase("protected struct Bar")]
-        [TestCase("private struct Bar")]
+        [TestCase("internal class C2")]
+        [TestCase("protected class C2")]
+        [TestCase("private class C2")]
+        [TestCase("internal struct S")]
+        [TestCase("protected struct S")]
+        [TestCase("private struct S")]
         public static void NestedType(string signature)
         {
             var code = @"
@@ -37,13 +37,13 @@ namespace N
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C1
     {
-        private class Bar
+        private class C2
         {
         }
     }
-}".AssertReplace("private class Bar", signature);
+}".AssertReplace("private class C2", signature);
 
             RoslynAssert.Valid(Analyzer, code);
         }

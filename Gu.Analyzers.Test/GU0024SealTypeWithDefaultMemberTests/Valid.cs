@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
 
@@ -14,9 +14,9 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public static Foo Default { get; } = new Foo();
+        public static C Default { get; } = new C();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -28,9 +28,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public static readonly Foo Default = new Foo();
+        public static readonly C Default = new C();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -42,7 +42,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
     }
 }";

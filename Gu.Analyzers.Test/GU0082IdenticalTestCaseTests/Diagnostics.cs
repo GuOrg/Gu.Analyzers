@@ -79,7 +79,7 @@ namespace N
     using System;
     using NUnit.Framework;
 
-    internal class Foo
+    internal class C
     {
         [↓TestCase(StringComparison.Ordinal)]
         [↓TestCase(StringComparison.Ordinal)]
@@ -100,7 +100,7 @@ namespace N
     using System;
     using NUnit.Framework;
 
-    internal class Foo
+    internal class C
     {
         [↓TestCase(""1"", StringComparison.Ordinal)]
         [↓TestCase(""1"", StringComparison.Ordinal)]
@@ -201,7 +201,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [↓TestCase(1, 2, 3)]
         [↓TestCase(1, 2, 3)]

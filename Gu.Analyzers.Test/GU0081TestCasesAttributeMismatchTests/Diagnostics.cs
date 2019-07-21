@@ -56,7 +56,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2, 3)]
         [↓TestCase(1)]
