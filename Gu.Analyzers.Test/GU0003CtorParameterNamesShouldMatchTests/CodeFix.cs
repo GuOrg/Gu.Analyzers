@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
     {
         private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
         private static readonly RenameConstructorParameterFix Fix = new RenameConstructorParameterFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch);
 
         [Test]
         public static void Message()

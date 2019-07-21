@@ -2,7 +2,7 @@ namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class Descriptors
+    internal static partial class Descriptors
     {
         internal static readonly DiagnosticDescriptor GU0001NameArguments = Create(
             id: "GU0001",
@@ -12,6 +12,24 @@ namespace Gu.Analyzers
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: "Name the arguments of calls to methods that have more than 3 arguments and are placed on separate lines.");
+
+        internal static readonly DiagnosticDescriptor GU0002NamedArgumentPositionMatches = Create(
+            id: "GU0002",
+            title: "The position of a named argument should match.",
+            messageFormat: "The position of a named arguments and parameters should match.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "The position of a named argument should match.");
+
+        internal static readonly DiagnosticDescriptor GU0003CtorParameterNamesShouldMatch = Create(
+            id: "GU0003",
+            title: "Name the parameter to match the assigned member.",
+            messageFormat: "Name the parameter to match the assigned member.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            description: "Name the constructor parameters to match the assigned member.");
 
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="T:Microsoft.CodeAnalysis.Diagnostic" />.

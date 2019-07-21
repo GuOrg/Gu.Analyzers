@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
         private static readonly MoveArgumentFix Fix = new MoveArgumentFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(GU0002NamedArgumentPositionMatches.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0002NamedArgumentPositionMatches);
 
         [Test]
         public static void Message()

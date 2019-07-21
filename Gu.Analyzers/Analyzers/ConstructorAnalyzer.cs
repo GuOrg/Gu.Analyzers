@@ -16,7 +16,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            GU0003CtorParameterNamesShouldMatch.Descriptor,
+            Descriptors.GU0003CtorParameterNamesShouldMatch,
             GU0004AssignAllReadOnlyMembers.Descriptor,
             GU0014PreferParameter.Descriptor);
 
@@ -43,7 +43,7 @@ namespace Gu.Analyzers
                             if (ShouldRename(parameter, walker, context, out var name))
                             {
                                 var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
-                                context.ReportDiagnostic(Diagnostic.Create(GU0003CtorParameterNamesShouldMatch.Descriptor, parameter.Identifier.GetLocation(), properties));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch, parameter.Identifier.GetLocation(), properties));
                             }
                         }
 

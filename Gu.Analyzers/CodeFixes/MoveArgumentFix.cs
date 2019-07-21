@@ -18,7 +18,7 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            GU0002NamedArgumentPositionMatches.Descriptor.Id,
+            Descriptors.GU0002NamedArgumentPositionMatches.Id,
             GU0005ExceptionArgumentsPositions.Descriptor.Id);
 
         /// <inheritdoc/>
@@ -34,7 +34,7 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                if (diagnostic.Id == GU0002NamedArgumentPositionMatches.Descriptor.Id)
+                if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id)
                 {
                     var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     if (!HasWhitespaceTriviaOnly(arguments))

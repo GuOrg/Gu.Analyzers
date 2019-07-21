@@ -13,7 +13,7 @@ namespace Gu.Analyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0001NameArguments,
-            GU0002NamedArgumentPositionMatches.Descriptor);
+            Descriptors.GU0002NamedArgumentPositionMatches);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -40,7 +40,7 @@ namespace Gu.Analyzers
 
                 if (!NamedArgumentPositionMatches(context, argumentList))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(GU0002NamedArgumentPositionMatches.Descriptor, argumentList.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0002NamedArgumentPositionMatches, argumentList.GetLocation()));
                 }
             }
         }
