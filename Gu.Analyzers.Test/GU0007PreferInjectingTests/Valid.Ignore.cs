@@ -137,11 +137,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly C2 bar;
 
-        public Foo()
+        public C1()
         {
             bar = new C2();
         }

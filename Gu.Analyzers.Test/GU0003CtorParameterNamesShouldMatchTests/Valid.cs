@@ -100,12 +100,12 @@ namespace N
         [Test]
         public static void BaseConstructorCall()
         {
-            var foo = @"
+            var c1 = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        public Foo(int a, int b, int c, int d)
+        public C1(int a, int b, int c, int d)
         {
             this.A = a;
             this.B = b;
@@ -123,18 +123,18 @@ namespace N
     }
 }";
 
-            var bar = @"
+            var c2 = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C2 : C1
     {
-        public Bar(int a, int b, int c, int d)
+        public C2(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, foo, bar);
+            RoslynAssert.Valid(Analyzer, c1, c2);
         }
 
         [Test]

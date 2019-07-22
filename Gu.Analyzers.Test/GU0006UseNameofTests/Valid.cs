@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0006UseNameof Analyzer = new GU0006UseNameof();
 

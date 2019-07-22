@@ -92,7 +92,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+                var c = @"
 namespace N
 {
     public class C
@@ -103,7 +103,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, ensure, code);
+                RoslynAssert.Valid(Analyzer, ensure, c);
             }
 
             [Test]
@@ -131,7 +131,7 @@ namespace N
             [Test]
             public static void WhenExtensionMethodReturningThis()
             {
-                var barCode = @"
+                var c2 = @"
 namespace N
 {
     internal static class C2
@@ -142,7 +142,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var c1 = @"
 namespace N
 {
     public class C1
@@ -154,7 +154,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, barCode, testCode);
+                RoslynAssert.Valid(Analyzer, c2, c1);
             }
 
             [Explicit("Don't know if we want this.")]

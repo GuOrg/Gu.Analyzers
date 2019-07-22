@@ -96,8 +96,8 @@ namespace N
             RoslynAssert.Valid(Analyzer, c1, bar);
         }
 
-        [TestCase("this.bar.Value;")]
-        [TestCase("bar.Value;")]
+        [TestCase("this.c2.P;")]
+        [TestCase("c2.P;")]
         public static void WhenReturningPropertyOfCreatedFieldExpressionBody(string getter)
         {
             var fooCode = @"
@@ -105,22 +105,22 @@ namespace N
 {
     public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 c2;
 
-        public C1(Bar bar)
+        public C1()
         {
-            this.bar = new Bar();
+            this.c2 = new C2();
         }
 
-        public int Value => this.bar.Value;
+        public int P => this.c2.P;
     }
-}".AssertReplace("this.bar.Value;", getter);
+}".AssertReplace("this.c2.P;", getter);
             var barCode = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
-        public int Value { get; }
+        public int P { get; }
     }
 }";
             RoslynAssert.Valid(Analyzer, fooCode, barCode);

@@ -71,9 +71,9 @@ namespace N
 {
     public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
-        public C1(Bar bar)
+        public C1(C2 bar)
         {
             this.bar = bar;
         }
@@ -82,11 +82,11 @@ namespace N
             var bar = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
         private readonly int value;
 
-        public Bar(int value)
+        public C2(int value)
         {
             this.value = value;
         }
@@ -99,7 +99,7 @@ namespace N
     public class Meh : C1
     {
         public Meh()
-           : base(new Bar(1))
+           : base(new C2(1))
         {
         }
     }

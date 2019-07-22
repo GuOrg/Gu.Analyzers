@@ -294,7 +294,7 @@ namespace N
         [Test]
         public static void BaseConstructorCall()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -317,24 +317,24 @@ namespace N
     }
 }";
 
-            var barCode = @"
+            var c2 = @"
 namespace N
 {
-    public class Bar : C1
+    public class C2 : C1
     {
-        public Bar(int a, int b, int c, int d)
+        public C2(int a, int b, int c, int d)
             : base(a, b, c, d)
         {
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, c1, c2);
         }
 
         [Test]
         public static void BaseConstructorCallSimple()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -348,18 +348,18 @@ namespace N
     }
 }";
 
-            var barCode = @"
+            var c2 = @"
 namespace N
 {
-    public class Bar : C1
+    public class C2 : C1
     {
-        public Bar(int a)
+        public C2(int a)
             : base(a)
         {
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, c1, c2);
         }
     }
 }

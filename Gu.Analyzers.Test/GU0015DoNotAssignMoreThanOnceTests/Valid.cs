@@ -243,7 +243,7 @@ namespace N
 {
     public class C
     {
-        public static string Bar(string text)
+        public static string M(string text)
         {
             text = text.Replace("" "", ""_"");
             text = text.Replace("":"", ""_"");

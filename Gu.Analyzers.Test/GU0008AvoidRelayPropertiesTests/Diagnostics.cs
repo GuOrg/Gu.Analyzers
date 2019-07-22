@@ -63,7 +63,7 @@ namespace N
         public int Value => ↓this.bar.Value;
     }
 }".AssertReplace("this.bar.Value;", body);
-            var C2 = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -71,7 +71,7 @@ namespace N
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, C2);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, c2);
         }
     }
 }

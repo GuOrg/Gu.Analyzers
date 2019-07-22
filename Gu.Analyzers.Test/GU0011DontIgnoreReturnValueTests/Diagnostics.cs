@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
         [TestCase("ints.Where(x => x > 1);")]
         public static void Linq(string linq)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Linq;
@@ -28,7 +28,7 @@ namespace N
     }
 }".AssertReplace("ints.Select(x => x);", linq);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), code);
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace N
         [TestCase("Remove(1)")]
         public static void ImmutableArray(string call)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Immutable;
@@ -70,14 +70,14 @@ namespace N
     }
 }".AssertReplace("Add(1)", call);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [TestCase("Add(1)")]
         [TestCase("Remove(1)")]
         public static void ImmutableList(string call)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Immutable;
@@ -91,7 +91,7 @@ namespace N
     }
 }".AssertReplace("Add(1)", call);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Explicit("Fix later.")]

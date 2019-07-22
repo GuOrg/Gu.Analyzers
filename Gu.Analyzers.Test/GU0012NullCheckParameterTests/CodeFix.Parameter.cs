@@ -98,10 +98,10 @@ namespace N
 
         public C(string ↓text)
         {
-            this.bar = Bar(text);
+            this.bar = M(text);
         }
 
-        private int Bar(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
 
@@ -119,10 +119,10 @@ namespace N
                 throw new System.ArgumentNullException(nameof(text));
             }
 
-            this.bar = Bar(text);
+            this.bar = M(text);
         }
 
-        private int Bar(string text) => text.Length;
+        private int M(string text) => text.Length;
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);

@@ -203,11 +203,11 @@ namespace N
                 var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
         private readonly Bar bar;
 
-        public Foo(int value, Bar bar)
+        public C1(int value, Bar bar)
         {
             this.bar = bar;
         }
@@ -217,7 +217,7 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class C3 : Foo
+    public class C3 : C1
     {
         public C3(int bar)
            : base(bar, ↓new Bar())
@@ -229,7 +229,7 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : Foo
+    public class C3 : C1
     {
         public C3(int bar, Bar bar_)
            : base(bar, bar_)
@@ -471,20 +471,20 @@ namespace N
                 var fooCode = @"
 namespace N
 {
-    public class Foo
+    public class C1
     {
-        private readonly Bar bar;
+        private readonly C2 c2;
 
-        public Foo(Bar bar)
+        public C1(C2 c2)
         {
-            this.bar = bar;
+            this.c2 = c2;
         }
     }
 }";
                 var barCode = @"
 namespace N
 {
-    public class Bar
+    public class C2
     {
     }
 }";
@@ -494,22 +494,22 @@ namespace N
 {
     public class Baz
     {
-        public Baz(Bar bar)
+        public Baz(C2 c2)
         {
-            this.Bar = bar;
+            this.C2 = c2;
         }
 
-        public Bar Bar { get; }
+        public C2 C2 { get; }
     }
 }";
 
                 var before = @"
 namespace N
 {
-    public class C3 : Foo
+    public class C3 : C1
     {
         public C3(Baz baz)
-           : base(baz.↓Bar)
+           : base(baz.↓C2)
         {
         }
     }
@@ -518,10 +518,10 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : Foo
+    public class C3 : C1
     {
-        public C3(Baz baz, Bar bar)
-           : base(bar)
+        public C3(Baz baz, C2 c2)
+           : base(c2)
         {
         }
     }

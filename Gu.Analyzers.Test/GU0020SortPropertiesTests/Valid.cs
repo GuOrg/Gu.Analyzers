@@ -62,7 +62,7 @@ namespace N
         [Test]
         public static void ExplicitImplementationGetOnly()
         {
-            var interfaceCode = @"
+            var iValue = @"
 namespace N
 {
     interface IValue
@@ -71,7 +71,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var c = @"
 namespace N
 {
     public class C : IValue
@@ -81,13 +81,13 @@ namespace N
         object IValue.Value { get; } = 5;
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iValue, c);
         }
 
         [Test]
         public static void ExplicitImplementationGetOnlyIndexer()
         {
-            var interfaceCode = @"
+            var iValue = @"
 namespace N
 {
     interface IValue
@@ -96,7 +96,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var c = @"
 namespace N
 {
     public class C : IValue
@@ -106,13 +106,13 @@ namespace N
         object IValue.this[int index] => index;
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iValue, c);
         }
 
         [Test]
         public static void ExplicitGetSetIndexerAndGetOnlyIndexer()
         {
-            var interfaceCode = @"
+            var iValue = @"
 namespace N
 {
     interface IValue
@@ -121,7 +121,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var c = @"
 namespace N
 {
     public class C : IValue
@@ -135,13 +135,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iValue, c);
         }
 
         [Test]
         public static void ExplicitGetSetIndexerAndGetSetIndexer()
         {
-            var interfaceCode = @"
+            var iValue = @"
 namespace N
 {
     interface IValue
@@ -150,7 +150,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var c = @"
 namespace N
 {
     public class C : IValue
@@ -170,13 +170,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iValue, c);
         }
 
         [Test]
         public static void ExplicitImplementationCalculatedBeforeGetSet()
         {
-            var interfaceCode = @"
+            var iValue = @"
 namespace N
 {
     interface IValue
@@ -185,7 +185,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var c = @"
 namespace N
 {
     public class C : IValue
@@ -195,7 +195,7 @@ namespace N
         public int Value { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iValue, c);
         }
 
         [Test]

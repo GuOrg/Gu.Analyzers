@@ -257,7 +257,7 @@ namespace N
         [TestCase("C.SetM(textBox, true)")]
         public static void DoNotWarnOnAttachedPropertySetter(string method)
         {
-            var apCode = @"
+            var c = @"
 namespace N
 {
     using System.Windows;
@@ -298,7 +298,7 @@ namespace N
     }
 }".AssertReplace("textBox.SetM(true)", method);
 
-            RoslynAssert.Valid(Analyzer, apCode, testCode);
+            RoslynAssert.Valid(Analyzer, c, testCode);
         }
 
         [Test]
@@ -312,7 +312,7 @@ namespace N
 
     internal class C
     {
-        public void Bar()
+        public void M()
         {
             Meh(() => Id(true)); // GU0009 should not warn here
         }
