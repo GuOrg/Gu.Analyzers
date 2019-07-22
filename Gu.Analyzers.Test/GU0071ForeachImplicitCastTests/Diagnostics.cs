@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
         [TestCase("System.Collections.Generic.IEnumerable<int>")]
         public static void ExplicitDouble(string type)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class A
@@ -27,7 +27,7 @@ namespace N
     }
 }".AssertReplace("int[]", type);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]

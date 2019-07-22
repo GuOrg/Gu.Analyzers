@@ -52,10 +52,10 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
         [field:NonSerialized]
-        public event EventHandler SomeEvent;
+        public event EventHandler E;
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -70,15 +70,15 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
         [NonSerialized]
-        private EventHandler someEvent;
+        private EventHandler e;
 
-        public event EventHandler SomeEvent
+        public event EventHandler E
         {
-            add { this.someEvent += value; }
-            remove { this.someEvent -= value; }
+            add { this.e += value; }
+            remove { this.e -= value; }
         }
     }
 }";

@@ -115,7 +115,7 @@ namespace N
         public int P => this.c2.P;
     }
 }".AssertReplace("this.c2.P;", getter);
-            var barCode = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -123,7 +123,7 @@ namespace N
         public int P { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, fooCode, c2);
         }
     }
 }

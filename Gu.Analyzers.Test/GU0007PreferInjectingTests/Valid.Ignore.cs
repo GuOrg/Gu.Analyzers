@@ -71,7 +71,7 @@ namespace N
             [TestCase("Abstract")]
             public static void WhenNewNotInjectable(string type)
             {
-                var abstractCode = @"
+                var @abstract = @"
 namespace N
 {
     public abstract class Abstract
@@ -106,13 +106,13 @@ namespace N
         }
     }
 }".AssertReplace("default(int)", $"default({type})");
-                RoslynAssert.Valid(Analyzer, abstractCode, c2, code);
+                RoslynAssert.Valid(Analyzer, @abstract, c2, code);
             }
 
             [Test]
             public static void WhenParams()
             {
-                var abstractCode = @"
+                var baz = @"
 namespace N
 {
     public class Baz
@@ -120,7 +120,7 @@ namespace N
     }
 }";
 
-                var barCode = @"
+                var c2 = @"
 namespace N
 {
     public class C2
@@ -139,16 +139,16 @@ namespace N
 {
     public class C1
     {
-        private readonly C2 bar;
+        private readonly C2 c2;
 
         public C1()
         {
-            bar = new C2();
+            c2 = new C2();
         }
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, abstractCode, barCode, code);
+                RoslynAssert.Valid(Analyzer, baz, c2, code);
             }
 
             [Test]
@@ -161,11 +161,11 @@ namespace N
 
     public class C
     {
-        private readonly Dictionary<Bar, Bar> bar;
+        private readonly Dictionary<Bar, Bar> map;
 
         public C()
         {
-            this.bar = new Dictionary<Bar, Bar>();
+            this.map = new Dictionary<Bar, Bar>();
         }
     }
 }";
@@ -183,11 +183,11 @@ namespace N
 
     public class C
     {
-        private ServiceLocator bar;
+        private ServiceLocator locator;
 
         public C()
         {
-            this.bar = new ServiceLocator[0].FirstOrDefault(x => x.Bar != null);
+            this.locator = new ServiceLocator[0].FirstOrDefault(x => x.Bar != null);
         }
     }
 }";
@@ -220,21 +220,30 @@ namespace N
             [Test]
             public static void WhenAssigningWithObjectInitializer()
             {
+                var c2 = @"
+namespace N
+{
+    public class C2
+    {
+        public int Baz { get; set; }
+    }
+}";
+
                 var code = @"
 namespace N
 {
     public class C
     {
-        private readonly Bar bar;
+        private readonly C2 bar;
 
         public C()
         {
-            this.bar = new Bar { Baz = 1 };
+            this.bar = new C2 { Baz = 1 };
         }
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, WithMutableProperty);
+                RoslynAssert.Valid(Analyzer, c2, code);
             }
         }
     }

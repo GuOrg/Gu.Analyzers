@@ -27,7 +27,7 @@ namespace N
             }
         }
     }
-}";
+}".AssertReplace("int[]", type);
             RoslynAssert.Valid(Analyzer, code);
         }
 

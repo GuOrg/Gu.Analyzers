@@ -129,7 +129,7 @@ namespace N
         }
      }
 }";
-            var converter = @"
+            var validationErrorToStringConverter = @"
 namespace N
 {
     using System;
@@ -172,7 +172,7 @@ namespace N
 #pragma warning restore GU0012
     }
 }";
-            RoslynAssert.Valid(analyzer, c, converter);
+            RoslynAssert.Valid(analyzer, c, validationErrorToStringConverter);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]

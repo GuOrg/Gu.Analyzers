@@ -82,13 +82,13 @@ namespace Gu.Analyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
-            var syntaxErrorCode = @"
+            var code = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    internal class Foo : SyntaxError
+    internal class C : SyntaxError
     {
         private readonly Stream stream = File.SyntaxError(string.Empty);
         private bool disposed;
@@ -110,7 +110,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(syntaxErrorCode, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
+            var sln = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
             var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
             RoslynAssert.NoDiagnostics(diagnostics);
         }

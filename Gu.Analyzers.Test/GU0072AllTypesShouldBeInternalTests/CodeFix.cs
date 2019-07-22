@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
             var before = @"
 namespace N
 {
-    ↓public class Foo
+    ↓public class C
     {
     }
 }";
@@ -23,7 +23,7 @@ namespace N
             var after = @"
 namespace N
 {
-    internal class Foo
+    internal class C
     {
     }
 }";

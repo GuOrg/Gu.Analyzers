@@ -82,9 +82,9 @@ namespace N
         }
 
         [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
-        public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string code)
+        public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -103,9 +103,9 @@ namespace N
             }
         }
     }
-}".AssertReplace("default(XmlSerializer)", code);
+}".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code: code);
         }
     }
 }

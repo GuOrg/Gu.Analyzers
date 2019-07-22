@@ -109,7 +109,7 @@ namespace N
         [Test]
         public static void DifferentProperties()
         {
-            var interfaceCode = @"
+            var iFoo = @"
 namespace N
 {
     public interface IFoo
@@ -117,7 +117,7 @@ namespace N
         int D { get; set; }
     }
 }";
-            var testCode = @"
+            var foo = @"
 namespace N
 {
     public class Foo : IFoo
@@ -155,7 +155,7 @@ namespace N
         // }
     }
 }";
-            RoslynAssert.Valid(Analyzer, interfaceCode, testCode);
+            RoslynAssert.Valid(Analyzer, iFoo, foo);
         }
 
         [Test]

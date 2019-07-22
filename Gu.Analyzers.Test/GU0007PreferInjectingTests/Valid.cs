@@ -79,7 +79,7 @@ namespace N
         }
     }
 }";
-            var bar = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -104,7 +104,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, bar, meh);
+            RoslynAssert.Valid(Analyzer, c1, c2, meh);
         }
     }
 }

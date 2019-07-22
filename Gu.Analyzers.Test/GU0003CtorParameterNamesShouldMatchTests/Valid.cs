@@ -143,14 +143,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int a;
         private readonly int b;
         private readonly int c;
         private readonly int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
@@ -168,14 +168,14 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         private readonly int _a;
         private readonly int _b;
         private readonly int _c;
         private readonly int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
@@ -193,9 +193,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a)
+        public C(int a)
         {
             this.A = a;
             this.B = a;
@@ -212,23 +212,12 @@ namespace N
         [Test]
         public static void IgnoresWhenBaseIsParams()
         {
-            var bar = @"
+            var c1 = @"
 namespace N
 {
-    public class Bar : Foo
+    public class C1
     {
-        public Bar(int a, int b, int c, int d)
-            : base(a, b, c, d)
-        {
-        }
-    }
-}";
-            var foo = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(params int[] values)
+        public C1(params int[] values)
         {
             this.Values = values;
         }
@@ -236,13 +225,8 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, bar, foo);
-        }
 
-        [Test]
-        public static void IgnoresWhenBaseIsParams2()
-        {
-            var bar = @"
+            var c2 = @"
 namespace N
 {
     public class C2 : C1
@@ -253,7 +237,14 @@ namespace N
         }
     }
 }";
-            var foo = @"
+
+            RoslynAssert.Valid(Analyzer, c1, c2);
+        }
+
+        [Test]
+        public static void IgnoresWhenBaseIsParams2()
+        {
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -269,7 +260,19 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, bar, foo);
+            var c2 = @"
+namespace N
+{
+    public class C2 : C1
+    {
+        public C2(int a, int b, int c, int d)
+            : base(a, b, c, d)
+        {
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, c1, c2);
         }
 
         [Test]

@@ -30,9 +30,9 @@ namespace N
     using System;
 
     [Serializable]
-    public class FooException : Exception
+    public class C : Exception
     {
-        public FooException()
+        public C()
             : base(string.Empty)
         {
         }
@@ -50,9 +50,9 @@ namespace N
     using System;
 
     [Serializable, Obsolete]
-    public class FooException : Exception
+    public class C : Exception
     {
-        public FooException()
+        public C()
             : base(string.Empty)
         {
         }
@@ -71,9 +71,9 @@ namespace N
 
     [Serializable]
     [Obsolete]
-    public class FooException : Exception
+    public class C : Exception
     {
-        public FooException()
+        public C()
             : base(string.Empty)
         {
         }
@@ -91,18 +91,18 @@ namespace N
     using System;
     
     [Serializable]
-    public class FooException : Exception
+    public class C1 : Exception
     {
-        public FooException()
+        public C1()
         : base(string.Empty)
         {
         }
     }
 
     [Serializable]
-    public class BarException : FooException
+    public class C2 : C1
     {
-        public BarException()
+        public C2()
         : base()
         {
         }
