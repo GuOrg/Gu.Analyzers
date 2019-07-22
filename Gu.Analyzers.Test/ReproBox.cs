@@ -37,7 +37,7 @@ namespace Gu.Analyzers.Test
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
     }
 }";

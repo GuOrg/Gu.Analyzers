@@ -292,14 +292,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public readonly int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
@@ -307,30 +307,30 @@ namespace N
             _d = d;
         }
 
-        public Foo Bar => ↓new Foo(_a, _b, _c, _d);
+        public C P => ↓new C(_a, _b, _c, _d);
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public readonly int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
             _c = c;
             _d = d;
-            Bar = new Foo(_a, _b, _c, _d);
+            P = new C(_a, _b, _c, _d);
         }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -342,27 +342,27 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
-        public Foo Bar => ↓new Foo();
+        public C P => ↓new C();
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
-            this.Bar = new Foo();
+            this.P = new C();
         }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -376,16 +376,16 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(Func<int> creator)
+        public C(Func<int> creator)
         {
             this.Value = creator();
         }
         
         public int Value { get; set; }
 
-        public Foo Bar => ↓new Foo(() => this.Value);
+        public C P => ↓new C(() => this.Value);
     }
 }";
 
@@ -394,17 +394,17 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(Func<int> creator)
+        public C(Func<int> creator)
         {
             this.Value = creator();
-            this.Bar = new Foo(() => this.Value);
+            this.P = new C(() => this.Value);
         }
         
         public int Value { get; set; }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -418,16 +418,16 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(Func<int> creator)
+        public C(Func<int> creator)
         {
             this.Value = creator();
         }
         
         public int Value { get; set; }
 
-        public Foo Bar => ↓new Foo(CreateNumber);
+        public C P => ↓new C(CreateNumber);
 
         private static int CreateNumber() => 2;
     }
@@ -438,17 +438,17 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(Func<int> creator)
+        public C(Func<int> creator)
         {
             this.Value = creator();
-            this.Bar = new Foo(CreateNumber);
+            this.P = new C(CreateNumber);
         }
         
         public int Value { get; set; }
 
-        public Foo Bar { get; }
+        public C P { get; }
 
         private static int CreateNumber() => 2;
     }

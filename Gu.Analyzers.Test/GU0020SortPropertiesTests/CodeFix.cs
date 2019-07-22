@@ -44,7 +44,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         /// <summary>
         /// B
@@ -61,7 +61,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         /// <summary>
         /// A
@@ -92,7 +92,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         ↓private int Value { get; } = 5;
 
@@ -103,7 +103,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         object IValue.Value { get; } = 5;
 
@@ -483,9 +483,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
         {
             this.B = b;
         }
@@ -499,9 +499,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
         {
             this.B = b;
         }
@@ -520,9 +520,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
         {
             this.B = b;
         }
@@ -542,9 +542,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
         {
             this.B = b;
         }
@@ -573,7 +573,7 @@ namespace N
     using System.Collections;
     using System.Collections.Generic;
 
-    public class Foo : IReadOnlyList<int>
+    public class C : IReadOnlyList<int>
     {
         public int Count { get; }
 
@@ -611,7 +611,7 @@ namespace N
     using System.Collections;
     using System.Collections.Generic;
 
-    public class Foo : IReadOnlyList<int>
+    public class C : IReadOnlyList<int>
     {
         public int Count { get; }
 
@@ -650,9 +650,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.A = a;
             this.B = b;
@@ -667,9 +667,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.A = a;
             this.B = b;
@@ -689,9 +689,9 @@ namespace N
             var before = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -713,9 +713,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
         }
 

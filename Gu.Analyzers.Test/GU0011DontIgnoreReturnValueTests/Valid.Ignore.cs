@@ -281,16 +281,16 @@ namespace N
 {
     using Moq;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
-            var mock = new Mock<IFoo>();
+            var mock = new Mock<IC>();
             mock.Setup(x => x.M());
         }
     }
 
-    public interface IFoo
+    public interface IC
     {
         void M();
     }

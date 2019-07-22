@@ -181,7 +181,7 @@ namespace N
 {
     using System.Globalization;
 
-    public static class Foo
+    public static class C
     {
         private static string Bar(int a, int b, int c, int d)
         {

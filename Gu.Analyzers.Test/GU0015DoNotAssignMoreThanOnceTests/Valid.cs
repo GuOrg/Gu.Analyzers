@@ -165,14 +165,14 @@ namespace N
 {
     public class C1
     {
-        public C1(Bar bar1, Bar bar2)
+        public C1(C2 bar1, C2 bar2)
         {
             bar1.Value = 1;
             bar2.Value = 3;
         }
     }
 
-    public class Bar
+    public class C2
     {
         public int Value { get; set; }
     }

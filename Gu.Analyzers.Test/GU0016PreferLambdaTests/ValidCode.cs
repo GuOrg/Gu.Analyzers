@@ -17,9 +17,9 @@ namespace N
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Foo
+    public class C
     {
-        public Foo(IEnumerable<int> ints)
+        public C(IEnumerable<int> ints)
         {
             var meh = ints.Where(x => IsEven(x));
         }

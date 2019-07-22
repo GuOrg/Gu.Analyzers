@@ -7,16 +7,16 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
     {
         private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
 
-        [TestCase("new Foo(a, b)")]
-        [TestCase("new Foo(a: a, b: b)")]
+        [TestCase("new C(a, b)")]
+        [TestCase("new C(a: a, b: b)")]
         public static void ConstructorCallWithTwoArguments(string call)
         {
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b)
+        public C(int a, int b)
         {
             this.A = a;
             this.B = b;
@@ -26,12 +26,12 @@ namespace N
 
         public int B { get; }
 
-        private Foo Create(int a, int b)
+        private C Create(int a, int b)
         {
-            return new Foo(a, b);
+            return new C(a, b);
         }
     }
-}".AssertReplace("new Foo(a, b)", call);
+}".AssertReplace("new C(a, b)", call);
 
             RoslynAssert.Valid(Analyzer, code);
         }
@@ -179,9 +179,9 @@ namespace N
 {
     using System.Globalization;
 
-    public static class Foo
+    public static class C
     {
-        private static string Bar(int a, int b, int c, int d)
+        private static string M(int a, int b, int c, int d)
         {
             return string.Format(
                 CultureInfo.InvariantCulture,
@@ -205,9 +205,9 @@ namespace N
 {
     using System;
 
-    public static class Foo
+    public static class C
     {
-        private static Tuple<int,int,int,int> Bar(int a, int b, int c, int d)
+        private static Tuple<int,int,int,int> M(int a, int b, int c, int d)
         {
             return Tuple.Create(
                 a,
@@ -229,9 +229,9 @@ namespace N
 {
     using System.Collections.Immutable;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var ints = ImmutableArray.Create(
                 1,

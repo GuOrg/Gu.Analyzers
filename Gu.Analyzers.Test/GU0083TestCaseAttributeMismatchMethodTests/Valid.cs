@@ -289,7 +289,7 @@ namespace N
 {
     using NUnit.Framework;
 
-    class Foo
+    class C
     {
         [TestCase(1, 2)]
         [TestCase(1, 2, 3)]

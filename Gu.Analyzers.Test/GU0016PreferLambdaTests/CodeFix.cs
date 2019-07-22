@@ -20,9 +20,9 @@ namespace N
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Foo
+    public class C
     {
-        public Foo(IEnumerable<int> ints)
+        public C(IEnumerable<int> ints)
         {
             var meh = ints.Where(↓IsEven);
         }
@@ -37,9 +37,9 @@ namespace N
     using System.Collections.Generic;
     using System.Linq;
 
-    public class Foo
+    public class C
     {
-        public Foo(IEnumerable<int> ints)
+        public C(IEnumerable<int> ints)
         {
             var meh = ints.Where(x => IsEven(x));
         }
@@ -99,9 +99,9 @@ namespace N
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += ↓OnCancelKeyPress;
         }
@@ -117,9 +117,9 @@ namespace N
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (sender, e) => OnCancelKeyPress(sender, e);
         }
