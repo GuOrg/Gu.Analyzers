@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
 
@@ -26,7 +26,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
@@ -47,7 +47,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; private set; }
 
@@ -68,9 +68,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(Foo previous, int a)
+        public C(C previous, int a)
         {
             previous.A = a;
         }
@@ -91,9 +91,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             this.E += (_, __) => this.A = 5;
         }
@@ -164,13 +164,13 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
         public int Value { get; private set; }
 
-        public static Foo Create(int value)
+        public static C Create(int value)
         {
-            return new Foo { Value = value };
+            return new C { Value = value };
         }
     }
 }";
@@ -183,11 +183,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
         public int Value { get; private set; }
 
-        public static void Update(Foo foo)
+        public static void Update(C foo)
         {
             foo.Value = 2;
         }
@@ -202,11 +202,11 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
         private int Value { get; set; }
 
-        public static void Update(Foo foo)
+        public static void Update(C foo)
         {
             foo.Value = 2;
         }
@@ -221,7 +221,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo<T>
+    public class C<T>
         where T : struct 
     {
         public T Value { get; private set; }
@@ -241,16 +241,16 @@ namespace N
             var code = @"
 namespace N
 {
-    interface IFoo
+    interface IC
     {
         object Value { get; set; }
     }
 
-    class Foo<T> : IFoo
+    class C<T> : IC
     {
         public T Value { get; private set; }
 
-        object IFoo.Value
+        object IC.Value
         {
             get { return this.Value; }
             set { this.Value = (T) value; }

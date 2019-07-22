@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0023StaticMemberOrderAnalyzer();
 
@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int Value1 = 1;
 
@@ -30,7 +30,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public const int Value1 = 1;
 
@@ -48,7 +48,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public static readonly Func<int> Value1 = () => Value2;
 
@@ -66,7 +66,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public static readonly DateTime DateTime = DateTime.MaxValue;
     }
@@ -80,7 +80,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly string Value1 = nameof(Value2);
         public static readonly string Value2 = ""2"";
@@ -95,7 +95,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static int Value1;
     }
@@ -109,7 +109,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static int Value2 { get; }
     }
@@ -123,7 +123,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int Value1 = Value2;
 
@@ -142,12 +142,12 @@ namespace N
     using System.Windows;
     using System.Windows.Controls;
 
-    public class FooControl : Control
+    public class CControl : Control
     {
         private static readonly DependencyPropertyKey ValuePropertyKey = DependencyProperty.RegisterReadOnly(
             nameof(Value),
             typeof(int),
-            typeof(FooControl), 
+            typeof(CControl), 
             new PropertyMetadata(default(int)));
 
         public static readonly DependencyProperty ValueProperty = ValuePropertyKey.DependencyProperty;

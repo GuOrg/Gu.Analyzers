@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class Codefix
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0022UseGetOnly();
         private static readonly CodeFixProvider Fix = new UseGetOnlyFix();

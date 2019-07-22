@@ -14,14 +14,14 @@ namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int Value1 = ↓Value2;
 
         public static readonly int Value2 = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'N.Foo.Value2' must be declared before 'N.Foo.Value1'"), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'N.C.Value2' must be declared before 'N.C.Value1'"), code);
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int Value1 = ↓Value2;
 
@@ -46,7 +46,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public const int Value1 = ↓Value2;
 
@@ -62,7 +62,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static int Value1 { get; } = ↓Value2;
 
@@ -78,7 +78,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static readonly int Value1 = ↓Id(Value2);
 
@@ -96,9 +96,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public static readonly Foo Default = ↓new Foo();
+        public static readonly C Default = ↓new C();
         
         private static readonly string text = ""abc"";
         
