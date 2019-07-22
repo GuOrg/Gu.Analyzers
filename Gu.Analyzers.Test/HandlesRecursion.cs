@@ -30,9 +30,9 @@ namespace Gu.Analyzers.Test
             var testCode = @"
 namespace N
 {
-    internal abstract class Foo
+    internal abstract class C
     {
-        internal Foo()
+        internal C()
             : this()
         {
         }

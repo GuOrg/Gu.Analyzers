@@ -183,7 +183,7 @@ namespace N
 
     public static class C
     {
-        private static string Bar(int a, int b, int c, int d)
+        private static string M(int a, int b, int c, int d)
         {
             return string.Format(
                 CultureInfo.InvariantCulture,

@@ -143,12 +143,12 @@ namespace N
     {
         public C1()
         {
-            var bar1 = new Bar { Value = 1 };
-            var bar2 = new Bar { Value = 1 };
+            var bar1 = new C2 { Value = 1 };
+            var bar2 = new C2 { Value = 1 };
         }
     }
 
-    public class Bar
+    public class C2
     {
         public int Value { get; set; }
     }

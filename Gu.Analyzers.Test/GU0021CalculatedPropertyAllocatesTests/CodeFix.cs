@@ -242,14 +242,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int a;
         public readonly int b;
         public readonly int c;
         public readonly int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
@@ -257,30 +257,30 @@ namespace N
             this.d = d;
         }
 
-        public Foo Bar => ↓new Foo(this.a, this.b, this.c, this.d);
+        public C P => ↓new C(this.a, this.b, this.c, this.d);
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int a;
         public readonly int b;
         public readonly int c;
         public readonly int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
             this.c = c;
             this.d = d;
-            this.Bar = new Foo(this.a, this.b, this.c, this.d);
+            this.P = new C(this.a, this.b, this.c, this.d);
         }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -574,14 +574,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int a;
         public readonly int b;
         public readonly int c;
         public int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
@@ -589,30 +589,30 @@ namespace N
             this.d = d;
         }
 
-        public Foo Bar => ↓new Foo(this.a, this.b, this.c, this.d);
+        public C P => ↓new C(this.a, this.b, this.c, this.d);
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int a;
         public readonly int b;
         public readonly int c;
         public int d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             this.a = a;
             this.b = b;
             this.c = c;
             this.d = d;
-            this.Bar = new Foo(this.a, this.b, this.c, this.d);
+            this.P = new C(this.a, this.b, this.c, this.d);
         }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -624,14 +624,14 @@ namespace N
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
@@ -639,30 +639,30 @@ namespace N
             _d = d;
         }
 
-        public Foo Bar => ↓new Foo(_a, _b, _c, _d);
+        public C P => ↓new C(_a, _b, _c, _d);
     }
 }";
 
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public int _d;
 
-        public Foo(int a, int b, int c, int d)
+        public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
             _c = c;
             _d = d;
-            Bar = new Foo(_a, _b, _c, _d);
+            P = new C(_a, _b, _c, _d);
         }
 
-        public Foo Bar { get; }
+        public C P { get; }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);

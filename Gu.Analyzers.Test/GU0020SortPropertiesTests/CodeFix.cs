@@ -17,7 +17,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
             var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         ↓public int B { get; set; }
 
@@ -28,7 +28,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public int A { get; }
 

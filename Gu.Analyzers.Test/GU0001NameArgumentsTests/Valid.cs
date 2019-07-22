@@ -251,15 +251,15 @@ namespace N
             var code = @"
 namespace N
 {
-    public static class Foo
+    public static class C
     {
-        public static void Bar(params int[] args)
+        public static void M(params int[] args)
         {
         }
 
         public static void Meh()
         {
-            Bar(
+            M(
                 1,
                 2,
                 3,
