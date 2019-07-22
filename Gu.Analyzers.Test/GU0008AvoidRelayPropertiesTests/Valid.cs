@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
 

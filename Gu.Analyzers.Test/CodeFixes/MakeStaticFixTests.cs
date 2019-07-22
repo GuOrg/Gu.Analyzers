@@ -12,17 +12,25 @@ namespace Gu.Analyzers.Test.CodeFixes
         [Test]
         public static void SimpleMethod()
         {
-            var before = @"public static class C
+            var before = @"
+namespace N
 {
-    public void ↓M()
+    public static class C
     {
+        public void ↓M()
+        {
+        }
     }
 }";
 
-            var after = @"public static class C
+            var after = @"
+namespace N
 {
-    public static void M()
+    public static class C
     {
+        public static void M()
+        {
+        }
     }
 }";
             RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
@@ -31,25 +39,33 @@ namespace Gu.Analyzers.Test.CodeFixes
         [Test]
         public static void TwoSimpleMethods()
         {
-            var before = @"public static class C
+            var before = @"
+namespace N
 {
-    public void M1()
+    public static class C
     {
-    }
+        public void ↓M1()
+        {
+        }
 
-    public void M2()
-    {
+        public void ↓M2()
+        {
+        }
     }
 }";
 
-            var after = @"public static class C
+            var after = @"
+namespace N
 {
-    public static void M1()
+    public static class C
     {
-    }
+        public static void M1()
+        {
+        }
 
-    public static void M2()
-    {
+        public static void M2()
+        {
+        }
     }
 }";
             RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);

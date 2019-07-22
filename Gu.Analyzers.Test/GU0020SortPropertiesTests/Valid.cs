@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
 
@@ -15,7 +15,7 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private EventHandler someEvent;
 
@@ -74,7 +74,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         public int Value { get; } = 5;
 
@@ -99,7 +99,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         public int this[int index] => index;
 
@@ -124,7 +124,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         public int this[int index] => index;
 
@@ -153,7 +153,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         private int meh;
 
@@ -188,7 +188,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class Foo : IValue
+    public class C : IValue
     {
         object IValue.Value => this.Value;
 
@@ -380,9 +380,9 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(StringComparison stringComparison)
+        public C(StringComparison stringComparison)
         {
             this.StringComparison = stringComparison;
         }
@@ -419,7 +419,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         internal int Value { get; set; }
 
@@ -435,9 +435,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int b)
+        public C(int b)
         {
             this.B = b;
         }
@@ -456,7 +456,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         public static int A { get; } = 1;
 
@@ -472,9 +472,9 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        public Foo(int a)
+        public C(int a)
         {
             this.A = a;
         }
@@ -493,7 +493,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
         protected static int B { get; }
 
