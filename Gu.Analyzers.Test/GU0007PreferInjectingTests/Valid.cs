@@ -18,15 +18,6 @@ namespace N
     }
 }";
 
-        private static readonly string WithMutableProperty = @"
-namespace N
-{
-    public class Bar
-    {
-        public int Baz { get; set; }
-    }
-}";
-
         private static readonly string ServiceLocator = @"
 namespace N
 {
