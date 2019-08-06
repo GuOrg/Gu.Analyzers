@@ -4,11 +4,17 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
     public class AllBenchmarks
     {
+        private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ClassDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ClassDeclarationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ConstructorAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ConstructorAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ExceptionAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark IdentifierNameAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.IdentifierNameAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark MethodGroupAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.MethodGroupAnalyzer());
 
@@ -20,13 +26,11 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark SimpleAssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.SimpleAssignmentAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark StringLiteralExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.StringLiteralExpressionAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark TestMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.TestMethodAnalyzer());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0006UseNameofBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0006UseNameof());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark GU0009UseNamedParametersForBooleansBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0009UseNamedParametersForBooleans());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0011DoNotIgnoreReturnValueBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0011DoNotIgnoreReturnValue());
 
@@ -52,7 +56,13 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0072AllTypesShouldBeInternalBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0072AllTypesShouldBeInternal());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new ExceptionAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark GU0073MemberShouldBeInternalBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0073MemberShouldBeInternal());
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ArgumentAnalyzer()
+        {
+            ArgumentAnalyzerBenchmark.Run();
+        }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void ArgumentListAnalyzer()
@@ -70,6 +80,18 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ConstructorAnalyzer()
         {
             ConstructorAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void ExceptionAnalyzer()
+        {
+            ExceptionAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void IdentifierNameAnalyzer()
+        {
+            IdentifierNameAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -103,27 +125,21 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
+        public void StringLiteralExpressionAnalyzer()
+        {
+            StringLiteralExpressionAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
         public void TestMethodAnalyzer()
         {
             TestMethodAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0006UseNameof()
-        {
-            GU0006UseNameofBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
         public void GU0007PreferInjecting()
         {
             GU0007PreferInjectingBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void GU0009UseNamedParametersForBooleans()
-        {
-            GU0009UseNamedParametersForBooleansBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -199,9 +215,9 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void ExceptionAnalyzer()
+        public void GU0073MemberShouldBeInternal()
         {
-            ExceptionAnalyzerBenchmark.Run();
+            GU0073MemberShouldBeInternalBenchmark.Run();
         }
     }
 }

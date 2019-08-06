@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
     public class ExceptionAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new ExceptionAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ExceptionAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnGuAnalyzersProject()

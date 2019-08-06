@@ -8,7 +8,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0009UseNamedParametersForBooleans : DiagnosticAnalyzer
+    internal class ArgumentAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0009UseNamedParametersForBooleans);

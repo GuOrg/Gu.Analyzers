@@ -38,66 +38,52 @@ namespace Gu.Analyzers
                                  .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing)
+                if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id &&
+                    syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax objectCreation) &&
+                    objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax property) &&
+                    property.Parent is TypeDeclarationSyntax containingType &&
+                    containingType.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax ctor) &&
+                    ctor.Body != null)
                 {
-                    continue;
-                }
+                    context.RegisterCodeFix(
+                        "Use get-only" + (IsUnsafe() ? " UNSAFE" : string.Empty),
+                        (editor, cancellationToken) => InitializeInCtorAsync(editor, ctor, property, objectCreation, cancellationToken),
+                        this.GetType().FullName + "UNSAFE",
+                        diagnostic);
 
-                var syntaxNode = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id)
-                {
-                    if (syntaxNode is ObjectCreationExpressionSyntax objectCreation)
+                    bool IsUnsafe()
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
-                        var hasMutable = IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
-                                         IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
-
-                        var property = syntaxNode.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                        if (TryGetConstructor(property, out var ctor))
-                        {
-                            context.RegisterCodeFix(
-                                "Use get-only" + (hasMutable ? " UNSAFE" : string.Empty),
-                                (editor, cancellationToken) =>
-                                    ApplyInitializeInCtorFix(editor, ctor, property, objectCreation),
-                                this.GetType().FullName + "UNSAFE",
-                                diagnostic);
-                        }
+                        return IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
+                               IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
                     }
                 }
-                else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id)
+                else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&
+                         syntaxRoot.TryFindNode(diagnostic, out AccessorDeclarationSyntax setter))
                 {
-                    var setter = syntaxNode.FirstAncestorOrSelf<AccessorDeclarationSyntax>();
-                    if (setter != null)
-                    {
-                        context.RegisterCodeFix(
-                            "Use get-only",
-                            (editor, _) => ApplyRemoveSetterFix(editor, setter),
-                            this.GetType(),
-                            diagnostic);
-                    }
+                    context.RegisterCodeFix(
+                        "Use get-only",
+                        (editor, _) => editor.RemoveNode(setter, SyntaxRemoveOptions.AddElasticMarker),
+                        this.GetType(),
+                        diagnostic);
                 }
             }
         }
 
-        private static void ApplyRemoveSetterFix(DocumentEditor editor, AccessorDeclarationSyntax setter)
-        {
-            editor.RemoveNode(setter, SyntaxRemoveOptions.AddElasticMarker);
-        }
-
-        private static void ApplyInitializeInCtorFix(
+        private static async Task InitializeInCtorAsync(
             DocumentEditor editor,
             ConstructorDeclarationSyntax ctor,
             PropertyDeclarationSyntax property,
-            ObjectCreationExpressionSyntax objectCreation)
+            ObjectCreationExpressionSyntax objectCreation,
+            CancellationToken cancellationToken)
         {
-            var member = editor.SemanticModel.UnderscoreFields()
-                ? (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText)
-                : SyntaxFactory.MemberAccessExpression(
+            var member = (await editor.OriginalDocument.QualifyPropertyAccessAsync(cancellationToken).ConfigureAwait(false))
+                ? SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),
                     SyntaxFactory.Token(SyntaxKind.DotToken),
-                    SyntaxFactory.IdentifierName(property.Identifier.ValueText));
+                    SyntaxFactory.IdentifierName(property.Identifier.ValueText))
+                : (ExpressionSyntax)SyntaxFactory.IdentifierName(property.Identifier.ValueText);
             var assignment =
                 SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.AssignmentExpression(
@@ -188,25 +174,6 @@ namespace Gu.Analyzers
             }
 
             return true;
-        }
-
-        private static bool TryGetConstructor(PropertyDeclarationSyntax property, out ConstructorDeclarationSyntax result)
-        {
-            result = null;
-            foreach (var member in ((TypeDeclarationSyntax)property.Parent).Members)
-            {
-                if (member is ConstructorDeclarationSyntax ctor)
-                {
-                    if (ctor.Body == null || result != null)
-                    {
-                        return false;
-                    }
-
-                    result = ctor;
-                }
-            }
-
-            return result != null;
         }
     }
 }

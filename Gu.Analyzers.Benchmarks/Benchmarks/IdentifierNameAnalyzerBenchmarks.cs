@@ -3,9 +3,9 @@
 namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
-    public class GU0009UseNamedParametersForBooleansBenchmarks
+    public class IdentifierNameAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.IdentifierNameAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnGuAnalyzersProject()

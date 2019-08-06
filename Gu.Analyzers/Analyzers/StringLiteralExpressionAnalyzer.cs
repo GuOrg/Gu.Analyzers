@@ -10,7 +10,7 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0006UseNameof : DiagnosticAnalyzer
+    internal class StringLiteralExpressionAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0006UseNameof);
@@ -25,12 +25,8 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is LiteralExpressionSyntax literal &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is LiteralExpressionSyntax literal &&
                 literal.Parent is ArgumentSyntax &&
                 SyntaxFacts.IsValidIdentifier(literal.Token.ValueText))
             {

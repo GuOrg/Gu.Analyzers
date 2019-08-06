@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0009UseNamedParametersForBooleans();
+        private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
         private static readonly CodeFixProvider Fix = new NameArgumentsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans);
 

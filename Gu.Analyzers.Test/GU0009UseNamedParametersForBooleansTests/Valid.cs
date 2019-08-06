@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 
     internal static class Valid
     {
-        private static readonly GU0009UseNamedParametersForBooleans Analyzer = new GU0009UseNamedParametersForBooleans();
+        private static readonly ArgumentAnalyzer Analyzer = new ArgumentAnalyzer();
 
         [Test]
         public static void UsesNamedParameter()
