@@ -294,20 +294,21 @@ namespace N
 {
     public class C
     {
-        public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public readonly int _d;
 
         public C(int a, int b, int c, int d)
         {
-            _a = a;
+            A = a;
             _b = b;
             _c = c;
             _d = d;
         }
 
-        public C P => ↓new C(_a, _b, _c, _d);
+        public int A { get; }
+
+        public C P => ↓new C(A, _b, _c, _d);
     }
 }";
 
@@ -316,19 +317,20 @@ namespace N
 {
     public class C
     {
-        public readonly int _a;
         public readonly int _b;
         public readonly int _c;
         public readonly int _d;
 
         public C(int a, int b, int c, int d)
         {
-            _a = a;
+            A = a;
             _b = b;
             _c = c;
             _d = d;
-            P = new C(_a, _b, _c, _d);
+            P = new C(A, _b, _c, _d);
         }
+
+        public int A { get; }
 
         public C P { get; }
     }
@@ -619,7 +621,7 @@ namespace N
         }
 
         [Test]
-        public static void AllocatingReferenceTypeFromMutableFieldUnderscoreNoFix()
+        public static void AllocatingReferenceTypeFromMutablePropertyUnderscore()
         {
             var before = @"
 namespace N
@@ -629,17 +631,18 @@ namespace N
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
-        public int _d;
 
         public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
             _c = c;
-            _d = d;
+            D = d;
         }
 
-        public C P => ↓new C(_a, _b, _c, _d);
+        public int D { get; set; }
+
+        public C P => ↓new C(_a, _b, _c, D);
     }
 }";
 
@@ -651,16 +654,17 @@ namespace N
         public readonly int _a;
         public readonly int _b;
         public readonly int _c;
-        public int _d;
 
         public C(int a, int b, int c, int d)
         {
             _a = a;
             _b = b;
             _c = c;
-            _d = d;
-            P = new C(_a, _b, _c, _d);
+            D = d;
+            P = new C(_a, _b, _c, D);
         }
+
+        public int D { get; set; }
 
         public C P { get; }
     }
