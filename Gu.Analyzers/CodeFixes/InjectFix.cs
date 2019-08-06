@@ -185,7 +185,7 @@ namespace Gu.Analyzers
             }
             else
             {
-                editor.AddMember(containingType, newField);
+                _ = editor.AddMember(containingType, newField);
             }
 
             var fieldAccess = underscoreFields
