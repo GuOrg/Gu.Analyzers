@@ -87,6 +87,43 @@ namespace N
             }
 
             [Test]
+            public static void WhenKeyword()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        private readonly string @default;
+
+        public C(string ↓@default)
+        {
+            this.@default = @default;
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        private readonly string @default;
+
+        public C(string @default)
+        {
+            this.@default = @default ?? throw new ArgumentNullException(nameof(@default));
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
+
+            [Test]
             public static void PassAsArgument()
             {
                 var before = @"
@@ -123,6 +160,48 @@ namespace N
         }
 
         private int M(string text) => text.Length;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
+
+            [Test]
+            public static void PassAsArgumentWhenKeyword()
+            {
+                var before = @"
+namespace N
+{
+    public class C
+    {
+        private readonly int bar;
+
+        public C(string ↓@default)
+        {
+            this.bar = M(@default);
+        }
+
+        private int M(string s) => s.Length;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    public class C
+    {
+        private readonly int bar;
+
+        public C(string @default)
+        {
+            if (@default == null)
+            {
+                throw new System.ArgumentNullException(nameof(@default));
+            }
+
+            this.bar = M(@default);
+        }
+
+        private int M(string s) => s.Length;
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -312,3 +391,4 @@ namespace N
         }
     }
 }
+

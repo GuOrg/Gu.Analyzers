@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
         {
             private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
             private static readonly NullCheckParameterFix Fix = new NullCheckParameterFix();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0012");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
 
             [TestCase("public")]
             [TestCase("internal")]

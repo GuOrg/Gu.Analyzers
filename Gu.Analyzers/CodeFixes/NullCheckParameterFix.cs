@@ -34,7 +34,7 @@ namespace Gu.Analyzers
                         "Throw if null.",
                         (editor, _) => editor.ReplaceNode(
                             node,
-                            SyntaxFactory.ParseExpression($"{identifierName.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({identifierName.Identifier.ValueText}))").WithSimplifiedNames()),
+                            SyntaxFactory.ParseExpression($"{identifierName.Identifier.Text} ?? throw new System.ArgumentNullException(nameof({identifierName.Identifier.Text}))").WithSimplifiedNames()),
                         this.GetType(),
                         diagnostic);
                 }
@@ -53,7 +53,7 @@ namespace Gu.Analyzers
                                     "Throw if null on first assignment.",
                                     (editor, _) => editor.ReplaceNode(
                                         assignedValue,
-                                        SyntaxFactory.ParseExpression($"{assignedValue.Identifier.ValueText} ?? throw new System.ArgumentNullException(nameof({assignedValue.Identifier.ValueText}))").WithSimplifiedNames()),
+                                        SyntaxFactory.ParseExpression($"{assignedValue.Identifier.Text} ?? throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames()),
                                     this.GetType(),
                                     diagnostic);
                             }
@@ -92,9 +92,9 @@ namespace Gu.Analyzers
         private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter)
         {
             var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"if ({parameter.Identifier.ValueText} == null)")
+                                        .AppendLine($"if ({parameter.Identifier.Text} == null)")
                                         .AppendLine("{")
-                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({parameter.Identifier.ValueText}));")
+                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}));")
                                         .AppendLine("}")
                                         .Return();
             var nullCheck = SyntaxFactory.ParseStatement(code)
