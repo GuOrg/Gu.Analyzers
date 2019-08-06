@@ -94,7 +94,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(Analyzer), RoslynAssert.MetadataReferences);
+            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(Analyzer), MetadataReferences.FromAttributes());
             var diagnostics = Analyze.GetDiagnostics(Analyzer, sln);
             RoslynAssert.NoDiagnostics(diagnostics);
         }

@@ -92,7 +92,7 @@ namespace Gu.Analyzers
         private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter)
         {
             var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"if ({parameter.Identifier.Text} == null)")
+                                        .AppendLine($"if ({parameter.Identifier.Text} is null)")
                                         .AppendLine("{")
                                         .AppendLine($"    throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}));")
                                         .AppendLine("}")

@@ -38,7 +38,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), RoslynAssert.MetadataReferences);
+            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
             var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
             RoslynAssert.NoDiagnostics(diagnostics);
         }
@@ -216,7 +216,7 @@ namespace N.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -268,7 +268,7 @@ namespace N.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -345,7 +345,7 @@ namespace N
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, RoslynAssert.MetadataReferences).ConfigureAwait(false);
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
         }
     }
 }

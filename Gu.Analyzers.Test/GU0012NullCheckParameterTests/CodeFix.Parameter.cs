@@ -124,7 +124,7 @@ namespace N
             }
 
             [Test]
-            public static void PassAsArgument()
+            public static void AddIfNullThrow()
             {
                 var before = @"
 namespace N
@@ -151,7 +151,7 @@ namespace N
 
         public C(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new System.ArgumentNullException(nameof(text));
             }
@@ -166,7 +166,51 @@ namespace N
             }
 
             [Test]
-            public static void PassAsArgumentWhenKeyword()
+            public static void AddIfNullThrowWhenComment()
+            {
+                var before = @"
+namespace N
+{
+    public class C
+    {
+        private readonly int bar;
+
+        public C(string ↓text)
+        {
+            // comment
+            this.bar = M(text);
+        }
+
+        private int M(string text) => text.Length;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    public class C
+    {
+        private readonly int bar;
+
+        public C(string text)
+        {
+            if (text is null)
+            {
+                throw new System.ArgumentNullException(nameof(text));
+            }
+
+            // comment
+            this.bar = M(text);
+        }
+
+        private int M(string text) => text.Length;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
+
+            [Test]
+            public static void AddIfNullThrowWhenKeyword()
             {
                 var before = @"
 namespace N
@@ -193,7 +237,7 @@ namespace N
 
         public C(string @default)
         {
-            if (@default == null)
+            if (@default is null)
             {
                 throw new System.ArgumentNullException(nameof(@default));
             }
@@ -228,7 +272,7 @@ namespace N
     {
         public C(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new System.ArgumentNullException(nameof(text));
             }
@@ -238,8 +282,10 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
-            [Test]
-            public static void AfterOtherParameter()
+            [TestCase("s1 is null")]
+            [TestCase("s1 == null")]
+            [TestCase("ReferenceEquals(s1, null)")]
+            public static void AfterOtherParameter(string expression)
             {
                 var before = @"
 namespace N
@@ -248,13 +294,13 @@ namespace N
     {
         public C(string s1, string ↓s2)
         {
-            if (s1 == null)
+            if (s1 is null)
             {
                 throw new System.ArgumentNullException(nameof(s1));
             }
         }
     }
-}";
+}".AssertReplace("s1 is null", expression);
 
                 var after = @"
 namespace N
@@ -263,18 +309,18 @@ namespace N
     {
         public C(string s1, string s2)
         {
-            if (s1 == null)
+            if (s1 is null)
             {
                 throw new System.ArgumentNullException(nameof(s1));
             }
 
-            if (s2 == null)
+            if (s2 is null)
             {
                 throw new System.ArgumentNullException(nameof(s2));
             }
         }
     }
-}";
+}".AssertReplace("s1 is null", expression);
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
@@ -288,7 +334,7 @@ namespace N
     {
         public C(string ↓s1, string s2)
         {
-            if (s2 == null)
+            if (s2 is null)
             {
                 throw new System.ArgumentNullException(nameof(s2));
             }
@@ -303,12 +349,12 @@ namespace N
     {
         public C(string s1, string s2)
         {
-            if (s1 == null)
+            if (s1 is null)
             {
                 throw new System.ArgumentNullException(nameof(s1));
             }
 
-            if (s2 == null)
+            if (s2 is null)
             {
                 throw new System.ArgumentNullException(nameof(s2));
             }
@@ -339,12 +385,12 @@ namespace N
     {
         public C(string s1, string s2)
         {
-            if (s1 == null)
+            if (s1 is null)
             {
                 throw new System.ArgumentNullException(nameof(s1));
             }
 
-            if (s2 == null)
+            if (s2 is null)
             {
                 throw new System.ArgumentNullException(nameof(s2));
             }
@@ -391,4 +437,3 @@ namespace N
         }
     }
 }
-

@@ -21,12 +21,12 @@ namespace Gu.Analyzers.Test
         private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("Gu.Analyzers.csproj"),
             AllAnalyzers,
-            RoslynAssert.MetadataReferences);
+            MetadataReferences.FromAttributes());
 
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
-            RoslynAssert.MetadataReferences);
+            MetadataReferences.FromAttributes());
 
         [SetUp]
         public void Setup()
@@ -110,7 +110,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
+            var sln = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer, SuppressWarnings.FromAttributes()), MetadataReferences.FromAttributes());
             var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
             RoslynAssert.NoDiagnostics(diagnostics);
         }

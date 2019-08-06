@@ -11,6 +11,10 @@
     <Rule Id="GURA01" Action="None" />
     <Rule Id="GURA03" Action="None" />
     <Rule Id="GURA09" Action="None" />
+    <Rule Id="GURA04" Action="Hidden" />
+    <Rule Id="GURA05" Action="Info" />
+    <Rule Id="GURA06" Action="Info" />
+    <Rule Id="GURA10" Action="Hidden" />
   </Rules>
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
