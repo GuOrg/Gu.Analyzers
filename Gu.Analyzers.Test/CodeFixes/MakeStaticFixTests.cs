@@ -9,15 +9,44 @@ namespace Gu.Analyzers.Test.CodeFixes
         private static readonly CodeFixProvider Fix = new MakeStaticFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS0708");
 
-        [Test]
-        public static void SimpleMethod()
+        [TestCase("public")]
+        [TestCase("internal")]
+        [TestCase("private")]
+        public static void SimpleMethod(string modifier)
         {
             var before = @"
 namespace N
 {
-    public static class C
+    static class C
     {
         public void ↓M()
+        {
+        }
+    }
+}".AssertReplace("public", modifier);
+
+            var after = @"
+namespace N
+{
+    static class C
+    {
+        public static void M()
+        {
+        }
+    }
+}".AssertReplace("public", modifier);
+            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void ImplicitPrivate()
+        {
+            var before = @"
+namespace N
+{
+    static class C
+    {
+        void ↓M()
         {
         }
     }
@@ -26,9 +55,9 @@ namespace N
             var after = @"
 namespace N
 {
-    public static class C
+    static class C
     {
-        public static void M()
+        static void M()
         {
         }
     }
@@ -69,6 +98,33 @@ namespace N
     }
 }";
             RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void AsyncMethod()
+        {
+            var before = @"
+namespace N
+{
+    using System.Threading.Tasks;
+
+    public static class C
+    {
+        public async Task ↓M() => await Task.CompletedTask;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Threading.Tasks;
+
+    public static class C
+    {
+        public static async Task M() => await Task.CompletedTask;
+    }
+}";
+            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

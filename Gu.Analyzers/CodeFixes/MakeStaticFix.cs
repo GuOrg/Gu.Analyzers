@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -32,11 +33,30 @@ namespace Gu.Analyzers
                         "Make Static.",
                         (editor, _) => editor.ReplaceNode(
                             methodDeclaration,
-                            x => x.WithModifiers(methodDeclaration.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.StaticKeyword)))),
+                            x => x.WithModifiers(MakeStatic(x.Modifiers))),
                         "Make Static.",
                         diagnostic);
                 }
             }
+        }
+
+        private static SyntaxTokenList MakeStatic(SyntaxTokenList before)
+        {
+            if (before.TryFirst(out var first))
+            {
+                switch (first.Kind())
+                {
+                    case SyntaxKind.PublicKeyword:
+                    case SyntaxKind.InternalKeyword:
+                    case SyntaxKind.ProtectedKeyword:
+                    case SyntaxKind.PrivateKeyword:
+                        return before.Insert(1, SyntaxFactory.Token(SyntaxKind.StaticKeyword));
+                    default:
+                        return before.Add(SyntaxFactory.Token(SyntaxKind.StaticKeyword));
+                }
+            }
+
+            return SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.StaticKeyword));
         }
     }
 }
