@@ -27,7 +27,7 @@ namespace Gu.Analyzers
                 {
                     context.RegisterCodeFix(
                         "Make sealed.",
-                        (editor, _) => editor.MakeSealed(classDeclaration),
+                        (editor, _) => editor.Seal(classDeclaration),
                         "Make sealed.",
                         diagnostic);
                 }

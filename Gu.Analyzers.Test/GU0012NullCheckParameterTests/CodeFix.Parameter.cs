@@ -5,6 +5,7 @@ namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
+    [Explicit("Temp.")]
     internal static partial class CodeFix
     {
         internal static class Parameter
