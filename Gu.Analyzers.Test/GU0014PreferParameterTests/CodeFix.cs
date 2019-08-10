@@ -12,6 +12,41 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0014PreferParameter);
 
         [Test]
+        public static void Messages()
+        {
+            var before = @"
+namespace N
+{
+    public class C
+    {
+        private readonly string text;
+
+        public C(string text)
+        {
+            this.text = text;
+            var length = ↓this.text.Length;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public class C
+    {
+        private readonly string text;
+
+        public C(string text)
+        {
+            this.text = text;
+            var length = text.Length;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Prefer using parameter."), before, after, fixTitle: "Prefer parameter.");
+        }
+
+        [Test]
         public static void WhenAccessingFieldProperty()
         {
             var before = @"
