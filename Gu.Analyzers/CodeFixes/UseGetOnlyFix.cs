@@ -77,7 +77,8 @@ namespace Gu.Analyzers
             ObjectCreationExpressionSyntax objectCreation,
             CancellationToken cancellationToken)
         {
-            var member = (await editor.OriginalDocument.QualifyPropertyAccessAsync(cancellationToken).ConfigureAwait(false))
+            var qualifyPropertyAccess = await editor.OriginalDocument.QualifyPropertyAccessAsync(cancellationToken).ConfigureAwait(false);
+            var member = qualifyPropertyAccess != CodeStyleResult.No
                 ? SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),

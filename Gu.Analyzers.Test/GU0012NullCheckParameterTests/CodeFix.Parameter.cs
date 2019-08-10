@@ -217,14 +217,14 @@ namespace N
 {
     public class C
     {
-        private readonly int bar;
+        private readonly int f;
 
         public C(string ↓@default)
         {
-            this.bar = M(@default);
+            this.f = M(@default);
         }
 
-        private int M(string s) => s.Length;
+        private static int M(string s) => s.Length;
     }
 }";
 
@@ -233,7 +233,7 @@ namespace N
 {
     public class C
     {
-        private readonly int bar;
+        private readonly int f;
 
         public C(string @default)
         {
@@ -242,10 +242,10 @@ namespace N
                 throw new System.ArgumentNullException(nameof(@default));
             }
 
-            this.bar = M(@default);
+            this.f = M(@default);
         }
 
-        private int M(string s) => s.Length;
+        private static int M(string s) => s.Length;
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);

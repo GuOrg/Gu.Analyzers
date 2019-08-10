@@ -468,7 +468,14 @@ namespace N
     {
         private int _value;
 
+        public C(int p)
+        {
+            P = p;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public int P { get; }
 
         public int Squared => _value*_value;
 
@@ -509,7 +516,14 @@ namespace N
     {
         private int _value;
 
+        public C(int p)
+        {
+            P = p;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public int P { get; }
 
         public int Squared => _value*_value;
 

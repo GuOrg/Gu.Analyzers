@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
@@ -61,9 +62,9 @@ namespace Gu.Analyzers
                             {
                                 context.RegisterCodeFix(
                                     "Add null check.",
-                                    (editor, _) => editor.ReplaceNode(
+                                    (editor, cancellationToken) => editor.ReplaceNode(
                                         block,
-                                        x => WithNullCheck(x, parameter)),
+                                        x => WithNullCheck(x, parameter, cancellationToken)),
                                     this.GetType(),
                                     diagnostic);
                             }
@@ -89,19 +90,20 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter)
+        private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter, CancellationToken cancellationToken)
         {
-            var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"if ({parameter.Identifier.Text} is null)")
-                                        .AppendLine("{")
-                                        .AppendLine($"    throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}));")
-                                        .AppendLine("}")
-                                        .Return();
-            var nullCheck = SyntaxFactory.ParseStatement(code)
-                                         .WithSimplifiedNames()
-                                         .WithAdditionalAnnotations(Formatter.Annotation)
+            var nullCheck = SyntaxFactory.IfStatement(
+                                             SyntaxFactory.IsPatternExpression(
+                                                 SyntaxFactory.ParseName(parameter.Identifier.Text),
+                                                 SyntaxFactory.ConstantPattern(
+                                                     SyntaxFactory.LiteralExpression(
+                                                         SyntaxKind.NullLiteralExpression))),
+                                             SyntaxFactory.Block(
+                                                 SyntaxFactory.ThrowStatement(
+                                                     SyntaxFactory.ParseExpression(
+                                                         $"new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames())))
                                          .WithLeadingElasticLineFeed()
-                                         .WithTrailingElasticLineFeed();
+                                         .WithTrailingLineFeed();
 
             return body.WithStatements(body.Statements.Insert(FindPosition(), nullCheck));
 
@@ -121,11 +123,8 @@ namespace Gu.Analyzers
                         var statement = body.Statements[i];
                         if (statement is IfStatementSyntax ifStatement &&
                             IsThrow(ifStatement.Statement) &&
-                            ifStatement.Condition is BinaryExpressionSyntax condition &&
-                            condition.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken) &&
-                            condition.Right is LiteralExpressionSyntax literal &&
-                            literal.IsKind(SyntaxKind.NullLiteralExpression) &&
-                            condition.Left is IdentifierNameSyntax identifierName &&
+                            NullCheck.IsNullCheck(ifStatement.Condition, null,cancellationToken, out var value) &&
+                            value is IdentifierNameSyntax identifierName &&
                             body.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                             methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&
                             parameterList.Parameters.IndexOf(other) < ordinal)

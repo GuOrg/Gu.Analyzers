@@ -158,7 +158,7 @@ namespace Gu.Analyzers
 
         private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            var underscoreFields = editor.SemanticModel.UnderscoreFields();
+            var underscoreFields = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
             var name = underscoreFields
                            ? "_" + parameter.Identifier.ValueText
                            : parameter.Identifier.ValueText;

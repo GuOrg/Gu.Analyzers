@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading;
@@ -38,30 +39,47 @@ namespace Gu.Analyzers
                 {
                     context.RegisterCodeFix(
                         "Use nameof",
-                        (editor, cancellationToken) => ApplyFix(editor, argument, literal.Token.ValueText, cancellationToken),
-                        this.GetType(),
+                        (editor, cancellationToken) => FixAsync(editor, argument, literal.Token.ValueText, cancellationToken),
+                        this.GetType().FullName,
                         diagnostic);
                 }
             }
         }
 
-        private static void ApplyFix(DocumentEditor editor, ArgumentSyntax argument, string name, CancellationToken cancellationToken)
+        private static async Task FixAsync(DocumentEditor editor, ArgumentSyntax argument, string name, CancellationToken cancellationToken)
         {
             if (!IsStaticContext(argument, editor.SemanticModel, cancellationToken) &&
                 editor.SemanticModel.LookupSymbols(argument.SpanStart, name: name).TrySingle(out var member) &&
                 (member is IFieldSymbol || member is IPropertySymbol || member is IMethodSymbol) &&
                 !member.IsStatic &&
-                !editor.SemanticModel.UnderscoreFields())
+                await Qualify(member).ConfigureAwait(false) != CodeStyleResult.No)
             {
                 editor.ReplaceNode(
                     argument.Expression,
-                    (x, _) => SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseExpression($"nameof(this.{name})"), x));
+                    (x, _) => SyntaxFactory.ParseExpression($"nameof(this.{name})").WithTriviaFrom(x));
             }
             else
             {
                 editor.ReplaceNode(
                     argument.Expression,
-                    (x, _) => SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseExpression($"nameof({name})"), x));
+                    (x, _) => SyntaxFactory.ParseExpression($"nameof({name})").WithTriviaFrom(x));
+            }
+
+            Task<CodeStyleResult> Qualify(ISymbol symbol)
+            {
+                switch (symbol.Kind)
+                {
+                    case SymbolKind.Field:
+                        return editor.QualifyFieldAccessAsync(cancellationToken);
+                    case SymbolKind.Event:
+                        return editor.QualifyEventAccessAsync(cancellationToken);
+                    case SymbolKind.Property:
+                        return editor.QualifyPropertyAccessAsync(cancellationToken);
+                    case SymbolKind.Method:
+                        return editor.QualifyMethodAccessAsync(cancellationToken);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
 

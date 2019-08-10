@@ -4,7 +4,6 @@ namespace Gu.Analyzers.Test
     using System.Collections.Immutable;
     using System.Linq;
     using System.Threading.Tasks;
-    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -27,20 +26,6 @@ namespace Gu.Analyzers.Test
             ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
             MetadataReferences.FromAttributes());
-
-        [SetUp]
-        public void Setup()
-        {
-            // The cache will be enabled when running in VS.
-            // It speeds up the tests and makes them more realistic
-            Cache<SyntaxTree, SemanticModel>.Begin();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Cache<SyntaxTree, SemanticModel>.End();
-        }
 
         [Test]
         public void NotEmpty()
