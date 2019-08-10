@@ -62,7 +62,6 @@ namespace Gu.Analyzers
             }
 
             return false;
-
         }
 
         private static bool IsStaticPublicOrInternal(SyntaxTokenList modifiers)

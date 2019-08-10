@@ -43,29 +43,6 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
-        [TestCase("[TestCase(\"a\", ↓1, null)]")]
-        [TestCase("[TestCase(null, \"a\", ↓1)]")]
-        [TestCase("[TestCase(↓1, null, \"b\")]")]
-        [TestCase("[TestCase(null, null, ↓1)]")]
-        public static void NullArgument(string testCase)
-        {
-            var testCode = @"
-namespace N
-{
-    using NUnit.Framework;
-
-    public class C
-    {
-        [TestCase(""x"", ""y"", null)]
-        public void M(string x, string y, string z)
-        {
-        }
-    }
-}".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
-
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
-
         [Test]
         public static void TestCaseAttribute_IfMultipleParametersAreWrong()
         {
@@ -96,25 +73,6 @@ namespace N
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
-
-        [Test]
-        public static void ArgumentIsNullAndParameterIsInt()
-        {
-            var testCode = @"
-namespace N
-{
-    using NUnit.Framework;
-
-    public class C
-    {
-        [TestCase(↓null)]
-        public void M(int obj)
-        {
-        }
-    }
-}";
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
         }
 
         [Test]

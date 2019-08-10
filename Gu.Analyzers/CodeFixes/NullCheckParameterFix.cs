@@ -122,7 +122,7 @@ namespace Gu.Analyzers
                         var statement = body.Statements[i];
                         if (statement is IfStatementSyntax ifStatement &&
                             IsThrow(ifStatement.Statement) &&
-                            NullCheck.IsNullCheck(ifStatement.Condition, null,cancellationToken, out var value) &&
+                            NullCheck.IsNullCheck(ifStatement.Condition, null, cancellationToken, out var value) &&
                             value is IdentifierNameSyntax identifierName &&
                             body.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                             methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&

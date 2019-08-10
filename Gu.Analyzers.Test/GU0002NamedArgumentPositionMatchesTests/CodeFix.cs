@@ -263,42 +263,5 @@ namespace N
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
-
-        [Test]
-        public static void ConstructorIgnoredIfNonWhitespaceTrivia()
-        {
-            var testCode = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
-
-        public int A { get; }
-
-        public int B { get; }
-
-        public int C { get; }
-
-        public int D { get; }
-
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo↓(
-                b: b, // some comment
-                a: a,
-                c: c,
-                d: d);
-        }
-    }
-}";
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
     }
 }

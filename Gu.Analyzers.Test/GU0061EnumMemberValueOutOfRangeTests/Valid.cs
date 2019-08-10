@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new GU0061EnumMemberValueOutOfRange();
 
