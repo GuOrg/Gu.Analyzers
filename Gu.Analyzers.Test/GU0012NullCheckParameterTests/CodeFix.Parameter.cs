@@ -398,6 +398,46 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
+
+            [Test]
+            public static void WhenInvoked()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.ComponentModel;
+
+    public class C
+    {
+        protected void M(object ↓source)
+        {
+            source.ToString();
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.ComponentModel;
+
+    public class C
+    {
+        protected void M(object source)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            source.ToString();
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
         }
     }
 }
