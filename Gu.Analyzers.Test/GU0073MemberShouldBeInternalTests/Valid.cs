@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new GU0073MemberShouldBeInternal();
 

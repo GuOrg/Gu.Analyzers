@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class CodeFixAll
+    internal static class FixAll
     {
         private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
         private static readonly SortPropertiesFix Fix = new SortPropertiesFix();

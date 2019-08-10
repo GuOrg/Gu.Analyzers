@@ -365,42 +365,6 @@ namespace N
             }
 
             [Test]
-            public static void FixAll()
-            {
-                var before = @"
-namespace N
-{
-    public sealed class C
-    {
-        public C(string ↓s1, string ↓s2)
-        {
-        }
-    }
-}";
-
-                var after = @"
-namespace N
-{
-    public sealed class C
-    {
-        public C(string s1, string s2)
-        {
-            if (s1 is null)
-            {
-                throw new System.ArgumentNullException(nameof(s1));
-            }
-
-            if (s2 is null)
-            {
-                throw new System.ArgumentNullException(nameof(s2));
-            }
-        }
-    }
-}";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
             public static void OutParameter()
             {
                 var before = @"

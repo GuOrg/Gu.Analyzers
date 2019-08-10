@@ -10,9 +10,9 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing);
 
         [Test]
-        public static void Message()
+        public static void Messages()
         {
-            var code = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -20,29 +20,24 @@ namespace N
     [Serializable]
     public class Foo
     {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
-
         ↓public event EventHandler SomeEvent;
-
-        public int A { get; }
-
-        public int B { get; protected set;}
-
-        public int C { get; internal set; }
-
-        public int D { get; set; }
-
-        public int E => A;
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Ignore events when serializing."), code);
+            var after = @"
+namespace N
+{
+    using System;
+
+    [Serializable]
+    public class Foo
+    {
+        [field: NonSerialized]
+        public event EventHandler SomeEvent;
+    }
+}";
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing.");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Add [field:NonSerialized].");
         }
 
         [Test]

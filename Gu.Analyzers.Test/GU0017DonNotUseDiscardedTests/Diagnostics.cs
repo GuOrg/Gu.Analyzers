@@ -4,7 +4,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class Diagnostic
+    internal static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0017DoNotUseDiscarded);

@@ -3,7 +3,7 @@ namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal static class ValidCode
+    internal static class Valid
     {
         private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
 
