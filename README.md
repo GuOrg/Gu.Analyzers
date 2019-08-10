@@ -32,6 +32,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only.
 | [GU0023](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md)| Static members that initialize with other static members depend on document order.
 | [GU0024](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md)| Seal type with default member.
+| [GU0025](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0025.md)| Seal type with overridden equality.
 | [GU0050](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md)| Ignore events when serializing.
 | [GU0051](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md)| Cache the XmlSerializer.
 | [GU0052](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md)| Mark exception with [Serializable].

@@ -12,7 +12,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0024SealTypeWithDefaultMember);
+            Descriptors.GU0024SealTypeWithDefaultMember,
+            Descriptors.GU0025SealTypeWithOverridenEquality);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -24,51 +25,56 @@ namespace Gu.Analyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.ContainingSymbol is INamedTypeSymbol type &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is INamedTypeSymbol type &&
                 !type.IsStatic &&
                 !type.IsSealed &&
                 context.Node is ClassDeclarationSyntax classDeclaration)
             {
-                foreach (var member in classDeclaration.Members)
+                if (HasDefaultMember(classDeclaration, context))
                 {
-                    if (member is PropertyDeclarationSyntax property &&
-                        IsStaticPublicOrInternal(property.Modifiers) &&
-                        property.IsGetOnly() &&
-                        IsInitializedWithContainingType(property.Initializer, context))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember, classDeclaration.Identifier.GetLocation()));
-                        return;
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember, classDeclaration.Identifier.GetLocation()));
+                }
 
-                    if (member is FieldDeclarationSyntax field &&
-                            IsStaticPublicOrInternal(field.Modifiers) &&
-                            field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                            field.Declaration is VariableDeclarationSyntax declaration &&
-                            declaration.Variables.TrySingle(out var variable) &&
-                             IsInitializedWithContainingType(variable.Initializer, context))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember, classDeclaration.Identifier.GetLocation()));
-                        return;
-                    }
+                if (Equality.IsOverriden(classDeclaration))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0025SealTypeWithOverridenEquality, classDeclaration.Identifier.GetLocation()));
                 }
             }
         }
 
-        private static bool IsStaticPublicOrInternal(SyntaxTokenList propertyModifiers)
+        private static bool HasDefaultMember(ClassDeclarationSyntax classDeclaration, SyntaxNodeAnalysisContext context)
         {
-            return propertyModifiers.Any(SyntaxKind.StaticKeyword) &&
-                   !propertyModifiers.Any(SyntaxKind.ProtectedKeyword) &&
-                   !propertyModifiers.Any(SyntaxKind.PrivateKeyword);
+            foreach (var member in classDeclaration.Members)
+            {
+                switch (member)
+                {
+                    case PropertyDeclarationSyntax property when IsStaticPublicOrInternal(property.Modifiers) &&
+                                                                 property.IsGetOnly() &&
+                                                                 IsInitializedWithContainingType(property.Initializer, context):
+                        return true;
+                    case FieldDeclarationSyntax field when IsStaticPublicOrInternal(field.Modifiers) &&
+                                                           field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                                                           field.Declaration is VariableDeclarationSyntax declaration &&
+                                                           declaration.Variables.TrySingle(out var variable) && IsInitializedWithContainingType(variable.Initializer, context):
+                        return true;
+                }
+            }
+
+            return false;
+
         }
 
-        private static bool IsInitializedWithContainingType(EqualsValueClauseSyntax iniializer, SyntaxNodeAnalysisContext context)
+        private static bool IsStaticPublicOrInternal(SyntaxTokenList modifiers)
         {
-            return iniializer?.Value is ObjectCreationExpressionSyntax objectCreation &&
+            return modifiers.Any(SyntaxKind.StaticKeyword) &&
+                   (modifiers.Any(SyntaxKind.PublicKeyword) ||
+                    modifiers.Any(SyntaxKind.InternalKeyword));
+        }
+
+        private static bool IsInitializedWithContainingType(EqualsValueClauseSyntax initializer, SyntaxNodeAnalysisContext context)
+        {
+            return initializer?.Value is ObjectCreationExpressionSyntax objectCreation &&
                    context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var createdType) &&
                    createdType.Equals(context.ContainingSymbol);
         }

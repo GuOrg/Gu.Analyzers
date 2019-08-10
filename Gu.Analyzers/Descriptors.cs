@@ -199,8 +199,17 @@ namespace Gu.Analyzers
             messageFormat: "Seal type with default member.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
-            isEnabledByDefault: false,
+            isEnabledByDefault: true,
             description: "Seal type with default member.");
+
+        internal static readonly DiagnosticDescriptor GU0025SealTypeWithOverridenEquality = Descriptors.Create(
+            id: "GU0025",
+            title: "Seal type with overridden equality.",
+            messageFormat: "Seal type with overridden equality.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: "Seal type with overridden equality.");
 
         internal static readonly DiagnosticDescriptor GU0050IgnoreEventsWhenSerializing = Descriptors.Create(
             id: "GU0050",

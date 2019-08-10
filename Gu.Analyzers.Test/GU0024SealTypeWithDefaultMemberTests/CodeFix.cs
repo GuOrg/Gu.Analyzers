@@ -8,6 +8,7 @@ namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
     internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember);
         private static readonly CodeFixProvider Fix = new MakeSealedFix();
 
         [Test]
@@ -30,7 +31,7 @@ namespace N
         public static readonly C Default = new C();
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Make sealed.");
         }
 
         [Test]
@@ -53,7 +54,7 @@ namespace N
         public static C Default { get; } = new C();
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Make sealed.");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Make sealed.");
         }
     }
 }
