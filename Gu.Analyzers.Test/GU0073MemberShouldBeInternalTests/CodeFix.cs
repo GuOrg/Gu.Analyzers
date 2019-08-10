@@ -10,6 +10,34 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         private static readonly DiagnosticAnalyzer Analyzer = new GU0073MemberShouldBeInternal();
         private static readonly CodeFixProvider Fix = new MakeInternalFix();
 
+        [Test]
+        public static void Messages()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    internal class C
+    {
+        ↓public readonly int F;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    internal class C
+    {
+        internal readonly int F;
+    }
+}";
+            var expectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0073MemberShouldBeInternal).WithMessage("Member F of non-public type C should be internal.");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Make internal.");
+        }
+
         [TestCase("readonly int F;")]
         [TestCase("static readonly int F;")]
         [TestCase("C() { }")]

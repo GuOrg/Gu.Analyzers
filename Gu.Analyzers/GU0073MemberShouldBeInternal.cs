@@ -47,8 +47,8 @@ namespace Gu.Analyzers
                     Diagnostic.Create(
                         Descriptors.GU0073MemberShouldBeInternal,
                         keyword.GetLocation(),
-                        memberSymbol.ToDisplayString(),
-                        memberSymbol.ContainingType.ToDisplayString()));
+                        memberSymbol.Name,
+                        memberSymbol.ContainingType.ToMinimalDisplayString(context.SemanticModel, context.Node.SpanStart)));
             }
 
             bool ImplementsInterface()
