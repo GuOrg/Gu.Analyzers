@@ -1,6 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System.Collections.Generic;
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
