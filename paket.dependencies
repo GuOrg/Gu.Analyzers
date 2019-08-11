@@ -35,6 +35,7 @@ group Benchmarks
   nuget NUnit
   nuget NUnit3TestAdapter
   nuget BenchmarkDotNet.Diagnostics.Windows
+  nuget CommandLineParser 2.4.3
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   nuget Gu.Roslyn.Asserts
 
