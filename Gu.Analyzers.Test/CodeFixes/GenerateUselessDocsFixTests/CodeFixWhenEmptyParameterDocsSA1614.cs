@@ -12,7 +12,7 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
     internal class CodeFixWhenEmptyParameterDocsSA1614
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
-        private static readonly CodeFixProvider Fix = new UselessDocsFix();
+        private static readonly CodeFixProvider Fix = new DocsFix();
 
         [Test]
         public void StandardTextForCancellationTokenWhenEmpty()

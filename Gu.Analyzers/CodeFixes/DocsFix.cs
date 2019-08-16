@@ -10,12 +10,12 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(UselessDocsFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocsFix))]
     [Shared]
-    internal class UselessDocsFix : DocumentEditorCodeFixProvider
+    internal class DocsFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("SA1611", "SA1614", "SA1618");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("SA1611", "SA1614", "SA1618", Descriptors.GU0100WrongDocs.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -49,7 +49,7 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
                                     x => x.WithParamText(parameter.Identifier.ValueText, string.Empty)),
-                                nameof(UselessDocsFix),
+                                nameof(DocsFix),
                                 diagnostic);
                         }
                         else
@@ -59,7 +59,7 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
                                     x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
-                                nameof(UselessDocsFix),
+                                nameof(DocsFix),
                                 diagnostic);
                         }
                     }
@@ -73,7 +73,7 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
                                     x => x.WithTypeParamText(typeParameter.Identifier.ValueText, text)),
-                                nameof(UselessDocsFix),
+                                nameof(DocsFix),
                                 diagnostic);
                         }
                         else
@@ -83,11 +83,11 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
                                     x => x.WithTypeParamText(typeParameter.Identifier.ValueText, string.Empty)),
-                                nameof(UselessDocsFix),
+                                nameof(DocsFix),
                                 diagnostic);
                         }
                     }
-                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, findInsideTrivia: true, getInnermostNodeForTie: true) is XmlElementSyntax element &&
+                    else if (TryFindParamDoc(out var element) &&
                              element.TryGetNameAttribute(out var name) &&
                              methodDeclaration.TryFindParameter(name.Identifier?.Identifier.ValueText, out parameter))
                     {
@@ -108,9 +108,28 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     element,
                                     x => WithText(x, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
-                                nameof(UselessDocsFix),
+                                nameof(DocsFix),
                                 diagnostic);
                         }
+                    }
+                }
+
+                bool TryFindParamDoc(out XmlElementSyntax result)
+                {
+                    switch (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, findInsideTrivia: true, getInnermostNodeForTie: true))
+                    {
+                        case XmlElementSyntax element:
+                            result = element;
+                            return true;
+                        case SyntaxNode node when node.Parent is TypeCrefSyntax typeCref &&
+                                                  typeCref.Parent is XmlCrefAttributeSyntax cref &&
+                                                  cref.Parent is XmlEmptyElementSyntax empty &&
+                                                  empty.Parent is XmlElementSyntax element:
+                            result = element;
+                            return true;
+                        default:
+                            result = null;
+                            return false;
                     }
                 }
             }
