@@ -126,13 +126,13 @@ namespace Gu.Analyzers
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
+                        if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _))
                         {
                             attribute = candidate;
                             return true;
                         }
 
-                        if (Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
+                        if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestAttribute, cancellationToken, out _))
                         {
                             attribute = candidate;
                         }

@@ -56,7 +56,7 @@ namespace Gu.Analyzers
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.SemanticModel, context.CancellationToken))
+                        if (context.SemanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.CancellationToken, out _))
                         {
                             if (!CountMatches(testMethod, candidate))
                             {
@@ -86,13 +86,13 @@ namespace Gu.Analyzers
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestAttribute, semanticModel, cancellationToken))
+                    if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestAttribute, cancellationToken, out _))
                     {
                         attribute = candidate;
                         count++;
                     }
-                    else if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken) ||
-                             Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, semanticModel, cancellationToken))
+                    else if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _) ||
+                             semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, cancellationToken, out _))
                     {
                         count++;
                     }
@@ -109,7 +109,7 @@ namespace Gu.Analyzers
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (Roslyn.AnalyzerExtensions.Attribute.IsType(candidate, KnownSymbol.NUnitTestCaseAttribute, semanticModel, cancellationToken))
+                    if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _))
                     {
                         if (attribute != null)
                         {
@@ -287,7 +287,7 @@ namespace Gu.Analyzers
                     {
                         if (xl.Token.Text == yl.Token.Text)
                         {
-                           continue;
+                            continue;
                         }
 
                         return false;
