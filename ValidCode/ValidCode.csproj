@@ -1,13 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>IDE0051,IDE0052,IDE0059,IDE0060,IDE0067,IDE0068,IDE0069</NoWarn>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
+
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

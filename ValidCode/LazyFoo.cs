@@ -1,6 +1,5 @@
 // ReSharper disable All
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
