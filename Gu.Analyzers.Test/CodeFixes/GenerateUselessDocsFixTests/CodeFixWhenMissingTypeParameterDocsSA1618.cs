@@ -9,13 +9,13 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFixWhenMissingTypeParameterDocsSA1618
+    internal static class CodeFixWhenMissingTypeParameterDocsSA1618
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
         private static readonly CodeFixProvider Fix = new DocsFix();
 
         [Test]
-        public void ForFirstParameterWhenSummaryOnly()
+        public static void ForFirstParameterWhenSummaryOnly()
         {
             var before = @"
 namespace N
@@ -49,7 +49,7 @@ namespace N
         }
 
         [Test]
-        public void ForFirstParameterWhenSummaryAndParam()
+        public static void ForFirstParameterWhenSummaryAndParam()
         {
             var before = @"
 namespace N
@@ -85,7 +85,7 @@ namespace N
         }
 
         [Test]
-        public void ForManyParameters()
+        public static void ForManyParameters()
         {
             var before = @"
 namespace N
@@ -119,7 +119,7 @@ namespace N
         }
 
         [Test]
-        public void Issue206()
+        public static void Issue206()
         {
             var before = @"
 namespace N
@@ -157,7 +157,7 @@ namespace N
         [TestCase("T[]")]
         [TestCase("List<T>")]
         [TestCase("System.Collections.Generic.List<T>")]
-        public void ForEnumerableParameter(string type)
+        public static void ForEnumerableParameter(string type)
         {
             var before = @"
 namespace N

@@ -9,13 +9,13 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFixWhenEmptyParameterDocsSA1614
+    internal static class CodeFixWhenEmptyParameterDocsSA1614
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
         private static readonly CodeFixProvider Fix = new DocsFix();
 
         [Test]
-        public void StandardTextForCancellationTokenWhenEmpty()
+        public static void StandardTextForCancellationTokenWhenEmpty()
         {
             var before = @"
 namespace N

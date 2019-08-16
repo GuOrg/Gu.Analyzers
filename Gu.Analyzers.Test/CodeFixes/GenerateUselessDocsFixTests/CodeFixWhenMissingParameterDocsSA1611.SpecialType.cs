@@ -3,12 +3,12 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFixWhenMissingParameterDocsSA1611
+    internal static partial class CodeFixWhenMissingParameterDocsSA1611
     {
-        internal class SpecialType
+        internal static class SpecialType
         {
             [Test]
-            public void StandardTextForCancellationToken()
+            public static void StandardTextForCancellationToken()
             {
                 var before = @"
 namespace N
