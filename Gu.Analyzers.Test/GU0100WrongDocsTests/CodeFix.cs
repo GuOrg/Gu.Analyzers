@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class Diagnostics
+    internal static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
         private static readonly CodeFixProvider Fix = new DocsFix();
