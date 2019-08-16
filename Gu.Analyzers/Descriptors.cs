@@ -337,6 +337,15 @@ namespace Gu.Analyzers
             isEnabledByDefault: true,
             description: "Don't throw NotImplementedException.");
 
+        internal static readonly DiagnosticDescriptor GU0100WrongDocs = Descriptors.Create(
+            id: "GU0100",
+            title: "Wrong docs.",
+            messageFormat: "Wrong docs.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Wrong docs.");
+
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="T:Microsoft.CodeAnalysis.Diagnostic" />.
         /// NOTE: For localizable <paramref name="title" />, <paramref name="description" /> and/or <paramref name="messageFormat" />,
