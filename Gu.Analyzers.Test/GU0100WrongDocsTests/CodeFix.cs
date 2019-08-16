@@ -11,8 +11,10 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
         private static readonly CodeFixProvider Fix = new DocsFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongDocs);
 
-        [Test]
-        public static void WhenWrong()
+        [TestCase("string")]
+        [TestCase("System.String")]
+        [TestCase("Decoder")]
+        public static void WhenWrong(string type)
         {
             var before = @"
 namespace N
@@ -29,7 +31,7 @@ namespace N
         {
         }
     }
-}";
+}".AssertReplace("string", type);
             var after = @"
 namespace N
 {

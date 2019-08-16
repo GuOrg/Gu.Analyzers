@@ -23,19 +23,20 @@ namespace Gu.Analyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is XmlCrefAttributeSyntax cref &&
-                cref.Parent is XmlEmptyElementSyntax emptyElement &&
+                context.Node is XmlCrefAttributeSyntax attribute &&
+                attribute.Parent is XmlEmptyElementSyntax emptyElement &&
                 emptyElement.Parent is XmlElementSyntax candidate &&
                 candidate.HasLocalName("param") &&
                 candidate.TryGetNameAttribute(out var nameAttribute) &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.TryFindParameter(nameAttribute.Identifier.Identifier.ValueText, out var parameter) &&
-                parameter.Type.Name != cref.Cref.ToString())
+                context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out var type) &&
+                !type.Equals(parameter.Type))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         Descriptors.GU0100WrongDocs,
-                        cref.Cref.GetLocation()));
+                        attribute.Cref.GetLocation()));
             }
         }
     }

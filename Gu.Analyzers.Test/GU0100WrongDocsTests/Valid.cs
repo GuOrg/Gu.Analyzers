@@ -8,13 +8,16 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
 
-        [Test]
-        public static void WhenCorrect()
+        [TestCase("List<int>")]
+        [TestCase("StringBuilder")]
+        [TestCase("System.Text.StringBuilder")]
+        public static void WhenCorrect(string cref)
         {
             var code = @"
 namespace N
 {
     using System.Text;
+    using System.Collections.Generic;
 
     class C
     {
@@ -26,7 +29,7 @@ namespace N
         {
         }
     }
-}";
+}".AssertReplace("StringBuilder", cref);
             RoslynAssert.Valid(Analyzer, code);
         }
     }

@@ -116,15 +116,12 @@ namespace Gu.Analyzers
 
                 bool TryFindParamDoc(out XmlElementSyntax result)
                 {
-                    switch (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, findInsideTrivia: true, getInnermostNodeForTie: true))
+                    switch (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, findInsideTrivia: true))
                     {
                         case XmlElementSyntax element:
                             result = element;
                             return true;
-                        case SyntaxNode node when node.Parent is TypeCrefSyntax typeCref &&
-                                                  typeCref.Parent is XmlCrefAttributeSyntax cref &&
-                                                  cref.Parent is XmlEmptyElementSyntax empty &&
-                                                  empty.Parent is XmlElementSyntax element:
+                        case SyntaxNode node when node.TryFirstAncestor(out XmlElementSyntax element):
                             result = element;
                             return true;
                         default:
