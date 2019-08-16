@@ -10,7 +10,7 @@ namespace Gu.Analyzers
             messageFormat: "Name the arguments.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Name the arguments of calls to methods that have more than 3 arguments and are placed on separate lines.");
 
         internal static readonly DiagnosticDescriptor GU0002NamedArgumentPositionMatches = Create(
@@ -19,7 +19,7 @@ namespace Gu.Analyzers
             messageFormat: "The position of a named arguments and parameters should match.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The position of a named argument should match.");
 
         internal static readonly DiagnosticDescriptor GU0003CtorParameterNamesShouldMatch = Create(
@@ -28,7 +28,7 @@ namespace Gu.Analyzers
             messageFormat: "Name the parameter to match the assigned member.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Name the constructor parameters to match the assigned member.");
 
         internal static readonly DiagnosticDescriptor GU0004AssignAllReadOnlyMembers = Descriptors.Create(
@@ -37,7 +37,7 @@ namespace Gu.Analyzers
             messageFormat: "The following readonly members are not assigned:\r\n{0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Assign all readonly members.");
 
         internal static readonly DiagnosticDescriptor GU0005ExceptionArgumentsPositions = Descriptors.Create(
@@ -46,7 +46,7 @@ namespace Gu.Analyzers
             messageFormat: "Use correct argument positions.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Use correct position for name and message.");
 
         internal static readonly DiagnosticDescriptor GU0006UseNameof = Descriptors.Create(
@@ -55,7 +55,7 @@ namespace Gu.Analyzers
             messageFormat: "Use nameof.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Use nameof.");
 
         internal static readonly DiagnosticDescriptor GU0007PreferInjecting = Descriptors.Create(
@@ -64,7 +64,7 @@ namespace Gu.Analyzers
             messageFormat: "Prefer injecting {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
+            isEnabledByDefault: false,
             description: "Prefer injecting.");
 
         internal static readonly DiagnosticDescriptor GU0008AvoidRelayProperties = Descriptors.Create(
@@ -73,7 +73,7 @@ namespace Gu.Analyzers
             messageFormat: "Avoid relay properties.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
+            isEnabledByDefault: false,
             description: "Avoid relay properties.");
 
         internal static readonly DiagnosticDescriptor GU0009UseNamedParametersForBooleans = Descriptors.Create(
@@ -82,7 +82,7 @@ namespace Gu.Analyzers
             messageFormat: "The boolean parameter is not named.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The unnamed boolean parameters aren't obvious about their purpose. Consider naming the boolean argument for clarity.");
 
         internal static readonly DiagnosticDescriptor GU0010DoNotAssignSameValue = Descriptors.Create(
@@ -91,7 +91,7 @@ namespace Gu.Analyzers
             messageFormat: "Assigning made to same, did you mean to assign something else?",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Error,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Assigning same value does not make sense and is sign of a bug.");
 
         internal static readonly DiagnosticDescriptor GU0011DoNotIgnoreReturnValue = Descriptors.Create(
@@ -100,7 +100,7 @@ namespace Gu.Analyzers
             messageFormat: "Don't ignore the return value.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't ignore the return value.");
 
         internal static readonly DiagnosticDescriptor GU0012NullCheckParameter = Descriptors.Create(
@@ -109,7 +109,7 @@ namespace Gu.Analyzers
             messageFormat: "Check if parameter is null.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Check if parameter is null.");
 
         internal static readonly DiagnosticDescriptor GU0013TrowForCorrectParameter = Descriptors.Create(
@@ -118,7 +118,7 @@ namespace Gu.Analyzers
             messageFormat: "Throw for correct parameter.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Throw for correct parameter.");
 
         internal static readonly DiagnosticDescriptor GU0014PreferParameter = Descriptors.Create(
@@ -127,7 +127,7 @@ namespace Gu.Analyzers
             messageFormat: "Prefer using parameter.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Prefer using parameter.");
 
         internal static readonly DiagnosticDescriptor GU0015DoNotAssignMoreThanOnce = Descriptors.Create(
@@ -163,7 +163,7 @@ namespace Gu.Analyzers
             messageFormat: "Move property.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Sort properties by StyleCop rules then by mutability.");
 
         internal static readonly DiagnosticDescriptor GU0021CalculatedPropertyAllocates = Descriptors.Create(
@@ -172,7 +172,7 @@ namespace Gu.Analyzers
             messageFormat: "Calculated property allocates reference type.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Calculated property allocates reference type.");
 
         internal static readonly DiagnosticDescriptor GU0022UseGetOnly = Descriptors.Create(
@@ -181,7 +181,7 @@ namespace Gu.Analyzers
             messageFormat: "Use get-only.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Use get-only.");
 
         internal static readonly DiagnosticDescriptor GU0023StaticMemberOrder = Descriptors.Create(
@@ -217,7 +217,7 @@ namespace Gu.Analyzers
             messageFormat: "Ignore events when serializing.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Ignore events when serializing.");
 
         internal static readonly DiagnosticDescriptor GU0051XmlSerializerNotCached = Descriptors.Create(
@@ -226,7 +226,7 @@ namespace Gu.Analyzers
             messageFormat: "The serializer is not cached.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "This constructor loads assemblies in non-GC memory, which may cause memory leaks.");
 
         internal static readonly DiagnosticDescriptor GU0052ExceptionShouldBeSerializable = Descriptors.Create(
@@ -235,7 +235,7 @@ namespace Gu.Analyzers
             messageFormat: "Mark exception with [Serializable].",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Mark exception with [Serializable].");
 
         internal static readonly DiagnosticDescriptor GU0060EnumMemberValueConflictsWithAnother = Descriptors.Create(
@@ -244,7 +244,7 @@ namespace Gu.Analyzers
             messageFormat: "Enum member value conflicts with another.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member");
 
         internal static readonly DiagnosticDescriptor GU0061EnumMemberValueOutOfRange = Descriptors.Create(
@@ -253,7 +253,7 @@ namespace Gu.Analyzers
             messageFormat: "Enum member value will overflow",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The enum member value will overflow at runtime. Probably not intended. Change enum type to long (int is default)");
 
         internal static readonly DiagnosticDescriptor GU0070DefaultConstructedValueTypeWithNoUsefulDefault = Descriptors.Create(
@@ -262,7 +262,7 @@ namespace Gu.Analyzers
             messageFormat: "Default constructed value type was created, which is likely not what was intended.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Types declared with struct must have a default constructor, even if there is no semantically sensible default value for that type. Examples include System.Guid and System.DateTime.");
 
         internal static readonly DiagnosticDescriptor GU0071ForeachImplicitCast = Descriptors.Create(
@@ -271,7 +271,7 @@ namespace Gu.Analyzers
             messageFormat: "Implicit cast done by the foreach",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "If an explicit type is used, the compiler inserts a cast. This was possibly useful in the pre-generic C# 1.0 era, but now it's a misfeature");
 
         internal static readonly DiagnosticDescriptor GU0072AllTypesShouldBeInternal = Descriptors.Create(
@@ -280,7 +280,7 @@ namespace Gu.Analyzers
             messageFormat: "All types should be internal.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.DisabledByDefault,
+            isEnabledByDefault: false,
             description: "All types should be internal.");
 
         internal static readonly DiagnosticDescriptor GU0073MemberShouldBeInternal = Descriptors.Create(
@@ -298,7 +298,7 @@ namespace Gu.Analyzers
             messageFormat: "Parameters {0} does not match attribute {1}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Parameter count does not match attribute.");
 
         internal static readonly DiagnosticDescriptor GU0081TestCasesAttributeMismatch = Descriptors.Create(
@@ -307,7 +307,7 @@ namespace Gu.Analyzers
             messageFormat: "TestCase {0} does not match parameters {1}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "TestCase does not match parameters.");
 
         internal static readonly DiagnosticDescriptor GU0082IdenticalTestCase = Descriptors.Create(
@@ -316,7 +316,7 @@ namespace Gu.Analyzers
             messageFormat: "TestCase is identical {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "TestCase is identical.");
 
         internal static readonly DiagnosticDescriptor GU0083TestCaseAttributeMismatchMethod = Descriptors.Create(
@@ -325,7 +325,7 @@ namespace Gu.Analyzers
             messageFormat: "TestCase arguments {0} does not match method parameters {1}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "TestCase Mismatches Method Parameters");
 
         internal static readonly DiagnosticDescriptor GU0090DoNotThrowNotImplementedException = Descriptors.Create(
@@ -334,7 +334,7 @@ namespace Gu.Analyzers
             messageFormat: "Don't throw NotImplementedException.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't throw NotImplementedException.");
 
         /// <summary>
