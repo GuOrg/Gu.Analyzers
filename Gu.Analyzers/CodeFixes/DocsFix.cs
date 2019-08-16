@@ -8,6 +8,7 @@ namespace Gu.Analyzers
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocsFix))]
@@ -15,7 +16,7 @@ namespace Gu.Analyzers
     internal class DocsFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("SA1611", "SA1614", "SA1618", Descriptors.GU0100WrongDocs.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS1591", "SA1611", "SA1614", "SA1618", Descriptors.GU0100WrongDocs.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -108,6 +109,46 @@ namespace Gu.Analyzers
                                 (editor, _) => editor.ReplaceNode(
                                     element,
                                     x => WithText(x, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
+                                nameof(DocsFix),
+                                diagnostic);
+                        }
+                    }
+                    else if (diagnostic.Id == "CS1591" &&
+                             syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax operatorDeclaration) &&
+                             operatorDeclaration.ParameterList is ParameterListSyntax parameterList &&
+                             parameterList.Parameters.Count == 2 &&
+                             parameterList.Parameters.TryElementAt(0, out var left) &&
+                             parameterList.Parameters.TryElementAt(1, out var right))
+                    {
+                        if (operatorDeclaration.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken))
+                        {
+                            context.RegisterCodeFix(
+                                "Generate standard xml documentation for operator.",
+                                (editor, _) => editor.ReplaceNode(
+                                    operatorDeclaration,
+                                    x => x.WithDocumentationText(
+                                        StringBuilderPool.Borrow()
+                                                         .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</summary>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{left.Type}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{right.Type}\"/>.</param>")
+                                                         .AppendLine("/// <returns>True if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</returns>")
+                                                         .Return())),
+                                nameof(DocsFix),
+                                diagnostic);
+                        }
+                        else if (operatorDeclaration.OperatorToken.IsKind(SyntaxKind.ExclamationEqualsToken))
+                        {
+                            context.RegisterCodeFix(
+                                "Generate standard xml documentation for operator.",
+                                (editor, _) => editor.ReplaceNode(
+                                    operatorDeclaration,
+                                    x => x.WithDocumentationText(
+                                        StringBuilderPool.Borrow()
+                                                         .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</summary>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{left.Type}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{right.Type}\"/>.</param>")
+                                                         .AppendLine("/// <returns>True if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</returns>")
+                                                         .Return())),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
