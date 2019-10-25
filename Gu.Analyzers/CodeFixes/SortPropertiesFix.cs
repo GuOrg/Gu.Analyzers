@@ -47,15 +47,12 @@ namespace Gu.Analyzers
 
             SyntaxNode WithMoved(TypeDeclarationSyntax old)
             {
-                switch (old)
+                return old switch
                 {
-                    case ClassDeclarationSyntax classDeclaration:
-                        return classDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property)));
-                    case StructDeclarationSyntax structDeclaration:
-                        return structDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property)));
-                    default:
-                        return old;
-                }
+                    ClassDeclarationSyntax classDeclaration => classDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property))),
+                    StructDeclarationSyntax structDeclaration => structDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property))),
+                    _ => old,
+                };
             }
         }
 

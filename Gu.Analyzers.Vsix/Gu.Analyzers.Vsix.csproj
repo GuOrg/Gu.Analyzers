@@ -26,6 +26,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
   </ItemGroup>
   

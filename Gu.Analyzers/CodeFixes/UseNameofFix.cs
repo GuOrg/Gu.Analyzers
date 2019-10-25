@@ -67,19 +67,14 @@ namespace Gu.Analyzers
 
             Task<CodeStyleResult> Qualify(ISymbol symbol)
             {
-                switch (symbol.Kind)
+                return symbol.Kind switch
                 {
-                    case SymbolKind.Field:
-                        return editor.QualifyFieldAccessAsync(cancellationToken);
-                    case SymbolKind.Event:
-                        return editor.QualifyEventAccessAsync(cancellationToken);
-                    case SymbolKind.Property:
-                        return editor.QualifyPropertyAccessAsync(cancellationToken);
-                    case SymbolKind.Method:
-                        return editor.QualifyMethodAccessAsync(cancellationToken);
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    SymbolKind.Field => editor.QualifyFieldAccessAsync(cancellationToken),
+                    SymbolKind.Event => editor.QualifyEventAccessAsync(cancellationToken),
+                    SymbolKind.Property => editor.QualifyPropertyAccessAsync(cancellationToken),
+                    SymbolKind.Method => editor.QualifyMethodAccessAsync(cancellationToken),
+                    _ => throw new ArgumentOutOfRangeException(),
+                };
             }
         }
 

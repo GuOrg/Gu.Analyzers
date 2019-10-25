@@ -120,15 +120,12 @@ namespace Gu.Analyzers
             if (expression.Parent is AssignmentExpressionSyntax assignment &&
                 assignment.Right.Contains(expression))
             {
-                switch (assignment.Left)
+                return assignment.Left switch
                 {
-                    case MemberAccessExpressionSyntax memberAccess:
-                        return UniqueName(memberAccess.Name.Identifier.ValueText.TrimStart('_').ToFirstCharLower());
-                    case IdentifierNameSyntax identifierName:
-                        return UniqueName(identifierName.Identifier.ValueText.TrimStart('_').ToFirstCharLower());
-                    default:
-                        throw new NotSupportedException("Could not figure out parameter name from assignment.");
-                }
+                    MemberAccessExpressionSyntax memberAccess => UniqueName(memberAccess.Name.Identifier.ValueText.TrimStart('_').ToFirstCharLower()),
+                    IdentifierNameSyntax identifierName => UniqueName(identifierName.Identifier.ValueText.TrimStart('_').ToFirstCharLower()),
+                    _ => throw new NotSupportedException("Could not figure out parameter name from assignment."),
+                };
             }
 
             var index = typeName.IndexOf('<');

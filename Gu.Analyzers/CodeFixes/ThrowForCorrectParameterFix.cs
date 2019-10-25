@@ -39,18 +39,15 @@ namespace Gu.Analyzers
 
                     ExpressionSyntax CreateNode(ExpressionSyntax old)
                     {
-                        switch (old)
+                        return old switch
                         {
-                            case LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression):
-                                return SyntaxFactory.ParseExpression($"nameof({name})");
-                            case IdentifierNameSyntax identifierName when identifierName.Parent is ArgumentSyntax candidate &&
+                            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression) => SyntaxFactory.ParseExpression($"nameof({name})"),
+                            IdentifierNameSyntax identifierName when identifierName.Parent is ArgumentSyntax candidate &&
                                                                           candidate.Parent is ArgumentListSyntax argumentList &&
                                                                           argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                                                          invocation.IsNameOf():
-                                return identifierName.WithIdentifier(SyntaxFactory.Identifier(name));
-                            default:
-                                throw new InvalidOperationException("Failed updating parameter name.");
-                        }
+                                                                          invocation.IsNameOf() => identifierName.WithIdentifier(SyntaxFactory.Identifier(name)),
+                            _ => throw new InvalidOperationException("Failed updating parameter name."),
+                        };
                     }
                 }
             }

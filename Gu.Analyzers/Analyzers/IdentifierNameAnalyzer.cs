@@ -30,17 +30,14 @@ namespace Gu.Analyzers
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0017DoNotUseDiscarded, name.Identifier.GetLocation()));
             }
 
-            bool IsUsed(IdentifierNameSyntax candidate)
+            static bool IsUsed(IdentifierNameSyntax candidate)
             {
-                switch (candidate.Parent)
+                return candidate.Parent switch
                 {
-                    case ArgumentSyntax arg when arg.RefOrOutKeyword.IsKind(SyntaxKind.None):
-                        return true;
-                    case ExpressionSyntax e when !e.IsKind(SyntaxKind.SimpleAssignmentExpression):
-                        return true;
-                    default:
-                        return false;
-                }
+                    ArgumentSyntax arg when arg.RefOrOutKeyword.IsKind(SyntaxKind.None) => true,
+                    ExpressionSyntax e when !e.IsKind(SyntaxKind.SimpleAssignmentExpression) => true,
+                    _ => false,
+                };
             }
         }
     }

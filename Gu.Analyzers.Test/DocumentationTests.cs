@@ -115,16 +115,16 @@ namespace Gu.Analyzers.Test
             var actual = GetConfigSeverity(descriptorInfo.DocumentationFile.AllText);
             CodeAssert.AreEqual(expected, actual);
 
-            string GetConfigSeverity(string doc)
+            static string GetConfigSeverity(string doc)
             {
                 return GetSection(doc, "<!-- start generated config severity -->", "<!-- end generated config severity -->");
             }
 
-            string GetSection(string doc, string startToken, string endToken)
+            static string GetSection(string doc, string startToken, string endToken)
             {
                 var start = doc.IndexOf(startToken, StringComparison.Ordinal);
                 var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
-                return doc.Substring(start, end - start);
+                return doc[start..end];
             }
         }
 

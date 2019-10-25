@@ -77,7 +77,7 @@ namespace Gu.Analyzers.Refactoring
                         yield return literal.Token.Text.Slice(start, literal.Token.Text.Length - 1);
                     }
 
-                    LiteralExpressionSyntax StringLiteral(SyntaxTriviaList leading, string text)
+                    static LiteralExpressionSyntax StringLiteral(SyntaxTriviaList leading, string text)
                     {
                         return SyntaxFactory.LiteralExpression(
                             SyntaxKind.StringLiteralExpression,

@@ -77,16 +77,13 @@ namespace Gu.Analyzers
 
         private static bool IsInitialized(MemberDeclarationSyntax declaration)
         {
-            switch (declaration)
+            return declaration switch
             {
-                case PropertyDeclarationSyntax propertyDeclaration:
-                    return propertyDeclaration.Initializer != null;
-                case FieldDeclarationSyntax fieldDeclaration:
-                    return fieldDeclaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                           variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _);
-                default:
-                    return false;
-            }
+                PropertyDeclarationSyntax propertyDeclaration => propertyDeclaration.Initializer != null,
+                FieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
+                           variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _),
+                _ => false,
+            };
         }
 
         private sealed class Walker : ExecutionWalker<Walker>

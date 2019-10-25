@@ -173,7 +173,7 @@ namespace Gu.Analyzers
                     chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
                     parameterSymbol.Name != parameter.Identifier.ValueText &&
-                    !char.IsDigit(parameterSymbol.Name[parameterSymbol.Name.Length - 1]))
+                    !char.IsDigit(parameterSymbol.Name[^1]))
                 {
                     name = parameterSymbol.Name;
                     return true;
@@ -182,7 +182,7 @@ namespace Gu.Analyzers
 
             return false;
 
-            bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string newName)
+            static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string newName)
             {
                 newName = null;
                 if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
@@ -197,7 +197,7 @@ namespace Gu.Analyzers
 
                 return false;
 
-                bool Equals(string memberName, string parameterName)
+                static bool Equals(string memberName, string parameterName)
                 {
                     if (memberName.StartsWith("_"))
                     {
@@ -220,7 +220,7 @@ namespace Gu.Analyzers
                     return string.Equals(memberName, parameterName, StringComparison.OrdinalIgnoreCase);
                 }
 
-                bool IsAllCaps(string text)
+                static bool IsAllCaps(string text)
                 {
                     foreach (var c in text)
                     {
@@ -233,7 +233,7 @@ namespace Gu.Analyzers
                     return true;
                 }
 
-                string FirstCharLowercase(string text)
+                static string FirstCharLowercase(string text)
                 {
                     if (char.IsLower(text[0]))
                     {
