@@ -110,7 +110,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                using (var walker = AssignmentExecutionWalker.For(left, member, Scope.Member, context.SemanticModel, context.CancellationToken))
+                using (var walker = AssignmentExecutionWalker.For(left, member, SearchScope.Member, context.SemanticModel, context.CancellationToken))
                 {
                     foreach (var candidate in walker.Assignments)
                     {

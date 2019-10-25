@@ -85,7 +85,7 @@ namespace Gu.Analyzers
 
         private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, Scope.Instance, semanticModel, cancellationToken))
+            using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, SearchScope.Instance, semanticModel, cancellationToken))
             {
                 foreach (var assignment in walker.Assignments)
                 {

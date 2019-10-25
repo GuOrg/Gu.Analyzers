@@ -128,7 +128,7 @@ namespace Gu.Analyzers
             /// <returns>A walker that has visited <paramref name="node"/>.</returns>
             internal static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                return BorrowAndVisit(node, Scope.Type, semanticModel, cancellationToken, () => new Walker());
+                return BorrowAndVisit(node, SearchScope.Type, semanticModel, cancellationToken, () => new Walker());
             }
 
             /// <inheritdoc />

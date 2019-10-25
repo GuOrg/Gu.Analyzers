@@ -45,7 +45,7 @@ namespace Gu.Analyzers
                     if (parameter.Parent is ParameterListSyntax parameterList &&
                         parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration)
                     {
-                        using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, Scope.Member, semanticModel, context.CancellationToken))
+                        using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, SearchScope.Member, semanticModel, context.CancellationToken))
                         {
                             if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
                             {
