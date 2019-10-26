@@ -72,7 +72,7 @@ namespace Gu.Analyzers
                                     (editor, _) => editor.ReplaceNode(
                                         assignedValue,
                                         SyntaxFactory.ParseExpression($"{assignedValue.Identifier.Text} ?? throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames()),
-                                    this.GetType(),
+                                    diagnostic.Id,
                                     diagnostic);
                             }
                             else if (methodDeclaration.Body is BlockSyntax block)
@@ -82,7 +82,7 @@ namespace Gu.Analyzers
                                     (editor, cancellationToken) => editor.ReplaceNode(
                                         block,
                                         x => WithNullCheck(x, parameter, cancellationToken)),
-                                    this.GetType(),
+                                    diagnostic.Id,
                                     diagnostic);
                             }
                         }
