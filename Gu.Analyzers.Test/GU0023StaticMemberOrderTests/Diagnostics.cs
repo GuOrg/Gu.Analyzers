@@ -107,5 +107,46 @@ namespace N
 }";
             RoslynAssert.Diagnostics(Analyzer, code);
         }
+
+        [Test]
+        public static void PartialSameDocument()
+        {
+            var code = @"
+namespace N
+{
+    partial class C
+    {
+       private static int F1 = ↓F2;
+    }
+    partial class C
+    {
+       private static int F2 = 1;
+    }
+}";
+            RoslynAssert.Diagnostics(Analyzer, code);
+        }
+
+        [Test]
+        public static void PartialDifferentDocuments()
+        {
+            var code1 = @"
+namespace N
+{
+    partial class C
+    {
+       private static int F1 = ↓F2;
+    }
+}";
+
+            var code2 = @"
+namespace N
+{
+    partial class C
+    {
+       private static int F2 = 1;
+    }
+}";
+            RoslynAssert.Diagnostics(Analyzer, code1, code2);
+        }
     }
 }

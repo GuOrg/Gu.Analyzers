@@ -29,21 +29,21 @@ namespace Gu.Analyzers
                     fieldDeclaration.Declaration is VariableDeclarationSyntax declaration &&
                     declaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
                     variable.Initializer.Value is ExpressionSyntax fieldValue &&
-                    IsInitializedWithUninitialized(fieldValue, context, out var other))
+                    IsInitializedWithUninitialized(fieldDeclaration, fieldValue, context, out var other))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, fieldValue.GetLocation(), other.Symbol, context.ContainingSymbol));
                 }
 
                 if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
                     propertyDeclaration.Initializer?.Value is ExpressionSyntax propertyValue &&
-                    IsInitializedWithUninitialized(propertyValue, context, out other))
+                    IsInitializedWithUninitialized(propertyDeclaration, propertyValue, context, out other))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, propertyValue.GetLocation(), other.Symbol, context.ContainingSymbol));
                 }
             }
         }
 
-        private static bool IsInitializedWithUninitialized(ExpressionSyntax value, SyntaxNodeAnalysisContext context, out FieldOrProperty other)
+        private static bool IsInitializedWithUninitialized(MemberDeclarationSyntax member, ExpressionSyntax value, SyntaxNodeAnalysisContext context, out FieldOrProperty other)
         {
             using (var walker = Walker.Borrow(value, context.SemanticModel, context.CancellationToken))
             {
@@ -54,16 +54,39 @@ namespace Gu.Analyzers
                         FieldOrProperty.TryCreate(symbol, out other) &&
                         other.IsStatic &&
                         Equals(other.ContainingType, context.ContainingSymbol.ContainingType) &&
-                        symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax otherDeclaration) &&
-                        otherDeclaration.SpanStart > context.Node.SpanStart &&
-                        IsInitialized(otherDeclaration))
+                        symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax otherDeclaration))
                     {
-                        return true;
+                        if (otherDeclaration.SpanStart > context.Node.SpanStart &&
+                            IsInitialized(otherDeclaration))
+                        {
+                            return true;
+                        }
+
+                        if (!IsInSamePart(member, otherDeclaration))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
 
             return false;
+
+            static bool IsInitialized(MemberDeclarationSyntax declaration)
+            {
+                return declaration switch
+                {
+                    PropertyDeclarationSyntax propertyDeclaration => propertyDeclaration.Initializer != null,
+                    FieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
+                                                               variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _),
+                    _ => false,
+                };
+            }
+
+            static bool IsInSamePart(MemberDeclarationSyntax x, MemberDeclarationSyntax y)
+            {
+                return x.TryFindSharedAncestorRecursive(y, out TypeDeclarationSyntax _);
+            }
         }
 
         private static bool IsNameOf(IdentifierNameSyntax name)
@@ -73,17 +96,6 @@ namespace Gu.Analyzers
                    argList.Parent is InvocationExpressionSyntax invocation &&
                    invocation.TryGetMethodName(out var methodName) &&
                    methodName == "nameof";
-        }
-
-        private static bool IsInitialized(MemberDeclarationSyntax declaration)
-        {
-            return declaration switch
-            {
-                PropertyDeclarationSyntax propertyDeclaration => propertyDeclaration.Initializer != null,
-                FieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                           variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _),
-                _ => false,
-            };
         }
 
         private sealed class Walker : ExecutionWalker<Walker>
