@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
     <NoWarn>IDE0051,IDE0052,IDE0059,IDE0060,IDE0067,IDE0068,IDE0069</NoWarn>
   </PropertyGroup>
