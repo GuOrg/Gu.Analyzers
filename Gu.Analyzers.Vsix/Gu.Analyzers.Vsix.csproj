@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2">
+    <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.4.1057">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
