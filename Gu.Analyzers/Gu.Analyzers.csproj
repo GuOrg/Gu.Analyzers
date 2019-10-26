@@ -5,7 +5,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>Gu.Analyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  
+
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
@@ -19,14 +19,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.5.5.0-dev</Version>
+    <Version>1.6.0-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
-    <PackageReleaseNotes>FEATURE: GU0007 handle singletons.
-BUGFIX GU0012: ignore out parameters.</PackageReleaseNotes>
+    <PackageReleaseNotes>
+      FEATURE: Generate null checks for CA1062
+      BUGFIX GU0012: ignore out parameters.
+    </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>
   </PropertyGroup>
@@ -51,7 +53,7 @@ BUGFIX GU0012: ignore out parameters.</PackageReleaseNotes>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Include="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\Gu.Roslyn.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
