@@ -1,0 +1,79 @@
+namespace Gu.Analyzers.Test.CodeFixes
+{
+    using System.Collections.Immutable;
+    using System.Linq;
+    using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Diagnostics;
+    using NUnit.Framework;
+
+    internal static class NullCheckParameterFixTests
+    {
+        private static readonly DiagnosticAnalyzer Analyzer = new FakeFxCopAnalyzer();
+        private static readonly CodeFixProvider Fix = new NullCheckParameterFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CA1062");
+
+        [Test]
+        public static void Simple()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M(string s)
+        {
+            _ = ↓s.Length;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M(string s)
+        {
+            if (s is null)
+            {
+                throw new System.ArgumentNullException(nameof(s));
+            }
+
+            _ = s.Length;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [DiagnosticAnalyzer(LanguageNames.CSharp)]
+        private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+        {
+            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("CA1062", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+                Descriptor);
+
+            public override void Initialize(AnalysisContext context)
+            {
+                context.EnableConcurrentExecution();
+                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+                context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.IdentifierName);
+            }
+
+            private static void Handle(SyntaxNodeAnalysisContext context)
+            {
+                if (context.Node is IdentifierNameSyntax element &&
+                    element.Parent is MemberAccessExpressionSyntax memberAccess &&
+                    memberAccess.Expression == element)
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, element.GetLocation()));
+                }
+            }
+        }
+    }
+}

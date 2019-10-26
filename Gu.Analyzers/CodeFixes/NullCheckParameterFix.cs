@@ -18,7 +18,8 @@ namespace Gu.Analyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.GU0012NullCheckParameter.Id);
+            Descriptors.GU0012NullCheckParameter.Id,
+            "CA1062");
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -28,6 +29,21 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+
+                if (diagnostic.Id == "CA1062")
+                {
+                    if (node.TryFirstAncestor<BaseMethodDeclarationSyntax>(out var method) &&
+                        method.TryFindParameter(node.ToString(), out var parameter))
+                    {
+                        node = parameter;
+
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+
                 if (node is IdentifierNameSyntax identifierName)
                 {
                     context.RegisterCodeFix(
