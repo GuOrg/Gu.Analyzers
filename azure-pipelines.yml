@@ -25,4 +25,4 @@ steps:
   displayName: test
   inputs:
     command: 'test'
-    arguments: '--no-build'
+    arguments: '--configuration $(buildConfiguration) --no-build'
