@@ -139,7 +139,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsMutable(SemanticModel semanticMode, ExpressionSyntax expression, CancellationToken cancellationToken)
+        private static bool IsMutable(SemanticModel semanticModel, ExpressionSyntax expression, CancellationToken cancellationToken)
         {
             if (expression is LiteralExpressionSyntax || expression is ThisExpressionSyntax || expression is ParenthesizedLambdaExpressionSyntax)
             {
@@ -171,7 +171,7 @@ namespace Gu.Analyzers
 
             if (expression is MemberAccessExpressionSyntax memberAccess)
             {
-                return IsMutable(semanticModel, cancellationToken, memberAccess.Expression);
+                return IsMutable(semanticModel, memberAccess.Expression, cancellationToken);
             }
 
             return true;
