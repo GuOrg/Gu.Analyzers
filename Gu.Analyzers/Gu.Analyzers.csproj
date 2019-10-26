@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>1.6.0-dev</Version>
+    <Version>1.6.1-dev</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

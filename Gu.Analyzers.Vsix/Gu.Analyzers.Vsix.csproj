@@ -35,13 +35,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <!-- https://github.com/dotnet/sdk/issues/433 -->
-    <ProjectReference Update="@(ProjectReference)" AdditionalProperties="TargetFramework=netstandard1.3" />
-    <!-- https://github.com/Microsoft/extendvs/issues/57 -->
-    <ProjectReference Update="@(ProjectReference)" Name="%(Filename)" />
-  </ItemGroup>
 
   <Target Name="IncludeNuGetPackageReferences" AfterTargets="GetVsixSourceItems">
     <ItemGroup>
