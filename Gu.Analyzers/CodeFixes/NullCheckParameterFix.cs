@@ -36,7 +36,6 @@ namespace Gu.Analyzers
                         method.TryFindParameter(node.ToString(), out var parameter))
                     {
                         node = parameter;
-
                     }
                     else
                     {
