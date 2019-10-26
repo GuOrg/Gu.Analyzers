@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -196,7 +197,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetMemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol result)
+        private static bool TryGetMemberType(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out INamedTypeSymbol? result)
         {
             if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol) &&
                 FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
@@ -215,7 +216,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool TryFindAssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out INamedTypeSymbol memberType)
+        private static bool TryFindAssignedType(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out INamedTypeSymbol? memberType)
         {
             foreach (var reference in symbol.DeclaringSyntaxReferences)
             {

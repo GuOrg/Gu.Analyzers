@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -71,7 +72,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, out ArgumentSyntax argument)
+        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, [NotNullWhen(true)]out ArgumentSyntax? argument)
         {
             argument = null;
             foreach (var arg in argumentList.Arguments)

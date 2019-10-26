@@ -1,6 +1,7 @@
 namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -74,7 +75,7 @@ namespace Gu.Analyzers
                    AreSame(leftMember.Expression, rightMember.Expression);
         }
 
-        private static bool TryGetIdentifierName(ExpressionSyntax expression, out IdentifierNameSyntax result)
+        private static bool TryGetIdentifierName(ExpressionSyntax expression, [NotNullWhen(true)]out IdentifierNameSyntax? result)
         {
             switch (expression)
             {

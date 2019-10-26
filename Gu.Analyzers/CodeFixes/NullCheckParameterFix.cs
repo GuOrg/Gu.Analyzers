@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -91,7 +92,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryFirstAssignedWith(ParameterSyntax parameter, IReadOnlyList<AssignmentExpressionSyntax> assignments, out IdentifierNameSyntax assignedValue)
+        private static bool TryFirstAssignedWith(ParameterSyntax parameter, IReadOnlyList<AssignmentExpressionSyntax> assignments, [NotNullWhen(true)]out IdentifierNameSyntax? assignedValue)
         {
             foreach (var assignment in assignments)
             {

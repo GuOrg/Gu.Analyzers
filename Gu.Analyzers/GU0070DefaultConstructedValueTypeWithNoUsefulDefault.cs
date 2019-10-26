@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -41,7 +42,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, out IMethodSymbol ctor)
+        private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, [NotNullWhen(true)]out IMethodSymbol? ctor)
         {
             // TODO: Stop using linear search if the number of types becomes large
             foreach (var qualifiedType in KnownTypes)

@@ -136,7 +136,7 @@ namespace Gu.Analyzers
 
         private static bool HasAdjacentParametersOfSameType(ImmutableArray<IParameterSymbol> parameters)
         {
-            IParameterSymbol previous = null;
+            IParameterSymbol? previous = null;
             foreach (var parameter in parameters)
             {
                 if (previous != null)

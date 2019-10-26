@@ -4,6 +4,7 @@ namespace Gu.Analyzers
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -69,7 +70,7 @@ namespace Gu.Analyzers
                         return;
                     }
 
-                    ExpressionSyntax fieldAccess = null;
+                    ExpressionSyntax? fieldAccess = null;
                     foreach (var replaceNode in replaceNodes)
                     {
                         if (replaceNode.FirstAncestor<ConstructorDeclarationSyntax>() == null)
@@ -258,7 +259,7 @@ namespace Gu.Analyzers
                 base.VisitIdentifierName(node);
             }
 
-            private bool TryGetReplaceNode(IdentifierNameSyntax node, IdentifierNameSyntax expected, out SyntaxNode result)
+            private bool TryGetReplaceNode(IdentifierNameSyntax node, IdentifierNameSyntax expected, [NotNullWhen(true)]out SyntaxNode? result)
             {
                 result = null;
                 if (node.Identifier.ValueText != expected.Identifier.ValueText)
@@ -276,7 +277,7 @@ namespace Gu.Analyzers
                 return this.TryGetReplaceNode(node.Parent as MemberAccessExpressionSyntax, expected.Parent as MemberAccessExpressionSyntax, out result);
             }
 
-            private bool TryGetReplaceNode(MemberAccessExpressionSyntax node, MemberAccessExpressionSyntax expected, out SyntaxNode result)
+            private bool TryGetReplaceNode(MemberAccessExpressionSyntax? node, MemberAccessExpressionSyntax? expected, [NotNullWhen(true)]out SyntaxNode? result)
             {
                 result = null;
                 if (node != null &&

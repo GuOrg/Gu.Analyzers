@@ -48,7 +48,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType MoqIFluentInterface = new QualifiedType("Moq.IFluentInterface");
         internal static readonly QualifiedType NinjectIFluentSyntax = new QualifiedType("Ninject.Syntax.IFluentSyntax");
 
-        private static QualifiedType Create(string qualifiedName, string alias = null)
+        private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
             return new QualifiedType(qualifiedName, alias);
         }

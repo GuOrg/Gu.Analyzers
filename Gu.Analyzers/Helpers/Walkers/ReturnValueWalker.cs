@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -48,7 +49,7 @@ namespace Gu.Analyzers
             this.returnValues.Add(node.Expression);
         }
 
-        internal static bool TrySingle(SyntaxNode scope, out ExpressionSyntax returnValue)
+        internal static bool TrySingle(SyntaxNode scope, [NotNullWhen(true)]out ExpressionSyntax? returnValue)
         {
             if (scope == null)
             {

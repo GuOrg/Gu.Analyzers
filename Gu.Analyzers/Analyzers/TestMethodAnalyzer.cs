@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -78,7 +79,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        private static bool TrySingleTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out AttributeSyntax? attribute)
         {
             attribute = null;
             var count = 0;
@@ -102,7 +103,7 @@ namespace Gu.Analyzers
             return count == 1 && attribute != null;
         }
 
-        private static bool TrySingleTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        private static bool TrySingleTestCaseAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out AttributeSyntax? attribute)
         {
             attribute = null;
             foreach (var attributeList in method.AttributeLists)
@@ -135,7 +136,7 @@ namespace Gu.Analyzers
             return CountArgs(attribute) == method.Parameters.Length;
         }
 
-        private static bool TryGetFirstMismatch(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, out AttributeArgumentSyntax attributeArgument)
+        private static bool TryGetFirstMismatch(IMethodSymbol methodSymbol, AttributeSyntax attributeSyntax, SyntaxNodeAnalysisContext context, [NotNullWhen(true)]out AttributeArgumentSyntax? attributeArgument)
         {
             attributeArgument = null;
             if (methodSymbol.Parameters.Length > 0 &&
@@ -229,7 +230,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, SyntaxNodeAnalysisContext context, out AttributeSyntax identical)
+        private static bool TryFindIdentical(MethodDeclarationSyntax method, AttributeSyntax attribute, SyntaxNodeAnalysisContext context, [NotNullWhen(true)]out AttributeSyntax? identical)
         {
             if (Roslyn.AnalyzerExtensions.Attribute.TryGetTypeName(attribute, out var name))
             {

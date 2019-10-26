@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -14,7 +15,7 @@ namespace Gu.Analyzers
             Unsafe,
         }
 
-        internal static bool TryFindConstructor(SyntaxNode node, out ConstructorDeclarationSyntax ctor)
+        internal static bool TryFindConstructor(SyntaxNode node, [NotNullWhen(true)]out ConstructorDeclarationSyntax? ctor)
         {
             ctor = null;
             return node.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration) &&

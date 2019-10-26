@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -117,7 +118,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool TryFindTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        private static bool TryFindTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out AttributeSyntax? attribute)
         {
             attribute = null;
             if (method != null)

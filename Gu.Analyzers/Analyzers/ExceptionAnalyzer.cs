@@ -23,18 +23,17 @@ namespace Gu.Analyzers
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
-            ExpressionSyntax expressionSyntax = null;
-
-            if (context.Node is ThrowStatementSyntax throwStatementSyntax)
+            switch (context.Node)
             {
-                expressionSyntax = throwStatementSyntax.Expression;
+                case ThrowStatementSyntax throwStatementSyntax:
+                    FindException<NotImplementedException>(context, throwStatementSyntax.Expression, Descriptors.GU0090DoNotThrowNotImplementedException);
+                    break;
+                case ThrowExpressionSyntax throwExpressionSyntax:
+                    FindException<NotImplementedException>(context, throwExpressionSyntax.Expression, Descriptors.GU0090DoNotThrowNotImplementedException);
+                    break;
+                default:
+                    return;
             }
-            else if (context.Node is ThrowExpressionSyntax throwExpressionSyntax)
-            {
-                expressionSyntax = throwExpressionSyntax.Expression;
-            }
-
-            FindException<NotImplementedException>(context, expressionSyntax, Descriptors.GU0090DoNotThrowNotImplementedException);
         }
 
         private static void FindException<TException>(SyntaxNodeAnalysisContext context, ExpressionSyntax expressionSyntax, DiagnosticDescriptor diagnosticDescriptor)

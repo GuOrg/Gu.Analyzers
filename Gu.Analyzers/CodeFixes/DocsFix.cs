@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -167,14 +168,14 @@ namespace Gu.Analyzers
                             result = element;
                             return true;
                         default:
-                            result = null;
+                            result = null!;
                             return false;
                     }
                 }
             }
         }
 
-        private static bool TryGetTypeParameterText(BaseMethodDeclarationSyntax methodDeclaration, TypeParameterSyntax typeParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out string text)
+        private static bool TryGetTypeParameterText(BaseMethodDeclarationSyntax methodDeclaration, TypeParameterSyntax typeParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out string? text)
         {
             text = null;
             if (methodDeclaration.ParameterList is ParameterListSyntax parameterList)

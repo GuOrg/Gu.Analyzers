@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
@@ -134,7 +135,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, out string name)
+        private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, [NotNullWhen(true)]out string? name)
         {
             name = null;
             if (parameter.Parent is ParameterListSyntax parameterList &&
@@ -183,7 +184,7 @@ namespace Gu.Analyzers
 
             return false;
 
-            static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string newName)
+            static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string? newName)
             {
                 newName = null;
                 if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
@@ -328,7 +329,7 @@ namespace Gu.Analyzers
             private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new List<BinaryExpressionSyntax>();
             private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-            private SemanticModel semanticModel;
+            private SemanticModel? semanticModel;
             private CancellationToken cancellationToken;
 
             private CtorWalker()
