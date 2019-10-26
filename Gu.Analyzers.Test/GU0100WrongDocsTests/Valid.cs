@@ -32,5 +32,28 @@ namespace N
 }".AssertReplace("StringBuilder", cref);
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void WhenOtherText()
+        {
+            var code = @"
+namespace N
+{
+    using System.Text;
+    using System.Collections.Generic;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""builder"">For creating a <see cref=""string""/>.</param>
+        public void M(StringBuilder builder)
+        {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

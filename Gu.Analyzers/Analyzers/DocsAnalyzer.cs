@@ -31,13 +31,22 @@ namespace Gu.Analyzers
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.TryFindParameter(nameAttribute.Identifier.Identifier.ValueText, out var parameter) &&
                 context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out var type) &&
-                !type.Equals(parameter.Type))
+                !type.Equals(parameter.Type) &&
+                attribute.Parent is XmlEmptyElementSyntax empty &&
+                empty.Parent is XmlElementSyntax element &&
+                IsAt(element, empty, 1) &&
+                element.Content.TryFirst(out var first) &&
+                first is XmlTextSyntax text &&
+                text.ToString() == "The ")
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
                         Descriptors.GU0100WrongDocs,
                         attribute.Cref.GetLocation()));
             }
+
+            bool IsAt(XmlElementSyntax e, XmlNodeSyntax a, int index) => e.Content.TryElementAt(index, out var match) &&
+                                                                               Equals(match, a);
         }
     }
 }
