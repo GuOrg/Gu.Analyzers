@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         internal static class Simple
         {
-            private static readonly string Bar = @"
+            private const string Bar = @"
 namespace N
 {
     public class Bar

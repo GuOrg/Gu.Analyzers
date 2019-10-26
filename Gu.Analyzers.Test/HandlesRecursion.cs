@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class HandlesRecursion
+    internal static class HandlesRecursion
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(Descriptors)
                                                                                  .Assembly
@@ -18,14 +18,14 @@ namespace Gu.Analyzers.Test
                                                                                  .ToArray();
 
         [Test]
-        public void NotEmpty()
+        public static void NotEmpty()
         {
             CollectionAssert.IsNotEmpty(AllAnalyzers);
             Assert.Pass($"Count: {AllAnalyzers.Count}");
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void CtorCallingSelf(DiagnosticAnalyzer analyzer)
+        public static void CtorCallingSelf(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace N
@@ -44,7 +44,7 @@ namespace N
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void RecursiveSample(DiagnosticAnalyzer analyzer)
+        public static void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
             var c = @"
 namespace N
@@ -176,7 +176,7 @@ namespace N
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task InSetAndRaise(DiagnosticAnalyzer analyzer)
+        public static async Task InSetAndRaise(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
 namespace N.Core
@@ -220,7 +220,7 @@ namespace N.Client
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task InOnPropertyChanged(DiagnosticAnalyzer analyzer)
+        public static async Task InOnPropertyChanged(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
 namespace N.Core
@@ -272,7 +272,7 @@ namespace N.Client
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task InProperty(DiagnosticAnalyzer analyzer)
+        public static async Task InProperty(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace N

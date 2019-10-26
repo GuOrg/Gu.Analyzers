@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
     {
         private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
 
-        private static readonly string Bar = @"
+        private const string Bar = @"
 namespace N
 {
     public class Bar
@@ -18,7 +18,7 @@ namespace N
     }
 }";
 
-        private static readonly string ServiceLocator = @"
+        private const string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator

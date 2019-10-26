@@ -54,7 +54,7 @@ namespace Gu.Analyzers
                     bool IsUnsafe()
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
-                        return IsAnyArgumentMutable(semanticModel, context.CancellationToken, arguments) ||
+                        return IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
                                IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
                     }
                 }
@@ -111,7 +111,7 @@ namespace Gu.Analyzers
             {
                 if (expression is AssignmentExpressionSyntax assignment)
                 {
-                    if (IsMutable(semanticModel, cancellationToken, assignment.Right))
+                    if (IsMutable(semanticModel, assignment.Right, cancellationToken))
                     {
                         return true;
                     }
@@ -126,11 +126,11 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, CancellationToken cancellationToken, SeparatedSyntaxList<ArgumentSyntax> arguments)
+        private static bool IsAnyArgumentMutable(SemanticModel semanticModel, SeparatedSyntaxList<ArgumentSyntax> arguments, CancellationToken cancellationToken)
         {
             foreach (var argument in arguments)
             {
-                if (IsMutable(semanticModel, cancellationToken, argument.Expression))
+                if (IsMutable(semanticModel, argument.Expression, cancellationToken))
                 {
                     return true;
                 }
@@ -139,7 +139,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool IsMutable(SemanticModel semanticModel, CancellationToken cancellationToken, ExpressionSyntax expression)
+        private static bool IsMutable(SemanticModel semanticMode, ExpressionSyntax expression, CancellationToken cancellationToken)
         {
             if (expression is LiteralExpressionSyntax || expression is ThisExpressionSyntax || expression is ParenthesizedLambdaExpressionSyntax)
             {

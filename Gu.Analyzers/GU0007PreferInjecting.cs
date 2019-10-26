@@ -152,7 +152,7 @@ namespace Gu.Analyzers
                         injectable = Inject.Injectable.Unsafe;
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(objectCreation));
                 }
             }
 

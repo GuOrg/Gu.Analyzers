@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
+    using System.Globalization;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -69,33 +70,10 @@ namespace Gu.Analyzers
         // see http://stackoverflow.com/a/10022661/1012936
         private static ulong UnboxUMaxInt(object a)
         {
-            return a is ulong ? (ulong)a : (ulong)Convert.ToInt64(a);
+            return a is ulong ? (ulong)a : (ulong)Convert.ToInt64(a, CultureInfo.InvariantCulture);
         }
 
-        private void HandleEnumMember(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var enumDeclaration = (EnumDeclarationSyntax)context.Node;
-            if (context.SemanticModel.GetDeclaredSymbolSafe(enumDeclaration, context.CancellationToken) is INamedTypeSymbol enumSymbol)
-            {
-                var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
-
-                if (hasFlagsAttribute)
-                {
-                    this.HandleFlagEnumMember(context, enumDeclaration);
-                }
-                else
-                {
-                    this.HandleNonFlagEnumMember(context, enumDeclaration);
-                }
-            }
-        }
-
-        private void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
+        private static void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
         {
             using (var enumValuesSet = PooledSet<ulong>.Borrow())
             {
@@ -115,7 +93,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private void HandleFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
+        private static void HandleFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
         {
             ulong bitSumOfLiterals = 0;
             foreach (var enumMember in enumDeclaration.Members)
@@ -130,6 +108,29 @@ namespace Gu.Analyzers
                 }
 
                 bitSumOfLiterals |= value;
+            }
+        }
+
+        private void HandleEnumMember(SyntaxNodeAnalysisContext context)
+        {
+            if (context.IsExcludedFromAnalysis())
+            {
+                return;
+            }
+
+            var enumDeclaration = (EnumDeclarationSyntax)context.Node;
+            if (context.SemanticModel.GetDeclaredSymbolSafe(enumDeclaration, context.CancellationToken) is INamedTypeSymbol enumSymbol)
+            {
+                var hasFlagsAttribute = HasFlagsAttribute(enumSymbol);
+
+                if (hasFlagsAttribute)
+                {
+                    HandleFlagEnumMember(context, enumDeclaration);
+                }
+                else
+                {
+                    HandleNonFlagEnumMember(context, enumDeclaration);
+                }
             }
         }
     }

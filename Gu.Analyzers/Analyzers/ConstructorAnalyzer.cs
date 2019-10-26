@@ -3,6 +3,7 @@ namespace Gu.Analyzers
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Globalization;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -199,7 +200,7 @@ namespace Gu.Analyzers
 
                 static bool Equals(string memberName, string parameterName)
                 {
-                    if (memberName.StartsWith("_"))
+                    if (memberName.StartsWith("_", StringComparison.OrdinalIgnoreCase))
                     {
                         if (parameterName.Length != memberName.Length - 1)
                         {
@@ -241,7 +242,7 @@ namespace Gu.Analyzers
                     }
 
                     var charArray = text.ToCharArray();
-                    charArray[0] = char.ToLower(charArray[0]);
+                    charArray[0] = char.ToLower(charArray[0], CultureInfo.InvariantCulture);
                     return new string(charArray);
                 }
             }

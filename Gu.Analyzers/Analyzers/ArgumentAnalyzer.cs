@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -110,13 +111,13 @@ namespace Gu.Analyzers
             {
                 return method.Parameters.Length == 2 &&
                        method.Parameters[0].Type.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
-                       method.Name.StartsWith("Set");
+                       method.Name.StartsWith("Set", StringComparison.Ordinal);
             }
 
             return method.IsExtensionMethod &&
                    method.ReceiverType.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
                    method.Parameters.Length == 1 &&
-                   method.Name.StartsWith("Set");
+                   method.Name.StartsWith("Set", StringComparison.Ordinal);
         }
 
         private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)

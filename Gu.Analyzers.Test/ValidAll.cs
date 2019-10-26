@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidAll
+    internal static class ValidAll
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()
@@ -28,14 +28,14 @@ namespace Gu.Analyzers.Test
             MetadataReferences.FromAttributes());
 
         [Test]
-        public void NotEmpty()
+        public static void NotEmpty()
         {
             CollectionAssert.IsNotEmpty(AllAnalyzers);
             Assert.Pass($"Count: {AllAnalyzers.Length}");
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void AnalyzerProject(DiagnosticAnalyzer analyzer)
+        public static void AnalyzerProject(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer ||
@@ -50,7 +50,7 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task ValidCodeProject(DiagnosticAnalyzer analyzer)
+        public static async Task ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer)
@@ -65,7 +65,7 @@ namespace Gu.Analyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
+        public static void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var code = @"
 namespace N

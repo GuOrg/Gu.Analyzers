@@ -37,15 +37,15 @@ namespace Gu.Analyzers
                     diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {
                     context.RegisterCodeFix(
-                        $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLower() : injectable.ToUpper())}.",
-                        (editor, cancellationToken) => Fix(editor, cancellationToken, node, typeName),
+                        $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLowerInvariant() : injectable.ToUpperInvariant())}.",
+                        (editor, cancellationToken) => Fix(editor, node, typeName, cancellationToken),
                         nameof(InjectFix),
                         diagnostic);
                 }
             }
         }
 
-        private static void Fix(DocumentEditor editor, CancellationToken cancellationToken, ExpressionSyntax expression, string typeName)
+        private static void Fix(DocumentEditor editor, ExpressionSyntax expression, string typeName, CancellationToken cancellationToken)
         {
             if (Inject.TryFindConstructor(expression, out var ctor))
             {

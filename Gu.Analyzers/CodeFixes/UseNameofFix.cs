@@ -73,7 +73,7 @@ namespace Gu.Analyzers
                     SymbolKind.Event => editor.QualifyEventAccessAsync(cancellationToken),
                     SymbolKind.Property => editor.QualifyPropertyAccessAsync(cancellationToken),
                     SymbolKind.Method => editor.QualifyMethodAccessAsync(cancellationToken),
-                    _ => throw new ArgumentOutOfRangeException(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(symbol)),
                 };
             }
         }

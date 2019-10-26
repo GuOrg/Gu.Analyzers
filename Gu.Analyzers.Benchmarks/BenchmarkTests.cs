@@ -1,4 +1,4 @@
-﻿// ReSharper disable RedundantNameQualifier
+// ReSharper disable RedundantNameQualifier
 namespace Gu.Analyzers.Benchmarks
 {
     using System;
@@ -8,7 +8,7 @@ namespace Gu.Analyzers.Benchmarks
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class BenchmarkTests
+    internal static class BenchmarkTests
     {
         private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
                                                                                                     .GetTypes()
@@ -21,7 +21,7 @@ namespace Gu.Analyzers.Benchmarks
             .ToArray();
 
         [OneTimeSetUp]
-        public void OneTimeSetUp()
+        public static void OneTimeSetUp()
         {
             foreach (var benchmark in AllBenchmarks)
             {
@@ -30,7 +30,7 @@ namespace Gu.Analyzers.Benchmarks
         }
 
         [TestCaseSource(nameof(AllBenchmarks))]
-        public void Run(Gu.Roslyn.Asserts.Benchmark benchmark)
+        public static void Run(Gu.Roslyn.Asserts.Benchmark benchmark)
         {
             benchmark.Run();
         }

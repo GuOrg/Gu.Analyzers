@@ -77,7 +77,7 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
                        .AppendLine("        {")
                        .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
                        .AppendLine("        }");
-                if (!ReferenceEquals(analyzer, AllAnalyzers.Last()))
+                if (!ReferenceEquals(analyzer, AllAnalyzers[^1]))
                 {
                     builder.AppendLine();
                 }
