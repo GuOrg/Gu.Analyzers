@@ -128,7 +128,7 @@ namespace Gu.Analyzers
                 };
             }
 
-            var index = typeName.IndexOf('<', StringComparison.Ordinal);
+            var index = typeName.IndexOf('<');
             if (index > 0)
             {
                 return ParameterName(parameterList, expression, typeName.Substring(0, index));

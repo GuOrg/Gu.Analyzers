@@ -174,7 +174,7 @@ namespace Gu.Analyzers
                     chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
                     parameterSymbol.Name != parameter.Identifier.ValueText &&
-                    !char.IsDigit(parameterSymbol.Name[^1]))
+                    !char.IsDigit(parameterSymbol.Name.Last()))
                 {
                     name = parameterSymbol.Name;
                     return true;
