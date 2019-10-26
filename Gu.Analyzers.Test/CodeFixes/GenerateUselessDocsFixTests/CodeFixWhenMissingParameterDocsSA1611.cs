@@ -1,5 +1,6 @@
 namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 {
+    using System;
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
@@ -300,7 +301,7 @@ namespace N
                     parameter.Parent is ParameterListSyntax parameterList &&
                     parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                     methodDeclaration.HasLeadingTrivia &&
-                    !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText))
+                    !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText, StringComparison.OrdinalIgnoreCase))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
                 }

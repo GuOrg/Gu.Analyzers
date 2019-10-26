@@ -36,7 +36,7 @@ namespace N
     }
 }";
 
-            private static readonly string ServiceLocator = @"
+            private const string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator

@@ -74,7 +74,7 @@ namespace Gu.Analyzers.Test
             var actual = descriptorInfo.DocumentationFile.AllLines
                                        .Skip(1)
                                        .First()
-                                       .Replace("`", string.Empty);
+                                       .Replace("`", string.Empty, StringComparison.OrdinalIgnoreCase);
             Assert.AreEqual(expected, actual);
         }
 
@@ -90,7 +90,7 @@ namespace Gu.Analyzers.Test
                                        .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
                                        .Skip(1)
                                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
-                                       ?.Replace("`", string.Empty);
+                                       ?.Replace("`", string.Empty, StringComparison.OrdinalIgnoreCase);
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -282,8 +282,8 @@ Or put this at the top of the file to disable all instances.
                 }
 
                 var text = builder.Return();
-                return stub.Replace("| Code     | [<TYPENAME>](<URL>)\r\n", text)
-                           .Replace("| Code     | [<TYPENAME>](<URL>)\n", text);
+                return stub.Replace("| Code     | [<TYPENAME>](<URL>)\r\n", text, StringComparison.OrdinalIgnoreCase)
+                           .Replace("| Code     | [<TYPENAME>](<URL>)\n", text, StringComparison.OrdinalIgnoreCase);
             }
         }
 

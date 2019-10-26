@@ -1,5 +1,6 @@
 namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading;
@@ -59,7 +60,7 @@ namespace Gu.Analyzers
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
-                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
+                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{", StringComparison.OrdinalIgnoreCase).Replace(">", "}", StringComparison.OrdinalIgnoreCase)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
@@ -108,7 +109,7 @@ namespace Gu.Analyzers
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     element,
-                                    x => WithText(x, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
+                                    x => WithText(x, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{", StringComparison.OrdinalIgnoreCase).Replace(">", "}", StringComparison.OrdinalIgnoreCase)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
