@@ -47,7 +47,10 @@ namespace Gu.Analyzers
                     {
                         using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, SearchScope.Member, semanticModel, context.CancellationToken))
                         {
-                            if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue))
+                            if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue) &&
+                                semanticModel.TryGetSymbol(parameter, context.CancellationToken, out var parameterSymbol) &&
+                                IdentifierNameWalker.TryFindFirst(methodDeclaration, parameterSymbol, semanticModel, context.CancellationToken, out var first) &&
+                                assignedValue.Contains(first))
                             {
                                 context.RegisterCodeFix(
                                     "Throw if null on first assignment.",

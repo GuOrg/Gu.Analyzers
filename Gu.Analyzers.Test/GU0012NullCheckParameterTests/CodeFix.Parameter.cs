@@ -438,6 +438,54 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
+
+            [Test]
+            public static void WhenArgumentBeforeAssignment()
+            {
+                var before = @"
+namespace N
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(FileInfo ↓file)
+        {
+            M(file);
+            this.File = file;
+        }
+
+        public FileInfo File { get; }
+
+        private void M(FileInfo _) { }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(FileInfo file)
+        {
+            if (file is null)
+            {
+                throw new System.ArgumentNullException(nameof(file));
+            }
+
+            M(file);
+            this.File = file;
+        }
+
+        public FileInfo File { get; }
+
+        private void M(FileInfo _) { }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
         }
     }
 }
