@@ -55,7 +55,7 @@ namespace Gu.Analyzers
                     {
                         var arguments = objectCreation.ArgumentList.Arguments;
                         return IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
-                               IsAnyInitializerMutable(semanticModel, context.CancellationToken, objectCreation.Initializer);
+                               IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken);
                     }
                 }
                 else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&
@@ -100,7 +100,7 @@ namespace Gu.Analyzers
                                                         .WithAccessorList(GetOnlyAccessorList));
         }
 
-        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, CancellationToken cancellationToken, InitializerExpressionSyntax initializer)
+        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer, CancellationToken cancellationToken)
         {
             if (initializer == null)
             {

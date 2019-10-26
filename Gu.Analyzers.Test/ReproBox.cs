@@ -11,7 +11,7 @@ namespace Gu.Analyzers.Test
     using NUnit.Framework;
 
     [Explicit]
-    internal class ReproBox
+    internal static class ReproBox
     {
         // ReSharper disable once UnusedMember.Local
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
@@ -26,13 +26,13 @@ namespace Gu.Analyzers.Test
             MetadataReferences.FromAttributes());
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void SolutionRepro(DiagnosticAnalyzer analyzer)
+        public static void SolutionRepro(DiagnosticAnalyzer analyzer)
         {
             RoslynAssert.Valid(analyzer, Solution);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void Repro(DiagnosticAnalyzer analyzer)
+        public static void Repro(DiagnosticAnalyzer analyzer)
         {
             var code = @"
 namespace N
