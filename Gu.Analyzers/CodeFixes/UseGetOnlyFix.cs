@@ -33,9 +33,9 @@ namespace Gu.Analyzers
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                                   .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                 .ConfigureAwait(false);
+                                                      .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id &&
@@ -53,9 +53,9 @@ namespace Gu.Analyzers
 
                     bool IsUnsafe()
                     {
-                        var arguments = objectCreation.ArgumentList.Arguments;
-                        return IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
-                               IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken);
+                        return objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
+                               (IsAnyArgumentMutable(semanticModel, argumentList.Arguments, context.CancellationToken) ||
+                                IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken));
                     }
                 }
                 else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&
