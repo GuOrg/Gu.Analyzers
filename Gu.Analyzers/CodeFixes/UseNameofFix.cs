@@ -28,7 +28,7 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax? argument) &&
                     argument.Expression is LiteralExpressionSyntax literal)
                 {
                     context.RegisterCodeFix(

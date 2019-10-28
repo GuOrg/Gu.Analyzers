@@ -31,7 +31,7 @@ namespace Gu.Analyzers
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax parameterList) &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax? parameterList) &&
                     parameterList.Parent is MethodDeclarationSyntax candidate &&
                     TryFindTestAttribute(candidate, semanticModel, context.CancellationToken, out var attribute) &&
                     TryGetParameters(attribute, semanticModel, context.CancellationToken, out var parameters))

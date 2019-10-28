@@ -32,7 +32,7 @@ namespace Gu.Analyzers
 
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly TaskType Task = new TaskType();
-        internal static readonly QualifiedType CancellationToken = new QualifiedType(typeof(CancellationToken).FullName);
+        internal static readonly QualifiedType CancellationToken = new QualifiedType(typeof(CancellationToken).FullName!);
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
         internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
 

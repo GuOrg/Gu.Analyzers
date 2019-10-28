@@ -26,7 +26,7 @@ namespace Gu.Analyzers
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument) &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument) &&
                     diagnostic.Properties.TryGetValue(nameof(IdentifierNameSyntax), out var name))
                 {
                     context.RegisterCodeFix(

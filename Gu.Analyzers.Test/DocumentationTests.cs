@@ -24,7 +24,7 @@ namespace Gu.Analyzers.Test
                                                                               .GetTypes()
                                                                               .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
                                                                               .OrderBy(x => x.Name)
-                                                                              .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                              .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
                                                                               .ToArray();
 
         private static readonly IReadOnlyList<DescriptorInfo> DescriptorInfos = Analyzers

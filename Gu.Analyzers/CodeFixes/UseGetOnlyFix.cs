@@ -39,7 +39,7 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id &&
-                    syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax objectCreation) &&
+                    syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax? objectCreation) &&
                     objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax? property) &&
                     property.Parent is TypeDeclarationSyntax containingType &&
                     containingType.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax ctor) &&
@@ -59,7 +59,7 @@ namespace Gu.Analyzers
                     }
                 }
                 else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&
-                         syntaxRoot.TryFindNode(diagnostic, out AccessorDeclarationSyntax setter))
+                         syntaxRoot.TryFindNode(diagnostic, out AccessorDeclarationSyntax? setter))
                 {
                     context.RegisterCodeFix(
                         "Use get-only",

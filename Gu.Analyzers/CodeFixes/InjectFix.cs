@@ -33,7 +33,7 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax node) &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? node) &&
                     diagnostic.Properties.TryGetValue(nameof(INamedTypeSymbol), out var typeName) &&
                     diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {

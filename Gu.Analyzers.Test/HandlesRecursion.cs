@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test
                                                                                  .Assembly
                                                                                  .GetTypes()
                                                                                  .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                 .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                                 .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
                                                                                  .ToArray();
 
         [Test]

@@ -14,7 +14,7 @@ namespace Gu.Analyzers.Test
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
                                                                                                      .GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
                                                                                                      .ToImmutableArray();
 
         private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(

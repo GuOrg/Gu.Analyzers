@@ -30,7 +30,7 @@ namespace Gu.Analyzers
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out BaseMethodDeclarationSyntax methodDeclaration))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out BaseMethodDeclarationSyntax? methodDeclaration))
                 {
                     if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
                         methodDeclaration.TryGetDocumentationComment(out var docs))
@@ -66,7 +66,7 @@ namespace Gu.Analyzers
                                 diagnostic);
                         }
                     }
-                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out TypeParameterSyntax typeParameter) &&
+                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out TypeParameterSyntax? typeParameter) &&
                              methodDeclaration.TryGetDocumentationComment(out docs))
                     {
                         if (TryGetTypeParameterText(methodDeclaration, typeParameter, semanticModel, context.CancellationToken, out var text))
@@ -116,7 +116,7 @@ namespace Gu.Analyzers
                         }
                     }
                     else if (diagnostic.Id == "CS1591" &&
-                             syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax operatorDeclaration) &&
+                             syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax? operatorDeclaration) &&
                              operatorDeclaration.ParameterList is ParameterListSyntax parameterList &&
                              parameterList.Parameters.Count == 2 &&
                              parameterList.Parameters.TryElementAt(0, out var left) &&
