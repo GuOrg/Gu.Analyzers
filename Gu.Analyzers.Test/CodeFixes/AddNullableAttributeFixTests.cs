@@ -178,12 +178,12 @@ namespace N
 
     public static class C
     {
-        public static bool Try1(object o, [NotNullWhen(true)]out string? result)
+        public static bool Try1(object o, [NotNullWhen(true)] out string? result)
         {
             return Try2(o, out result);
         }
 
-        public static bool Try2(object o, [NotNullWhen(true)]out string? result)
+        public static bool Try2(object o, [NotNullWhen(true)] out string? result)
         {
             result = o as string;
             return result != null;
