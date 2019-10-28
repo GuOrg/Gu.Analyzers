@@ -28,19 +28,13 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing)
-                {
-                    continue;
-                }
-
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax argument &&
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
                     argument.Expression is LiteralExpressionSyntax literal)
                 {
                     context.RegisterCodeFix(
                         "Use nameof",
                         (editor, cancellationToken) => FixAsync(editor, argument, literal.Token.ValueText, cancellationToken),
-                        this.GetType().FullName,
+                        nameof(UseNameofFix),
                         diagnostic);
                 }
             }
@@ -48,7 +42,7 @@ namespace Gu.Analyzers
 
         private static async Task FixAsync(DocumentEditor editor, ArgumentSyntax argument, string name, CancellationToken cancellationToken)
         {
-            if (!IsStaticContext(argument, editor.SemanticModel, cancellationToken) &&
+            if (!argument.IsInStaticContext() &&
                 editor.SemanticModel.LookupSymbols(argument.SpanStart, name: name).TrySingle(out var member) &&
                 (member is IFieldSymbol || member is IPropertySymbol || member is IMethodSymbol) &&
                 !member.IsStatic &&
@@ -76,19 +70,6 @@ namespace Gu.Analyzers
                     _ => throw new ArgumentOutOfRangeException(nameof(symbol)),
                 };
             }
-        }
-
-        private static bool IsStaticContext(SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var accessor = context.FirstAncestor<AccessorDeclarationSyntax>();
-            if (accessor != null)
-            {
-                return semanticModel.GetDeclaredSymbolSafe(accessor.FirstAncestor<PropertyDeclarationSyntax>(), cancellationToken)
-                                    ?.IsStatic != false;
-            }
-
-            var methodDeclaration = context.FirstAncestor<MethodDeclarationSyntax>();
-            return semanticModel.GetDeclaredSymbolSafe(methodDeclaration, cancellationToken)?.IsStatic != false;
         }
     }
 }

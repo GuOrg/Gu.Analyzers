@@ -40,7 +40,7 @@ namespace Gu.Analyzers
             {
                 if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id &&
                     syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax objectCreation) &&
-                    objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax property) &&
+                    objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax? property) &&
                     property.Parent is TypeDeclarationSyntax containingType &&
                     containingType.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax ctor) &&
                     ctor.Body != null)

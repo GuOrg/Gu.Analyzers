@@ -58,7 +58,7 @@ namespace Gu.Analyzers
                                     parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
                                     !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
                                     walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _) &&
-                                    context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol leftSymbol))
+                                    context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol? leftSymbol))
                                 {
                                     foreach (var argument in walker.Arguments)
                                     {
@@ -278,12 +278,12 @@ namespace Gu.Analyzers
 
             bool IsMutatedOnceBefore()
             {
-                if (expression.TryFirstAncestor(out StatementSyntax statement))
+                if (expression.TryFirstAncestor(out StatementSyntax? statement))
                 {
                     using (var walker = MutationWalker.For(left, context.SemanticModel, context.CancellationToken))
                     {
                         return walker.TrySingle(out var single) &&
-                               single.TryFirstAncestor(out StatementSyntax singleStatement) &&
+                               single.TryFirstAncestor(out StatementSyntax? singleStatement) &&
                                singleStatement.IsExecutedBefore(statement) == ExecutedBefore.Yes;
                     }
                 }
@@ -292,7 +292,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetIdentifier(ExpressionSyntax expression, out IdentifierNameSyntax result)
+        private static bool TryGetIdentifier(ExpressionSyntax expression, [NotNullWhen(true)]out IdentifierNameSyntax? result)
         {
             result = expression as IdentifierNameSyntax;
             if (result != null)
@@ -329,7 +329,7 @@ namespace Gu.Analyzers
             private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new List<BinaryExpressionSyntax>();
             private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-            private SemanticModel? semanticModel;
+            private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
 
             private CtorWalker()
@@ -352,10 +352,11 @@ namespace Gu.Analyzers
 
             public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
             {
-                if (TryGetIdentifier(node.Left, out var identifierName))
+                if (TryGetIdentifier(node.Left, out var identifierName) &&
+                    this.semanticModel.TryGetSymbol(identifierName, this.cancellationToken, out var symbol))
                 {
                     this.assignments.Add(node);
-                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                    this.unassigned.Remove(symbol);
                 }
 
                 base.VisitAssignmentExpression(node);
@@ -364,9 +365,10 @@ namespace Gu.Analyzers
             public override void VisitArgument(ArgumentSyntax node)
             {
                 if (TryGetIdentifier(node.Expression, out var identifierName) &&
-                    node.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword))
+                    node.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
+                    this.semanticModel.TryGetSymbol(identifierName, this.cancellationToken, out var symbol))
                 {
-                    this.unassigned.Remove(this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken));
+                    this.unassigned.Remove(symbol);
                 }
 
                 this.arguments.Add(node);
@@ -377,7 +379,7 @@ namespace Gu.Analyzers
             {
                 if (this.visited.Add(node) &&
                     this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
-                    ctor.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax declaration))
+                    ctor.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax? declaration))
                 {
                     this.Visit(declaration);
                 }

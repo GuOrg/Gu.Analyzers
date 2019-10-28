@@ -94,7 +94,7 @@ namespace N
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
-        [Explicit("Fix later.")]
+        [Ignore("Fix later.")]
         [Test]
         public static void MoqSetupNonVoidNoReturn()
         {

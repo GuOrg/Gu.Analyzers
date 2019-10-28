@@ -283,8 +283,8 @@ namespace Gu.Analyzers
                 if (node != null &&
                     expected != null &&
                     node.Name.Identifier.ValueText == expected.Name.Identifier.ValueText &&
-                    this.semanticModel.TryGetSymbol(node, this.cancellationToken, out ISymbol nodeSymbol) &&
-                    this.semanticModel.TryGetSymbol(this.identifierName, this.cancellationToken, out ISymbol expectedSymbol) &&
+                    this.semanticModel.TryGetSymbol(node, this.cancellationToken, out ISymbol? nodeSymbol) &&
+                    this.semanticModel.TryGetSymbol(this.identifierName, this.cancellationToken, out ISymbol? expectedSymbol) &&
                     nodeSymbol.Equals(expectedSymbol) &&
                     GU0007PreferInjecting.IsRootValid(node, this.semanticModel, this.cancellationToken))
                 {

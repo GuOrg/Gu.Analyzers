@@ -25,11 +25,11 @@ namespace Gu.Analyzers
         {
             switch (context.Node)
             {
-                case ThrowStatementSyntax throwStatementSyntax:
-                    FindException<NotImplementedException>(context, throwStatementSyntax.Expression, Descriptors.GU0090DoNotThrowNotImplementedException);
+                case ThrowStatementSyntax throwStatementSyntax when throwStatementSyntax.Expression is { } expression:
+                    FindException<NotImplementedException>(context, expression, Descriptors.GU0090DoNotThrowNotImplementedException);
                     break;
-                case ThrowExpressionSyntax throwExpressionSyntax:
-                    FindException<NotImplementedException>(context, throwExpressionSyntax.Expression, Descriptors.GU0090DoNotThrowNotImplementedException);
+                case ThrowExpressionSyntax throwExpressionSyntax when throwExpressionSyntax.Expression is { } expression:
+                    FindException<NotImplementedException>(context, expression, Descriptors.GU0090DoNotThrowNotImplementedException);
                     break;
                 default:
                     return;

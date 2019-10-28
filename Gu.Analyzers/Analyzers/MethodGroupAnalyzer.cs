@@ -47,7 +47,7 @@ namespace Gu.Analyzers
         private static bool IsMethodGroup(ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
         {
             return expression is IdentifierNameSyntax identifierName &&
-                   context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out IMethodSymbol method) &&
+                   context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out IMethodSymbol? method) &&
                    method.IsStatic;
         }
     }

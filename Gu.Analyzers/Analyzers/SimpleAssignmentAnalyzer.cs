@@ -29,9 +29,9 @@ namespace Gu.Analyzers
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is AssignmentExpressionSyntax assignment &&
-                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol left))
+                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol? left))
             {
-                if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol right) &&
+                if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol? right) &&
                     AreSame(assignment.Left, assignment.Right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
                     left.Equals(right))
@@ -45,7 +45,8 @@ namespace Gu.Analyzers
                     method.Parameters.TryFirst(x => x.Name == identifier.Identifier.ValueText, out var parameter) &&
                     parameter.Type.IsReferenceType &&
                     !parameter.HasExplicitDefaultValue &&
-                    !NullCheck.IsChecked(parameter, assignment.FirstAncestor<BaseMethodDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                    assignment.TryFirstAncestor(out BaseMethodDeclarationSyntax? containingMethod) &&
+                    !NullCheck.IsChecked(parameter, containingMethod, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, assignment.Right.GetLocation()));
                 }
@@ -142,10 +143,7 @@ namespace Gu.Analyzers
                                 foreach (var name in nameWalker.IdentifierNames)
                                 {
                                     if (left.Name == name.Identifier.ValueText &&
-                                        context.SemanticModel.TryGetSymbol(
-                                            name,
-                                            context.CancellationToken,
-                                            out ISymbol symbol) &&
+                                        context.SemanticModel.TryGetSymbol(name, context.CancellationToken, out ISymbol? symbol) &&
                                         symbol.Equals(left))
                                     {
                                         return false;

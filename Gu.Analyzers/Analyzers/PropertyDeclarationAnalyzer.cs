@@ -60,7 +60,7 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            if (semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out ISymbol member) &&
+            if (semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out ISymbol? member) &&
                 FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
                 memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
                 !IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken))

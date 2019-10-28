@@ -242,7 +242,7 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
             }
 
-            [Explicit("Not creating ctors yet.")]
+            [Ignore("Not creating ctors yet.")]
             [Test]
             public static void UsingInMethodWhenNoCtor()
             {

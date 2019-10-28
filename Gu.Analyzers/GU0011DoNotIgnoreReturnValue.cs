@@ -91,7 +91,7 @@ namespace Gu.Analyzers
                     method = method.ReducedFrom;
                 }
 
-                if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax declaration) &&
+                if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? declaration) &&
                     ReturnValueWalker.TrySingle(declaration, out var returnValue))
                 {
                     if (returnValue is IdentifierNameSyntax identifierName &&

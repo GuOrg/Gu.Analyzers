@@ -88,7 +88,7 @@ namespace Gu.Analyzers
 
             bool CreatesMany()
             {
-                if (objectCreation.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration))
+                if (objectCreation.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration))
                 {
                     using (var walker = ObjectCreationWalker.BorrowAndVisit(classDeclaration))
                     {
@@ -178,7 +178,7 @@ namespace Gu.Analyzers
                     }
 
                     if (MemberPath.TryFindRoot(memberAccess, out var rootMember) &&
-                        semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol rootSymbol))
+                        semanticModel.TryGetSymbol(rootMember, cancellationToken, out ISymbol? rootSymbol))
                     {
                         switch (rootSymbol)
                         {

@@ -35,7 +35,7 @@ namespace Gu.Analyzers
                 expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
                 !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
                 argumentSyntax.Parent is ArgumentListSyntax argumentList &&
-                context.SemanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out IMethodSymbol method) &&
+                context.SemanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out IMethodSymbol? method) &&
                 !IsIgnored(method, context.Compilation))
             {
                 if (!ReferenceEquals(method.OriginalDefinition, method))

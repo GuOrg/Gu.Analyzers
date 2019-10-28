@@ -32,7 +32,7 @@ namespace Gu.Analyzers
             {
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax parameter) &&
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
                         methodDeclaration.TryGetDocumentationComment(out var docs))
                     {
                         if (StandardDocs.TryGet(parameter, out var text))
@@ -164,7 +164,7 @@ namespace Gu.Analyzers
                         case XmlElementSyntax element:
                             result = element;
                             return true;
-                        case SyntaxNode node when node.TryFirstAncestor(out XmlElementSyntax element):
+                        case SyntaxNode node when node.TryFirstAncestor(out XmlElementSyntax? element):
                             result = element;
                             return true;
                         default:

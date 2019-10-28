@@ -30,7 +30,7 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is ParameterSyntax parameterSyntax &&
-                    semanticModel.TryGetSymbol(parameterSyntax, context.CancellationToken, out IParameterSymbol parameter) &&
+                    semanticModel.TryGetSymbol(parameterSyntax, context.CancellationToken, out IParameterSymbol? parameter) &&
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {
                     context.RegisterCodeFix(

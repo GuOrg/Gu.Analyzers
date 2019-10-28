@@ -40,7 +40,7 @@ namespace Gu.Analyzers
                 if (diagnostic.Id == Descriptors.GU0001NameArguments.Id &&
                     syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
                     !HasAnyNamedArgument(arguments) &&
-                    semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol method))
+                    semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol? method))
                 {
                     context.RegisterCodeFix(
                         "Name arguments",

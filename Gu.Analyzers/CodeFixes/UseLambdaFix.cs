@@ -41,7 +41,7 @@ namespace Gu.Analyzers
 
         private static void UseLambda(DocumentEditor editor, IdentifierNameSyntax identifierName, CancellationToken cancellationToken)
         {
-            if (editor.SemanticModel.TryGetSymbol(identifierName, cancellationToken, out IMethodSymbol method))
+            if (editor.SemanticModel.TryGetSymbol(identifierName, cancellationToken, out IMethodSymbol? method))
             {
                 if (method.Parameters.Length == 0)
                 {

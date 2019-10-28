@@ -18,7 +18,7 @@ namespace Gu.Analyzers
         internal static bool TryFindConstructor(SyntaxNode node, [NotNullWhen(true)]out ConstructorDeclarationSyntax? ctor)
         {
             ctor = null;
-            return node.TryFirstAncestor(out ClassDeclarationSyntax classDeclaration) &&
+            return node.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration) &&
                    !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword) &&
                    classDeclaration.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ctor) &&
                    !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);

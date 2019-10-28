@@ -32,7 +32,8 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax parameterList) &&
-                    TryFindTestAttribute(parameterList.Parent as MethodDeclarationSyntax, semanticModel, context.CancellationToken, out var attribute) &&
+                    parameterList.Parent is MethodDeclarationSyntax candidate &&
+                    TryFindTestAttribute(candidate, semanticModel, context.CancellationToken, out var attribute) &&
                     TryGetParameters(attribute, semanticModel, context.CancellationToken, out var parameters))
                 {
                     context.RegisterCodeFix(
@@ -45,7 +46,7 @@ namespace Gu.Analyzers
                         diagnostic);
                 }
                 else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out attribute) &&
-                         attribute.TryFirstAncestor(out MethodDeclarationSyntax method) &&
+                         attribute.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
                          TryGetParameters(attribute, semanticModel, context.CancellationToken, out parameters))
                 {
                     context.RegisterCodeFix(
@@ -70,7 +71,7 @@ namespace Gu.Analyzers
 
             if (testCase.ArgumentList is AttributeArgumentListSyntax argumentList &&
                 !argumentList.Arguments.Any(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression)) &&
-                testCase.TryFirstAncestor(out MethodDeclarationSyntax method) &&
+                testCase.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
                 method.ParameterList is ParameterListSyntax current)
             {
                 if (argumentList.Arguments.Count == 0)
