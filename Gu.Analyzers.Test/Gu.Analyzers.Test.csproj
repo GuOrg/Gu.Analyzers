@@ -17,10 +17,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Gu.Analyzers" Version="1.6.1-dev">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.2.5" />
     <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.2.4">
       <PrivateAssets>all</PrivateAssets>
