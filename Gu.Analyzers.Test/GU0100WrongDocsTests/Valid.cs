@@ -8,7 +8,6 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
 
-        [TestCase("List<int>")]
         [TestCase("StringBuilder")]
         [TestCase("System.Text.StringBuilder")]
         public static void WhenCorrect(string cref)
@@ -17,7 +16,6 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
 namespace N
 {
     using System.Text;
-    using System.Collections.Generic;
 
     class C
     {
@@ -30,6 +28,60 @@ namespace N
         }
     }
 }".AssertReplace("StringBuilder", cref);
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [TestCase("List{int}")]
+        [TestCase("List{Int32}")]
+        [TestCase("List{System.Int32}")]
+        [TestCase("System.Collections.Generic.List{int}")]
+        [TestCase("System.Collections.Generic.List{Int32}")]
+        [TestCase("System.Collections.Generic.List{System.Int32}")]
+        public static void WhenListOfInt(string cref)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""list"">The <see cref=""List{int}""/>.</param>
+        public void M(List<int> list)
+        {
+        }
+    }
+}".AssertReplace("List{int}", cref);
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [TestCase("List{C}")]
+        [TestCase("List{N.C}")]
+        [TestCase("System.Collections.Generic.List{C}")]
+        [TestCase("System.Collections.Generic.List{N.C}")]
+        public static void WhenListOfC(string cref)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""list"">The <see cref=""List{C}""/>.</param>
+        public void M(List<C> list)
+        {
+        }
+    }
+}".AssertReplace("List{C}", cref);
             RoslynAssert.Valid(Analyzer, code);
         }
 

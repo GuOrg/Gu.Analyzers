@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
         private static readonly CodeFixProvider Fix = new DocsFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongDocs);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongCrefType);
 
         [TestCase("string")]
         [TestCase("System.String")]
@@ -44,6 +44,78 @@ namespace N
         /// </summary>
         /// <param name=""builder"">The <see cref=""StringBuilder""/>.</param>
         public void M(StringBuilder builder)
+        {
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void WhenWrongArray()
+        {
+            var before = @"
+namespace N
+{
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""array"">The <see cref=""↓string""/>.</param>
+        public void M(string[] array)
+        {
+        }
+    }
+}";
+            var after = @"
+namespace N
+{
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""array"">The <see cref=""string[]""/>.</param>
+        public void M(string[] array)
+        {
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void WhenWrongGenericList()
+        {
+            var before = @"
+namespace N
+{
+    using System.Collections.Generic;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""list"">The <see cref=""↓string""/>.</param>
+        public void M(List<string> list)
+        {
+        }
+    }
+}";
+            var after = @"
+namespace N
+{
+    using System.Collections.Generic;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""list"">The <see cref=""List{string}""/>.</param>
+        public void M(List<string> list)
         {
         }
     }

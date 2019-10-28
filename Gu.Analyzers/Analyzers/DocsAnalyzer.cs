@@ -11,7 +11,7 @@ namespace Gu.Analyzers
     internal class DocsAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0100WrongDocs);
+            Descriptors.GU0100WrongCrefType);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -26,27 +26,62 @@ namespace Gu.Analyzers
                 context.Node is XmlCrefAttributeSyntax attribute &&
                 attribute.Parent is XmlEmptyElementSyntax emptyElement &&
                 emptyElement.Parent is XmlElementSyntax candidate &&
+                IsAutoDoc() &&
                 candidate.HasLocalName("param") &&
-                candidate.TryGetNameAttribute(out var nameAttribute) &&
-                context.ContainingSymbol is IMethodSymbol method &&
-                method.TryFindParameter(nameAttribute.Identifier.Identifier.ValueText, out var parameter) &&
-                context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out var type) &&
-                !type.Equals(parameter.Type) &&
-                attribute.Parent is XmlEmptyElementSyntax empty &&
-                empty.Parent is XmlElementSyntax element &&
-                IsAt(element, empty, 1) &&
-                element.Content.TryFirst(out var first) &&
-                first is XmlTextSyntax text &&
-                text.ToString() == "The ")
+                TryGetTypes(out var parameterType, out var crefType) &&
+                IsWrongCref(parameterType, crefType))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
-                        Descriptors.GU0100WrongDocs,
-                        attribute.Cref.GetLocation()));
+                        Descriptors.GU0100WrongCrefType,
+                        attribute.Cref.GetLocation(),
+                        parameterType.ToDisplayString()));
             }
 
-            bool IsAt(XmlElementSyntax e, XmlNodeSyntax a, int index) => e.Content.TryElementAt(index, out var match) &&
-                                                                               Equals(match, a);
+            bool IsAutoDoc()
+            {
+                return candidate.Content.TryElementAt(1, out var match) &&
+                       Equals(match, emptyElement) &&
+                       candidate.Content.TryFirst(out var first) &&
+                       first is XmlTextSyntax text &&
+                       IsAutoPrefix();
+
+                bool IsAutoPrefix()
+                {
+                    switch (text.ToString())
+                    {
+                        case "The ":
+                        case "The left ":
+                        case "The right ":
+                        case "The first ":
+                        case "The other ":
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            }
+
+            bool TryGetTypes(out ITypeSymbol parameterType, out ITypeSymbol crefType)
+            {
+                if (candidate.TryGetNameAttribute(out var nameAttribute) &&
+                    context.ContainingSymbol is IMethodSymbol method &&
+                    method.TryFindParameter(nameAttribute.Identifier.Identifier.ValueText, out var parameter) &&
+                    context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out crefType!))
+                {
+                    parameterType = parameter.Type;
+                    return true;
+                }
+
+                parameterType = null!;
+                crefType = null!;
+                return false;
+            }
+
+            bool IsWrongCref(ITypeSymbol parameterType, ITypeSymbol crefType)
+            {
+                return !Equals(parameterType.MetadataName, crefType.MetadataName);
+            }
         }
     }
 }

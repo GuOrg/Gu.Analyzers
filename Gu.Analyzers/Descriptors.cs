@@ -337,14 +337,14 @@ namespace Gu.Analyzers
             isEnabledByDefault: true,
             description: "Don't throw NotImplementedException.");
 
-        internal static readonly DiagnosticDescriptor GU0100WrongDocs = Descriptors.Create(
+        internal static readonly DiagnosticDescriptor GU0100WrongCrefType = Descriptors.Create(
             id: "GU0100",
-            title: "Wrong docs.",
-            messageFormat: "Wrong docs.",
+            title: "Wrong cref type.",
+            messageFormat: "Wrong cref type, expected {0}.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Wrong docs.");
+            description: "Wrong cref type.");
 
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="Diagnostic" />.

@@ -12,13 +12,14 @@ namespace Gu.Analyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocsFix))]
     [Shared]
     internal class DocsFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS1591", "SA1611", "SA1614", "SA1618", Descriptors.GU0100WrongDocs.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS1591", "SA1611", "SA1614", "SA1618", Descriptors.GU0100WrongCrefType.Id);
 
         /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
@@ -48,7 +49,7 @@ namespace Gu.Analyzers
                         else if (parameter.Type is PredefinedTypeSyntax)
                         {
                             context.RegisterCodeFix(
-                                "Generate useless xml documentation for parameter.",
+                                "Generate empty xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
                                     x => x.WithParamText(parameter.Identifier.ValueText, string.Empty)),
@@ -61,7 +62,7 @@ namespace Gu.Analyzers
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
-                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{parameter.Type.ToString().Replace("<", "{").Replace(">", "}")}\"/>.")),
+                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{CrefType(parameter)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
@@ -110,7 +111,7 @@ namespace Gu.Analyzers
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     element,
-                                    x => WithText(x, $"The <see cref=\"{parameter.Type.ToString().Replace('<', '{').Replace('>', '}')}\"/>.")),
+                                    x => WithText(x, $"The <see cref=\"{CrefType(parameter)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
@@ -131,8 +132,8 @@ namespace Gu.Analyzers
                                     x => x.WithDocumentationText(
                                         StringBuilderPool.Borrow()
                                                          .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</summary>")
-                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{left.Type}\"/>.</param>")
-                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{right.Type}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(left)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(right)}\"/>.</param>")
                                                          .AppendLine("/// <returns>True if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</returns>")
                                                          .Return())),
                                 nameof(DocsFix),
@@ -147,8 +148,8 @@ namespace Gu.Analyzers
                                     x => x.WithDocumentationText(
                                         StringBuilderPool.Borrow()
                                                          .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</summary>")
-                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{left.Type}\"/>.</param>")
-                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{right.Type}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(left)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(right)}\"/>.</param>")
                                                          .AppendLine("/// <returns>True if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</returns>")
                                                          .Return())),
                                 nameof(DocsFix),
@@ -171,6 +172,14 @@ namespace Gu.Analyzers
                             result = null!;
                             return false;
                     }
+                }
+
+                string CrefType(ParameterSyntax parameter)
+                {
+                    return SyntaxFactory.TypeCref(parameter.Type)
+                                        .ToString()
+                                        .Replace('<', '{')
+                                        .Replace('>', '}');
                 }
             }
         }
