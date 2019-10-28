@@ -1,7 +1,6 @@
 namespace Gu.Analyzers.Test.CodeFixes
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -14,7 +13,7 @@ namespace Gu.Analyzers.Test.CodeFixes
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FakeFxCopAnalyzer();
         private static readonly CodeFixProvider Fix = new NullCheckParameterFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CA1062");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
 
         [Test]
         public static void Simple()
@@ -53,7 +52,7 @@ namespace N
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class FakeFxCopAnalyzer : DiagnosticAnalyzer
         {
-            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("CA1062", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("CA1062", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
                 Descriptor);
