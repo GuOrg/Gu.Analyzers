@@ -149,6 +149,51 @@ namespace N
         }
 
         [Test]
+        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithOut()
+        {
+            var before = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try1(object o, out string result)
+        {
+            return Try2(o, out ↓result);
+        }
+
+        public static bool Try2(object o, [NotNullWhen(true)] out string? result)
+        {
+            result = o as string;
+            return result != null;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try1(object o, [NotNullWhen(true)]out string? result)
+        {
+            return Try2(o, out result);
+        }
+
+        public static bool Try2(object o, [NotNullWhen(true)]out string? result)
+        {
+            result = o as string;
+            return result != null;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
         public static void AddMaybeNullWhenFalse()
         {
             var before = @"

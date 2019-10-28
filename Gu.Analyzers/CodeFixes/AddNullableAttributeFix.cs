@@ -44,12 +44,8 @@ namespace Gu.Analyzers.CodeFixes
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
                 {
-                    if (expression.Parent is AssignmentExpressionSyntax assignment &&
-                        assignment.Left is IdentifierNameSyntax left &&
-                        assignment.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
-                        method.ReturnType == KnownSymbol.Boolean &&
-                        method.TryFindParameter(left.Identifier.ValueText, out var parameter) &&
-                        parameter.Modifiers.Any(SyntaxKind.OutKeyword))
+                    if (TryFindLocalOrParameter(out var identifierName) &&
+                        TryFindOutParemeter(identifierName.Identifier.ValueText, out var outParameter))
                     {
                         if (diagnostic.Id == "CS8625" ||
                             diagnostic.Id == "CS8601")
@@ -57,9 +53,9 @@ namespace Gu.Analyzers.CodeFixes
                             context.RegisterCodeFix(
                                 "[NotNullWhen(true)]",
                                 (editor, _) => editor.ReplaceNode(
-                                    parameter,
-                                    x => parameter.WithAttributeList(NotNullWhenTrue)
-                                                  .WithType(SyntaxFactory.NullableType(parameter.Type)))
+                                    outParameter!,
+                                    x => outParameter!.WithAttributeList(NotNullWhenTrue)
+                                                      .WithType(SyntaxFactory.NullableType(outParameter!.Type)))
                                                      .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
                                 "[NotNullWhen(true)]",
                                 diagnostic);
@@ -68,7 +64,7 @@ namespace Gu.Analyzers.CodeFixes
                         {
                             context.RegisterCodeFix(
                                 "[MaybeNullWhen(false)]",
-                                (editor, _) => editor.ReplaceNode(parameter, x => parameter.WithAttributeList(MaybeNullWhenFalse))
+                                (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter!.WithAttributeList(MaybeNullWhenFalse))
                                                      .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
                                                      .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
                                 "[MaybeNullWhen(false)]",
@@ -86,6 +82,31 @@ namespace Gu.Analyzers.CodeFixes
                                 x => optionalParameter.WithType(SyntaxFactory.NullableType(optionalParameter.Type))),
                             "?",
                             diagnostic);
+                    }
+
+                    bool TryFindLocalOrParameter(out IdentifierNameSyntax result)
+                    {
+                        switch (expression.Parent)
+                        {
+                            case AssignmentExpressionSyntax assignment when assignment.Left is IdentifierNameSyntax local:
+                                result = local;
+                                return true;
+                            case ArgumentSyntax argument when expression is IdentifierNameSyntax arg:
+                                result = arg;
+                                return true;
+                            default:
+                                result = null!;
+                                return false;
+                        }
+                    }
+
+                    bool TryFindOutParemeter(string name, out ParameterSyntax? result)
+                    {
+                        result = null!;
+                        return expression.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
+                               method.ReturnType == KnownSymbol.Boolean &&
+                               method.TryFindParameter(name, out result) &&
+                               result.Modifiers.Any(SyntaxKind.OutKeyword);
                     }
                 }
             }
