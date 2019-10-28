@@ -199,5 +199,32 @@ namespace N
 }";
             RoslynAssert.CodeFix(Fix, CS8653, before, after, compilationOptions: CompilationOptions);
         }
+
+        [Test]
+        public static void MakeOptionalParemeterNullable()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M(string s = ↓null)
+        {
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M(string? s = null)
+        {
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+        }
     }
 }

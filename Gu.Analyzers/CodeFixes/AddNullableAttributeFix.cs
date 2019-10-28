@@ -42,34 +42,48 @@ namespace Gu.Analyzers.CodeFixes
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression) &&
-                    expression.Parent is AssignmentExpressionSyntax assignment &&
-                    assignment.Left is IdentifierNameSyntax left &&
-                    assignment.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
-                    method.ReturnType == KnownSymbol.Boolean &&
-                    method.TryFindParameter(left.Identifier.ValueText, out var parameter) &&
-                    parameter.Modifiers.Any(SyntaxKind.OutKeyword))
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
                 {
-                    if (diagnostic.Id == "CS8625")
+                    if (expression.Parent is AssignmentExpressionSyntax assignment &&
+                        assignment.Left is IdentifierNameSyntax left &&
+                        assignment.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
+                        method.ReturnType == KnownSymbol.Boolean &&
+                        method.TryFindParameter(left.Identifier.ValueText, out var parameter) &&
+                        parameter.Modifiers.Any(SyntaxKind.OutKeyword))
                     {
-                        context.RegisterCodeFix(
-                            "[NotNullWhen(true)]",
-                            (editor, _) => editor.ReplaceNode(
-                                parameter,
-                                x => parameter.WithAttributeList(NotNullWhenTrue)
-                                              .WithType(SyntaxFactory.NullableType(parameter.Type)))
-                                                 .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
-                            "[NotNullWhen(true)]",
-                            diagnostic);
+                        if (diagnostic.Id == "CS8625")
+                        {
+                            context.RegisterCodeFix(
+                                "[NotNullWhen(true)]",
+                                (editor, _) => editor.ReplaceNode(
+                                    parameter,
+                                    x => parameter.WithAttributeList(NotNullWhenTrue)
+                                                  .WithType(SyntaxFactory.NullableType(parameter.Type)))
+                                                     .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                                "[NotNullWhen(true)]",
+                                diagnostic);
+                        }
+                        else if (diagnostic.Id == "CS8653")
+                        {
+                            context.RegisterCodeFix(
+                                "[MaybeNullWhen(false)]",
+                                (editor, _) => editor.ReplaceNode(parameter, x => parameter.WithAttributeList(MaybeNullWhenFalse))
+                                                     .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
+                                                     .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                                "[MaybeNullWhen(false)]",
+                                diagnostic);
+                        }
                     }
-                    else if (diagnostic.Id == "CS8653")
+
+                    if (expression.Parent is EqualsValueClauseSyntax equalsValueClause &&
+                        equalsValueClause.Parent is ParameterSyntax optionalParameter)
                     {
                         context.RegisterCodeFix(
-                            "[MaybeNullWhen(false)]",
-                            (editor, _) => editor.ReplaceNode(parameter, x => parameter.WithAttributeList(MaybeNullWhenFalse))
-                                                 .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
-                                                 .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
-                            "[MaybeNullWhen(false)]",
+                            optionalParameter.Type.ToString() + "?",
+                            (editor, _) => editor.ReplaceNode(
+                                optionalParameter,
+                                x => optionalParameter.WithType(SyntaxFactory.NullableType(optionalParameter.Type))),
+                            optionalParameter.Type.ToString() + "?",
                             diagnostic);
                     }
                 }
