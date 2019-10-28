@@ -34,7 +34,7 @@ namespace Gu.Analyzers.CodeFixes
                                 SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
 
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8625", "CS8653");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8601", "CS8625", "CS8653");
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -51,7 +51,8 @@ namespace Gu.Analyzers.CodeFixes
                         method.TryFindParameter(left.Identifier.ValueText, out var parameter) &&
                         parameter.Modifiers.Any(SyntaxKind.OutKeyword))
                     {
-                        if (diagnostic.Id == "CS8625")
+                        if (diagnostic.Id == "CS8625" ||
+                            diagnostic.Id == "CS8601")
                         {
                             context.RegisterCodeFix(
                                 "[NotNullWhen(true)]",

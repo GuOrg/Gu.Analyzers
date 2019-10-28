@@ -12,6 +12,7 @@ namespace Gu.Analyzers.Test.CodeFixes
     internal static class AddNullableAttributeFixTests
     {
         private static readonly CodeFixProvider Fix = new AddNullableAttributeFix();
+        private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
         private static readonly ExpectedDiagnostic CS8653 = ExpectedDiagnostic.Create("CS8653");
         private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
@@ -62,7 +63,7 @@ namespace N
         }
 
         [Test]
-        public static void AddNotNullWhenTrue()
+        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithNullLiteral()
         {
             var before = @"
 namespace N
@@ -108,6 +109,43 @@ namespace N
     }
 }";
             RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
+        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithAs()
+        {
+            var before = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try(object o, out string result)
+        {
+            _ = typeof(NotNullWhenAttribute);
+            result = ↓o as string;
+            return result != null;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try(object o, [NotNullWhen(true)] out string? result)
+        {
+            _ = typeof(NotNullWhenAttribute);
+            result = o as string;
+            return result != null;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
         }
 
         [Test]
