@@ -12,7 +12,9 @@ namespace Gu.Analyzers.Test.CodeFixes
     internal static class AddNullableAttributeFixTests
     {
         private static readonly CodeFixProvider Fix = new AddNullableAttributeFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS8625");
+        private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
+        private static readonly ExpectedDiagnostic CS8653 = ExpectedDiagnostic.Create("CS8653");
+        private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 
         [Test]
         public static void AddNotNullWhenAndUsing()
@@ -56,11 +58,11 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
         }
 
         [Test]
-        public static void AddNotNullWhen()
+        public static void AddNotNullWhenTrue()
         {
             var before = @"
 namespace N
@@ -105,7 +107,52 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
+        public static void AddMaybeNullWhenFalse()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static bool Try<T>(T s, bool b, out T result)
+        {
+            if (b)
+            {
+                result = s;
+                return true;
+            }
+
+            result = ↓default;
+            return false;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try<T>(T s, bool b, [MaybeNullWhen(false)] out T result)
+        {
+            if (b)
+            {
+                result = s;
+                return true;
+            }
+
+            result = default;
+            return false;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8653, before, after, compilationOptions: CompilationOptions);
         }
     }
 }

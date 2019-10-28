@@ -24,8 +24,17 @@ namespace Gu.Analyzers.CodeFixes
                             SyntaxFactory.AttributeArgument(
                                 SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))))));
 
+        private static readonly AttributeListSyntax MaybeNullWhenFalse = SyntaxFactory.AttributeList(
+            SyntaxFactory.SingletonSeparatedList(
+                SyntaxFactory.Attribute(
+                    SyntaxFactory.ParseName("MaybeNullWhen"),
+                    SyntaxFactory.AttributeArgumentList(
+                        SyntaxFactory.SingletonSeparatedList(
+                            SyntaxFactory.AttributeArgument(
+                                SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
+
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8625");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8625", "CS8653");
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -33,8 +42,7 @@ namespace Gu.Analyzers.CodeFixes
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out LiteralExpressionSyntax literal) &&
-                    literal.IsKind(SyntaxKind.NullLiteralExpression) &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax literal) &&
                     literal.Parent is AssignmentExpressionSyntax assignment &&
                     assignment.Left is IdentifierNameSyntax left &&
                     assignment.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
@@ -42,15 +50,27 @@ namespace Gu.Analyzers.CodeFixes
                     method.TryFindParameter(left.Identifier.ValueText, out var parameter) &&
                     parameter.Modifiers.Any(SyntaxKind.OutKeyword))
                 {
-                    context.RegisterCodeFix(
-                        "Add [NotNullWhen(true)].",
-                        (editor, _) => editor.ReplaceNode(
-                            parameter,
-                            x => parameter.WithAttributeList(NotNullWhenTrue)
-                                          .WithType(SyntaxFactory.NullableType(parameter.Type)))
-                                             .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
-                        "Add [NotNullWhen(true)].",
-                        diagnostic);
+                    if (diagnostic.Id == "CS8625")
+                    {
+                        context.RegisterCodeFix(
+                            "[NotNullWhen(true)]",
+                            (editor, _) => editor.ReplaceNode(
+                                parameter,
+                                x => parameter.WithAttributeList(NotNullWhenTrue)
+                                              .WithType(SyntaxFactory.NullableType(parameter.Type)))
+                                                 .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                            "[NotNullWhen(true)]",
+                            diagnostic);
+                    }
+                    else if (diagnostic.Id == "CS8653")
+                    {
+                        context.RegisterCodeFix(
+                            "[MaybeNullWhen(false)]",
+                            (editor, _) => editor.ReplaceNode(parameter, x => parameter.WithAttributeList(MaybeNullWhenFalse))
+                                                 .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                            "[MaybeNullWhen(false)]",
+                            diagnostic);
+                    }
                 }
             }
         }
