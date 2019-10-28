@@ -86,6 +86,30 @@ namespace N
         }
 
         [Test]
+        public static void WhenKeyValuePair()
+        {
+            var code = @"
+namespace N
+{
+    using System.Text;
+    using System.Collections.Generic;
+    using System;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""list"">The <see cref=""KeyValuePair{Type, StringBuilder}""/>.</param>
+        public void M(KeyValuePair<Type, StringBuilder> kvp)
+        {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public static void WhenOtherText()
         {
             var code = @"

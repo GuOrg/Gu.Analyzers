@@ -209,5 +209,48 @@ namespace N
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
+
+        [TestCase("KeyValuePair{int, StringBuilder}")]
+        [TestCase("KeyValuePair{Type, int}")]
+        public static void WhenKeyValuePair(string cref)
+        {
+            var before = @"
+namespace N
+{
+    using System.Text;
+    using System.Collections.Generic;
+    using System;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""kvp"">The <see cref=""KeyValuePair{Type, StringBuilder}""/>.</param>
+        public void M(KeyValuePair<Type, StringBuilder> kvp)
+        {
+        }
+    }
+}".AssertReplace("KeyValuePair{Type, StringBuilder}", cref);
+            var after = @"
+namespace N
+{
+    using System.Text;
+    using System.Collections.Generic;
+    using System;
+
+    class C
+    {
+        /// <summary>
+        /// Text.
+        /// </summary>
+        /// <param name=""kvp"">The <see cref=""KeyValuePair{Type, StringBuilder}""/>.</param>
+        public void M(KeyValuePair<Type, StringBuilder> kvp)
+        {
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
     }
 }
