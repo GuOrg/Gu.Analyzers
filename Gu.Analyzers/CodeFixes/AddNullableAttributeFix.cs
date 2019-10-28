@@ -83,7 +83,7 @@ namespace Gu.Analyzers.CodeFixes
                             (editor, _) => editor.ReplaceNode(
                                 optionalParameter,
                                 x => optionalParameter.WithType(SyntaxFactory.NullableType(optionalParameter.Type))),
-                            optionalParameter.Type.ToString() + "?",
+                            "?",
                             diagnostic);
                     }
                 }
