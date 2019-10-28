@@ -15,7 +15,7 @@ namespace Gu.Analyzers.Test.CodeFixes
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS8625");
 
         [Test]
-        public static void Simple()
+        public static void AddNotNullWhenAndUsing()
         {
             var before = @"
 namespace N
@@ -39,10 +39,61 @@ namespace N
             var after = @"
 namespace N
 {
+    using System.Diagnostics.CodeAnalysis;
+
     public static class C
     {
-        public static bool Try(string s, [NotNullWhen(true)]out string? result)
+        public static bool Try(string s, [NotNullWhen(true)] out string? result)
         {
+            if (s.Length > 2)
+            {
+                result = s;
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, compilationOptions: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));
+        }
+
+        [Test]
+        public static void AddNotNullWhen()
+        {
+            var before = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try(string s, out string result)
+        {
+            _ = typeof(NotNullWhenAttribute);
+            if (s.Length > 2)
+            {
+                result = s;
+                return true;
+            }
+
+            result = ↓null;
+            return false;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try(string s, [NotNullWhen(true)] out string? result)
+        {
+            _ = typeof(NotNullWhenAttribute);
             if (s.Length > 2)
             {
                 result = s;

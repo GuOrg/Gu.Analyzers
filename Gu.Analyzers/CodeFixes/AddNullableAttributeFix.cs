@@ -14,6 +14,16 @@ namespace Gu.Analyzers.CodeFixes
     [Shared]
     internal class AddNullableAttributeFix : DocumentEditorCodeFixProvider
     {
+        private static readonly UsingDirectiveSyntax UsingSystemDiagnostcisCodeAnalysis = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Diagnostics.CodeAnalysis"));
+        private static readonly AttributeListSyntax NotNullWhenTrue = SyntaxFactory.AttributeList(
+            SyntaxFactory.SingletonSeparatedList(
+                SyntaxFactory.Attribute(
+                    SyntaxFactory.ParseName("NotNullWhen"),
+                    SyntaxFactory.AttributeArgumentList(
+                        SyntaxFactory.SingletonSeparatedList(
+                            SyntaxFactory.AttributeArgument(
+                                SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))))));
+
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8625");
 
@@ -36,8 +46,9 @@ namespace Gu.Analyzers.CodeFixes
                         "Add [NotNullWhen(true)].",
                         (editor, _) => editor.ReplaceNode(
                             parameter,
-                            x => parameter.WithAttributeListText("[NotNullWhen(true)]")
-                                          .WithType(SyntaxFactory.NullableType(parameter.Type))),
+                            x => parameter.WithAttributeList(NotNullWhenTrue)
+                                          .WithType(SyntaxFactory.NullableType(parameter.Type)))
+                                             .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
                         "Add [NotNullWhen(true)].",
                         diagnostic);
                 }
