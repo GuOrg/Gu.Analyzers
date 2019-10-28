@@ -42,8 +42,8 @@ namespace Gu.Analyzers.CodeFixes
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax literal) &&
-                    literal.Parent is AssignmentExpressionSyntax assignment &&
+                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax expression) &&
+                    expression.Parent is AssignmentExpressionSyntax assignment &&
                     assignment.Left is IdentifierNameSyntax left &&
                     assignment.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
                     method.ReturnType == KnownSymbol.Boolean &&
@@ -67,6 +67,7 @@ namespace Gu.Analyzers.CodeFixes
                         context.RegisterCodeFix(
                             "[MaybeNullWhen(false)]",
                             (editor, _) => editor.ReplaceNode(parameter, x => parameter.WithAttributeList(MaybeNullWhenFalse))
+                                                 .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
                                                  .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
                             "[MaybeNullWhen(false)]",
                             diagnostic);

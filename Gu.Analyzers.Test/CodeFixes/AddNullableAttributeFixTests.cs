@@ -147,7 +147,52 @@ namespace N
                 return true;
             }
 
-            result = default;
+            result = default!;
+            return false;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8653, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
+        public static void AddMaybeNullWhenFalseDefaultOfT()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static bool Try<T>(T s, bool b, out T result)
+        {
+            if (b)
+            {
+                result = s;
+                return true;
+            }
+
+            result = ↓default(T);
+            return false;
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System.Diagnostics.CodeAnalysis;
+
+    public static class C
+    {
+        public static bool Try<T>(T s, bool b, [MaybeNullWhen(false)] out T result)
+        {
+            if (b)
+            {
+                result = s;
+                return true;
+            }
+
+            result = default!;
             return false;
         }
     }
