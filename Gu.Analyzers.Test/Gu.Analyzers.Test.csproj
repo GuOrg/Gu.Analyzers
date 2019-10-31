@@ -4,6 +4,7 @@
     <UseWpf>true</UseWpf>
     <Nullable>enable</Nullable>
     <LangVersion>8</LangVersion>
+    <IsTestProject>true</IsTestProject>
     <CodeAnalysisRuleSet>Gu.Analyzers.Test.ruleset</CodeAnalysisRuleSet>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
