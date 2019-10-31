@@ -6,7 +6,6 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>Gu.Analyzers</RootNamespace>
     <TargetName>Gu.Analyzers</TargetName>
-    <NoWarn>NU1605</NoWarn>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 

@@ -4,7 +4,6 @@
     <OutputType>Exe</OutputType>
     <CodeAnalysisRuleSet>Gu.Analyzers.Benchmarks.ruleset</CodeAnalysisRuleSet>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <NoWarn>NU1605</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
