@@ -1,6 +1,5 @@
 namespace Gu.Analyzers
 {
-    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Diagnostics.CodeAnalysis;
@@ -173,7 +172,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                string CrefType(ParameterSyntax parameter)
+                static string CrefType(ParameterSyntax parameter)
                 {
                     return SyntaxFactory.TypeCref(parameter.Type)
                                         .ToString()

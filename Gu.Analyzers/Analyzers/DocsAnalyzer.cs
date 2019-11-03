@@ -45,7 +45,7 @@ namespace Gu.Analyzers
                        candidate.Content.TryFirst(out var first) &&
                        first is XmlTextSyntax text &&
                        IsAutoPrefix() &&
-                       IsAutoSufffix();
+                       IsAutoSuffix();
 
                 bool IsAutoPrefix()
                 {
@@ -62,7 +62,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                bool IsAutoSufffix()
+                bool IsAutoSuffix()
                 {
                     if (candidate.Content.Count == 2)
                     {
@@ -74,13 +74,11 @@ namespace Gu.Analyzers
                         return false;
                     }
 
-                    switch (candidate.Content[2].ToString())
+                    return candidate.Content[2].ToString() switch
                     {
-                        case ".":
-                            return true;
-                        default:
-                            return false;
-                    }
+                        "." => true,
+                        _ => false,
+                    };
                 }
             }
 
@@ -89,7 +87,7 @@ namespace Gu.Analyzers
                 if (candidate.TryGetNameAttribute(out var nameAttribute) &&
                     context.ContainingSymbol is IMethodSymbol method &&
                     method.TryFindParameter(nameAttribute.Identifier.Identifier.ValueText, out var parameter) &&
-                    context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out crefType!))
+                    context.SemanticModel.TryGetType(attribute.Cref, context.CancellationToken, out crefType))
                 {
                     parameterType = parameter.Type;
                     return true;
@@ -100,17 +98,17 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            bool IsMatch(ITypeSymbol parameterType, ITypeSymbol crefType)
+            static bool IsMatch(ITypeSymbol parameterType, ITypeSymbol crefType)
             {
                 return Equals(parameterType.MetadataName, crefType.MetadataName) &&
                        TypeArgumentsMatch(TypeArguments(parameterType as INamedTypeSymbol), TypeArguments(crefType as INamedTypeSymbol));
 
-                ImmutableArray<ITypeSymbol> TypeArguments(INamedTypeSymbol? nt)
+                static ImmutableArray<ITypeSymbol> TypeArguments(INamedTypeSymbol? nt)
                 {
                     return nt?.TypeArguments ?? ImmutableArray<ITypeSymbol>.Empty;
                 }
 
-                bool TypeArgumentsMatch(ImmutableArray<ITypeSymbol> x, ImmutableArray<ITypeSymbol> y)
+                static bool TypeArgumentsMatch(ImmutableArray<ITypeSymbol> x, ImmutableArray<ITypeSymbol> y)
                 {
                     if (x.Length != y.Length)
                     {

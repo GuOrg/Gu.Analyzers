@@ -43,8 +43,7 @@ namespace Gu.Analyzers
                         assignmentSymbol.CanBeReferencedByName &&
                         assignmentSymbol.DeclaringSyntaxReferences.TrySingle(out var assignedToDeclaration))
                     {
-                        var assignedToDeclarator =
-                            assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
+                        var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
                         if (context.SemanticModel.SemanticModelFor(assignedToDeclarator)
                                    ?.GetDeclaredSymbol(
                                        assignedToDeclarator,
