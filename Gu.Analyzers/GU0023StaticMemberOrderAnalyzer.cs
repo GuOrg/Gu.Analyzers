@@ -25,20 +25,17 @@ namespace Gu.Analyzers
         {
             if (context.ContainingSymbol.IsStatic)
             {
-                if (context.Node is FieldDeclarationSyntax fieldDeclaration &&
-                    fieldDeclaration.Declaration is VariableDeclarationSyntax declaration &&
-                    declaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
-                    variable.Initializer.Value is ExpressionSyntax fieldValue &&
-                    IsInitializedWithUninitialized(fieldDeclaration, fieldValue, context, out var other))
+                switch (context.Node)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, fieldValue.GetLocation(), other.Symbol, context.ContainingSymbol));
-                }
-
-                if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-                    propertyDeclaration.Initializer?.Value is ExpressionSyntax propertyValue &&
-                    IsInitializedWithUninitialized(propertyDeclaration, propertyValue, context, out other))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, propertyValue.GetLocation(), other.Symbol, context.ContainingSymbol));
+                    case FieldDeclarationSyntax { Declaration: { Variables: { } variables } } field
+                        when variables.Last() is { Initializer: { Value: { } value } } &&
+                             IsInitializedWithUninitialized(field, value, context, out var other):
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, value.GetLocation(), other.Symbol, context.ContainingSymbol));
+                        break;
+                    case PropertyDeclarationSyntax { Initializer: { Value: { } value } } property
+                        when IsInitializedWithUninitialized(property, value, context, out var other):
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, value.GetLocation(), other.Symbol, context.ContainingSymbol));
+                        break;
                 }
             }
         }
@@ -76,9 +73,8 @@ namespace Gu.Analyzers
             {
                 return declaration switch
                 {
-                    PropertyDeclarationSyntax propertyDeclaration => propertyDeclaration.Initializer != null,
-                    FieldDeclarationSyntax fieldDeclaration => fieldDeclaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                                                               variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out _),
+                    PropertyDeclarationSyntax { Initializer: { } } => true,
+                    FieldDeclarationSyntax { Declaration: { Variables: { } variables } } => variables.TryFirst(x => x.Initializer != null, out _),
                     _ => false,
                 };
             }
@@ -91,9 +87,7 @@ namespace Gu.Analyzers
 
         private static bool IsNameOf(IdentifierNameSyntax name)
         {
-            return name.Parent is ArgumentSyntax arg &&
-                   arg.Parent is ArgumentListSyntax argList &&
-                   argList.Parent is InvocationExpressionSyntax invocation &&
+            return name.Parent is ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { } invocation } } &&
                    invocation.TryGetMethodName(out var methodName) &&
                    methodName == "nameof";
         }
