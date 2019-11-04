@@ -61,7 +61,7 @@ namespace Gu.Analyzers
                 }
 
                 if (TryGetWithParameterName(argumentList, method.Parameters, out var argument) &&
-                    argument.NameColon == null &&
+                    argument.NameColon is null &&
                     objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
                 {
                     context.ReportDiagnostic(

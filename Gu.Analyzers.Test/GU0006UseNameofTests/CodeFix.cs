@@ -21,7 +21,7 @@ namespace N
     {
         public void Meh(object value)
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException(↓""value"");
             }
@@ -38,7 +38,7 @@ namespace N
     {
         public void Meh(object value)
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }

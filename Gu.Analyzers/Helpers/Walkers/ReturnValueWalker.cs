@@ -51,7 +51,7 @@ namespace Gu.Analyzers
 
         internal static bool TrySingle(SyntaxNode scope, [NotNullWhen(true)]out ExpressionSyntax? returnValue)
         {
-            if (scope == null)
+            if (scope is null)
             {
                 returnValue = null;
                 return false;

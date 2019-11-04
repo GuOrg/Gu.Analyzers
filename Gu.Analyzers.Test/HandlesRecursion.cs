@@ -120,7 +120,7 @@ namespace N
 
         private static int RecursiveStatementBodyMethodWithOptionalParameter(int value, IEnumerable<int> values = null)
         {
-            if (values == null)
+            if (values is null)
             {
                 return RecursiveStatementBodyMethodWithOptionalParameter(value, new[] { value });
             }

@@ -134,7 +134,7 @@ namespace Gu.Analyzers
 
         private static Inject.Injectable CanInject(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (objectCreation?.ArgumentList == null)
+            if (objectCreation?.ArgumentList is null)
             {
                 return Inject.Injectable.No;
             }
@@ -243,7 +243,7 @@ namespace Gu.Analyzers
 
         private static bool IsInjectable(INamedTypeSymbol type)
         {
-            if (type?.ContainingNamespace == null ||
+            if (type?.ContainingNamespace is null ||
                 type.IsValueType ||
                 type.IsStatic ||
                 type.IsAbstract ||

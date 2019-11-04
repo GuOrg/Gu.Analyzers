@@ -139,7 +139,7 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase("text == null")]
+        [TestCase("text is null")]
         [TestCase("text is null")]
         public static void WhenOldStyleNullCheckAbove(string check)
         {
@@ -154,7 +154,7 @@ namespace N
 
         public C(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 throw new ArgumentNullException(nameof(text));
             }
@@ -162,7 +162,7 @@ namespace N
             this.text = text;
         }
     }
-}".AssertReplace("text == null", check);
+}".AssertReplace("text is null", check);
 
             RoslynAssert.Valid(Analyzer, code);
         }

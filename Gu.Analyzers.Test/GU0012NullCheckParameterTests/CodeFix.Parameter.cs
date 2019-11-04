@@ -283,7 +283,7 @@ namespace N
             }
 
             [TestCase("s1 is null")]
-            [TestCase("s1 == null")]
+            [TestCase("s1 is null")]
             [TestCase("ReferenceEquals(s1, null)")]
             public static void AfterOtherParameter(string expression)
             {

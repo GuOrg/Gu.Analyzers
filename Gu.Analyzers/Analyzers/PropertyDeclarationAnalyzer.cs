@@ -37,7 +37,7 @@ namespace Gu.Analyzers
                 ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
             {
                 if (property.Type.IsReferenceType &&
-                    property.SetMethod == null &&
+                    property.SetMethod is null &&
                     returnValue is ObjectCreationExpressionSyntax)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
@@ -52,10 +52,10 @@ namespace Gu.Analyzers
 
         private static bool IsRelayReturn(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (memberAccess == null ||
+            if (memberAccess is null ||
                 !memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) ||
                 memberAccess.Expression is InstanceExpressionSyntax ||
-                memberAccess.Expression == null)
+                memberAccess.Expression is null)
             {
                 return false;
             }

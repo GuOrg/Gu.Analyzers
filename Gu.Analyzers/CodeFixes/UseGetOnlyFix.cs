@@ -102,7 +102,7 @@ namespace Gu.Analyzers
 
         private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer, CancellationToken cancellationToken)
         {
-            if (initializer == null)
+            if (initializer is null)
             {
                 return false;
             }
@@ -159,7 +159,7 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            if (property == null && field == null)
+            if (property is null && field is null)
             {
                 return false;
             }

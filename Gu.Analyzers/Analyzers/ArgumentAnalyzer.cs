@@ -30,7 +30,7 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is ArgumentSyntax argumentSyntax &&
-                argumentSyntax.NameColon == null &&
+                argumentSyntax.NameColon is null &&
                 argumentSyntax.Expression is ExpressionSyntax expression &&
                 expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
                 !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
@@ -53,7 +53,7 @@ namespace Gu.Analyzers
                 else
                 {
                     var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
-                    if (parameterIndexOpt == null)
+                    if (parameterIndexOpt is null)
                     {
                         return;
                     }
@@ -100,7 +100,7 @@ namespace Gu.Analyzers
 
         private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
         {
-            if (method == null ||
+            if (method is null ||
                 !method.ReturnsVoid ||
                 method.AssociatedSymbol != null)
             {
@@ -122,7 +122,7 @@ namespace Gu.Analyzers
 
         private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
         {
-            if (argument.NameColon == null)
+            if (argument.NameColon is null)
             {
                 var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
                                     .Arguments.IndexOf(argument);

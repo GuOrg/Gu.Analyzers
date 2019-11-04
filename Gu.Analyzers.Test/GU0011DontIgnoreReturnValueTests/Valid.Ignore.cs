@@ -68,7 +68,7 @@ namespace N
         {
             Debug.Assert(!string.IsNullOrEmpty(parameter), ""parameter cannot be null"");
 
-            if (value == null)
+            if (value is null)
             {
                 var message = $""Expected parameter {parameter} in member {caller} to not be null"";
                 throw new ArgumentNullException(parameter, message);
@@ -82,7 +82,7 @@ namespace N
         {
             Debug.Assert(!string.IsNullOrEmpty(parameter), ""parameter cannot be null"");
 
-            if (value == null)
+            if (value is null)
             {
                 var message = $""Expected parameter {parameter} in member {caller} to not be null"";
                 throw new ArgumentNullException(parameter, message);

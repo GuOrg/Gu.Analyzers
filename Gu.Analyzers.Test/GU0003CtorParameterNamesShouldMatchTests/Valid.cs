@@ -429,7 +429,7 @@ namespace N
 
         public C(string s1, string s2)
         {
-            if (s2 == null)
+            if (s2 is null)
             {
                 throw new System.ArgumentNullException(nameof(s1));
             }

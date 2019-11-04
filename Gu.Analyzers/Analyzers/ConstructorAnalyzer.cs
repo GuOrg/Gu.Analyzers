@@ -431,7 +431,7 @@ namespace Gu.Analyzers
                 this.conditionalAccesses.Clear();
                 this.binaryExpressionSyntaxes.Clear();
                 this.visited.Clear();
-                this.semanticModel = null;
+                this.semanticModel = null!;
                 this.cancellationToken = CancellationToken.None;
             }
 
@@ -442,23 +442,23 @@ namespace Gu.Analyzers
                     foreach (var member in typeDeclarationSyntax.Members)
                     {
                         var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
-                        if (member is FieldDeclarationSyntax fieldDeclaration &&
-                            fieldDeclaration.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                            fieldDeclaration.Declaration.Variables.TryLast(out var last) &&
-                            last.Initializer == null &&
-                            isStatic == fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
+                        if (member is FieldDeclarationSyntax { Modifiers: { } modifiers, Declaration: { Variables: { } variables } } &&
+                            modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                            isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
+                            variables.TryLast(out var last) &&
+                            last.Initializer is null)
                         {
-                            foreach (var variable in fieldDeclaration.Declaration.Variables)
+                            foreach (var variable in variables)
                             {
                                 this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
                             }
                         }
                         else if (member is PropertyDeclarationSyntax propertyDeclaration &&
-                                 propertyDeclaration.ExpressionBody == null &&
+                                 propertyDeclaration.ExpressionBody is null &&
                                  !propertyDeclaration.TryGetSetter(out _) &&
                                  propertyDeclaration.TryGetGetter(out var getter) &&
-                                 getter.Body == null &&
-                                 propertyDeclaration.Initializer == null &&
+                                 getter.Body is null &&
+                                 propertyDeclaration.Initializer is null &&
                                  !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
                                  isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
                         {

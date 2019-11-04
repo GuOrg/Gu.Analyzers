@@ -95,7 +95,7 @@ namespace Gu.Analyzers
                     }
 
                     lineNumber = ln;
-                    if (argument.NameColon == null)
+                    if (argument.NameColon is null)
                     {
                         return true;
                     }

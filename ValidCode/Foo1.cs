@@ -92,7 +92,7 @@ namespace ValidCode
 
         private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
         {
-            if (disposables == null)
+            if (disposables is null)
             {
                 return Bar(disposable, new[] { disposable });
             }

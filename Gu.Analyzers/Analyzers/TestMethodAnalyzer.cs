@@ -255,20 +255,20 @@ namespace Gu.Analyzers
 
             bool IsIdentical(AttributeSyntax x, AttributeSyntax y)
             {
-                if (x.ArgumentList == null &&
-                    y.ArgumentList == null)
+                if (x.ArgumentList is null &&
+                    y.ArgumentList is null)
                 {
                     return true;
                 }
 
-                if (x.ArgumentList == null ||
-                    y.ArgumentList == null)
+                if (x.ArgumentList is null ||
+                    y.ArgumentList is null)
                 {
                     return false;
                 }
 
-                if (x.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals == null) !=
-                    y.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals == null))
+                if (x.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals is null) !=
+                    y.ArgumentList.Arguments.LastIndexOf(a => a.NameEquals is null))
                 {
                     return false;
                 }
@@ -357,7 +357,7 @@ namespace Gu.Analyzers
             {
                 foreach (var argument in argumentList.Arguments)
                 {
-                    if (argument.NameEquals == null)
+                    if (argument.NameEquals is null)
                     {
                         count++;
                     }

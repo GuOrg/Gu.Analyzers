@@ -33,7 +33,7 @@ namespace Gu.Analyzers
             {
                 if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol? right) &&
                     AreSame(assignment.Left, assignment.Right) &&
-                    assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() == null &&
+                    assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() is null &&
                     left.Equals(right))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0010DoNotAssignSameValue, assignment.GetLocation()));

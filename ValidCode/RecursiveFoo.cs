@@ -157,7 +157,7 @@ namespace ValidCode
 
         internal static bool RecursiveOut(string foo, out IDisposable value)
         {
-            if (foo == null)
+            if (foo is null)
             {
                 return RecursiveOut(3.0, out value);
             }
@@ -237,7 +237,7 @@ namespace ValidCode
 
         private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
         {
-            if (values == null)
+            if (values is null)
             {
                 return RecursiveStatementBodyMethodWithOptionalParameter(value, new[] { value });
             }

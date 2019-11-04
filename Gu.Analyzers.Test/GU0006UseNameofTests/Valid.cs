@@ -19,7 +19,7 @@ namespace N
     {
         public void M(object value)
         {
-            if (value == null)
+            if (value is null)
             {
                 throw new ArgumentNullException(nameof(value));
             }

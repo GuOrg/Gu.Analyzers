@@ -103,7 +103,7 @@ namespace N
             where TCollection : IReadOnlyList<TItem>
         {
             result = default(TItem);
-            if (source == null)
+            if (source is null)
             {
                 return false;
             }

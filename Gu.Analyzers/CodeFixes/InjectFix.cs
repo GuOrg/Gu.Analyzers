@@ -73,9 +73,9 @@ namespace Gu.Analyzers
                     ExpressionSyntax? fieldAccess = null;
                     foreach (var replaceNode in replaceNodes)
                     {
-                        if (replaceNode.FirstAncestor<ConstructorDeclarationSyntax>() == null)
+                        if (replaceNode.FirstAncestor<ConstructorDeclarationSyntax>() is null)
                         {
-                            if (fieldAccess == null)
+                            if (fieldAccess is null)
                             {
                                 fieldAccess = WithField(editor, ctor, parameterSyntax);
                             }
@@ -93,7 +93,7 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                if (ctor.ParameterList == null)
+                if (ctor.ParameterList is null)
                 {
                     editor.ReplaceNode(ctor, ctor.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SingletonSeparatedList(parameterSyntax))));
                 }
@@ -268,7 +268,7 @@ namespace Gu.Analyzers
                 }
 
                 var member = node.FirstAncestor<MemberDeclarationSyntax>();
-                if (member == null ||
+                if (member is null ||
                     this.semanticModel.GetDeclaredSymbolSafe(member, this.cancellationToken)?.IsStatic != false)
                 {
                     return false;

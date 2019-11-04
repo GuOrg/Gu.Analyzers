@@ -27,7 +27,7 @@ namespace Gu.Analyzers
 
         private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (enumMember.EqualsValue == null)
+            if (enumMember.EqualsValue is null)
             {
                 return false;
             }

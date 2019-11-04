@@ -30,7 +30,7 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is AccessorDeclarationSyntax setter &&
-                setter.Body == null &&
+                setter.Body is null &&
                 context.ContainingSymbol is IMethodSymbol setMethod &&
                 setMethod.DeclaredAccessibility == Accessibility.Private &&
                 setMethod.AssociatedSymbol is IPropertySymbol property &&

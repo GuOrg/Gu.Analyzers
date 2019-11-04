@@ -166,7 +166,7 @@ namespace N
 
         public C(string text)
         {
-            if (text == null)
+            if (text is null)
             {
                 this.text = string.Empty;
             }
