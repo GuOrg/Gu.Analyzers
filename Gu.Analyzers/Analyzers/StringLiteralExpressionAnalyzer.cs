@@ -26,8 +26,7 @@ namespace Gu.Analyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is LiteralExpressionSyntax literal &&
-                literal.Parent is ArgumentSyntax &&
+                context.Node is LiteralExpressionSyntax { Parent: ArgumentSyntax _ } literal &&
                 SyntaxFacts.IsValidIdentifier(literal.Token.ValueText))
             {
                 foreach (var symbol in context.SemanticModel.LookupSymbols(literal.SpanStart, name: literal.Token.ValueText))

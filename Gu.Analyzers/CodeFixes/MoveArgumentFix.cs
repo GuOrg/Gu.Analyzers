@@ -28,30 +28,20 @@ namespace Gu.Analyzers
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing)
+                if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id &&
+                    syntaxRoot.TryFindNode(diagnostic, out ArgumentListSyntax? arguments) &&
+                    HasWhitespaceTriviaOnly(arguments))
                 {
-                    continue;
-                }
-
-                if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id)
-                {
-                    var arguments = (ArgumentListSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                    if (!HasWhitespaceTriviaOnly(arguments))
-                    {
-                        continue;
-                    }
-
                     context.RegisterCodeFix(
-                        "Move arguments to match parameter positions.",
-                        (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
-                        this.GetType(),
-                        diagnostic);
+                              "Move arguments to match parameter positions.",
+                              (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
+                              this.GetType(),
+                              diagnostic);
                 }
 
-                if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id)
+                if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id &&
+                    syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
                 {
-                    var argument = (ArgumentSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                     context.RegisterCodeFix(
                         "Move name argument to match parameter positions.",
                         (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),

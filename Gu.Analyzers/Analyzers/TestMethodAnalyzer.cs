@@ -36,8 +36,7 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is MethodDeclarationSyntax methodDeclaration &&
-                methodDeclaration.ParameterList is ParameterListSyntax parameterList &&
+            if (context.Node is MethodDeclarationSyntax { ParameterList: { } parameterList } methodDeclaration &&
                 methodDeclaration.AttributeLists.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol testMethod)
             {
@@ -141,12 +140,12 @@ namespace Gu.Analyzers
             attributeArgument = null;
             if (methodSymbol.Parameters.Length > 0 &&
                 methodSymbol.Parameters != null &&
-                attributeSyntax.ArgumentList is AttributeArgumentListSyntax argumentList &&
-                argumentList.Arguments.Count > 0)
+                attributeSyntax is { ArgumentList: { Arguments: { } arguments } } &&
+                arguments.Count > 0)
             {
                 for (var i = 0; i < Math.Min(CountArgs(attributeSyntax), methodSymbol.Parameters.Length); i++)
                 {
-                    var argument = argumentList.Arguments[i];
+                    var argument = arguments[i];
                     var parameter = methodSymbol.Parameters[i];
 
                     if (argument is null ||
@@ -212,13 +211,7 @@ namespace Gu.Analyzers
 
                 if (argument.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                 {
-                    if (parameterType.IsValueType &&
-                        parameterType.Name != "Nullable")
-                    {
-                        return false;
-                    }
-
-                    return true;
+                    return !parameterType.IsValueType || parameterType.Name == "Nullable";
                 }
 
                 if (!argument.Expression.IsAssignableTo(parameterType, context.SemanticModel))
@@ -353,9 +346,9 @@ namespace Gu.Analyzers
         private static int CountArgs(AttributeSyntax attribute)
         {
             var count = 0;
-            if (attribute?.ArgumentList is AttributeArgumentListSyntax argumentList)
+            if (attribute is { ArgumentList: { Arguments: { } arguments } })
             {
-                foreach (var argument in argumentList.Arguments)
+                foreach (var argument in arguments)
                 {
                     if (argument.NameEquals is null)
                     {
@@ -369,22 +362,18 @@ namespace Gu.Analyzers
 
         private static bool TryGetArrayExpressions(ExpressionSyntax expression, out SeparatedSyntaxList<ExpressionSyntax> expressions)
         {
-            expressions = default;
-            if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreation &&
-                implicitArrayCreation.Initializer != null)
+            switch (expression)
             {
-                expressions = implicitArrayCreation.Initializer.Expressions;
-                return true;
+                case ImplicitArrayCreationExpressionSyntax { Initializer: { } initializer }:
+                    expressions = initializer.Expressions;
+                    return true;
+                case ArrayCreationExpressionSyntax { Initializer: { } initializer }:
+                    expressions = initializer.Expressions;
+                    return true;
+                default:
+                    expressions = default;
+                    return false;
             }
-
-            if (expression is ArrayCreationExpressionSyntax arrayCreation &&
-                arrayCreation.Initializer != null)
-            {
-                expressions = arrayCreation.Initializer.Expressions;
-                return true;
-            }
-
-            return false;
         }
     }
 }

@@ -37,7 +37,7 @@ namespace N
     }
 }";
             var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing.");
-            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Add [field:NonSerialized].");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "[field:NonSerialized].");
         }
 
         [Test]

@@ -33,17 +33,10 @@ namespace Gu.Analyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
-                {
-                    continue;
-                }
-
-                if (syntaxRoot.TryFindNodeOrAncestor<EventFieldDeclarationSyntax>(diagnostic, out var eventField))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out EventFieldDeclarationSyntax? eventField))
                 {
                     context.RegisterCodeFix(
-                        "Add [field:NonSerialized].",
+                        "[field:NonSerialized].",
                         (editor, _) => editor.ReplaceNode(
                             eventField,
                             x => x.AddAttributeLists(NonSerializedWithTargetSpecifier)
@@ -53,10 +46,10 @@ namespace Gu.Analyzers
                     continue;
                 }
 
-                if (syntaxRoot.TryFindNodeOrAncestor<FieldDeclarationSyntax>(diagnostic, out var field))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out FieldDeclarationSyntax? field))
                 {
                     context.RegisterCodeFix(
-                        "Add [NonSerialized].",
+                        "[NonSerialized].",
                         (editor, _) => editor.ReplaceNode(
                             field,
                             x => x.AddAttributeLists(NonSerialized)

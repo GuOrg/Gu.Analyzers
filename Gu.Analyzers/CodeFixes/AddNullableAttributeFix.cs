@@ -45,7 +45,7 @@ namespace Gu.Analyzers.CodeFixes
                 if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
                 {
                     if (TryFindLocalOrParameter(out var identifierName) &&
-                        TryFindOutParemeter(identifierName.Identifier.ValueText, out var outParameter))
+                        TryFindOutParameter(identifierName.Identifier.ValueText, out var outParameter))
                     {
                         if (diagnostic.Id == "CS8625" ||
                             diagnostic.Id == "CS8601")
@@ -72,8 +72,7 @@ namespace Gu.Analyzers.CodeFixes
                         }
                     }
 
-                    if (expression.Parent is EqualsValueClauseSyntax equalsValueClause &&
-                        equalsValueClause.Parent is ParameterSyntax optionalParameter)
+                    if (expression.Parent is EqualsValueClauseSyntax { Parent: ParameterSyntax { } optionalParameter })
                     {
                         context.RegisterCodeFix(
                             optionalParameter.Type.ToString() + "?",
@@ -84,14 +83,13 @@ namespace Gu.Analyzers.CodeFixes
                             diagnostic);
                     }
 
-                    if (expression is DeclarationExpressionSyntax declaration &&
-                        declaration.Parent.IsKind(SyntaxKind.Argument) &&
+                    if (expression is DeclarationExpressionSyntax { Type: { } type, Parent: ArgumentSyntax _ } &&
                         diagnostic.Id == "CS8600")
                     {
                         context.RegisterCodeFix(
-                            declaration.Type.ToString() + "?",
+                            type.ToString() + "?",
                             (editor, _) => editor.ReplaceNode(
-                                declaration.Type,
+                                type,
                                 x => SyntaxFactory.NullableType(x)),
                             "out?",
                             diagnostic);
@@ -101,10 +99,10 @@ namespace Gu.Analyzers.CodeFixes
                     {
                         switch (expression.Parent)
                         {
-                            case AssignmentExpressionSyntax assignment when assignment.Left is IdentifierNameSyntax local:
+                            case AssignmentExpressionSyntax { Left: IdentifierNameSyntax local }:
                                 result = local;
                                 return true;
-                            case ArgumentSyntax argument when expression is IdentifierNameSyntax arg:
+                            case ArgumentSyntax { Expression: IdentifierNameSyntax arg }:
                                 result = arg;
                                 return true;
                             default:
@@ -113,7 +111,7 @@ namespace Gu.Analyzers.CodeFixes
                         }
                     }
 
-                    bool TryFindOutParemeter(string name, out ParameterSyntax? result)
+                    bool TryFindOutParameter(string name, out ParameterSyntax? result)
                     {
                         result = null!;
                         return expression.TryFirstAncestor(out MethodDeclarationSyntax? method) &&

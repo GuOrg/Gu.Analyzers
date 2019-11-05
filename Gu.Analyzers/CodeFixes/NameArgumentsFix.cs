@@ -38,7 +38,7 @@ namespace Gu.Analyzers
                 }
 
                 if (diagnostic.Id == Descriptors.GU0001NameArguments.Id &&
-                    syntaxRoot.TryFindNode<ArgumentListSyntax>(diagnostic, out var arguments) &&
+                    syntaxRoot.TryFindNode(diagnostic, out ArgumentListSyntax? arguments) &&
                     !HasAnyNamedArgument(arguments) &&
                     semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol? method))
                 {
@@ -49,8 +49,8 @@ namespace Gu.Analyzers
                         diagnostic);
                 }
                 else if (diagnostic.Id == Descriptors.GU0009UseNamedParametersForBooleans.Id &&
-                         syntaxRoot.TryFindNode<ArgumentSyntax>(diagnostic, out var boolArgument) &&
-                         boolArgument.Parent is ArgumentListSyntax argumentList &&
+                         syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? boolArgument) &&
+                         boolArgument.Parent is ArgumentListSyntax { } argumentList &&
                          !HasAnyNamedArgument(argumentList) &&
                          semanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out method))
                 {

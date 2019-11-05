@@ -28,30 +28,29 @@ namespace Gu.Analyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is AssignmentExpressionSyntax assignment &&
-                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol? left))
+                context.Node is AssignmentExpressionSyntax { Left: { } left, Right: { } right } assignment &&
+                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol? leftSymbol))
             {
-                if (context.SemanticModel.TryGetSymbol(assignment.Right, context.CancellationToken, out ISymbol? right) &&
-                    AreSame(assignment.Left, assignment.Right) &&
+                if (context.SemanticModel.TryGetSymbol(right, context.CancellationToken, out ISymbol? rightSymbol) &&
+                    AreSame(left, right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() is null &&
-                    left.Equals(right))
+                    leftSymbol.Equals(rightSymbol))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0010DoNotAssignSameValue, assignment.GetLocation()));
                 }
 
-                if (assignment.Right is IdentifierNameSyntax identifier &&
+                if (right is IdentifierNameSyntax identifier &&
                     context.ContainingSymbol is IMethodSymbol method &&
                     method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
                     method.Parameters.TryFirst(x => x.Name == identifier.Identifier.ValueText, out var parameter) &&
-                    parameter.Type.IsReferenceType &&
-                    !parameter.HasExplicitDefaultValue &&
+                    parameter is { Type: { IsReferenceType: true }, HasExplicitDefaultValue: false } &&
                     assignment.TryFirstAncestor(out BaseMethodDeclarationSyntax? containingMethod) &&
                     !NullCheck.IsChecked(parameter, containingMethod, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, assignment.Right.GetLocation()));
                 }
 
-                if (IsRedundantAssignment(left, assignment, context))
+                if (IsRedundantAssignment(leftSymbol, assignment, context))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce, assignment.GetLocation()));
                 }
@@ -70,10 +69,10 @@ namespace Gu.Analyzers
                 return leftName.Identifier.ValueText == rightName.Identifier.ValueText;
             }
 
-            return left is MemberAccessExpressionSyntax leftMember &&
-                   right is MemberAccessExpressionSyntax rightMember &&
-                   AreSame(leftMember.Name, rightMember.Name) &&
-                   AreSame(leftMember.Expression, rightMember.Expression);
+            return left is MemberAccessExpressionSyntax { Expression: { } le, Name: { } ln } &&
+                   right is MemberAccessExpressionSyntax { Expression: { } re, Name: { } rn } &&
+                   AreSame(ln, rn) &&
+                   AreSame(le, re);
         }
 
         private static bool TryGetIdentifierName(ExpressionSyntax expression, [NotNullWhen(true)]out IdentifierNameSyntax? result)
@@ -83,8 +82,8 @@ namespace Gu.Analyzers
                 case IdentifierNameSyntax identifierName:
                     result = identifierName;
                     return true;
-                case MemberAccessExpressionSyntax memberAccess when memberAccess.Expression is ThisExpressionSyntax:
-                    return TryGetIdentifierName(memberAccess.Name, out result);
+                case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }:
+                    return TryGetIdentifierName(name, out result);
                 default:
                     result = null;
                     return false;
@@ -128,8 +127,7 @@ namespace Gu.Analyzers
 
                         if (candidate.IsExecutedBefore(assignment) == ExecutedBefore.Yes)
                         {
-                            if (left is IParameterSymbol parameter &&
-                                parameter.RefKind == RefKind.Out &&
+                            if (left is IParameterSymbol { RefKind: RefKind.Out } &&
                                 assignment.TryFirstAncestor<BlockSyntax>(out var assignmentBlock) &&
                                 candidate.TryFirstAncestor<BlockSyntax>(out var candidateBlock) &&
                                 (candidateBlock.Contains(assignmentBlock) ||

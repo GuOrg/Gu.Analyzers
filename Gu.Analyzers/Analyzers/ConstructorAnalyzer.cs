@@ -37,10 +37,10 @@ namespace Gu.Analyzers
             {
                 using (var walker = CtorWalker.Borrow(constructorDeclaration, context.SemanticModel, context.CancellationToken))
                 {
-                    if (constructorDeclaration.ParameterList is ParameterListSyntax parameterList &&
-                        parameterList.Parameters.Count > 0)
+                    if (constructorDeclaration.ParameterList is { Parameters: { } parameters } &&
+                        parameters.Count > 0)
                     {
-                        foreach (var parameter in parameterList.Parameters)
+                        foreach (var parameter in parameters)
                         {
                             if (ShouldRename(parameter, walker, context, out var name))
                             {
@@ -55,15 +55,14 @@ namespace Gu.Analyzers
                                TryGetIdentifier(assignment.Left, out var left))
                             {
                                 if (TryGetIdentifier(assignment.Right, out var right) &&
-                                    parameterList.Parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
+                                    parameters.TryFirst(x => x.Identifier.ValueText == right.Identifier.ValueText, out var parameter) &&
                                     !parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
                                     walker.Assignments.TrySingle(x => x.Right is IdentifierNameSyntax id && id.Identifier.ValueText == parameter.Identifier.ValueText, out _) &&
                                     context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol? leftSymbol))
                                 {
                                     foreach (var argument in walker.Arguments)
                                     {
-                                        if (argument.Parent is ArgumentListSyntax al &&
-                                            al.Parent is InvocationExpressionSyntax invocation &&
+                                        if (argument.Parent is ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } &&
                                             invocation.TryGetMethodName(out var methodName) &&
                                             methodName == "nameof")
                                         {
@@ -138,12 +137,11 @@ namespace Gu.Analyzers
         private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, [NotNullWhen(true)]out string? name)
         {
             name = null;
-            if (parameter.Parent is ParameterListSyntax parameterList &&
-                parameterList.Parent is ConstructorDeclarationSyntax constructorDeclaration)
+            if (parameter.Parent is ParameterListSyntax { Parent: ConstructorDeclarationSyntax ctor })
             {
                 foreach (var assignment in walker.Assignments)
                 {
-                    if (constructorDeclaration.Contains(assignment) &&
+                    if (ctor.Contains(assignment) &&
                         assignment.Right is IdentifierNameSyntax right &&
                         right.Identifier.ValueText == parameter.Identifier.ValueText &&
                         TryGetIdentifier(assignment.Left, out var left))
@@ -168,10 +166,9 @@ namespace Gu.Analyzers
                     return true;
                 }
 
-                if (constructorDeclaration.Initializer is ConstructorInitializerSyntax initializer &&
-                    initializer.ArgumentList is ArgumentListSyntax argumentList &&
-                    argumentList.Arguments.TrySingle(syntax => IsParameter(syntax), out var argument) &&
-                    context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is IMethodSymbol chained &&
+                if (ctor.Initializer is { ArgumentList: { Arguments: { } arguments } } initializer &&
+                    arguments.TrySingle(syntax => IsParameter(syntax), out var argument) &&
+                    context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is { } chained &&
                     chained.TryFindParameter(argument, out var parameterSymbol) &&
                     parameterSymbol.IsParams == parameter.Modifiers.Any(SyntaxKind.ParamKeyword) &&
                     parameterSymbol.Name != parameter.Identifier.ValueText &&
@@ -378,7 +375,7 @@ namespace Gu.Analyzers
             public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
             {
                 if (this.visited.Add(node) &&
-                    this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
+                    this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is { } ctor &&
                     ctor.TrySingleDeclaration(this.cancellationToken, out ConstructorDeclarationSyntax? declaration))
                 {
                     this.Visit(declaration);
@@ -442,27 +439,24 @@ namespace Gu.Analyzers
                     foreach (var member in typeDeclarationSyntax.Members)
                     {
                         var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
-                        if (member is FieldDeclarationSyntax { Modifiers: { } modifiers, Declaration: { Variables: { } variables } } &&
-                            modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                            isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
-                            variables.TryLast(out var last) &&
-                            last.Initializer is null)
+                        switch (member)
                         {
-                            foreach (var variable in variables)
-                            {
-                                this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(variable, this.cancellationToken));
-                            }
-                        }
-                        else if (member is PropertyDeclarationSyntax propertyDeclaration &&
-                                 propertyDeclaration.ExpressionBody is null &&
-                                 !propertyDeclaration.TryGetSetter(out _) &&
-                                 propertyDeclaration.TryGetGetter(out var getter) &&
-                                 getter.Body is null &&
-                                 propertyDeclaration.Initializer is null &&
-                                 !propertyDeclaration.Modifiers.Any(SyntaxKind.AbstractKeyword) &&
-                                 isStatic == propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword))
-                        {
-                            this.unassigned.Add(this.semanticModel.GetDeclaredSymbolSafe(propertyDeclaration, this.cancellationToken));
+                            case FieldDeclarationSyntax { Modifiers: { } modifiers, Declaration: { Variables: { } variables } }
+                                when modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                                     isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
+                                     variables.LastOrDefault() is { Initializer: null }:
+                                foreach (var variable in variables)
+                                {
+                                    this.unassigned.Add(this.semanticModel.GetDeclaredSymbol(variable, this.cancellationToken));
+                                }
+
+                                break;
+                            case PropertyDeclarationSyntax { Modifiers: { } modifiers, ExpressionBody: null, AccessorList: { Accessors: { Count: 1 } accessors }, Initializer: null } property
+                                when accessors[0] is { Keyword: { ValueText: "get" }, Body: null } &&
+                                     !modifiers.Any(SyntaxKind.AbstractKeyword) &&
+                                     isStatic == modifiers.Any(SyntaxKind.StaticKeyword):
+                                this.unassigned.Add(this.semanticModel.GetDeclaredSymbol(property, this.cancellationToken));
+                                break;
                         }
                     }
                 }

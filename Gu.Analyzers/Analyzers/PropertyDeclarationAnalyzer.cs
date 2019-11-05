@@ -32,12 +32,10 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-                context.ContainingSymbol is IPropertySymbol property &&
-                property.GetMethod != null &&
+                context.ContainingSymbol is IPropertySymbol { GetMethod: { } } property &&
                 ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
             {
-                if (property.Type.IsReferenceType &&
-                    property.SetMethod is null &&
+                if (property is { Type: { IsReferenceType: true }, SetMethod: null } &&
                     returnValue is ObjectCreationExpressionSyntax)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
@@ -52,35 +50,20 @@ namespace Gu.Analyzers
 
         private static bool IsRelayReturn(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (memberAccess is null ||
-                !memberAccess.IsKind(SyntaxKind.SimpleMemberAccessExpression) ||
-                memberAccess.Expression is InstanceExpressionSyntax ||
-                memberAccess.Expression is null)
+            return memberAccess switch
             {
-                return false;
-            }
+                { Expression: IdentifierNameSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
+                { Expression: MemberAccessExpressionSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
+                _ => false,
+            };
 
-            if (semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out ISymbol? member) &&
-                FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
-                memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                !IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken))
+            bool IsAssignedWithInjected(ExpressionSyntax candidate)
             {
-                return false;
+                return semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol? member) &&
+                       FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
+                       memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
+                       IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken);
             }
-
-            if (memberAccess.Expression is IdentifierNameSyntax &&
-                memberAccess.Name is IdentifierNameSyntax)
-            {
-                return true;
-            }
-
-            if (memberAccess.Expression is MemberAccessExpressionSyntax &&
-                memberAccess.Name is IdentifierNameSyntax)
-            {
-                return true;
-            }
-
-            return false;
         }
 
         private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)

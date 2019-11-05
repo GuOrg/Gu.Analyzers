@@ -76,7 +76,7 @@ namespace Gu.Analyzers
                                     diagnostic.Id,
                                     diagnostic);
                             }
-                            else if (methodDeclaration.Body is BlockSyntax block)
+                            else if (methodDeclaration.Body is { } block)
                             {
                                 context.RegisterCodeFix(
                                     "Add null check.",
