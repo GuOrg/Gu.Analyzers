@@ -41,17 +41,17 @@ namespace Gu.Analyzers
                               this.GetType(),
                               diagnostic);
 
-                    static ArgumentListSyntax Replacement(ArgumentListSyntax argumentList, DocumentEditor editor)
+                    static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
                     {
-                        if (editor.SemanticModel.GetSpeculativeSymbolInfo(argumentList.SpanStart, argumentList.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                        if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
                         {
-                            return argumentList.WithArguments(
+                            return old.WithArguments(
                                 SyntaxFactory.SeparatedList(
-                                    argumentList.Arguments.OrderBy(x => ParameterIndex(method, x)),
-                                    argumentList.Arguments.GetSeparators()));
+                                    old.Arguments.OrderBy(x => ParameterIndex(method, x)),
+                                    old.Arguments.GetSeparators()));
                         }
 
-                        return argumentList;
+                        return old;
                     }
                 }
 
