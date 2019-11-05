@@ -29,13 +29,10 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is ArgumentSyntax argumentSyntax &&
-                argumentSyntax.NameColon is null &&
-                argumentSyntax.Expression is ExpressionSyntax expression &&
+            if (context.Node is ArgumentSyntax { NameColon: null, Expression: { } expression, Parent: ArgumentListSyntax { Parent: { } parent } } argumentSyntax &&
                 expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
                 !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
-                argumentSyntax.Parent is ArgumentListSyntax argumentList &&
-                context.SemanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out IMethodSymbol? method) &&
+                context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
                 !IsIgnored(method, context.Compilation))
             {
                 if (!ReferenceEquals(method.OriginalDefinition, method))
@@ -92,10 +89,8 @@ namespace Gu.Analyzers
 
         private static bool IsDisposePattern(IMethodSymbol methodSymbol)
         {
-            return methodSymbol.Name == "Dispose" &&
-                   methodSymbol.Parameters.Length == 1 &&
-                   methodSymbol.Parameters[0]
-                               .Type == KnownSymbol.Boolean;
+            return methodSymbol is { Name: "Dispose", Parameters: { Length: 1 } parameters } &&
+                   parameters[0].Type == KnownSymbol.Boolean;
         }
 
         private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)

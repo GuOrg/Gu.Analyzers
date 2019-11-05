@@ -68,7 +68,6 @@ namespace Gu.Analyzers
             if (!context.IsExcludedFromAnalysis() &&
                 !context.ContainingSymbol.IsStatic &&
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                !context.ContainingSymbol.IsStatic &&
                 Inject.TryFindConstructor(objectCreation, out _) &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
                 injectable != Inject.Injectable.No &&
@@ -111,9 +110,8 @@ namespace Gu.Analyzers
         {
             if (!context.IsExcludedFromAnalysis() &&
                 !context.ContainingSymbol.IsStatic &&
-                context.Node is MemberAccessExpressionSyntax memberAccess &&
-                memberAccess.Expression?.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) == false &&
-                !context.ContainingSymbol.IsStatic &&
+                context.Node is MemberAccessExpressionSyntax { Expression: { } expression } memberAccess &&
+                !expression.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) &&
                 Inject.TryFindConstructor(memberAccess, out _) &&
                 IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken) &&
                 TryGetMemberType(memberAccess, context.SemanticModel, context.CancellationToken, out var memberType) &&

@@ -94,8 +94,8 @@ namespace Gu.Analyzers
                 if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? declaration) &&
                     ReturnValueWalker.TrySingle(declaration, out var returnValue))
                 {
-                    if (returnValue is IdentifierNameSyntax identifierName &&
-                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out _))
+                    if (returnValue is IdentifierNameSyntax { Identifier: { ValueText: { } valueText } } &&
+                        method.TryFindParameter(valueText, out _))
                     {
                         return true;
                     }

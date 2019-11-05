@@ -32,10 +32,10 @@ namespace Gu.Analyzers
             }
 
             if (context.Node is BasePropertyDeclarationSyntax propertyDeclaration &&
-                propertyDeclaration.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration))
+                propertyDeclaration.Parent is TypeDeclarationSyntax { Members: { } members })
             {
-                var index = typeDeclaration.Members.IndexOf(propertyDeclaration);
-                if (typeDeclaration.Members.TryElementAt(index + 1, out var after) &&
+                var index = members.IndexOf(propertyDeclaration);
+                if (members.TryElementAt(index + 1, out var after) &&
                     (after is PropertyDeclarationSyntax || after is IndexerDeclarationSyntax))
                 {
                     if (MemberDeclarationComparer.Compare(propertyDeclaration, after) > 0)

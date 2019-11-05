@@ -29,12 +29,8 @@ namespace Gu.Analyzers
                 return;
             }
 
-            if (context.Node is AccessorDeclarationSyntax setter &&
-                setter.Body is null &&
-                context.ContainingSymbol is IMethodSymbol setMethod &&
-                setMethod.DeclaredAccessibility == Accessibility.Private &&
-                setMethod.AssociatedSymbol is IPropertySymbol property &&
-                !property.IsIndexer)
+            if (context.Node is AccessorDeclarationSyntax { Body: null } setter &&
+                context.ContainingSymbol is IMethodSymbol { DeclaredAccessibility: Accessibility.Private, AssociatedSymbol: IPropertySymbol { IsIndexer: false } property })
             {
                 using (var walker = MutationWalker.For(property, context.SemanticModel, context.CancellationToken))
                 {

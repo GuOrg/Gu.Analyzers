@@ -42,7 +42,7 @@ namespace Gu.Analyzers
                     syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax? objectCreation) &&
                     objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax? property) &&
                     property.Parent is TypeDeclarationSyntax containingType &&
-                    containingType.Members.TrySingleOfType(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax ctor) &&
+                    containingType.Members.TrySingleOfType<MemberDeclarationSyntax, ConstructorDeclarationSyntax>(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax? ctor) &&
                     ctor.Body != null)
                 {
                     context.RegisterCodeFix(
@@ -53,9 +53,9 @@ namespace Gu.Analyzers
 
                     bool IsUnsafe()
                     {
-                        return objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
-                               (IsAnyArgumentMutable(semanticModel, argumentList.Arguments, context.CancellationToken) ||
-                                IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken));
+                        return objectCreation is { ArgumentList: { Arguments: { } arguments }, Initializer: var initializer } &&
+                               (IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
+                                IsAnyInitializerMutable(semanticModel, initializer, context.CancellationToken));
                     }
                 }
                 else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&

@@ -23,15 +23,12 @@ namespace Gu.Analyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is ParameterSyntax parameterSyntax &&
+                context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText }, Parent: ParameterListSyntax { Parent: BaseMethodDeclarationSyntax methodDeclaration } } parameterSyntax &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
-                method.TryFindParameter(parameterSyntax.Identifier.ValueText, out var parameter) &&
-                parameter.Type.IsReferenceType &&
+                method.TryFindParameter(valueText, out var parameter) &&
+                parameter is { Type: { IsReferenceType: true }, HasExplicitDefaultValue: false } &&
                 parameter.RefKind != RefKind.Out &&
-                !parameter.HasExplicitDefaultValue &&
-                parameterSyntax.Parent is ParameterListSyntax parameterList &&
-                parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                 !NullCheck.IsChecked(parameter, methodDeclaration, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, parameterSyntax.Identifier.GetLocation()));
