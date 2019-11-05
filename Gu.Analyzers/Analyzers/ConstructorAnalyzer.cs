@@ -134,7 +134,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, [NotNullWhen(true)]out string? name)
+        private static bool ShouldRename(ParameterSyntax parameter, CtorWalker walker, SyntaxNodeAnalysisContext context, [NotNullWhen(true)] out string? name)
         {
             name = null;
             if (parameter.Parent is ParameterListSyntax { Parent: ConstructorDeclarationSyntax ctor })
@@ -289,7 +289,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetIdentifier(ExpressionSyntax expression, [NotNullWhen(true)]out IdentifierNameSyntax? result)
+        private static bool TryGetIdentifier(ExpressionSyntax expression, [NotNullWhen(true)] out IdentifierNameSyntax? result)
         {
             result = expression as IdentifierNameSyntax;
             if (result != null)
@@ -326,7 +326,7 @@ namespace Gu.Analyzers
             private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new List<BinaryExpressionSyntax>();
             private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-            private SemanticModel semanticModel;
+            private SemanticModel semanticModel = null!;
             private CancellationToken cancellationToken;
 
             private CtorWalker()

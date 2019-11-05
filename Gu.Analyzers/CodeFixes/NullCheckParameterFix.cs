@@ -92,7 +92,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryFirstAssignedWith(ParameterSyntax parameter, IReadOnlyList<AssignmentExpressionSyntax> assignments, [NotNullWhen(true)]out IdentifierNameSyntax? assignedValue)
+        private static bool TryFirstAssignedWith(ParameterSyntax parameter, IReadOnlyList<AssignmentExpressionSyntax> assignments, [NotNullWhen(true)] out IdentifierNameSyntax? assignedValue)
         {
             foreach (var assignment in assignments)
             {

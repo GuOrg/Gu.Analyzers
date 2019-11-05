@@ -64,7 +64,7 @@ namespace Gu.Analyzers.Test
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void TitleId(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", descriptorInfo.DocumentationFile.AllLines[0]);
+            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", descriptorInfo.DocumentationFile.AllLines?[0]);
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -86,13 +86,13 @@ namespace Gu.Analyzers.Test
                                          .ToString(CultureInfo.InvariantCulture)
                                          .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                                          .First();
+            DumpIfDebug(expected);
             var actual = descriptorInfo.DocumentationFile.AllLines
                                        .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
                                        .Skip(1)
                                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
-                                       ?.Replace("`", string.Empty, StringComparison.OrdinalIgnoreCase);
+                                      ?.Replace("`", string.Empty, StringComparison.OrdinalIgnoreCase);
 
-            DumpIfDebug(expected);
             DumpIfDebug(actual);
             Assert.AreEqual(expected, actual);
         }
@@ -103,8 +103,11 @@ namespace Gu.Analyzers.Test
             const string HeaderRow = "| Topic    | Value";
             var expected = GetTable(descriptorInfo.Stub, HeaderRow);
             DumpIfDebug(expected);
-            var actual = GetTable(descriptorInfo.DocumentationFile.AllText, HeaderRow);
-            CodeAssert.AreEqual(expected, actual);
+            if (descriptorInfo.DocumentationFile.AllText is { } allText)
+            {
+                var actual = GetTable(allText, HeaderRow);
+                CodeAssert.AreEqual(expected, actual);
+            }
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -112,8 +115,11 @@ namespace Gu.Analyzers.Test
         {
             var expected = GetConfigSeverity(descriptorInfo.Stub);
             DumpIfDebug(expected);
-            var actual = GetConfigSeverity(descriptorInfo.DocumentationFile.AllText);
-            CodeAssert.AreEqual(expected, actual);
+            if (descriptorInfo.DocumentationFile.AllText is { } allText)
+            {
+                var actual = GetConfigSeverity(allText);
+                CodeAssert.AreEqual(expected, actual);
+            }
 
             static string GetConfigSeverity(string doc)
             {
@@ -182,7 +188,7 @@ namespace Gu.Analyzers.Test
         }
 
         [Conditional("DEBUG")]
-        private static void DumpIfDebug(string text)
+        private static void DumpIfDebug(string? text)
         {
             Console.Write(text);
             Console.WriteLine();
@@ -303,9 +309,9 @@ Or put this at the top of the file to disable all instances.
 
             public bool Exists => File.Exists(this.Name);
 
-            public string AllText { get; }
+            public string? AllText { get; }
 
-            public IReadOnlyList<string> AllLines { get; }
+            public IReadOnlyList<string>? AllLines { get; }
         }
 
         public class CodeFile

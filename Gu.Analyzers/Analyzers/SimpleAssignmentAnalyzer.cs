@@ -66,7 +66,7 @@ namespace Gu.Analyzers
 
             if (leftName != null)
             {
-                return leftName.Identifier.ValueText == rightName.Identifier.ValueText;
+                return leftName.Identifier.ValueText == rightName!.Identifier.ValueText;
             }
 
             return left is MemberAccessExpressionSyntax { Expression: { } le, Name: { } ln } &&
@@ -75,7 +75,7 @@ namespace Gu.Analyzers
                    AreSame(le, re);
         }
 
-        private static bool TryGetIdentifierName(ExpressionSyntax expression, [NotNullWhen(true)]out IdentifierNameSyntax? result)
+        private static bool TryGetIdentifierName(ExpressionSyntax expression, [NotNullWhen(true)] out IdentifierNameSyntax? result)
         {
             switch (expression)
             {

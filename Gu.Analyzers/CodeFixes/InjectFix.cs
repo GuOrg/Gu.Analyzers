@@ -224,7 +224,7 @@ namespace Gu.Analyzers
                 this.identifierName = identifierName;
                 this.semanticModel = semanticModel;
                 this.cancellationToken = cancellationToken;
-                this.Visit(identifierName.FirstAncestor<ClassDeclarationSyntax>());
+                this.Visit(identifierName.FirstAncestor<ClassDeclarationSyntax>() ?? throw new InvalidOperationException("Did not find a class declaration."));
             }
 
             internal List<SyntaxNode> Nodes { get; } = new List<SyntaxNode>();
@@ -259,7 +259,7 @@ namespace Gu.Analyzers
                 base.VisitIdentifierName(node);
             }
 
-            private bool TryGetReplaceNode(IdentifierNameSyntax node, IdentifierNameSyntax expected, [NotNullWhen(true)]out SyntaxNode? result)
+            private bool TryGetReplaceNode(IdentifierNameSyntax node, IdentifierNameSyntax expected, [NotNullWhen(true)] out SyntaxNode? result)
             {
                 result = null;
                 if (node.Identifier.ValueText != expected.Identifier.ValueText)
@@ -277,7 +277,7 @@ namespace Gu.Analyzers
                 return this.TryGetReplaceNode(node.Parent as MemberAccessExpressionSyntax, expected.Parent as MemberAccessExpressionSyntax, out result);
             }
 
-            private bool TryGetReplaceNode(MemberAccessExpressionSyntax? node, MemberAccessExpressionSyntax? expected, [NotNullWhen(true)]out SyntaxNode? result)
+            private bool TryGetReplaceNode(MemberAccessExpressionSyntax? node, MemberAccessExpressionSyntax? expected, [NotNullWhen(true)] out SyntaxNode? result)
             {
                 result = null;
                 if (node != null &&

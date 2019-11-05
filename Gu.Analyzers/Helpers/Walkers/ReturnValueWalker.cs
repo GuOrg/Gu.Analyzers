@@ -49,7 +49,7 @@ namespace Gu.Analyzers
             this.returnValues.Add(node.Expression);
         }
 
-        internal static bool TrySingle(SyntaxNode scope, [NotNullWhen(true)]out ExpressionSyntax? returnValue)
+        internal static bool TrySingle(SyntaxNode scope, [NotNullWhen(true)] out ExpressionSyntax? returnValue)
         {
             if (scope is null)
             {

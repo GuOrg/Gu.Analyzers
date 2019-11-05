@@ -42,7 +42,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, [NotNullWhen(true)]out IMethodSymbol? ctor)
+        private static bool IsTheCreatedTypeKnownForHavingNoUsefulDefault(SyntaxNodeAnalysisContext context, ObjectCreationExpressionSyntax objectCreation, [NotNullWhen(true)] out IMethodSymbol? ctor)
         {
             // TODO: Stop using linear search if the number of types becomes large
             foreach (var qualifiedType in KnownTypes)

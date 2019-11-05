@@ -15,7 +15,7 @@ namespace Gu.Analyzers
             Unsafe,
         }
 
-        internal static bool TryFindConstructor(SyntaxNode node, [NotNullWhen(true)]out ConstructorDeclarationSyntax? ctor)
+        internal static bool TryFindConstructor(SyntaxNode node, [NotNullWhen(true)] out ConstructorDeclarationSyntax? ctor)
         {
             ctor = null;
             return node.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration) &&

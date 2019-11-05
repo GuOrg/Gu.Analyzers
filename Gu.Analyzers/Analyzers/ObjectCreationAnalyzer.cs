@@ -72,7 +72,7 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, [NotNullWhen(true)]out ArgumentSyntax? argument)
+        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, [NotNullWhen(true)] out ArgumentSyntax? argument)
         {
             argument = null;
             foreach (var arg in argumentList.Arguments)

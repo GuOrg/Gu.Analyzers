@@ -91,7 +91,7 @@ namespace Gu.Analyzers
                     }
                     else if (TryFindParamDoc(out var element) &&
                              element.TryGetNameAttribute(out var name) &&
-                             methodDeclaration.TryFindParameter(name.Identifier?.Identifier.ValueText, out parameter))
+                             methodDeclaration.TryFindParameter(name.Identifier.Identifier.ValueText, out parameter))
                     {
                         if (StandardDocs.TryGet(parameter, out var text))
                         {
@@ -116,8 +116,7 @@ namespace Gu.Analyzers
                     }
                     else if (diagnostic.Id == "CS1591" &&
                              syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax? operatorDeclaration) &&
-                             operatorDeclaration.ParameterList is ParameterListSyntax parameterList &&
-                             parameterList.Parameters.Count == 2 &&
+                             operatorDeclaration.ParameterList is { Parameters: { Count: 2 } } parameterList &&
                              parameterList.Parameters.TryElementAt(0, out var left) &&
                              parameterList.Parameters.TryElementAt(1, out var right))
                     {
@@ -163,7 +162,7 @@ namespace Gu.Analyzers
                         case XmlElementSyntax element:
                             result = element;
                             return true;
-                        case SyntaxNode node when node.TryFirstAncestor(out XmlElementSyntax? element):
+                        case { } node when node.TryFirstAncestor(out XmlElementSyntax? element):
                             result = element;
                             return true;
                         default:
@@ -182,12 +181,12 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetTypeParameterText(BaseMethodDeclarationSyntax methodDeclaration, TypeParameterSyntax typeParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out string? text)
+        private static bool TryGetTypeParameterText(BaseMethodDeclarationSyntax methodDeclaration, TypeParameterSyntax typeParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out string? text)
         {
             text = null;
-            if (methodDeclaration.ParameterList is ParameterListSyntax parameterList)
+            if (methodDeclaration.ParameterList is { Parameters: { } parameters })
             {
-                foreach (var parameter in parameterList.Parameters)
+                foreach (var parameter in parameters)
                 {
                     if (IsParameterType(parameter.Type))
                     {

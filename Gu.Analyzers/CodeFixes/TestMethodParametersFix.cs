@@ -119,7 +119,7 @@ namespace Gu.Analyzers
             return false;
         }
 
-        private static bool TryFindTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)]out AttributeSyntax? attribute)
+        private static bool TryFindTestAttribute(MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AttributeSyntax? attribute)
         {
             attribute = null;
             if (method != null)

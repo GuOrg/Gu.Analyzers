@@ -2,6 +2,7 @@ namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -29,42 +30,41 @@ namespace Gu.Analyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id &&
-                    syntaxRoot.TryFindNode(diagnostic, out ArgumentListSyntax? arguments) &&
-                    HasWhitespaceTriviaOnly(arguments))
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentListSyntax? argumentList) &&
+                    HasWhitespaceTriviaOnly(argumentList))
                 {
                     context.RegisterCodeFix(
                               "Move arguments to match parameter positions.",
-                              (editor, cancellationToken) => ApplyFixGU0002(editor, arguments, cancellationToken),
+                              (editor, _) => editor.ReplaceNode(
+                                  argumentList,
+                                  x => Replacement(x, editor)),
                               this.GetType(),
                               diagnostic);
+
+                    static ArgumentListSyntax Replacement(ArgumentListSyntax argumentList, DocumentEditor editor)
+                    {
+                        if (editor.SemanticModel.GetSpeculativeSymbolInfo(argumentList.SpanStart, argumentList.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                        {
+                            return argumentList.WithArguments(
+                                SyntaxFactory.SeparatedList(
+                                    argumentList.Arguments.OrderBy(x => ParameterIndex(method, x)),
+                                    argumentList.Arguments.GetSeparators()));
+                        }
+
+                        return argumentList;
+                    }
                 }
 
                 if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id &&
                     syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
                 {
                     context.RegisterCodeFix(
-                        "Move name argument to match parameter positions.",
+                        "Move named argument to match parameter positions.",
                         (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
                         this.GetType(),
                         diagnostic);
                 }
             }
-        }
-
-        private static void ApplyFixGU0002(DocumentEditor editor, ArgumentListSyntax argumentListSyntax, CancellationToken cancellationToken)
-        {
-            var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = editor.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
-            foreach (var argument in argumentListSyntax.Arguments)
-            {
-                var index = ParameterIndex(method, argument);
-                var oldArg = argumentListSyntax.Arguments[index];
-                arguments[index] = argument.WithLeadingTrivia(oldArg.GetLeadingTrivia())
-                                           .WithTrailingTrivia(oldArg.GetTrailingTrivia());
-            }
-
-            var updated = argumentListSyntax.WithArguments(SyntaxFactory.SeparatedList(arguments, argumentListSyntax.Arguments.GetSeparators()));
-            editor.ReplaceNode(argumentListSyntax, updated);
         }
 
         private static void ApplyFixGU0005(DocumentEditor editor, ArgumentSyntax nameArgument, CancellationToken cancellationToken)
