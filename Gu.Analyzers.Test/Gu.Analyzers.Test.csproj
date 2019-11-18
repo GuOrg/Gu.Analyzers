@@ -5,8 +5,6 @@
     <Nullable>enable</Nullable>
     <LangVersion>8</LangVersion>
     <CodeAnalysisRuleSet>Gu.Analyzers.Test.ruleset</CodeAnalysisRuleSet>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <PropertyGroup>
