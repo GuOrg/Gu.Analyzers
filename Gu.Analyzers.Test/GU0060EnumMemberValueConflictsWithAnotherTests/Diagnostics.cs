@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
+﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad
+    public enum E
     {
         None,
         A,
@@ -43,7 +43,7 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad2
+    public enum E
     {
         A = 1,
         B = 2,
@@ -62,7 +62,7 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad
+    public enum E
     {
         A = 1,
         B = 2,
@@ -81,7 +81,7 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad
+    public enum E
     {
         A = 1,
         B = 2,
@@ -104,7 +104,7 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad
+    public enum E
     {
         A = 1 << 0,
         B = 1 << 1,
@@ -123,7 +123,7 @@ namespace N
 {
     using System;
 
-    public enum Bad
+    public enum E
     {
         A,
         B,
@@ -143,11 +143,30 @@ namespace N
     using System;
 
     [Flags]
-    public enum Bad
+    public enum E
     {
         A = 1,
         B = 2,
         ↓Bad = A | 2
+    }
+}";
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
+
+        [Test]
+        public static void ExplicitValueSharingPartial2()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    [Flags]
+    public enum E
+    {
+        A = 1,
+        B = 2,
+        ↓Bad = 2 | A,
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
