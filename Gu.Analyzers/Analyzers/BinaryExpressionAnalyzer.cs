@@ -34,7 +34,24 @@
                                 left.GetLocation()));
                         break;
 
-                    case { Left: IsPatternExpressionSyntax { Expression: IdentifierNameSyntax leftMember, Pattern: RecursivePatternSyntax _ } isPattern, Right: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax rightMember, Name: IdentifierNameSyntax _ } right }
+                    case { Left: PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } } left }
+                        when left.IsKind(SyntaxKind.LogicalNotExpression):
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.GU0074PreferPattern,
+                                left.GetLocation()));
+                        break;
+                    case { Left: IsPatternExpressionSyntax { Expression: IdentifierNameSyntax leftMember, Pattern: RecursivePatternSyntax _ } isPattern,
+                           Right: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax rightMember, Name: IdentifierNameSyntax _ } right }
+                        when leftMember.Identifier.ValueText == rightMember.Identifier.ValueText:
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.GU0074PreferPattern,
+                                right.GetLocation(),
+                                additionalLocations: new[] { isPattern.GetLocation() }));
+                        break;
+                    case { Left: IsPatternExpressionSyntax { Expression: IdentifierNameSyntax leftMember, Pattern: RecursivePatternSyntax _ } isPattern,
+                           Right: PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax rightMember, Name: IdentifierNameSyntax _ } } right }
                         when leftMember.Identifier.ValueText == rightMember.Identifier.ValueText:
                         context.ReportDiagnostic(
                             Diagnostic.Create(

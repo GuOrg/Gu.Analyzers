@@ -25,31 +25,58 @@
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MemberAccessExpressionSyntax? memberAccess) &&
-                    memberAccess.Name is IdentifierNameSyntax leftName)
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression))
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {
-                        context.RegisterCodeFix(
-                            $"{memberAccess.Expression} is {{ {leftName}: true }}",
-                            (e, c) => e.ReplaceNode(
-                                memberAccess,
-                                SyntaxFactory.IsPatternExpression(
-                                    memberAccess.Expression,
-                                    SyntaxFactory.RecursivePattern(
-                                        null,
-                                        null,
-                                        SyntaxFactory.PropertyPatternClause(SyntaxFactory.SingletonSeparatedList(IsTrue(leftName))),
-                                        null))),
-                            "Use pattern",
-                            diagnostic);
+                        switch (expression)
+                        {
+                            case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax member, Name: IdentifierNameSyntax property }:
+                                context.RegisterCodeFix(
+                                    $"{member} is {{ {property}: true }}",
+                                    (e, c) => e.ReplaceNode(
+                                        expression,
+                                        SyntaxFactory.IsPatternExpression(
+                                            member,
+                                            SyntaxFactory.RecursivePattern(
+                                                null,
+                                                null,
+                                                SyntaxFactory.PropertyPatternClause(
+                                                    SyntaxFactory.SingletonSeparatedList(
+                                                        PropertyPattern(
+                                                            property,
+                                                            SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))),
+                                                null))),
+                                    "Use pattern",
+                                    diagnostic);
+                                break;
+                            case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax member, Name: IdentifierNameSyntax property } }:
+                                context.RegisterCodeFix(
+                                    $"{member} is {{ {property}: false }}",
+                                    (e, c) => e.ReplaceNode(
+                                        expression,
+                                        SyntaxFactory.IsPatternExpression(
+                                            member,
+                                            SyntaxFactory.RecursivePattern(
+                                                null,
+                                                null,
+                                                SyntaxFactory.PropertyPatternClause(
+                                                    SyntaxFactory.SingletonSeparatedList(
+                                                        PropertyPattern(
+                                                            property,
+                                                            SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))),
+                                                null))),
+                                    "Use pattern",
+                                    diagnostic);
+                                break;
+                        }
                     }
                     else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
                              syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? pattern) &&
-                             memberAccess.TryFindSharedAncestorRecursive(pattern, out BinaryExpressionSyntax? binary))
+                             expression.TryFindSharedAncestorRecursive(pattern, out BinaryExpressionSyntax? binary))
                     {
                         context.RegisterCodeFix(
-                            $"Merge with pattern.",
+                            $"Merge {binary.Right}.",
                             (e, c) => e.ReplaceNode(
                                 binary,
                                 x => Merge(x)),
@@ -58,10 +85,23 @@
 
                         ExpressionSyntax Merge(BinaryExpressionSyntax old)
                         {
-                            if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern &&
-                                old.Right is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax right })
+                            if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern)
                             {
-                                return isPattern.WithPattern(recursive.AddPropertyPatternClauseSubpatterns(IsTrue(right)));
+                                switch (old.Right)
+                                {
+                                    case MemberAccessExpressionSyntax { Name: IdentifierNameSyntax right }:
+                                        return isPattern.WithPattern(
+                                            recursive.AddPropertyPatternClauseSubpatterns(
+                                                PropertyPattern(
+                                                    right,
+                                                    SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+                                    case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax right } }:
+                                        return isPattern.WithPattern(
+                                            recursive.AddPropertyPatternClauseSubpatterns(
+                                                PropertyPattern(
+                                                    right,
+                                                    SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression))));
+                                }
                             }
 
                             return old;
@@ -69,11 +109,11 @@
                     }
                 }
 
-                static SubpatternSyntax IsTrue(IdentifierNameSyntax identifierName)
+                static SubpatternSyntax PropertyPattern(IdentifierNameSyntax identifierName, LiteralExpressionSyntax constant)
                 {
                     return SyntaxFactory.Subpattern(
                         nameColon: SyntaxFactory.NameColon(identifierName),
-                        pattern: SyntaxFactory.ConstantPattern(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+                        pattern: SyntaxFactory.ConstantPattern(constant));
                 }
             }
         }
