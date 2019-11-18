@@ -145,7 +145,6 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
         }
 
-        [Ignore("tbd")]
         [Test]
         public static void CreatePatternForLeftWhenNotNull()
         {
@@ -170,7 +169,7 @@ namespace N
         bool M(Type type) => type is { Name: { } } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: {} }");
         }
 
         [Test]
@@ -227,7 +226,6 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, before, after);
         }
 
-        [Ignore("tbd")]
         [Test]
         public static void MergeStringRight()
         {

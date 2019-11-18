@@ -14,6 +14,15 @@
     [Shared]
     internal class MoveToPatternFix : DocumentEditorCodeFixProvider
     {
+        private static readonly ConstantPatternSyntax True = SyntaxFactory.ConstantPattern(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression));
+        private static readonly ConstantPatternSyntax False = SyntaxFactory.ConstantPattern(SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression));
+
+        private static readonly RecursivePatternSyntax Empty = SyntaxFactory.RecursivePattern(
+            null,
+            null,
+            SyntaxFactory.PropertyPatternClause(),
+            null);
+
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0074PreferPattern.Id);
 
@@ -29,10 +38,10 @@
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {
-                        if (Parse() is var (member, property, constant))
+                        if (Parse(expression) is var (member, property, pattern))
                         {
                             context.RegisterCodeFix(
-                                $"{member} is {{ {property}: {constant} }}",
+                                $"{member} is {{ {property}: {pattern} }}",
                                 (e, c) => e.ReplaceNode(
                                     expression,
                                     SyntaxFactory.IsPatternExpression(
@@ -40,30 +49,19 @@
                                         SyntaxFactory.RecursivePattern(
                                             null,
                                             null,
-                                            SyntaxFactory.PropertyPatternClause(SyntaxFactory.SingletonSeparatedList(PropertyPattern(property, constant))),
+                                            SyntaxFactory.PropertyPatternClause(SyntaxFactory.SingletonSeparatedList(PropertyPattern(property, pattern))),
                                             null))),
                                 "Use pattern",
                                 diagnostic);
                         }
-
-                        (IdentifierNameSyntax, IdentifierNameSyntax, LiteralExpressionSyntax)? Parse()
-                        {
-                            return expression switch
-                            {
-                                MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)),
-                                PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)),
-                                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c } => (m, p, c),
-                                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax c } } => (m, p, c),
-                                _ => ((IdentifierNameSyntax, IdentifierNameSyntax, LiteralExpressionSyntax)?)null,
-                            };
-                        }
                     }
                     else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
-                             syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? pattern) &&
-                             expression.TryFindSharedAncestorRecursive(pattern, out BinaryExpressionSyntax? binary))
+                             syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? left) &&
+                             expression.TryFindSharedAncestorRecursive(left, out BinaryExpressionSyntax? binary) &&
+                             Parse(expression) is var (member, property, pattern))
                     {
                         context.RegisterCodeFix(
-                            $"Merge {binary.Right}.",
+                            $"Merge {{ {property}: {pattern} }}",
                             (e, c) => e.ReplaceNode(
                                 binary,
                                 x => Merge(x)),
@@ -74,35 +72,43 @@
                         {
                             if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern)
                             {
-                                switch (old.Right)
-                                {
-                                    case MemberAccessExpressionSyntax { Name: IdentifierNameSyntax right }:
-                                        return isPattern.WithPattern(
-                                            recursive.AddPropertyPatternClauseSubpatterns(
-                                                PropertyPattern(
-                                                    right,
-                                                    SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
-                                    case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax right } }:
-                                        return isPattern.WithPattern(
-                                            recursive.AddPropertyPatternClauseSubpatterns(
-                                                PropertyPattern(
-                                                    right,
-                                                    SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression))));
-                                }
+                                return isPattern.WithPattern(
+                                    recursive.AddPropertyPatternClauseSubpatterns(
+                                        PropertyPattern(
+                                            property,
+                                            pattern)));
                             }
 
                             return old;
                         }
                     }
                 }
-
-                static SubpatternSyntax PropertyPattern(IdentifierNameSyntax identifierName, LiteralExpressionSyntax constant)
-                {
-                    return SyntaxFactory.Subpattern(
-                        nameColon: SyntaxFactory.NameColon(identifierName),
-                        pattern: SyntaxFactory.ConstantPattern(constant));
-                }
             }
+        }
+
+        private static (IdentifierNameSyntax, IdentifierNameSyntax, PatternSyntax)? Parse(ExpressionSyntax expression)
+        {
+            return expression switch
+            {
+                MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }
+                    => (m, p, True),
+                PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } }
+                    => (m, p, False),
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
+                    => (m, p, SyntaxFactory.ConstantPattern(c)),
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+                    => (m, p, Empty),
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
+                    => (m, p, c),
+                _ => default,
+            };
+        }
+
+        private static SubpatternSyntax PropertyPattern(IdentifierNameSyntax property, PatternSyntax constant)
+        {
+            return SyntaxFactory.Subpattern(
+                nameColon: SyntaxFactory.NameColon(property),
+                pattern: constant);
         }
     }
 }
