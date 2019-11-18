@@ -41,7 +41,7 @@ namespace N
             }
 
             [Test]
-            public static void LeftTrueMiltiLine()
+            public static void LeftTrueMultiLine()
             {
                 var before = @"
 namespace N
@@ -226,6 +226,36 @@ namespace N
     class C
     {
         bool M(Type type) => type is { IsPublic: true, IsAbstract: true } && type.Name == ""abc"";
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void RightTrueMultiLine()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } &&
+                             ↓type.IsAbstract &&
+                             type.Name == ""abc"";
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, IsAbstract: true } &&
+                             type.Name == ""abc"";
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
