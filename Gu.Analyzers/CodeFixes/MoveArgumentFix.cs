@@ -39,7 +39,7 @@
                             (editor, _) => editor.ReplaceNode(
                                 argumentList,
                                 x => Replacement(x, editor)),
-                            this.GetType(),
+                            "sort",
                             diagnostic);
 
                         static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
@@ -56,45 +56,51 @@
                         }
                     }
 
-                    if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id &&
-                        syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
+                    if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id)
                     {
                         context.RegisterCodeFix(
                             "Move named argument to match parameter positions.",
-                            (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
-                            this.GetType(),
+                            (editor, _) => editor.ReplaceNode(
+                                argumentList,
+                                x => Replacement(x, editor)),
+                            "move",
                             diagnostic);
+
+                        static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
+                        {
+                            if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                            {
+                                var arguments = new ArgumentSyntax[old.Arguments.Count];
+                                var messageIndex = ParameterIndex(method, "message");
+                                var nameIndex = ParameterIndex(method, "paramName");
+                                for (var i = 0; i < old.Arguments.Count; i++)
+                                {
+                                    if (i == messageIndex)
+                                    {
+                                        arguments[nameIndex] = old.Arguments[i];
+                                        continue;
+                                    }
+
+                                    if (i == nameIndex)
+                                    {
+                                        arguments[messageIndex] = old.Arguments[i];
+                                        continue;
+                                    }
+
+                                    arguments[i] = old.Arguments[i];
+                                }
+
+                                return old.WithArguments(
+                                     SyntaxFactory.SeparatedList(
+                                         arguments,
+                                         old.Arguments.GetSeparators()));
+                            }
+
+                            return old;
+                        }
                     }
                 }
             }
-        }
-
-        private static void ApplyFixGU0005(DocumentEditor editor, ArgumentSyntax nameArgument, CancellationToken cancellationToken)
-        {
-            var argumentListSyntax = nameArgument.FirstAncestorOrSelf<ArgumentListSyntax>();
-            var arguments = new ArgumentSyntax[argumentListSyntax.Arguments.Count];
-            var method = editor.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, cancellationToken) as IMethodSymbol;
-            var messageIndex = ParameterIndex(method, "message");
-            var nameIndex = ParameterIndex(method, "paramName");
-            for (var i = 0; i < argumentListSyntax.Arguments.Count; i++)
-            {
-                if (i == messageIndex)
-                {
-                    arguments[nameIndex] = argumentListSyntax.Arguments[i];
-                    continue;
-                }
-
-                if (i == nameIndex)
-                {
-                    arguments[messageIndex] = argumentListSyntax.Arguments[i];
-                    continue;
-                }
-
-                arguments[i] = argumentListSyntax.Arguments[i];
-            }
-
-            var updated = argumentListSyntax.WithArguments(SyntaxFactory.SeparatedList(arguments, argumentListSyntax.Arguments.GetSeparators()));
-            editor.ReplaceNode(argumentListSyntax, updated);
         }
 
         private static int ParameterIndex(IMethodSymbol method, ArgumentSyntax argument)

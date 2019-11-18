@@ -218,7 +218,8 @@
             {
                 var node = reference.GetSyntax(cancellationToken);
 
-                if (AssignmentExecutionWalker.SingleFor(symbol, node.FirstAncestor<TypeDeclarationSyntax>(), SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
+                if (node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
+                    AssignmentExecutionWalker.SingleFor(symbol, containingType, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                     assignment.Right is IdentifierNameSyntax identifier)
                 {
                     var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
