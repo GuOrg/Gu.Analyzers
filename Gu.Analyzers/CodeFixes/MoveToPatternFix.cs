@@ -14,9 +14,9 @@
     [Shared]
     internal class MoveToPatternFix : DocumentEditorCodeFixProvider
     {
-        private static readonly ConstantPatternSyntax True = ConstantPattern(SyntaxKind.TrueKeyword);
+        private static readonly ConstantPatternSyntax True = ConstantPattern(SyntaxKind.TrueLiteralExpression, SyntaxKind.TrueKeyword);
 
-        private static readonly ConstantPatternSyntax False = ConstantPattern(SyntaxKind.FalseKeyword);
+        private static readonly ConstantPatternSyntax False = ConstantPattern(SyntaxKind.FalseLiteralExpression, SyntaxKind.FalseKeyword);
 
         private static readonly RecursivePatternSyntax Empty = SyntaxFactory.RecursivePattern(
             null,
@@ -71,7 +71,8 @@
                                     recursive.AddPropertyPatternClauseSubpatterns(
                                         PropertyPattern(
                                             property,
-                                            pattern)));
+                                            pattern)))
+                                                .WithTrailingTrivia(SyntaxFactory.ElasticSpace);
                             }
 
                             return old;
@@ -90,7 +91,7 @@
                 PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } }
                     => (m, p, False),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
-                    => (m, p, SyntaxFactory.ConstantPattern(c)),
+                    => (m, p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
                     => (m, p, Empty),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
@@ -127,15 +128,15 @@
                         closeBraceToken: SyntaxFactory.Token(
                             leading: default,
                             kind: SyntaxKind.CloseBraceToken,
-                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))),
+                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.ElasticSpace))),
                     designation: default));
         }
 
-        private static ConstantPatternSyntax ConstantPattern(SyntaxKind keyword)
+        private static ConstantPatternSyntax ConstantPattern(SyntaxKind expressionKind, SyntaxKind keyword)
         {
             return SyntaxFactory.ConstantPattern(
                 expression: SyntaxFactory.LiteralExpression(
-                    kind: SyntaxKind.TrueLiteralExpression,
+                    kind: expressionKind,
                     token: SyntaxFactory.Token(
                         leading: default,
                         kind: keyword,

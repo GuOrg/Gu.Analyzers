@@ -232,6 +232,33 @@ namespace N
             }
 
             [Test]
+            public static void RightTrueLast()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } && ↓type.IsAbstract;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, IsAbstract: true };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
             public static void RightTrueMultiLine()
             {
                 var before = @"
