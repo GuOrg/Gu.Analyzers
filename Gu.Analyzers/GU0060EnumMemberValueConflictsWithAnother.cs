@@ -27,36 +27,26 @@
 
         private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (enumMember.EqualsValue is null)
+            if (enumMember is { EqualsValue: { Value: { } value } } &&
+                !value.IsKind(SyntaxKind.NumericLiteralExpression))
             {
-                return false;
-            }
-
-            var expression = enumMember.EqualsValue.Value;
-            foreach (var node in expression.DescendantNodesAndSelf())
-            {
-                if (!(node is ExpressionSyntax))
+                foreach (var node in value.DescendantNodesAndSelf())
                 {
-                    continue;
-                }
-
-                if (node is LiteralExpressionSyntax)
-                {
-                    return false;
-                }
-
-                if (node is IdentifierNameSyntax identifier)
-                {
-                    var isEnumMember = semanticModel.GetSymbolSafe(identifier, cancellationToken)
-                                                    .TrySingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
-                    if (!isEnumMember)
+                    switch (node)
                     {
-                        return false;
+                        case IdentifierNameSyntax identifier
+                            when semanticModel.GetSymbolSafe(identifier, cancellationToken) is { } symbol &&
+                                 symbol.ContainingType.TypeKind != TypeKind.Enum:
+                            return false;
+                        case LiteralExpressionSyntax _:
+                            return false;
                     }
                 }
+
+                return true;
             }
 
-            return true;
+            return false;
         }
 
         private static bool HasFlagsAttribute(INamedTypeSymbol enumType)
