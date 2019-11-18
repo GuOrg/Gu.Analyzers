@@ -5,15 +5,18 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal static class CodeFix
+    public static partial class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new BinaryExpressionAnalyzer();
         private static readonly CodeFixProvider Fix = new MoveToPatternFix();
 
-        [Test]
-        public static void CreatePatternForLeftWhenTrue()
+        public static class And
         {
-            var before = @"
+            private static readonly DiagnosticAnalyzer Analyzer = new BinaryExpressionAnalyzer();
+
+            [Test]
+            public static void LeftTrue()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -24,7 +27,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -34,13 +37,13 @@ namespace N
         bool M(Type type) => type is { IsPublic: true } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: true }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: true }");
+            }
 
-        [Test]
-        public static void CreatePatternForLeftWhenNegated()
-        {
-            var before = @"
+            [Test]
+            public static void LeftNegated()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -51,7 +54,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -61,13 +64,13 @@ namespace N
         bool M(Type type) => type is { IsPublic: false } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: false }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: false }");
+            }
 
-        [Test]
-        public static void CreatePatternForLeftWhenString()
-        {
-            var before = @"
+            [Test]
+            public static void LeftString()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -78,7 +81,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -88,13 +91,13 @@ namespace N
         bool M(Type type) => type is { Name: ""abc"" } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: \"abc\" }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: \"abc\" }");
+            }
 
-        [Test]
-        public static void CreatePatternForLeftWhenNull()
-        {
-            var before = @"
+            [Test]
+            public static void LeftNull()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -105,7 +108,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -115,13 +118,13 @@ namespace N
         bool M(Type type) => type is { Name: null } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+            }
 
-        [Test]
-        public static void CreatePatternForLeftWhenIsNull()
-        {
-            var before = @"
+            [Test]
+            public static void LeftIsNull()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -132,7 +135,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -142,13 +145,13 @@ namespace N
         bool M(Type type) => type is { Name: null } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+            }
 
-        [Test]
-        public static void CreatePatternForLeftWhenNotNull()
-        {
-            var before = @"
+            [Test]
+            public static void LeftNotNull()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -159,7 +162,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -169,13 +172,13 @@ namespace N
         bool M(Type type) => type is { Name: { } } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: {} }");
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: {} }");
+            }
 
-        [Test]
-        public static void MergeRight()
-        {
-            var before = @"
+            [Test]
+            public static void RightTrue()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -186,7 +189,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -196,13 +199,13 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, IsAbstract: true } && type.Name == ""abc"";
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
 
-        [Test]
-        public static void MergeRightWhenNegated()
-        {
-            var before = @"
+            [Test]
+            public static void RightNegated()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -213,7 +216,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -223,13 +226,13 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, IsAbstract: false } && type.Name == ""abc"";
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
 
-        [Test]
-        public static void MergeStringRight()
-        {
-            var before = @"
+            [Test]
+            public static void RightString()
+            {
+                var before = @"
 namespace N
 {
     using System;
@@ -240,7 +243,7 @@ namespace N
     }
 }";
 
-            var after = @"
+                var after = @"
 namespace N
 {
     using System;
@@ -250,7 +253,8 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, Name: ""abc"" } && type.IsAbstract;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
         }
     }
 }

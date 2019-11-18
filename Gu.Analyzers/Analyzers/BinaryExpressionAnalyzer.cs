@@ -23,7 +23,8 @@
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is BinaryExpressionSyntax binaryExpression)
+                context.Node is BinaryExpressionSyntax binaryExpression &&
+                binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
             {
                 if (ConvertToPattern(binaryExpression.Left) is { } left)
                 {
