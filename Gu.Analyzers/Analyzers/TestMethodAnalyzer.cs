@@ -290,8 +290,8 @@
                         ya.Expression is IdentifierNameSyntax yn)
                     {
                         if (xn.Identifier.ValueText == yn.Identifier.ValueText &&
-                            context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out ISymbol? xs) &&
-                            context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out ISymbol? ys) &&
+                            context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out var xs) &&
+                            context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out var ys) &&
                             xs.Equals(ys))
                         {
                             continue;
@@ -304,8 +304,8 @@
                         ya.Expression is MemberAccessExpressionSyntax yma)
                     {
                         if (xma.Name.Identifier.ValueText == yma.Name.Identifier.ValueText &&
-                            context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out ISymbol? xs) &&
-                            context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out ISymbol? ys) &&
+                            context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out var xs) &&
+                            context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out var ys) &&
                             xs.Equals(ys))
                         {
                             continue;

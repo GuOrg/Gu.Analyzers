@@ -65,6 +65,60 @@ namespace N
         }
 
         [Test]
+        public static void CreatePatternForLeftWhenString()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => ↓type.Name == ""abc"" && type.IsAbstract;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { Name: ""abc"" } && type.IsAbstract;
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: \"abc\" }");
+        }
+
+        [Test]
+        public static void CreatePatternForLeftWhenNull()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => ↓type.Name == null && type.IsAbstract;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { Name: null } && type.IsAbstract;
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+        }
+
+        [Test]
         public static void MergeRight()
         {
             var before = @"
@@ -113,6 +167,34 @@ namespace N
     class C
     {
         bool M(Type type) => type is { IsPublic: true, IsAbstract: false } && type.Name == ""abc"";
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+        }
+
+        [Ignore("tbd")]
+        [Test]
+        public static void MergeStringRight()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } && ↓type.Name == ""abc"" && type.IsAbstract;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, Name: ""abc"" } && type.IsAbstract;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, before, after);

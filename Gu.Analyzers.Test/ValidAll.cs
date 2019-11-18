@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Immutable;
@@ -39,6 +39,7 @@ namespace Gu.Analyzers.Test
         {
             if (analyzer is SimpleAssignmentAnalyzer ||
                 analyzer is ParameterAnalyzer ||
+                analyzer is BinaryExpressionAnalyzer ||
                 analyzer is GU0007PreferInjecting)
             {
                 Analyze.GetDiagnostics(AnalyzerProjectSln, analyzer);

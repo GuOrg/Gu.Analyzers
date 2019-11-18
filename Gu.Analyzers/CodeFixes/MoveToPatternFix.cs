@@ -29,46 +29,32 @@
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {
-                        switch (expression)
+                        if (Parse() is var (member, property, constant))
                         {
-                            case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax member, Name: IdentifierNameSyntax property }:
-                                context.RegisterCodeFix(
-                                    $"{member} is {{ {property}: true }}",
-                                    (e, c) => e.ReplaceNode(
-                                        expression,
-                                        SyntaxFactory.IsPatternExpression(
-                                            member,
-                                            SyntaxFactory.RecursivePattern(
-                                                null,
-                                                null,
-                                                SyntaxFactory.PropertyPatternClause(
-                                                    SyntaxFactory.SingletonSeparatedList(
-                                                        PropertyPattern(
-                                                            property,
-                                                            SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))),
-                                                null))),
-                                    "Use pattern",
-                                    diagnostic);
-                                break;
-                            case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax member, Name: IdentifierNameSyntax property } }:
-                                context.RegisterCodeFix(
-                                    $"{member} is {{ {property}: false }}",
-                                    (e, c) => e.ReplaceNode(
-                                        expression,
-                                        SyntaxFactory.IsPatternExpression(
-                                            member,
-                                            SyntaxFactory.RecursivePattern(
-                                                null,
-                                                null,
-                                                SyntaxFactory.PropertyPatternClause(
-                                                    SyntaxFactory.SingletonSeparatedList(
-                                                        PropertyPattern(
-                                                            property,
-                                                            SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))),
-                                                null))),
-                                    "Use pattern",
-                                    diagnostic);
-                                break;
+                            context.RegisterCodeFix(
+                                $"{member} is {{ {property}: {constant} }}",
+                                (e, c) => e.ReplaceNode(
+                                    expression,
+                                    SyntaxFactory.IsPatternExpression(
+                                        member,
+                                        SyntaxFactory.RecursivePattern(
+                                            null,
+                                            null,
+                                            SyntaxFactory.PropertyPatternClause(SyntaxFactory.SingletonSeparatedList(PropertyPattern(property, constant))),
+                                            null))),
+                                "Use pattern",
+                                diagnostic);
+                        }
+
+                        (IdentifierNameSyntax, IdentifierNameSyntax, LiteralExpressionSyntax)? Parse()
+                        {
+                            return expression switch
+                            {
+                                MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)),
+                                PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)),
+                                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Right: LiteralExpressionSyntax literal } => (m, p, literal),
+                                _ => ((IdentifierNameSyntax, IdentifierNameSyntax, LiteralExpressionSyntax)?)null,
+                            };
                         }
                     }
                     else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&

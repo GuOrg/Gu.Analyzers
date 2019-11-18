@@ -25,40 +25,32 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is BinaryExpressionSyntax binaryExpression)
             {
-                switch (binaryExpression)
+                if (ConvertToPattern(binaryExpression.Left) is { } left)
                 {
-                    case { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } left }:
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
-                                left.GetLocation()));
-                        break;
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0074PreferPattern,
+                            left.GetLocation()));
+                }
+                else if (binaryExpression.Left is IsPatternExpressionSyntax { Expression: IdentifierNameSyntax _, Pattern: RecursivePatternSyntax _ } isPattern &&
+                         ConvertToPattern(binaryExpression.Right) is { } right)
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0074PreferPattern,
+                            right.GetLocation(),
+                            additionalLocations: new[] { isPattern.GetLocation() }));
+                }
 
-                    case { Left: PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } } left }
-                        when left.IsKind(SyntaxKind.LogicalNotExpression):
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
-                                left.GetLocation()));
-                        break;
-                    case { Left: IsPatternExpressionSyntax { Expression: IdentifierNameSyntax leftMember, Pattern: RecursivePatternSyntax _ } isPattern,
-                           Right: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax rightMember, Name: IdentifierNameSyntax _ } right }
-                        when leftMember.Identifier.ValueText == rightMember.Identifier.ValueText:
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
-                                right.GetLocation(),
-                                additionalLocations: new[] { isPattern.GetLocation() }));
-                        break;
-                    case { Left: IsPatternExpressionSyntax { Expression: IdentifierNameSyntax leftMember, Pattern: RecursivePatternSyntax _ } isPattern,
-                           Right: PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax rightMember, Name: IdentifierNameSyntax _ } } right }
-                        when leftMember.Identifier.ValueText == rightMember.Identifier.ValueText:
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
-                                right.GetLocation(),
-                                additionalLocations: new[] { isPattern.GetLocation() }));
-                        break;
+                ExpressionSyntax? ConvertToPattern(ExpressionSyntax expression)
+                {
+                    return expression switch
+                    {
+                        MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } => expression,
+                        PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } } => expression,
+                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ } => expression,
+                        _ => null,
+                    };
                 }
             }
         }
