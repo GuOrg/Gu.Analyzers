@@ -29,7 +29,7 @@
                 IsAutoDoc() &&
                 candidate.HasLocalName("param") &&
                 TryGetTypes(out var parameterType, out var crefType) &&
-                !IsMatch(parameterType, crefType))
+                !IsMatch(parameterType, crefType!))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
@@ -82,7 +82,7 @@
                 }
             }
 
-            bool TryGetTypes(out ITypeSymbol parameterType, out ITypeSymbol crefType)
+            bool TryGetTypes(out ITypeSymbol parameterType, out ITypeSymbol? crefType)
             {
                 if (candidate.TryGetNameAttribute(out var nameAttribute) &&
                     context.ContainingSymbol is IMethodSymbol method &&

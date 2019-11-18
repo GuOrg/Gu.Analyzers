@@ -160,7 +160,7 @@
             var name = underscoreFields
                            ? "_" + parameter.Identifier.ValueText
                            : parameter.Identifier.ValueText;
-            var containingType = ctor.FirstAncestor<TypeDeclarationSyntax>();
+            var containingType = (TypeDeclarationSyntax)ctor.Parent;
             var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
             while (declaredSymbol.MemberNames.Contains(name))
             {
