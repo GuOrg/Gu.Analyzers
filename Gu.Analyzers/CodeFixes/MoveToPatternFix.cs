@@ -14,8 +14,9 @@
     [Shared]
     internal class MoveToPatternFix : DocumentEditorCodeFixProvider
     {
-        private static readonly ConstantPatternSyntax True = SyntaxFactory.ConstantPattern(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression));
-        private static readonly ConstantPatternSyntax False = SyntaxFactory.ConstantPattern(SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression));
+        private static readonly ConstantPatternSyntax True = ConstantPattern(SyntaxKind.TrueKeyword);
+
+        private static readonly ConstantPatternSyntax False = ConstantPattern(SyntaxKind.FalseKeyword);
 
         private static readonly RecursivePatternSyntax Empty = SyntaxFactory.RecursivePattern(
             null,
@@ -44,13 +45,7 @@
                                 $"{member} is {{ {property}: {pattern} }}",
                                 (e, c) => e.ReplaceNode(
                                     expression,
-                                    SyntaxFactory.IsPatternExpression(
-                                        member,
-                                        SyntaxFactory.RecursivePattern(
-                                            null,
-                                            null,
-                                            SyntaxFactory.PropertyPatternClause(SyntaxFactory.SingletonSeparatedList(PropertyPattern(property, pattern))),
-                                            null))),
+                                    IsPattern(member, property, pattern)),
                                 "Use pattern",
                                 diagnostic);
                         }
@@ -102,6 +97,49 @@
                     => (m, p, c),
                 _ => default,
             };
+        }
+
+        private static IsPatternExpressionSyntax IsPattern(IdentifierNameSyntax expression, IdentifierNameSyntax property, PatternSyntax constant)
+        {
+            return SyntaxFactory.IsPatternExpression(
+                expression: expression.WithoutTrailingTrivia().WithTrailingTrivia(SyntaxFactory.Space),
+                isKeyword: SyntaxFactory.Token(
+                    leading: default,
+                    kind: SyntaxKind.IsKeyword,
+                    trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
+                pattern: SyntaxFactory.RecursivePattern(
+                    type: default,
+                    positionalPatternClause: default,
+                    propertyPatternClause: SyntaxFactory.PropertyPatternClause(
+                        openBraceToken: SyntaxFactory.Token(
+                            leading: default,
+                            kind: SyntaxKind.OpenBraceToken,
+                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
+                        subpatterns: SyntaxFactory.SingletonSeparatedList<SubpatternSyntax>(
+                            SyntaxFactory.Subpattern(
+                                nameColon: SyntaxFactory.NameColon(
+                                    name: property.WithoutTrivia(),
+                                    colonToken: SyntaxFactory.Token(
+                                        leading: default,
+                                        kind: SyntaxKind.ColonToken,
+                                        trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))),
+                                pattern: constant)),
+                        closeBraceToken: SyntaxFactory.Token(
+                            leading: default,
+                            kind: SyntaxKind.CloseBraceToken,
+                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))),
+                    designation: default));
+        }
+
+        private static ConstantPatternSyntax ConstantPattern(SyntaxKind keyword)
+        {
+            return SyntaxFactory.ConstantPattern(
+                expression: SyntaxFactory.LiteralExpression(
+                    kind: SyntaxKind.TrueLiteralExpression,
+                    token: SyntaxFactory.Token(
+                        leading: default,
+                        kind: keyword,
+                        trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))));
         }
 
         private static SubpatternSyntax PropertyPattern(IdentifierNameSyntax property, PatternSyntax constant)

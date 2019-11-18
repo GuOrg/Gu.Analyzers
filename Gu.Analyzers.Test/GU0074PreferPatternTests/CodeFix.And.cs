@@ -41,6 +41,35 @@ namespace N
             }
 
             [Test]
+            public static void LeftTrueMiltiLine()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => ↓type.IsPublic &&
+                             type.IsAbstract;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } &&
+                             type.IsAbstract;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: true }");
+            }
+
+            [Test]
             public static void LeftNegated()
             {
                 var before = @"
