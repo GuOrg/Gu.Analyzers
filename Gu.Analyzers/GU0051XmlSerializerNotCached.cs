@@ -47,11 +47,7 @@ namespace Gu.Analyzers
 
                 if (objectCreation.FirstAncestor<VariableDeclaratorSyntax>() is { } declarator)
                 {
-                    if (context.SemanticModel.SemanticModelFor(declarator)
-                               ?.GetDeclaredSymbol(declarator, context.CancellationToken) is IFieldSymbol
-                            fieldSymbol &&
-                        fieldSymbol.IsReadOnly &&
-                        fieldSymbol.IsStatic)
+                    if (context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is IFieldSymbol { IsStatic: true, IsReadOnly: true })
                     {
                         return;
                     }

@@ -222,12 +222,8 @@
                     AssignmentExecutionWalker.SingleFor(symbol, containingType, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                     assignment.Right is IdentifierNameSyntax identifier)
                 {
-                    var ctor = assignment.FirstAncestor<ConstructorDeclarationSyntax>();
-                    if (ctor != null &&
-                        ctor.ParameterList != null &&
-                        ctor.ParameterList.Parameters.TryFirst(
-                            p => p.Identifier.ValueText == identifier.Identifier.ValueText,
-                            out var parameter))
+                    if (assignment.FirstAncestor<ConstructorDeclarationSyntax>() is { ParameterList: { Parameters: { } parameters } } &&
+                        parameters.TryFirst(p => p.Identifier.ValueText == identifier.Identifier.ValueText, out var parameter))
                     {
                         return semanticModel.TryGetNamedType(parameter, cancellationToken, out memberType);
                     }
@@ -238,18 +234,10 @@
             return false;
         }
 
-        private static bool IsInjectable(INamedTypeSymbol type)
+        private static bool IsInjectable(INamedTypeSymbol? type)
         {
-            if (type?.ContainingNamespace is null ||
-                type.IsValueType ||
-                type.IsStatic ||
-                type.IsAbstract ||
-                type.DeclaringSyntaxReferences.Length == 0)
-            {
-                return false;
-            }
-
-            if (type.Constructors.TrySingle(x => !x.IsStatic, out var ctor))
+            if (type is { ContainingNamespace: { }, IsValueType: false, IsStatic: false, IsAbstract: false, DeclaringSyntaxReferences: { Length: 1 } } &&
+                type.Constructors.TrySingle(x => !x.IsStatic, out var ctor))
             {
                 if (ctor.Parameters.TryFirst(x => !IsInjectable(x.Type as INamedTypeSymbol), out _))
                 {
@@ -259,7 +247,7 @@
                 return true;
             }
 
-            return type.TryFindSingleMember<ISymbol>(x => IsMatch(x), out _);
+            return type?.TryFindSingleMember<ISymbol>(x => IsMatch(x), out _) == true;
 
             bool IsMatch(ISymbol candidate)
             {
