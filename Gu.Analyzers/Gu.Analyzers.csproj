@@ -41,8 +41,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.9.0-dev" />
-    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2" PrivateAssets="all" />
+    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.10.2-dev" />
+    <PackageReference Include="IDisposableAnalyzers" Version="3.0.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="all" />
     <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />
