@@ -26,7 +26,7 @@
                 context.Node is BinaryExpressionSyntax binaryExpression &&
                 binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
             {
-                if (ConvertToPattern(binaryExpression.Left) is { } left)
+                if (Pattern(binaryExpression.Left) is { } left)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
@@ -34,7 +34,7 @@
                             left.GetLocation()));
                 }
                 else if (binaryExpression.Left is IsPatternExpressionSyntax { Expression: IdentifierNameSyntax _, Pattern: RecursivePatternSyntax _ } isPattern &&
-                         ConvertToPattern(binaryExpression.Right) is { } right)
+                         Pattern(binaryExpression.Right) is { } right)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
@@ -43,7 +43,7 @@
                             additionalLocations: new[] { isPattern.GetLocation() }));
                 }
 
-                ExpressionSyntax? ConvertToPattern(ExpressionSyntax expression)
+                static ExpressionSyntax? Pattern(ExpressionSyntax expression)
                 {
                     return expression switch
                     {
