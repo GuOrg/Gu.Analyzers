@@ -36,18 +36,9 @@ namespace Gu.Analyzers
                 if (objectCreation.FirstAncestor<AssignmentExpressionSyntax>() is { Left: { } left } assignment)
                 {
                     if (context.SemanticModel.GetSymbolSafe(left, context.CancellationToken) is { CanBeReferencedByName: true } assignmentSymbol &&
-                        assignmentSymbol.DeclaringSyntaxReferences.TrySingle(out var assignedToDeclaration))
+                        assignmentSymbol is IFieldSymbol { IsStatic: true, IsReadOnly: true })
                     {
-                        var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
-                        if (context.SemanticModel.SemanticModelFor(assignedToDeclarator)
-                                   ?.GetDeclaredSymbol(
-                                       assignedToDeclarator,
-                                       context.CancellationToken) is IFieldSymbol fieldSymbol &&
-                            fieldSymbol.IsReadOnly &&
-                            fieldSymbol.IsStatic)
-                        {
-                            return;
-                        }
+                        return;
                     }
 
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0051XmlSerializerNotCached, assignment.GetLocation()));
