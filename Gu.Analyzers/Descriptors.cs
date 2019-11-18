@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -291,6 +291,15 @@ namespace Gu.Analyzers
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "Member of non-public type should be internal.");
+
+        internal static readonly DiagnosticDescriptor GU0074PreferPattern = Descriptors.Create(
+            id: "GU0074",
+            title: "Prefer pattern.",
+            messageFormat: "Prefer pattern.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: true,
+            description: "Prefer C#8 pattern syntax.");
 
         internal static readonly DiagnosticDescriptor GU0080TestAttributeCountMismatch = Descriptors.Create(
             id: "GU0080",
