@@ -52,7 +52,8 @@
                             {
                                 MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)),
                                 PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } } => (m, p, SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)),
-                                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Right: LiteralExpressionSyntax literal } => (m, p, literal),
+                                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c } => (m, p, c),
+                                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax c } } => (m, p, c),
                                 _ => ((IdentifierNameSyntax, IdentifierNameSyntax, LiteralExpressionSyntax)?)null,
                             };
                         }

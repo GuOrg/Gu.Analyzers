@@ -119,6 +119,61 @@ namespace N
         }
 
         [Test]
+        public static void CreatePatternForLeftWhenIsNull()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => ↓type.Name is null && type.IsAbstract;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { Name: null } && type.IsAbstract;
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+        }
+
+        [Ignore("tbd")]
+        [Test]
+        public static void CreatePatternForLeftWhenNotNull()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => ↓type.Name != null && type.IsAbstract;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { Name: { } } && type.IsAbstract;
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+        }
+
+        [Test]
         public static void MergeRight()
         {
             var before = @"
