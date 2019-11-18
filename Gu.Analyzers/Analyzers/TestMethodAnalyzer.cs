@@ -14,14 +14,12 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class TestMethodAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0080TestAttributeCountMismatch,
             Descriptors.GU0081TestCasesAttributeMismatch,
             Descriptors.GU0082IdenticalTestCase,
             Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -31,12 +29,8 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is MethodDeclarationSyntax { ParameterList: { } parameterList } methodDeclaration &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is MethodDeclarationSyntax { ParameterList: { } parameterList } methodDeclaration &&
                 methodDeclaration.AttributeLists.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol testMethod)
             {
