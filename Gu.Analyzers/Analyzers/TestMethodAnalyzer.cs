@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -139,7 +139,6 @@ namespace Gu.Analyzers
         {
             attributeArgument = null;
             if (methodSymbol.Parameters.Length > 0 &&
-                methodSymbol.Parameters != null &&
                 attributeSyntax is { ArgumentList: { Arguments: { } arguments } } &&
                 arguments.Count > 0)
             {
@@ -156,7 +155,7 @@ namespace Gu.Analyzers
                         return true;
                     }
 
-                    if (parameter.IsParams &&
+                    if (parameter is { IsParams: true } &&
                         parameter.Type is IArrayTypeSymbol arrayType)
                     {
                         for (var j = i; j < CountArgs(attributeSyntax); j++)

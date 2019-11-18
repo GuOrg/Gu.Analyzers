@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -41,8 +41,7 @@ namespace Gu.Analyzers
                     var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
                     //// ReSharper disable once IsExpressionAlwaysTrue R# dumbs analysis here.
                     if (parameterIndexOpt is int parameterIndex &&
-                        methodGenericSymbol.Parameters[parameterIndex]
-                                           .Type is ITypeParameterSymbol)
+                        methodGenericSymbol.Parameters[parameterIndex].Type is ITypeParameterSymbol)
                     {
                         return;
                     }
@@ -83,8 +82,7 @@ namespace Gu.Analyzers
                     methodSymbol.ReceiverType == KnownSymbol.TaskOfT) &&
                    methodSymbol.Name == "ConfigureAwait" &&
                    methodSymbol.Parameters.Length == 1 &&
-                   methodSymbol.Parameters[0]
-                               .Type == KnownSymbol.Boolean;
+                   methodSymbol.Parameters[0].Type == KnownSymbol.Boolean;
         }
 
         private static bool IsDisposePattern(IMethodSymbol methodSymbol)
@@ -109,7 +107,7 @@ namespace Gu.Analyzers
                        method.Name.StartsWith("Set", StringComparison.Ordinal);
             }
 
-            return method.IsExtensionMethod &&
+            return method is { IsExtensionMethod: true } &&
                    method.ReceiverType.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
                    method.Parameters.Length == 1 &&
                    method.Name.StartsWith("Set", StringComparison.Ordinal);

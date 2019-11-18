@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -74,8 +74,7 @@ namespace Gu.Analyzers
         private static SyntaxList<MemberDeclarationSyntax> RemoveLeadingEndOfLine(SyntaxList<MemberDeclarationSyntax> members)
         {
             if (members.TryFirst(out var first) &&
-                first.HasLeadingTrivia &&
-                first.GetLeadingTrivia() is SyntaxTriviaList triviaList &&
+                first.TryGetLeadingTrivia(out var triviaList) &&
                 triviaList.TryFirst(x => x.IsKind(SyntaxKind.EndOfLineTrivia), out var eol))
             {
                 return members.Replace(
@@ -103,8 +102,7 @@ namespace Gu.Analyzers
         private static T UpdateLineFeed<T>(T member)
             where T : MemberDeclarationSyntax
         {
-            if (member.HasLeadingTrivia &&
-                member.GetLeadingTrivia() is SyntaxTriviaList triviaList &&
+            if (member.TryGetLeadingTrivia(out var triviaList) &&
                 triviaList.First() is SyntaxTrivia trivia &&
                 trivia.IsKind(SyntaxKind.EndOfLineTrivia))
             {
