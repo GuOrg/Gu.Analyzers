@@ -29,40 +29,42 @@
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id &&
-                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentListSyntax? argumentList) &&
-                    HasWhitespaceTriviaOnly(argumentList))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentListSyntax? argumentList))
                 {
-                    context.RegisterCodeFix(
-                              "Move arguments to match parameter positions.",
-                              (editor, _) => editor.ReplaceNode(
-                                  argumentList,
-                                  x => Replacement(x, editor)),
-                              this.GetType(),
-                              diagnostic);
-
-                    static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
+                    if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id &&
+                        HasWhitespaceTriviaOnly(argumentList))
                     {
-                        if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                        context.RegisterCodeFix(
+                            "Move arguments to match parameter positions.",
+                            (editor, _) => editor.ReplaceNode(
+                                argumentList,
+                                x => Replacement(x, editor)),
+                            this.GetType(),
+                            diagnostic);
+
+                        static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
                         {
-                            return old.WithArguments(
-                                SyntaxFactory.SeparatedList(
-                                    old.Arguments.OrderBy(x => ParameterIndex(method, x)),
-                                    old.Arguments.GetSeparators()));
+                            if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                            {
+                                return old.WithArguments(
+                                    SyntaxFactory.SeparatedList(
+                                        old.Arguments.OrderBy(x => ParameterIndex(method, x)),
+                                        old.Arguments.GetSeparators()));
+                            }
+
+                            return old;
                         }
-
-                        return old;
                     }
-                }
 
-                if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id &&
-                    syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
-                {
-                    context.RegisterCodeFix(
-                        "Move named argument to match parameter positions.",
-                        (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
-                        this.GetType(),
-                        diagnostic);
+                    if (diagnostic.Id == Descriptors.GU0005ExceptionArgumentsPositions.Id &&
+                        syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
+                    {
+                        context.RegisterCodeFix(
+                            "Move named argument to match parameter positions.",
+                            (editor, cancellationToken) => ApplyFixGU0005(editor, argument, cancellationToken),
+                            this.GetType(),
+                            diagnostic);
+                    }
                 }
             }
         }
