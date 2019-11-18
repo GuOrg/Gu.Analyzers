@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -47,8 +47,8 @@ namespace Gu.Analyzers
 
                 if (node is IdentifierNameSyntax identifier)
                 {
-                    bool isEnumMember = semanticModel.GetSymbolSafe(identifier, cancellationToken)
-                                            .TrySingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
+                    var isEnumMember = semanticModel.GetSymbolSafe(identifier, cancellationToken)
+                                                    .TrySingleDeclaration(cancellationToken, out EnumMemberDeclarationSyntax _);
                     if (!isEnumMember)
                     {
                         return false;
@@ -62,7 +62,7 @@ namespace Gu.Analyzers
         private static bool HasFlagsAttribute(INamedTypeSymbol enumType)
         {
             return enumType.GetAttributes()
-                  .TryFirst(attr => attr.AttributeClass == KnownSymbol.FlagsAttribute, out AttributeData _);
+                  .TryFirst(attr => attr.AttributeClass == KnownSymbol.FlagsAttribute, out var _);
         }
 
         // unboxes a boxed integral value to ulong, regardless of the original boxed type
@@ -75,21 +75,18 @@ namespace Gu.Analyzers
 
         private static void HandleNonFlagEnumMember(SyntaxNodeAnalysisContext context, EnumDeclarationSyntax enumDeclaration)
         {
-            using (var enumValuesSet = PooledSet<ulong>.Borrow())
+            using var enumValuesSet = PooledSet<ulong>.Borrow();
+            foreach (var enumMember in enumDeclaration.Members)
             {
-                foreach (var enumMember in enumDeclaration.Members)
+                var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
+                var notDerivedFromOther = !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
+                var value = UnboxUMaxInt(symbol.ConstantValue);
+                if (notDerivedFromOther && enumValuesSet.Contains(value))
                 {
-                    var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
-                    bool notDerivedFromOther =
-                        !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
-                    var value = UnboxUMaxInt(symbol.ConstantValue);
-                    if (notDerivedFromOther && enumValuesSet.Contains(value))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
-                    }
-
-                    enumValuesSet.Add(value);
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
                 }
+
+                enumValuesSet.Add(value);
             }
         }
 
@@ -99,7 +96,7 @@ namespace Gu.Analyzers
             foreach (var enumMember in enumDeclaration.Members)
             {
                 var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
-                bool notDerivedFromOther =
+                var notDerivedFromOther =
                     !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
                 var value = UnboxUMaxInt(symbol.ConstantValue);
                 if (notDerivedFromOther && (bitSumOfLiterals & value) != 0)

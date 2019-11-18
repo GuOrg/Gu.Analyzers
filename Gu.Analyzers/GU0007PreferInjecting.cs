@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -89,15 +89,13 @@ namespace Gu.Analyzers
             {
                 if (objectCreation.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration))
                 {
-                    using (var walker = ObjectCreationWalker.BorrowAndVisit(classDeclaration))
+                    using var walker = ObjectCreationWalker.BorrowAndVisit(classDeclaration);
+                    foreach (var creation in walker.ObjectCreations)
                     {
-                        foreach (var creation in walker.ObjectCreations)
+                        if (!ReferenceEquals(creation, objectCreation) &&
+                            creation.Type.IsEquivalentTo(objectCreation.Type))
                         {
-                            if (!ReferenceEquals(creation, objectCreation) &&
-                                creation.Type.IsEquivalentTo(objectCreation.Type))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }

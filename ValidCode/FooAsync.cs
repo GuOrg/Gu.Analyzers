@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System.IO;
@@ -8,24 +8,16 @@ namespace ValidCode
     {
         internal static async Task<string> Bar1Async()
         {
-            using (var stream = await ReadAsync(string.Empty))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadLine();
-                }
-            }
+            using var stream = await ReadAsync(string.Empty);
+            using var reader = new StreamReader(stream);
+            return reader.ReadLine();
         }
 
         internal static async Task<string> Bar2Async()
         {
-            using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadLine();
-                }
-            }
+            using var stream = await ReadAsync(string.Empty).ConfigureAwait(false);
+            using var reader = new StreamReader(stream);
+            return reader.ReadLine();
         }
 
         private static async Task<Stream> ReadAsync(this string fileName)

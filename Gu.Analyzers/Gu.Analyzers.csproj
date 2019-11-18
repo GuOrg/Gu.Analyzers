@@ -5,6 +5,7 @@
     <Nullable>Enable</Nullable>
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>Gu.Analyzers.ruleset</CodeAnalysisRuleSet>
+    <NoWarn>$(NoWarn);IDE0009</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>

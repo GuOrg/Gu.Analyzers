@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -29,9 +29,9 @@ namespace Gu.Analyzers
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is AssignmentExpressionSyntax { Left: { } left, Right: { } right } assignment &&
-                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out ISymbol? leftSymbol))
+                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out var leftSymbol))
             {
-                if (context.SemanticModel.TryGetSymbol(right, context.CancellationToken, out ISymbol? rightSymbol) &&
+                if (context.SemanticModel.TryGetSymbol(right, context.CancellationToken, out var rightSymbol) &&
                     AreSame(left, right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() is null &&
                     leftSymbol.Equals(rightSymbol))
@@ -111,46 +111,44 @@ namespace Gu.Analyzers
                     }
                 }
 
-                using (var walker = AssignmentExecutionWalker.For(left, member, SearchScope.Member, context.SemanticModel, context.CancellationToken))
+                using var walker = AssignmentExecutionWalker.For(left, member, SearchScope.Member, context.SemanticModel, context.CancellationToken);
+                foreach (var candidate in walker.Assignments)
                 {
-                    foreach (var candidate in walker.Assignments)
+                    if (candidate == assignment)
                     {
-                        if (candidate == assignment)
+                        continue;
+                    }
+
+                    if (!MemberPath.Equals(candidate.Left, assignment.Left))
+                    {
+                        continue;
+                    }
+
+                    if (candidate.IsExecutedBefore(assignment) == ExecutedBefore.Yes)
+                    {
+                        if (left is IParameterSymbol { RefKind: RefKind.Out } &&
+                            assignment.TryFirstAncestor<BlockSyntax>(out var assignmentBlock) &&
+                            candidate.TryFirstAncestor<BlockSyntax>(out var candidateBlock) &&
+                            (candidateBlock.Contains(assignmentBlock) ||
+                             candidateBlock.Statements.Last() is ReturnStatementSyntax))
                         {
-                            continue;
+                            return false;
                         }
 
-                        if (!MemberPath.Equals(candidate.Left, assignment.Left))
+                        using (var nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
                         {
-                            continue;
-                        }
-
-                        if (candidate.IsExecutedBefore(assignment) == ExecutedBefore.Yes)
-                        {
-                            if (left is IParameterSymbol { RefKind: RefKind.Out } &&
-                                assignment.TryFirstAncestor<BlockSyntax>(out var assignmentBlock) &&
-                                candidate.TryFirstAncestor<BlockSyntax>(out var candidateBlock) &&
-                                (candidateBlock.Contains(assignmentBlock) ||
-                                 candidateBlock.Statements.Last() is ReturnStatementSyntax))
+                            foreach (var name in nameWalker.IdentifierNames)
                             {
-                                return false;
-                            }
-
-                            using (var nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
-                            {
-                                foreach (var name in nameWalker.IdentifierNames)
+                                if (left.Name == name.Identifier.ValueText &&
+                                    context.SemanticModel.TryGetSymbol(name, context.CancellationToken, out var symbol) &&
+                                    symbol.Equals(left))
                                 {
-                                    if (left.Name == name.Identifier.ValueText &&
-                                        context.SemanticModel.TryGetSymbol(name, context.CancellationToken, out ISymbol? symbol) &&
-                                        symbol.Equals(left))
-                                    {
-                                        return false;
-                                    }
+                                    return false;
                                 }
                             }
-
-                            return true;
                         }
+
+                        return true;
                     }
                 }
             }

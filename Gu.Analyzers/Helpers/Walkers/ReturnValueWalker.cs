@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -57,10 +57,8 @@ namespace Gu.Analyzers
                 return false;
             }
 
-            using (var walker = BorrowAndVisit(scope, () => new ReturnValueWalker()))
-            {
-                return walker.returnValues.TrySingle(out returnValue);
-            }
+            using var walker = BorrowAndVisit(scope, () => new ReturnValueWalker());
+            return walker.returnValues.TrySingle(out returnValue);
         }
 
         protected override void Clear()

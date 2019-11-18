@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -115,7 +115,7 @@ namespace Gu.Analyzers
                         return false;
                     }
 
-                    for (int i = 0; i < x.Length; i++)
+                    for (var i = 0; i < x.Length; i++)
                     {
                         if (!IsMatch(x[i], y[i]))
                         {

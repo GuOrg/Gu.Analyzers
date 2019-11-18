@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -102,7 +102,7 @@ namespace Gu.Analyzers
 
         private static int ParameterIndex(IMethodSymbol method, string name)
         {
-            for (int i = 0; i < method.Parameters.Length; i++)
+            for (var i = 0; i < method.Parameters.Length; i++)
             {
                 if (method.Parameters[i].Name == name)
                 {

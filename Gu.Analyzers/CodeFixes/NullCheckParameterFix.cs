@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -61,31 +61,29 @@ namespace Gu.Analyzers
                     if (parameter.Parent is ParameterListSyntax parameterList &&
                         parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration)
                     {
-                        using (var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, SearchScope.Member, semanticModel, context.CancellationToken))
+                        using var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, SearchScope.Member, semanticModel, context.CancellationToken);
+                        if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue) &&
+                            semanticModel.TryGetSymbol(parameter, context.CancellationToken, out var parameterSymbol) &&
+                            IdentifierNameWalker.TryFindFirst(methodDeclaration, parameterSymbol, semanticModel, context.CancellationToken, out var first) &&
+                            assignedValue.Contains(first))
                         {
-                            if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue) &&
-                                semanticModel.TryGetSymbol(parameter, context.CancellationToken, out var parameterSymbol) &&
-                                IdentifierNameWalker.TryFindFirst(methodDeclaration, parameterSymbol, semanticModel, context.CancellationToken, out var first) &&
-                                assignedValue.Contains(first))
-                            {
-                                context.RegisterCodeFix(
-                                    "Throw if null on first assignment.",
-                                    (editor, _) => editor.ReplaceNode(
-                                        assignedValue,
-                                        SyntaxFactory.ParseExpression($"{assignedValue.Identifier.Text} ?? throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames()),
-                                    diagnostic.Id,
-                                    diagnostic);
-                            }
-                            else if (methodDeclaration.Body is { } block)
-                            {
-                                context.RegisterCodeFix(
-                                    "Add null check.",
-                                    (editor, cancellationToken) => editor.ReplaceNode(
-                                        block,
-                                        x => WithNullCheck(x, parameter, cancellationToken)),
-                                    diagnostic.Id,
-                                    diagnostic);
-                            }
+                            context.RegisterCodeFix(
+                                "Throw if null on first assignment.",
+                                (editor, _) => editor.ReplaceNode(
+                                    assignedValue,
+                                    SyntaxFactory.ParseExpression($"{assignedValue.Identifier.Text} ?? throw new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames()),
+                                diagnostic.Id,
+                                diagnostic);
+                        }
+                        else if (methodDeclaration.Body is { } block)
+                        {
+                            context.RegisterCodeFix(
+                                "Add null check.",
+                                (editor, cancellationToken) => editor.ReplaceNode(
+                                    block,
+                                    x => WithNullCheck(x, parameter, cancellationToken)),
+                                diagnostic.Id,
+                                diagnostic);
                         }
                     }
                 }
@@ -129,7 +127,7 @@ namespace Gu.Analyzers
             {
                 if (parameter.Parent is ParameterListSyntax parameterList)
                 {
-                    int ordinal = parameterList.Parameters.IndexOf(parameter);
+                    var ordinal = parameterList.Parameters.IndexOf(parameter);
                     if (ordinal <= 0)
                     {
                         return 0;

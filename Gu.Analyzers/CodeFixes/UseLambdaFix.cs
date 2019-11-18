@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -70,16 +70,14 @@ namespace Gu.Analyzers
         {
             if (context.TryFirstAncestor<MemberDeclarationSyntax>(out var ancestor))
             {
-                using (var walker = IdentifierTokenWalker.Borrow(ancestor))
+                using var walker = IdentifierTokenWalker.Borrow(ancestor);
+                var name = parameter.Name;
+                while (walker.TryFind(name, out _))
                 {
-                    var name = parameter.Name;
-                    while (walker.TryFind(name, out _))
-                    {
-                        name += "_";
-                    }
-
-                    return name;
+                    name += "_";
                 }
+
+                return name;
             }
 
             return parameter.Name;
