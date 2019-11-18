@@ -80,15 +80,14 @@
         {
             return (methodSymbol.ReceiverType == KnownSymbol.Task ||
                     methodSymbol.ReceiverType == KnownSymbol.TaskOfT) &&
-                   methodSymbol.Name == "ConfigureAwait" &&
-                   methodSymbol.Parameters.Length == 1 &&
-                   methodSymbol.Parameters[0].Type == KnownSymbol.Boolean;
+                   methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
+                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
 
         private static bool IsDisposePattern(IMethodSymbol methodSymbol)
         {
             return methodSymbol is { Name: "Dispose", Parameters: { Length: 1 } parameters } &&
-                   parameters[0].Type == KnownSymbol.Boolean;
+                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
 
         private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
