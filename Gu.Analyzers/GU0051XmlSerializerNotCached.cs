@@ -33,14 +33,9 @@ namespace Gu.Analyzers
                 context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.XmlSerializer, context.CancellationToken, out var ctor) &&
                 IsLeakyConstructor(ctor))
             {
-                var assignment = objectCreation.FirstAncestor<AssignmentExpressionSyntax>();
-                if (assignment != null)
+                if (objectCreation.FirstAncestor<AssignmentExpressionSyntax>() is { Left: { } left } assignment)
                 {
-                    var assignmentSymbol = context.SemanticModel.GetSymbolSafe(
-                        assignment.Left,
-                        context.CancellationToken);
-                    if (assignmentSymbol != null &&
-                        assignmentSymbol.CanBeReferencedByName &&
+                    if (context.SemanticModel.GetSymbolSafe(left, context.CancellationToken) is { CanBeReferencedByName: true } assignmentSymbol &&
                         assignmentSymbol.DeclaringSyntaxReferences.TrySingle(out var assignedToDeclaration))
                     {
                         var assignedToDeclarator = assignedToDeclaration.GetSyntax(context.CancellationToken) as VariableDeclaratorSyntax;
@@ -59,8 +54,7 @@ namespace Gu.Analyzers
                     return;
                 }
 
-                var declarator = objectCreation.FirstAncestor<VariableDeclaratorSyntax>();
-                if (declarator != null)
+                if (objectCreation.FirstAncestor<VariableDeclaratorSyntax>() is { } declarator)
                 {
                     if (context.SemanticModel.SemanticModelFor(declarator)
                                ?.GetDeclaredSymbol(declarator, context.CancellationToken) is IFieldSymbol
