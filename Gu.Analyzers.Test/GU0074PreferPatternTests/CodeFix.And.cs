@@ -231,6 +231,61 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
 
+            [Ignore("tbd")]
+            [Test]
+            public static void RightTrueWhenLeftIsPattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o is Type type && ↓type.IsAbstract && type.Name == ""abc"";
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o is Type { IsAbstract: true } type && type.Name == ""abc"";
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void RightTrueWhenLeftIsRecursivePattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o is Type { IsPublic: true } type && ↓type.IsAbstract && type.Name == ""abc"";
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o is Type { IsPublic: true, IsAbstract: true } type && type.Name == ""abc"";
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
             [Test]
             public static void RightTrueLast()
             {
