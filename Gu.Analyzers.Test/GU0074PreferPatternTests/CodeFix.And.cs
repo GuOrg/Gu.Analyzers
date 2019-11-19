@@ -23,7 +23,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓type.IsPublic && type.IsAbstract;
+        bool M(Type type) => ↓type.IsPublic && ↓type.IsAbstract;
     }
 }";
 
@@ -51,7 +51,7 @@ namespace N
     class C
     {
         bool M(Type type) => ↓type.IsPublic &&
-                             type.IsAbstract;
+                             ↓type.IsAbstract;
     }
 }";
 
@@ -79,7 +79,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓!type.IsPublic && type.IsAbstract;
+        bool M(Type type) => ↓!type.IsPublic && ↓type.IsAbstract;
     }
 }";
 
@@ -94,6 +94,18 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsPublic: false }");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => !type.IsPublic && type is { IsAbstract: true };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsAbstract: true }");
             }
 
             [Test]
@@ -106,7 +118,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓type.Name == ""abc"" && type.IsAbstract;
+        bool M(Type type) => ↓type.Name == ""abc"" && ↓type.IsAbstract;
     }
 }";
 
@@ -133,7 +145,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓type.Name == null && type.IsAbstract;
+        bool M(Type type) => ↓type.Name == null && ↓type.IsAbstract;
     }
 }";
 
@@ -160,7 +172,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓type.Name is null && type.IsAbstract;
+        bool M(Type type) => ↓type.Name is null && ↓type.IsAbstract;
     }
 }";
 
@@ -175,6 +187,18 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { Name: null }");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.Name is null && type is { IsAbstract: true };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "type is { IsAbstract: true }");
             }
 
             [Test]
@@ -187,7 +211,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => ↓type.Name != null && type.IsAbstract;
+        bool M(Type type) => ↓type.Name != null && ↓type.IsAbstract;
     }
 }";
 
@@ -214,7 +238,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => type is { IsPublic: true } && ↓type.IsAbstract && type.Name == ""abc"";
+        bool M(Type type) => type is { IsPublic: true } && ↓type.IsAbstract && ↓type.Name == ""abc"";
     }
 }";
 
@@ -228,7 +252,7 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, IsAbstract: true } && type.Name == ""abc"";
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: true");
             }
 
             [Test]
@@ -255,7 +279,7 @@ namespace N
         bool M(object o) => o is Type { IsAbstract: true } type;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsAbstract: true }");
             }
 
             [Test]
@@ -268,7 +292,7 @@ namespace N
 
     class C
     {
-        bool M(object o) => o is Type { IsPublic: true } type && ↓type.IsAbstract && type.Name == ""abc"";
+        bool M(object o) => o is Type { IsPublic: true } type && ↓type.IsAbstract && ↓type.Name == ""abc"";
     }
 }";
 
@@ -282,7 +306,7 @@ namespace N
         bool M(object o) => o is Type { IsPublic: true, IsAbstract: true } type && type.Name == ""abc"";
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: true");
             }
 
             [Test]
@@ -312,6 +336,34 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
 
+            [Ignore("temp")]
+            [Test]
+            public static void ExpressionBetween()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type, bool b) => type is { IsPublic: true } && b && ↓type.IsAbstract;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type, bool b) => type is { IsPublic: true, IsAbstract: true } && b;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
             [Test]
             public static void RightTrueMultiLine()
             {
@@ -324,7 +376,7 @@ namespace N
     {
         bool M(Type type) => type is { IsPublic: true } &&
                              ↓type.IsAbstract &&
-                             type.Name == ""abc"";
+                             ↓type.Name == ""abc"";
     }
 }";
 
@@ -339,7 +391,21 @@ namespace N
                              type.Name == ""abc"";
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: true");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, IsAbstract: true } &&
+                             type.Name == ""abc"";
+    }
+}";
+                Assert.Inconclusive("tbd");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Name: \"abc\"");
             }
 
             [Test]
@@ -352,7 +418,34 @@ namespace N
 
     class C
     {
-        bool M(Type type) => type is { IsPublic: true } && ↓!type.IsAbstract && type.Name == ""abc"";
+        bool M(Type type) => type is { IsPublic: true } && ↓!type.IsAbstract;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, IsAbstract: false };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: false");
+            }
+
+            [Test]
+            public static void RightNegatedNotLast()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } && ↓!type.IsAbstract && ↓type.Name == ""abc"";
     }
 }";
 
@@ -366,7 +459,7 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, IsAbstract: false } && type.Name == ""abc"";
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: false");
             }
 
             [Test]
@@ -379,7 +472,7 @@ namespace N
 
     class C
     {
-        bool M(Type type) => type is { IsPublic: true } && ↓type.Name == ""abc"" && type.IsAbstract;
+        bool M(Type type) => type is { IsPublic: true } && ↓type.Name == ""abc"" && ↓type.IsAbstract;
     }
 }";
 
@@ -393,9 +486,10 @@ namespace N
         bool M(Type type) => type is { IsPublic: true, Name: ""abc"" } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Name: \"abc\"");
             }
 
+            [Ignore("temp")]
             [Test]
             public static void WhenAnd()
             {

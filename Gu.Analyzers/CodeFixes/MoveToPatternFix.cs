@@ -49,76 +49,48 @@
                             "Use pattern",
                             diagnostic);
                     }
-                    else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation))
+                    else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
+                             syntaxRoot.TryFindNode(additionalLocation, out PatternSyntax? mergeWith))
                     {
-                        if (syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? left) &&
-                            expression.TryFindSharedAncestorRecursive(left, out BinaryExpressionSyntax? binary))
-                        {
-                            context.RegisterCodeFix(
-                                $"Merge {{ {property}: {pattern} }}",
-                                (e, c) => e.ReplaceNode(
-                                    binary,
-                                    x => Merge(x)),
-                                "Use pattern",
-                                diagnostic);
-
-                            ExpressionSyntax Merge(BinaryExpressionSyntax old)
+                        context.RegisterCodeFix(
+                            mergeWith is RecursivePatternSyntax
+                                ? $", {property}: {pattern}"
+                                : $"{{ {property}: {pattern} }}",
+                            (e, c) =>
                             {
-                                return old switch
+                                _ = e.ReplaceNode(mergeWith, x => Merge(x));
+                                switch (expression.Parent)
                                 {
-                                    { Left: IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern }
-                                        => isPattern.WithPattern(AddProperty(recursive, property, pattern))
-                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace),
-                                    { Left: IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax declaration } isPattern }
-                                        => isPattern.WithPattern(AddProperty(declaration, property, pattern))
-                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace),
-                                    _ => old,
-                                };
-                            }
-                        }
-                        else if (syntaxRoot.TryFindNode(additionalLocation, out PatternSyntax? switchPattern) &&
-                                 switchPattern.Parent.IsEither(SyntaxKind.SwitchExpressionArm, SyntaxKind.CasePatternSwitchLabel))
+                                    case WhenClauseSyntax whenClause:
+                                        e.RemoveNode(whenClause);
+                                        break;
+                                    case BinaryExpressionSyntax binary:
+                                        if (binary.Left == expression)
+                                        {
+                                            e.ReplaceNode(binary, x => x.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                        }
+
+                                        if (binary.Right == expression)
+                                        {
+                                            e.ReplaceNode(binary, x => x.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                        }
+
+                                        break;
+                                }
+                            },
+                            "Use pattern",
+                            diagnostic);
+
+                        RecursivePatternSyntax Merge(PatternSyntax old)
                         {
-                            context.RegisterCodeFix(
-                                $"Merge {{ {property}: {pattern} }}",
-                                (e, c) =>
-                                {
-                                    _ = e.ReplaceNode(
-                                        switchPattern,
-                                        x => Merge(x));
-                                    switch (expression.Parent)
-                                    {
-                                        case WhenClauseSyntax whenClause:
-                                            e.RemoveNode(whenClause);
-                                            break;
-                                        case BinaryExpressionSyntax binary:
-                                            if (binary.Left == expression)
-                                            {
-                                                e.ReplaceNode(binary, binary.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
-                                            }
-
-                                            if (binary.Right == expression)
-                                            {
-                                                e.ReplaceNode(binary, binary.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
-                                            }
-
-                                            break;
-                                    }
-                                },
-                                "Use pattern",
-                                diagnostic);
-
-                            RecursivePatternSyntax Merge(PatternSyntax old)
+                            return old switch
                             {
-                                return old switch
-                                {
-                                    RecursivePatternSyntax recursive
-                                        => AddProperty(recursive, property, pattern),
-                                    DeclarationPatternSyntax declaration
-                                        => AddProperty(declaration, property, pattern),
-                                    _ => throw new NotSupportedException(),
-                                };
-                            }
+                                RecursivePatternSyntax recursive
+                                    => AddProperty(recursive, property, pattern),
+                                DeclarationPatternSyntax declaration
+                                    => AddProperty(declaration, property, pattern),
+                                _ => throw new NotSupportedException(),
+                            };
                         }
                     }
                 }
