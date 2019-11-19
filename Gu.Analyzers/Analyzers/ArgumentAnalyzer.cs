@@ -12,7 +12,9 @@
     internal class ArgumentAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0009UseNamedParametersForBooleans);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptors.GU0009UseNamedParametersForBooleans,
+            Descriptors.GU0075PreferReturnNullable);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
