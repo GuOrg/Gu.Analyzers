@@ -76,7 +76,7 @@
                             }
                         }
                         else if (syntaxRoot.TryFindNode(additionalLocation, out RecursivePatternSyntax? recursive) &&
-                                 recursive.Parent.IsKind(SyntaxKind.SwitchExpressionArm))
+                                 recursive.Parent.IsEither(SyntaxKind.SwitchExpressionArm, SyntaxKind.CasePatternSwitchLabel))
                         {
                             context.RegisterCodeFix(
                                 $"Merge {{ {property}: {pattern} }}",

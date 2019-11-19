@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Linq.Expressions;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -25,20 +26,66 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is WhenClauseSyntax whenClause)
             {
-                switch (whenClause.Parent)
+                if (Pattern() is { } pattern)
                 {
-                    case SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }:
-                        if (whenClause.Condition is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax expression, Name: IdentifierNameSyntax _ } memberAccess &&
-                            expression.Identifier.ValueText == designation.Identifier.ValueText)
-                        {
-                            context.ReportDiagnostic(
-                                Diagnostic.Create(
-                                    Descriptors.GU0074PreferPattern,
-                                    memberAccess.GetLocation(),
-                                    additionalLocations: new[] { pattern.GetLocation() }));
-                        }
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0074PreferPattern,
+                            whenClause.Condition.GetLocation(),
+                            additionalLocations: new[] { pattern.GetLocation() }));
+                }
 
-                        break;
+                PatternSyntax? Pattern()
+                {
+                    if (Expression(whenClause.Condition) is { } expression)
+                    {
+                        return whenClause switch
+                        {
+                            { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchExpressionSyntax _ } }
+                                when AreSame(expression, designation)
+                                    => pattern,
+                            { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchExpressionSyntax switchExpression } }
+                                when AreSame(expression, switchExpression.GoverningExpression)
+                                    => pattern,
+                            { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
+                                when AreSame(expression, designation)
+                                    => pattern,
+                            { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement } } }
+                                when AreSame(expression, switchStatement.Expression)
+                                    => pattern,
+                            _ => null,
+                        };
+                    }
+
+                    return null;
+                }
+
+                static bool AreSame(ExpressionSyntax x, SyntaxNode y)
+                {
+                    return (x, y) switch
+                    {
+                        { x: IdentifierNameSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                        { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                        _ => false,
+                    };
+                }
+
+                static ExpressionSyntax? Expression(ExpressionSyntax candidate)
+                {
+                    return candidate switch
+                    {
+                        MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
+                            => e,
+                        PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
+                            => e,
+                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
+                            => e,
+                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+                            => e,
+                        IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
+                            => e,
+                        _ => null,
+                    };
                 }
             }
         }

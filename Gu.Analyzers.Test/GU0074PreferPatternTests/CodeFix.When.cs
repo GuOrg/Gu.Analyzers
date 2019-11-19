@@ -11,7 +11,93 @@
             private static readonly DiagnosticAnalyzer Analyzer = new WhenAnalyzer();
 
             [Test]
-            public static void SwitchExpressionSingleLine()
+            public static void SwitchStatementUsesDesignation()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            switch (type)
+            {
+                case { IsPublic: true } t when ↓t.IsAbstract:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            switch (type)
+            {
+                case { IsPublic: true, IsAbstract: true } t:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void SwitchStatementUsesExpression()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            switch (type)
+            {
+                case { IsPublic: true } when ↓type.IsAbstract:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            switch (type)
+            {
+                case { IsPublic: true, IsAbstract: true }:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void SwitchExpressionSingleLineUsesDesignation()
             {
                 var before = @"
 namespace N
@@ -43,6 +129,47 @@ namespace N
             return type switch
             {
                 { IsPublic: true, IsAbstract: true } t => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void SwitchExpressionSingleLineUsesExpression()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { IsPublic: true } when ↓type.IsAbstract => true,
+                _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { IsPublic: true, IsAbstract: true } => true,
                 _ => false,
             };
         }
