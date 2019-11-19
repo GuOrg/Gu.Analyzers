@@ -13,8 +13,7 @@
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0009UseNamedParametersForBooleans,
-            Descriptors.GU0075PreferReturnNullable);
+            Descriptors.GU0009UseNamedParametersForBooleans);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -90,27 +89,6 @@
                    method.ReceiverType.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
                    method.Parameters.Length == 1 &&
                    method.Name.StartsWith("Set", StringComparison.Ordinal);
-        }
-
-        private static int? FindParameterIndexCorrespondingToIndex(IMethodSymbol method, ArgumentSyntax argument)
-        {
-            if (argument.NameColon is null)
-            {
-                var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
-                                    .Arguments.IndexOf(argument);
-                return index;
-            }
-
-            for (int i = 0; i < method.Parameters.Length; ++i)
-            {
-                var candidate = method.Parameters[i];
-                if (candidate.Name == argument.NameColon.Name.Identifier.ValueText)
-                {
-                    return i;
-                }
-            }
-
-            return null;
         }
     }
 }

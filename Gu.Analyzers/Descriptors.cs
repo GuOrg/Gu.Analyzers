@@ -301,6 +301,15 @@
             isEnabledByDefault: true,
             description: "Prefer C#8 pattern syntax.");
 
+        internal static readonly DiagnosticDescriptor GU0075PreferReturnNullable = Descriptors.Create(
+            id: "GU0075",
+            title: "Prefer return nullable.",
+            messageFormat: "Prefer return nullable.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: true,
+            description: "Prefer return nullable. Nicer for pattern matching.");
+
         internal static readonly DiagnosticDescriptor GU0080TestAttributeCountMismatch = Descriptors.Create(
             id: "GU0080",
             title: "Parameter count does not match attribute.",

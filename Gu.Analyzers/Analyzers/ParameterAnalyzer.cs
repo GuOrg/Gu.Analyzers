@@ -11,7 +11,8 @@
     internal class ParameterAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0012NullCheckParameter);
+            Descriptors.GU0012NullCheckParameter,
+            Descriptors.GU0075PreferReturnNullable);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -23,18 +24,25 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is IMethodSymbol method &&
-                context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText } } parameter &&
-                method.TryFindParameter(valueText, out var parameterSymbol))
+                 context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText }, Parent: ParameterListSyntax { Parameters: { } parameters } parameterList } parameter)
             {
                 if (ShouldCheckNull())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0012NullCheckParameter, parameter.Identifier.GetLocation()));
                 }
 
+                if (parameter.Modifiers.Any(SyntaxKind.OutKeyword) &&
+                    parameters.TrySingle(x => x.Modifiers.Count > 0, out _) &&
+                    context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is { ContainingSymbol: IMethodSymbol { ReturnType: { SpecialType: SpecialType.System_Boolean } } })
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0075PreferReturnNullable, parameter.GetLocation()));
+                }
+
                 bool ShouldCheckNull()
                 {
-                    return method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
+                    return context.ContainingSymbol is IMethodSymbol method &&
+                           method.TryFindParameter(valueText, out var parameterSymbol) &&
+                           method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
                            parameterSymbol is { Type: { IsReferenceType: true }, HasExplicitDefaultValue: false } &&
                            parameterSymbol.RefKind != RefKind.Out &&
                            parameter.Parent is ParameterListSyntax { Parent: BaseMethodDeclarationSyntax methodDeclaration } &&

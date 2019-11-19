@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -91,7 +91,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, Descriptors.GU0012NullCheckParameter, code);
         }
 
         [Test]
