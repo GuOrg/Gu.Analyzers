@@ -49,6 +49,8 @@
             this.returnValues.Add(node.Expression);
         }
 
+        internal static ReturnValueWalker Borrow(SyntaxNode scope) => BorrowAndVisit(scope, () => new ReturnValueWalker());
+
         internal static bool TrySingle(SyntaxNode scope, [NotNullWhen(true)] out ExpressionSyntax? returnValue)
         {
             if (scope is null)

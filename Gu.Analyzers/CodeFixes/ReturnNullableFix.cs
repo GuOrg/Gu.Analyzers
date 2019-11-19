@@ -5,6 +5,7 @@
     using System.Composition;
     using System.Linq;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -30,13 +31,17 @@
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
                     parameter is { Parent: ParameterListSyntax { Parent: { } method } })
                 {
-                    context.RegisterCodeFix(
-                        "Return nullable",
-                        (editor, _) => editor.ReplaceNode(
-                            method,
-                            x => Rewriter.Update(parameter, x)),
-                        "Return nullable",
-                        diagnostic);
+                    using var walker = ReturnValueWalker.Borrow(method);
+                    if (walker.All(x => x.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression)))
+                    {
+                        context.RegisterCodeFix(
+                            "Return nullable",
+                            (editor, _) => editor.ReplaceNode(
+                                method,
+                                x => Rewriter.Update(parameter, x)),
+                            "Return nullable",
+                            diagnostic);
+                    }
                 }
             }
         }
