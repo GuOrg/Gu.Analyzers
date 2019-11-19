@@ -11,7 +11,50 @@
             private static readonly DiagnosticAnalyzer Analyzer = new WhenAnalyzer();
 
             [Test]
-            public static void SwitchStatementUsesDesignation()
+            public static void SwitchStatementDeclarationPatternsUsesDesignation()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type t when ↓t.IsAbstract:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type { IsAbstract: true } t:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void SwitchStatementRecursivePatternsUsesDesignation()
             {
                 var before = @"
 namespace N

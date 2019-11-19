@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
@@ -75,16 +76,16 @@
                                 };
                             }
                         }
-                        else if (syntaxRoot.TryFindNode(additionalLocation, out RecursivePatternSyntax? recursive) &&
-                                 recursive.Parent.IsEither(SyntaxKind.SwitchExpressionArm, SyntaxKind.CasePatternSwitchLabel))
+                        else if (syntaxRoot.TryFindNode(additionalLocation, out PatternSyntax? switchPattern) &&
+                                 switchPattern.Parent.IsEither(SyntaxKind.SwitchExpressionArm, SyntaxKind.CasePatternSwitchLabel))
                         {
                             context.RegisterCodeFix(
                                 $"Merge {{ {property}: {pattern} }}",
                                 (e, c) =>
                                 {
                                     _ = e.ReplaceNode(
-                                        recursive,
-                                        x => AddProperty(x, property, pattern));
+                                        switchPattern,
+                                        x => Merge(x));
                                     if (expression.Parent is WhenClauseSyntax whenClause)
                                     {
                                         e.RemoveNode(whenClause);
@@ -92,6 +93,18 @@
                                 },
                                 "Use pattern",
                                 diagnostic);
+
+                            RecursivePatternSyntax Merge(PatternSyntax old)
+                            {
+                                return old switch
+                                {
+                                    RecursivePatternSyntax recursive
+                                        => AddProperty(recursive, property, pattern),
+                                    DeclarationPatternSyntax declaration
+                                        => AddProperty(declaration, property, pattern),
+                                    _ => throw new NotSupportedException(),
+                                };
+                            }
                         }
                     }
                 }
