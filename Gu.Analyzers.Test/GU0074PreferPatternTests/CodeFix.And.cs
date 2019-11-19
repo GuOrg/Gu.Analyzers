@@ -336,7 +336,6 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
 
-            [Ignore("temp")]
             [Test]
             public static void ExpressionBetween()
             {
@@ -489,7 +488,7 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Name: \"abc\"");
             }
 
-            [Ignore("temp")]
+            [Ignore("tbd")]
             [Test]
             public static void WhenAnd()
             {
@@ -530,7 +529,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Merge { IsAbstract: true }");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: true");
 
                 after = @"
 namespace N
@@ -550,27 +549,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Merge { IsPublic: true }");
-
-                after = @"
-namespace N
-{
-    using System;
-
-    class C
-    {
-        bool M(object o)
-        {
-            switch (o)
-            {
-                case Type t when t is { IsAbstract: true } && t.IsPublic:
-                    return true;
-                default: return false;
-            }
-        }
-    }
-}";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "t is { IsAbstract: true }");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsPublic: true");
             }
         }
     }

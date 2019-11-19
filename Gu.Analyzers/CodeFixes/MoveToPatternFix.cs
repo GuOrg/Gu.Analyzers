@@ -67,12 +67,16 @@
                                     case BinaryExpressionSyntax binary:
                                         if (binary.Left == expression)
                                         {
-                                            e.ReplaceNode(binary, x => x.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                            _ = e.ReplaceNode(
+                                                binary,
+                                                x => x.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
                                         }
 
                                         if (binary.Right == expression)
                                         {
-                                            e.ReplaceNode(binary, x => x.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                            _ = e.ReplaceNode(
+                                                binary,
+                                                x => x.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
                                         }
 
                                         break;

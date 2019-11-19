@@ -32,7 +32,8 @@
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
-                    if (FindMergePattern(leftOrRight) is { } mergeWith)
+                    if (Identifier(leftOrRight) is { } identifier &&
+                        FindMergePattern(identifier, and) is { } mergeWith)
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(
@@ -47,32 +48,49 @@
                                 Descriptors.GU0074PreferPattern,
                                 leftOrRight.GetLocation()));
                     }
+
+                    static SyntaxNode? Identifier(ExpressionSyntax candidate)
+                    {
+                        return candidate switch
+                        {
+                            MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
+                                => e,
+                            PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
+                                => e,
+                            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
+                                => e,
+                            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+                                => e,
+                            IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
+                                => e,
+                            IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax d } }
+                                => d,
+                            _ => null,
+                        };
+                    }
                 }
             }
         }
 
-        private static PatternSyntax? FindMergePattern(ExpressionSyntax expression)
+        private static PatternSyntax? FindMergePattern(SyntaxNode identifier, ExpressionSyntax parent)
         {
-            if (expression.Parent is BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } binary)
+            return parent switch
             {
-                if (binary.Left == expression &&
-                    Pattern(Identifier(expression), binary.Right as IsPatternExpressionSyntax) is { } rightPattern)
-                {
-                    return rightPattern;
-                }
+                BinaryExpressionSyntax { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } } binary
+                    when MergePattern(identifier, left) is { } mergePattern
+                         => mergePattern,
+                BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right } binary
+                    when MergePattern(identifier, right) is { } mergePattern
+                         => mergePattern,
+                BinaryExpressionSyntax { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } recursive }
+                    => FindMergePattern(identifier, recursive),
+                _ => null,
+            };
 
-                if (binary.Right == expression &&
-                    Pattern(Identifier(expression), binary.Left as IsPatternExpressionSyntax) is { } leftPattern)
-                {
-                    return leftPattern;
-                }
-            }
-
-            return null;
-
-            PatternSyntax? Pattern(SyntaxNode? identifier, IsPatternExpressionSyntax? isPattern)
+            static PatternSyntax? MergePattern(SyntaxNode? identifier, IsPatternExpressionSyntax isPattern)
             {
-                if (identifier == null)
+                if (identifier is null ||
+                    isPattern.Contains(identifier))
                 {
                     return null;
                 }
@@ -88,26 +106,6 @@
                     { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
                         when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
                             => pattern,
-                    _ => null,
-                };
-            }
-
-            static SyntaxNode? Identifier(ExpressionSyntax candidate)
-            {
-                return candidate switch
-                {
-                    MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
-                        => e,
-                    PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
-                        => e,
-                    BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
-                        => e,
-                    BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
-                        => e,
-                    IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
-                        => e,
-                    IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax d } }
-                        => d,
                     _ => null,
                 };
             }
@@ -129,7 +127,7 @@
         {
             switch (candidate)
             {
-                case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }:
+                case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }:
                 case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } }:
                 case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }:
                 case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }:
