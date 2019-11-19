@@ -24,46 +24,24 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ArgumentSyntax { Expression: { } expression, Parent: ArgumentListSyntax { Parent: { } parent } } argument)
             {
-                return;
+                if (ShouldName())
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans, argument.GetLocation()));
+                }
             }
 
-            if (context.Node is ArgumentSyntax { NameColon: null, Expression: { } expression, Parent: ArgumentListSyntax { Parent: { } parent } } argumentSyntax &&
-                expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
-                !argumentSyntax.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
-                context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
-                !IsIgnored(method, context.Compilation))
+            bool ShouldName()
             {
-                if (!ReferenceEquals(method.OriginalDefinition, method))
-                {
-                    var methodGenericSymbol = method.OriginalDefinition;
-                    var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
-                    //// ReSharper disable once IsExpressionAlwaysTrue R# dumbs analysis here.
-                    if (parameterIndexOpt is int parameterIndex &&
-                        methodGenericSymbol.Parameters[parameterIndex].Type is ITypeParameterSymbol)
-                    {
-                        return;
-                    }
-                }
-                else
-                {
-                    var parameterIndexOpt = FindParameterIndexCorrespondingToIndex(method, argumentSyntax);
-                    if (parameterIndexOpt is null)
-                    {
-                        return;
-                    }
-
-                    var parameterIndex = System.Math.Min(parameterIndexOpt.Value, method.Parameters.Length - 1);
-                    var parameter = method.Parameters[parameterIndex];
-                    if (parameter.IsParams ||
-                        parameter.Type != KnownSymbol.Boolean)
-                    {
-                        return;
-                    }
-                }
-
-                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans, argumentSyntax.GetLocation()));
+                return argument.NameColon is null &&
+                       expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
+                       !argument.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
+                       context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
+                       method.FindParameter(argument) is { Type: { SpecialType: SpecialType.System_Boolean } } parameter &&
+                       parameter.OriginalDefinition.Type.SpecialType == SpecialType.System_Boolean &&
+                       !IsIgnored(method, context.Compilation);
             }
         }
 
