@@ -84,6 +84,18 @@
                          => mergePattern,
                 BinaryExpressionSyntax { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } recursive }
                     => FindMergePattern(identifier, recursive),
+                { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
+                    when AreSame(identifier, designation)
+                    => pattern,
+                { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
+                    when AreSame(identifier, designation)
+                        => pattern,
+                { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
+                    when AreSame(identifier, designation)
+                    => pattern,
+                { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
+                    when AreSame(identifier, designation)
+                        => pattern,
                 _ => null,
             };
 

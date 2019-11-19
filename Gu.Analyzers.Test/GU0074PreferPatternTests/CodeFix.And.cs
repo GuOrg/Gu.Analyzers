@@ -488,9 +488,59 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Name: \"abc\"");
             }
 
-            [Ignore("tbd")]
             [Test]
-            public static void WhenAnd()
+            public static void WhenAndSwitchExpression()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o switch
+        {
+            Type t when ↓t.IsAbstract && ↓t.IsPublic => true,
+            _ => false,
+        };
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o switch
+        {
+            Type { IsAbstract: true } t when t.IsPublic => true,
+            _ => false,
+        };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsAbstract: true }");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o) => o switch
+        {
+            Type { IsPublic: true } t when t.IsAbstract => true,
+            _ => false,
+        };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsPublic: true }");
+            }
+
+            [Test]
+            public static void WhenAndSwitchStatement()
             {
                 var before = @"
 namespace N
@@ -529,7 +579,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsAbstract: true");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsAbstract: true }");
 
                 after = @"
 namespace N
@@ -549,7 +599,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", IsPublic: true");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsPublic: true }");
             }
         }
     }
