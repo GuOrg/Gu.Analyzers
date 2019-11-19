@@ -80,7 +80,7 @@
                                 $"Merge {{ {property}: {pattern} }}",
                                 (e, c) =>
                                 {
-                                    e.ReplaceNode(
+                                    _ = e.ReplaceNode(
                                         recursive,
                                         x => AddProperty(x, property, pattern));
                                     if (expression.Parent is WhenClauseSyntax whenClause)
