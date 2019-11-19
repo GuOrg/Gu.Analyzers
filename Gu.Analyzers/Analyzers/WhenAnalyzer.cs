@@ -28,13 +28,13 @@
                 switch (whenClause.Parent)
                 {
                     case SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }:
-                        if (whenClause.Condition is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax variable, Name: IdentifierNameSyntax property } &&
-                            variable.Identifier.ValueText == designation.Identifier.ValueText)
+                        if (whenClause.Condition is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax expression, Name: IdentifierNameSyntax _ } memberAccess &&
+                            expression.Identifier.ValueText == designation.Identifier.ValueText)
                         {
                             context.ReportDiagnostic(
                                 Diagnostic.Create(
                                     Descriptors.GU0074PreferPattern,
-                                    property.GetLocation(),
+                                    memberAccess.GetLocation(),
                                     additionalLocations: new[] { pattern.GetLocation() }));
                         }
 

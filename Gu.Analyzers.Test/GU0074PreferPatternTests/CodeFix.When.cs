@@ -10,9 +10,8 @@
         {
             private static readonly DiagnosticAnalyzer Analyzer = new WhenAnalyzer();
 
-            [Ignore("tbd")]
             [Test]
-            public static void SwitchExpression()
+            public static void SwitchExpressionSingleLine()
             {
                 var before = @"
 namespace N
@@ -43,7 +42,49 @@ namespace N
         {
             return type switch
             {
-                { IsPublic: true, IsAbstract: true } => true,
+                { IsPublic: true, IsAbstract: true } t => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
+            public static void SwitchExpressionWhenOnSeparateLine()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { IsPublic: true } t
+                    when ↓t.IsAbstract => true,
+                _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { IsPublic: true, IsAbstract: true } t => true,
                 _ => false,
             };
         }

@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
@@ -35,51 +36,69 @@
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
+                    Parse(expression) is var (member, property, pattern))
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {
-                        if (Parse(expression) is var (member, property, pattern))
+                        context.RegisterCodeFix(
+                            $"{member} is {{ {property}: {pattern} }}",
+                            (e, c) => e.ReplaceNode(
+                                expression,
+                                IsPattern(member, property, pattern)),
+                            "Use pattern",
+                            diagnostic);
+                    }
+                    else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation))
+                    {
+                        if (syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? left) &&
+                            expression.TryFindSharedAncestorRecursive(left, out BinaryExpressionSyntax? binary))
                         {
                             context.RegisterCodeFix(
-                                $"{member} is {{ {property}: {pattern} }}",
+                                $"Merge {{ {property}: {pattern} }}",
                                 (e, c) => e.ReplaceNode(
-                                    expression,
-                                    IsPattern(member, property, pattern)),
+                                    binary,
+                                    x => Merge(x)),
+                                "Use pattern",
+                                diagnostic);
+
+                            ExpressionSyntax Merge(BinaryExpressionSyntax old)
+                            {
+                                if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern)
+                                {
+                                    return isPattern.WithPattern(AddProperty(recursive, property, pattern))
+                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace);
+                                }
+
+                                return old;
+                            }
+                        }
+                        else if (syntaxRoot.TryFindNode(additionalLocation, out RecursivePatternSyntax? recursive) &&
+                                 recursive.Parent.IsKind(SyntaxKind.SwitchExpressionArm))
+                        {
+                            context.RegisterCodeFix(
+                                $"Merge {{ {property}: {pattern} }}",
+                                (e, c) =>
+                                {
+                                    e.ReplaceNode(
+                                        recursive,
+                                        x => AddProperty(x, property, pattern));
+                                    if (expression.Parent is WhenClauseSyntax whenClause)
+                                    {
+                                        e.RemoveNode(whenClause);
+                                    }
+                                },
                                 "Use pattern",
                                 diagnostic);
                         }
                     }
-                    else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
-                             syntaxRoot.TryFindNode(additionalLocation, out IsPatternExpressionSyntax? left) &&
-                             expression.TryFindSharedAncestorRecursive(left, out BinaryExpressionSyntax? binary) &&
-                             Parse(expression) is var (member, property, pattern))
-                    {
-                        context.RegisterCodeFix(
-                            $"Merge {{ {property}: {pattern} }}",
-                            (e, c) => e.ReplaceNode(
-                                binary,
-                                x => Merge(x)),
-                            "Use pattern",
-                            diagnostic);
-
-                        ExpressionSyntax Merge(BinaryExpressionSyntax old)
-                        {
-                            if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern)
-                            {
-                                return isPattern.WithPattern(
-                                    recursive.AddPropertyPatternClauseSubpatterns(
-                                        PropertyPattern(
-                                            property,
-                                            pattern)))
-                                                .WithTrailingTrivia(SyntaxFactory.ElasticSpace);
-                            }
-
-                            return old;
-                        }
-                    }
                 }
             }
+        }
+
+        private static RecursivePatternSyntax AddProperty(RecursivePatternSyntax recursive, IdentifierNameSyntax property, PatternSyntax pattern)
+        {
+            return recursive.AddPropertyPatternClauseSubpatterns(PropertyPattern(property, pattern));
         }
 
         private static (IdentifierNameSyntax, IdentifierNameSyntax, PatternSyntax)? Parse(ExpressionSyntax expression)
