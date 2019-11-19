@@ -26,32 +26,57 @@
                 context.Node is BinaryExpressionSyntax binaryExpression &&
                 binaryExpression.IsKind(SyntaxKind.LogicalAndExpression))
             {
-                if (Pattern(binaryExpression.Left) is { } left)
+                if (Expression(binaryExpression.Left) is { })
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptors.GU0074PreferPattern,
-                            left.GetLocation()));
+                            binaryExpression.Left.GetLocation()));
                 }
-                else if (binaryExpression.Left is IsPatternExpressionSyntax { Expression: IdentifierNameSyntax _, Pattern: RecursivePatternSyntax _ } isPattern &&
-                         Pattern(binaryExpression.Right) is { } right)
+                else if (binaryExpression.Left is IsPatternExpressionSyntax { Expression: IdentifierNameSyntax _ } isPattern &&
+                         Expression(binaryExpression.Right) is { } expression)
                 {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptors.GU0074PreferPattern,
-                            right.GetLocation(),
-                            additionalLocations: new[] { isPattern.GetLocation() }));
+                    switch (isPattern)
+                    {
+                        case { Pattern: RecursivePatternSyntax { Designation: null } }
+                            when AreSame(expression, isPattern.Expression):
+                        case { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax rd } }
+                            when AreSame(expression, rd):
+                        case { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax dd } }
+                            when AreSame(expression, dd):
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0074PreferPattern,
+                                    binaryExpression.Right.GetLocation(),
+                                    additionalLocations: new[] { isPattern.GetLocation() }));
+                            break;
+                    }
                 }
 
-                static ExpressionSyntax? Pattern(ExpressionSyntax expression)
+                static bool AreSame(ExpressionSyntax x, SyntaxNode y)
                 {
-                    return expression switch
+                    return (x, y) switch
                     {
-                        MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } => expression,
-                        PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } } => expression,
-                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ } => expression,
-                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } } => expression,
-                        IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ } => expression,
+                        { x: IdentifierNameSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                        { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                        _ => false,
+                    };
+                }
+
+                static ExpressionSyntax? Expression(ExpressionSyntax candidate)
+                {
+                    return candidate switch
+                    {
+                        MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
+                            => e,
+                        PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
+                            => e,
+                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
+                            => e,
+                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+                            => e,
+                        IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
+                            => e,
                         _ => null,
                     };
                 }

@@ -63,13 +63,16 @@
 
                             ExpressionSyntax Merge(BinaryExpressionSyntax old)
                             {
-                                if (old.Left is IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern)
+                                return old switch
                                 {
-                                    return isPattern.WithPattern(AddProperty(recursive, property, pattern))
-                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace);
-                                }
-
-                                return old;
+                                    { Left: IsPatternExpressionSyntax { Pattern: RecursivePatternSyntax recursive } isPattern }
+                                        => isPattern.WithPattern(AddProperty(recursive, property, pattern))
+                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace),
+                                    { Left: IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax declaration } isPattern }
+                                        => isPattern.WithPattern(AddProperty(declaration, property, pattern))
+                                                    .WithTrailingTrivia(SyntaxFactory.ElasticSpace),
+                                    _ => old,
+                                };
                             }
                         }
                         else if (syntaxRoot.TryFindNode(additionalLocation, out RecursivePatternSyntax? recursive) &&
@@ -98,6 +101,32 @@
         private static RecursivePatternSyntax AddProperty(RecursivePatternSyntax recursive, IdentifierNameSyntax property, PatternSyntax pattern)
         {
             return recursive.AddPropertyPatternClauseSubpatterns(PropertyPattern(property, pattern));
+        }
+
+        private static RecursivePatternSyntax AddProperty(DeclarationPatternSyntax declaration, IdentifierNameSyntax property, PatternSyntax pattern)
+        {
+            return SyntaxFactory.RecursivePattern(
+                    type: declaration.Type,
+                    positionalPatternClause: default,
+                    propertyPatternClause: SyntaxFactory.PropertyPatternClause(
+                        openBraceToken: SyntaxFactory.Token(
+                            leading: default,
+                            kind: SyntaxKind.OpenBraceToken,
+                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
+                        subpatterns: SyntaxFactory.SingletonSeparatedList<SubpatternSyntax>(
+                            SyntaxFactory.Subpattern(
+                                nameColon: SyntaxFactory.NameColon(
+                                    name: property.WithoutTrivia(),
+                                    colonToken: SyntaxFactory.Token(
+                                        leading: default,
+                                        kind: SyntaxKind.ColonToken,
+                                        trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))),
+                                pattern: pattern)),
+                        closeBraceToken: SyntaxFactory.Token(
+                            leading: default,
+                            kind: SyntaxKind.CloseBraceToken,
+                            trailing: SyntaxFactory.TriviaList(SyntaxFactory.ElasticSpace))),
+                    designation: declaration.Designation);
         }
 
         private static (IdentifierNameSyntax, IdentifierNameSyntax, PatternSyntax)? Parse(ExpressionSyntax expression)

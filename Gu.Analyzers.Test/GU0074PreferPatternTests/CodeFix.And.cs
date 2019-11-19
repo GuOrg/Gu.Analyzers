@@ -231,7 +231,6 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
 
-            [Ignore("tbd")]
             [Test]
             public static void RightTrueWhenLeftIsPattern()
             {
@@ -242,7 +241,7 @@ namespace N
 
     class C
     {
-        bool M(object o) => o is Type type && ↓type.IsAbstract && type.Name == ""abc"";
+        bool M(object o) => o is Type type && ↓type.IsAbstract;
     }
 }";
 
@@ -253,7 +252,7 @@ namespace N
 
     class C
     {
-        bool M(object o) => o is Type { IsAbstract: true } type && type.Name == ""abc"";
+        bool M(object o) => o is Type { IsAbstract: true } type;
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
