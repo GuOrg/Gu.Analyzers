@@ -20,10 +20,19 @@
         private static readonly ConstantPatternSyntax False = ConstantPattern(SyntaxKind.FalseLiteralExpression, SyntaxKind.FalseKeyword);
 
         private static readonly RecursivePatternSyntax Empty = SyntaxFactory.RecursivePattern(
-            null,
-            null,
-            SyntaxFactory.PropertyPatternClause(),
-            null);
+            type: default,
+            positionalPatternClause: default,
+            propertyPatternClause: SyntaxFactory.PropertyPatternClause(
+                openBraceToken: SyntaxFactory.Token(
+                    leading: default,
+                    kind: SyntaxKind.OpenBraceToken,
+                    trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
+                subpatterns: default,
+                closeBraceToken: SyntaxFactory.Token(
+                    leading: default,
+                    kind: SyntaxKind.CloseBraceToken,
+                    trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space))),
+            designation: default);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0074PreferPattern.Id);
