@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
     using System.Threading.Tasks;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
@@ -49,14 +50,15 @@
                 this.parameter = parameter;
             }
 
-            public override SyntaxNode? VisitParameter(ParameterSyntax node)
+            public override SyntaxNode VisitParameterList(ParameterListSyntax node)
             {
-                if (this.parameter.IsEquivalentTo(node))
+                var match = node.Parameters.SingleOrDefault(x => x.IsEquivalentTo(this.parameter));
+                if (match is { })
                 {
-                    return null;
+                    return node.RemoveNode(match, SyntaxRemoveOptions.AddElasticMarker);
                 }
 
-                return base.VisitParameter(node);
+                return node;
             }
 
             public override SyntaxNode? VisitReturnStatement(ReturnStatementSyntax node)
