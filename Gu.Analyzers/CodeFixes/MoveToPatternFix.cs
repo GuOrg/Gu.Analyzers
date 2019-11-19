@@ -86,9 +86,23 @@
                                     _ = e.ReplaceNode(
                                         switchPattern,
                                         x => Merge(x));
-                                    if (expression.Parent is WhenClauseSyntax whenClause)
+                                    switch (expression.Parent)
                                     {
-                                        e.RemoveNode(whenClause);
+                                        case WhenClauseSyntax whenClause:
+                                            e.RemoveNode(whenClause);
+                                            break;
+                                        case BinaryExpressionSyntax binary:
+                                            if (binary.Left == expression)
+                                            {
+                                                e.ReplaceNode(binary, binary.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                            }
+
+                                            if (binary.Right == expression)
+                                            {
+                                                e.ReplaceNode(binary, binary.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                            }
+
+                                            break;
                                     }
                                 },
                                 "Use pattern",

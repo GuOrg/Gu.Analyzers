@@ -18,59 +18,55 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => AnalyzeNode(c), SyntaxKind.WhenClause);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.WhenClause);
         }
 
-        private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
+        internal static PatternSyntax? Pattern(ExpressionSyntax expression, WhenClauseSyntax whenClause)
+        {
+            return whenClause switch
+            {
+                { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchExpressionSyntax _ } }
+                    when AreSame(expression, designation)
+                        => pattern,
+                { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchExpressionSyntax switchExpression } }
+                    when AreSame(expression, switchExpression.GoverningExpression)
+                        => pattern,
+                { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
+                    when AreSame(expression, designation)
+                        => pattern,
+                { Parent: CasePatternSwitchLabelSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
+                    when AreSame(expression, designation)
+                        => pattern,
+                { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement } } }
+                    when AreSame(expression, switchStatement.Expression)
+                        => pattern,
+                _ => null,
+            };
+
+            static bool AreSame(ExpressionSyntax x, SyntaxNode y)
+            {
+                return (x, y) switch
+                {
+                    { x: IdentifierNameSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                    { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
+                    _ => false,
+                };
+            }
+        }
+
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is WhenClauseSyntax whenClause)
             {
-                if (Pattern() is { } pattern)
+                if (Expression(whenClause.Condition) is { } expression &&
+                    Pattern(expression, whenClause) is { } pattern)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptors.GU0074PreferPattern,
                             whenClause.Condition.GetLocation(),
                             additionalLocations: new[] { pattern.GetLocation() }));
-                }
-
-                PatternSyntax? Pattern()
-                {
-                    if (Expression(whenClause.Condition) is { } expression)
-                    {
-                        return whenClause switch
-                        {
-                            { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchExpressionSyntax _ } }
-                                when AreSame(expression, designation)
-                                    => pattern,
-                            { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchExpressionSyntax switchExpression } }
-                                when AreSame(expression, switchExpression.GoverningExpression)
-                                    => pattern,
-                            { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
-                                when AreSame(expression, designation)
-                                    => pattern,
-                            { Parent: CasePatternSwitchLabelSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
-                                when AreSame(expression, designation)
-                                    => pattern,
-                            { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement } } }
-                                when AreSame(expression, switchStatement.Expression)
-                                    => pattern,
-                            _ => null,
-                        };
-                    }
-
-                    return null;
-                }
-
-                static bool AreSame(ExpressionSyntax x, SyntaxNode y)
-                {
-                    return (x, y) switch
-                    {
-                        { x: IdentifierNameSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                        { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                        _ => false,
-                    };
                 }
 
                 static ExpressionSyntax? Expression(ExpressionSyntax candidate)

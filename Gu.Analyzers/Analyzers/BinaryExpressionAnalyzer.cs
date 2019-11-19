@@ -28,6 +28,37 @@
             {
                 if (Expression(binaryExpression.Left) is { })
                 {
+                    if (binaryExpression.TryFirstAncestor(out WhenClauseSyntax? whenClause))
+                    {
+                        if (WhenAnalyzer.Pattern(BranchExpression(binaryExpression.Left), whenClause) is { } leftPattern)
+                        {
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0074PreferPattern,
+                                    binaryExpression.Left.GetLocation(),
+                                    additionalLocations: new[] { leftPattern.GetLocation() }));
+                        }
+
+                        if (WhenAnalyzer.Pattern(BranchExpression(binaryExpression.Right), whenClause) is { } rightPattern)
+                        {
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0074PreferPattern,
+                                    binaryExpression.Right.GetLocation(),
+                                    additionalLocations: new[] { rightPattern.GetLocation() }));
+                        }
+
+                        ExpressionSyntax BranchExpression(ExpressionSyntax e)
+                        {
+                            return e switch
+                            {
+                                MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax identifierName }
+                                    => identifierName,
+                                _ => e,
+                            };
+                        }
+                    }
+
                     context.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptors.GU0074PreferPattern,

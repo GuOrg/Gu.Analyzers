@@ -395,6 +395,89 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
+
+            [Test]
+            public static void WhenAnd()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type t when ↓t.IsAbstract && ↓t.IsPublic:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type { IsAbstract: true } t when t.IsPublic:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Merge { IsAbstract: true }");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type { IsPublic: true } t when t.IsAbstract:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Merge { IsPublic: true }");
+
+                after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type t when t is { IsAbstract: true } && t.IsPublic:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "t is { IsAbstract: true }");
+            }
         }
     }
 }
