@@ -33,7 +33,7 @@
 
                 if (parameter.Modifiers.Any(SyntaxKind.OutKeyword) &&
                     parameters.TrySingle(x => x.Modifiers.Count > 0, out _) &&
-                    context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is { ContainingSymbol: IMethodSymbol { ReturnType: { SpecialType: SpecialType.System_Boolean } } })
+                    context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is { Type: { IsValueType: false }, ContainingSymbol: IMethodSymbol { ReturnType: { SpecialType: SpecialType.System_Boolean } } })
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0075PreferReturnNullable, parameter.GetLocation()));
                 }
