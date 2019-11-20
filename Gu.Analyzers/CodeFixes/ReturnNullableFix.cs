@@ -59,8 +59,11 @@
                         {
                             switch (value)
                             {
-                                case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax _ }:
+                                case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax statement }
+                                    when IsPreviousStatementAssigning(statement, parameter):
                                 case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
+                                case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ }
+                                    when left.Identifier.ValueText == parameter.Identifier.ValueText:
                                     break;
                                 default:
                                     return false;
@@ -71,6 +74,14 @@
                     }
                 }
             }
+        }
+
+        private static bool IsPreviousStatementAssigning(StatementSyntax statement, ParameterSyntax parameter)
+        {
+            return statement.Parent is BlockSyntax { Statements: { } statements } &&
+                   statements.TryElementAt(statements.IndexOf(statement) - 1, out var previous) &&
+                   previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } } &&
+                   left.Identifier.ValueText == parameter.Identifier.ValueText;
         }
 
         private class Rewriter : CSharpSyntaxRewriter
@@ -95,7 +106,14 @@
                 {
                     { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
                     { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
-                    _ => node,
+                    { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
+                        when left.Identifier.ValueText == this.parameter.Identifier.ValueText
+                        => node.WithExpression(left.WithoutTrailingTrivia()),
+                    _ => node.WithExpression(
+                        SyntaxFactory.ConditionalExpression(
+                            node.Expression,
+                            SyntaxFactory.IdentifierName(this.parameter.Identifier),
+                            SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression))),
                 };
             }
 

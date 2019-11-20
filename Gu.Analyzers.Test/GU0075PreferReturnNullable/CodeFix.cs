@@ -111,16 +111,20 @@ namespace N
     {
         bool M1(↓out string? s)
         {
-            if (nameof(this.M1).Length > 1)
+            M2(out s);
+            return s != null;
+        }
+
+        void M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
             {
                 s = string.Empty;
-            }
-            else
-            {
-                s = null;
+                return;
             }
 
-            return s != null;
+            s = null;
+            return;
         }
     }
 }".AssertReplace("s != null", expression);
@@ -133,23 +137,26 @@ namespace N
     {
         bool M1(↓out string? s)
         {
-            if (nameof(this.M1).Length > 1)
+            M2(out s);
+            return s;
+        }
+
+        void M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
             {
                 s = string.Empty;
-            }
-            else
-            {
-                s = null;
+                return;
             }
 
-            return s;
+            s = null;
+            return;
         }
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
         }
 
-        [Ignore("tbd")]
         [Test]
         public static void ReturnAssignedViaOut()
         {
@@ -161,7 +168,7 @@ namespace N
     {
         bool M1(↓out string? s)
         {
-            return M1(out s);
+            return M2(out s);
         }
 
 #pragma warning disable GU0075
@@ -185,11 +192,9 @@ namespace N
 {
     class C
     {
-        bool M1(↓out string? s)
+        string? M1()
         {
-            return M1(out s)
-                ? s
-                : null;
+            return M2(out s) ? s : null;
         }
 
 #pragma warning disable GU0075
@@ -206,7 +211,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", AllowCompilationErrors.Yes);
         }
 
         [Test]
