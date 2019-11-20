@@ -29,18 +29,45 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
-                    parameter is { Parent: ParameterListSyntax { Parent: { } method } })
+                    parameter is { Parent: ParameterListSyntax { Parent: { } methodOrLocalFunction } })
                 {
-                    using var walker = ReturnValueWalker.Borrow(method);
-                    if (walker.All(x => x.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression)))
+                    if (CanRewrite())
                     {
                         context.RegisterCodeFix(
                             "Return nullable",
                             (editor, _) => editor.ReplaceNode(
-                                method,
+                                methodOrLocalFunction,
                                 x => Rewriter.Update(parameter, x)),
                             "Return nullable",
                             diagnostic);
+                    }
+                    else
+                    {
+                        context.RegisterCodeFix(
+                            "UNSAFE Return nullable",
+                            (editor, _) => editor.ReplaceNode(
+                                methodOrLocalFunction,
+                                x => Rewriter.Update(parameter, x)),
+                            "UNSAFE Return nullable",
+                            diagnostic);
+                    }
+
+                    bool CanRewrite()
+                    {
+                        using var walker = ReturnValueWalker.Borrow(methodOrLocalFunction);
+                        foreach (var value in walker)
+                        {
+                            switch (value)
+                            {
+                                case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax _ }:
+                                case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
+                                    break;
+                                default:
+                                    return false;
+                            }
+                        }
+
+                        return true;
                     }
                 }
             }
@@ -57,18 +84,19 @@
 
             public override SyntaxNode VisitParameterList(ParameterListSyntax node)
             {
-                var match = node.Parameters.SingleOrDefault(x => x.IsEquivalentTo(this.parameter));
-                if (match is { })
-                {
-                    return node.RemoveNode(match, SyntaxRemoveOptions.AddElasticMarker);
-                }
-
-                return node;
+                return node.RemoveNode(
+                    node.Parameters.Single(x => x.IsEquivalentTo(this.parameter)),
+                    SyntaxRemoveOptions.AddElasticMarker);
             }
 
             public override SyntaxNode? VisitReturnStatement(ReturnStatementSyntax node)
             {
-                return null;
+                return node switch
+                {
+                    { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
+                    { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
+                    _ => node,
+                };
             }
 
             public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
@@ -80,6 +108,17 @@
                 }
 
                 return base.VisitExpressionStatement(node);
+            }
+
+            public override SyntaxNode VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
+            {
+                if (node is { ParameterList: { Parameters: { } paramaters } } &&
+                    paramaters.Any(x => x.IsEquivalentTo(this.parameter)))
+                {
+                    return base.VisitLocalFunctionStatement(node);
+                }
+
+                return node;
             }
 
             internal static SyntaxNode Update(ParameterSyntax parameter, SyntaxNode method)

@@ -12,7 +12,7 @@
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0075PreferReturnNullable);
 
         [Test]
-        public static void InstanceMethodSIngleOut()
+        public static void InstanceMethodSingleParameter()
         {
             var before = @"
 #nullable enable
@@ -55,7 +55,7 @@ namespace N
         }
 
         [Test]
-        public static void InstanceMethodLastOut()
+        public static void InstanceMethodTwoParameters()
         {
             var before = @"
 #nullable enable
@@ -94,11 +94,123 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+        }
+
+        [Ignore("tbd")]
+        [TestCase("s != null")]
+        [TestCase("s is { }")]
+        [TestCase("s is object")]
+        public static void ReturnNotNull(string expression)
+        {
+            var before = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M1(↓out string? s)
+        {
+            if (nameof(this.M1).Length > 1)
+            {
+                s = string.Empty;
+            }
+            else
+            {
+                s = null;
+            }
+
+            return s != null;
+        }
+    }
+}".AssertReplace("s != null", expression);
+
+            var after = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M1(↓out string? s)
+        {
+            if (nameof(this.M1).Length > 1)
+            {
+                s = string.Empty;
+            }
+            else
+            {
+                s = null;
+            }
+
+            return s;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+        }
+
+        [Ignore("tbd")]
+        [Test]
+        public static void ReturnAssignedViaOut()
+        {
+            var before = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M1(↓out string? s)
+        {
+            return M1(out s);
+        }
+
+#pragma warning disable GU0075
+        bool M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
+            {
+                s = string.Empty;
+                return true;
+            }
+
+            s = null;
+            return false;
+        }
+    }
+}";
+
+            var after = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M1(↓out string? s)
+        {
+            return M1(out s)
+                ? s
+                : null;
+        }
+
+#pragma warning disable GU0075
+        bool M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
+            {
+                s = string.Empty;
+                return true;
+            }
+
+            s = null;
+            return false;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
         }
 
         [Test]
-        public static void Local()
+        public static void LocalFunction()
         {
             var before = @"
 #nullable enable
@@ -143,7 +255,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
         }
     }
 }
