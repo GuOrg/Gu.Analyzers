@@ -24,7 +24,7 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                 context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText }, Parent: ParameterListSyntax { Parameters: { } parameters } parameterList } parameter)
+                 context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText }, Parent: ParameterListSyntax { Parameters: { } parameters } } parameter)
             {
                 if (ShouldCheckNull())
                 {

@@ -301,7 +301,7 @@
                 }
 
                 if (memberAccess.Expression is IdentifierNameSyntax candidate &&
-                    expression.FirstAncestor<TypeDeclarationSyntax>() is TypeDeclarationSyntax typeDeclaration &&
+                    expression.FirstAncestor<TypeDeclarationSyntax>() is { } typeDeclaration &&
                     candidate.Identifier.ValueText == typeDeclaration.Identifier.ValueText)
                 {
                     return TryGetIdentifier(memberAccess.Name, out result);

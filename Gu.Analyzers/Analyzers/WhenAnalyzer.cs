@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Linq.Expressions;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;

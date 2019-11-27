@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -69,10 +69,10 @@ namespace Gu.Analyzers
                 return true;
             }
 
-            if (testCase.ArgumentList is AttributeArgumentListSyntax argumentList &&
+            if (testCase.ArgumentList is { } argumentList &&
                 !argumentList.Arguments.Any(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression)) &&
                 testCase.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
-                method.ParameterList is ParameterListSyntax current)
+                method.ParameterList is { } current)
             {
                 if (argumentList.Arguments.Count == 0)
                 {

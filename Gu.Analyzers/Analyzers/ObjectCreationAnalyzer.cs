@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -29,8 +29,8 @@ namespace Gu.Analyzers
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
-                objectCreation.ArgumentList is ArgumentListSyntax argumentList &&
-                argumentList.Arguments.Count > 0 &&
+                objectCreation.ArgumentList is { Arguments:{} arguments }  &&
+                arguments.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
                 ctor.TryFindParameter("paramName", out var nameParameter))
@@ -60,7 +60,7 @@ namespace Gu.Analyzers
                     }
                 }
 
-                if (TryGetWithParameterName(argumentList, method.Parameters, out var argument) &&
+                if (TryGetWithParameterName(arguments, method.Parameters, out var argument) &&
                     argument.NameColon is null &&
                     objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
                 {
@@ -72,10 +72,10 @@ namespace Gu.Analyzers
             }
         }
 
-        private static bool TryGetWithParameterName(ArgumentListSyntax argumentList, ImmutableArray<IParameterSymbol> parameters, [NotNullWhen(true)] out ArgumentSyntax? argument)
+        private static bool TryGetWithParameterName(SeparatedSyntaxList<ArgumentSyntax> arguments, ImmutableArray<IParameterSymbol> parameters, [NotNullWhen(true)] out ArgumentSyntax? argument)
         {
             argument = null;
-            foreach (var arg in argumentList.Arguments)
+            foreach (var arg in arguments)
             {
                 if (arg.Expression is LiteralExpressionSyntax literal &&
                     literal.IsKind(SyntaxKind.StringLiteralExpression) &&

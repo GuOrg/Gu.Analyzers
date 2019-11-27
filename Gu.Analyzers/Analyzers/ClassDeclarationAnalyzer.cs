@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -55,7 +55,7 @@ namespace Gu.Analyzers
                         return true;
                     case FieldDeclarationSyntax field when IsStaticPublicOrInternal(field.Modifiers) &&
                                                            field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                                                           field.Declaration is VariableDeclarationSyntax declaration &&
+                                                           field.Declaration is { } declaration &&
                                                            declaration.Variables.TrySingle(out var variable) && IsInitializedWithContainingType(variable.Initializer, context):
                         return true;
                 }

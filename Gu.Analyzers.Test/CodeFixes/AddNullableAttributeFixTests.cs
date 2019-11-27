@@ -1,12 +1,10 @@
-namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes
 {
-    using System.Collections.Immutable;
     using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class AddNullableAttributeFixTests

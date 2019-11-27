@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -123,7 +123,7 @@ namespace Gu.Analyzers
                 {
                     var argument = argumentList.Arguments[i];
                     var parameter = method.Parameters[i];
-                    if (argument.NameColon?.Name is IdentifierNameSyntax nameColon &&
+                    if (argument.NameColon?.Name is { } nameColon &&
                         parameter.Name != nameColon.Identifier.ValueText)
                     {
                         return false;

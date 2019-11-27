@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -35,11 +35,7 @@ namespace Gu.Analyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is ISymbol memberSymbol &&
-                !memberSymbol.IsOverride &&
-                memberSymbol.DeclaredAccessibility == Accessibility.Public &&
-                memberSymbol.ContainingType is INamedTypeSymbol containingType &&
-                containingType.DeclaredAccessibility != Accessibility.Public &&
+                context.ContainingSymbol is { IsOverride: false, DeclaredAccessibility: Accessibility.Public, ContainingType: { DeclaredAccessibility: Accessibility.Public } } memberSymbol &&
                 TryFindPublicKeyword(out var keyword) &&
                 !ImplementsInterface())
             {
