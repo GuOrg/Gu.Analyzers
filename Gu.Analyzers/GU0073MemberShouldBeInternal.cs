@@ -35,7 +35,8 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is { IsOverride: false, DeclaredAccessibility: Accessibility.Public, ContainingType: { DeclaredAccessibility: Accessibility.Public } } memberSymbol &&
+                context.ContainingSymbol is { IsOverride: false, DeclaredAccessibility: Accessibility.Public, ContainingType: { } containingType } memberSymbol &&
+                containingType.DeclaredAccessibility != Accessibility.Public &&
                 TryFindPublicKeyword(out var keyword) &&
                 !ImplementsInterface())
             {
