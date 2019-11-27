@@ -31,8 +31,8 @@
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
-                    if (Pattern.Identifier(leftOrRight) is { } identifier &&
-                        FindMergePattern(identifier, and) is { } mergeWith)
+                    if (Pattern.Identifier(leftOrRight) is { } property &&
+                        FindMergePattern(property, and) is { } mergeWith)
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(
@@ -55,63 +55,22 @@
         {
             return parent switch
             {
-                BinaryExpressionSyntax { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } } binary
-                    when MergePattern(identifier, left) is { } mergePattern
-                         => mergePattern,
-                BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right } binary
-                    when MergePattern(identifier, right) is { } mergePattern
-                         => mergePattern,
+                BinaryExpressionSyntax { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } }
+                when Pattern.MergePattern(identifier, left) is { } mergePattern
+                => mergePattern,
+                BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right }
+                when Pattern.MergePattern(identifier, right) is { } mergePattern
+                => mergePattern,
                 BinaryExpressionSyntax { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } recursive }
-                    => FindMergePattern(identifier, recursive),
-                { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
-                    when AreSame(identifier, designation)
-                    => pattern,
-                { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
-                    when AreSame(identifier, designation)
-                        => pattern,
-                { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
-                    when AreSame(identifier, designation)
-                    => pattern,
-                { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern } } }
-                    when AreSame(identifier, designation)
-                        => pattern,
+                => FindMergePattern(identifier, recursive),
+                { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: { } pattern } } }
+                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
+                => mergePattern,
+                { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern } } }
+                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
+                => mergePattern,
                 _ => null,
             };
-
-            static PatternSyntax? MergePattern(SyntaxNode? identifier, IsPatternExpressionSyntax isPattern)
-            {
-                if (identifier is null ||
-                    isPattern.Contains(identifier))
-                {
-                    return null;
-                }
-
-                return isPattern switch
-                {
-                    { Pattern: RecursivePatternSyntax { Designation: null } pattern }
-                        when AreSame(identifier, isPattern.Expression)
-                            => pattern,
-                    { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
-                        when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
-                            => pattern,
-                    { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
-                        when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
-                            => pattern,
-                    _ => null,
-                };
-            }
-
-            static bool AreSame(SyntaxNode x, SyntaxNode y)
-            {
-                return (x, y) switch
-                {
-                    { x: IdentifierNameSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                    { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                    { x: SingleVariableDesignationSyntax xn, y: IdentifierNameSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                    { x: SingleVariableDesignationSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
-                    _ => false,
-                };
-            }
         }
 
         private static bool CanConvert(ExpressionSyntax candidate)

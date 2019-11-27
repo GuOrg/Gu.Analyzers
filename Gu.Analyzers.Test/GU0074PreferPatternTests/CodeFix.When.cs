@@ -262,6 +262,47 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after);
             }
+
+            [Test]
+            public static void LeftIsTypeRightIsType()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { ReflectedType: Type reflectedType } when ↓reflectedType.Name is string name => true,
+                _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type)
+        {
+            return type switch
+            {
+                { ReflectedType: Type { Name: string name } reflectedType } => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+            }
         }
     }
 }

@@ -25,8 +25,8 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is WhenClauseSyntax whenClause &&
-                Pattern.Identifier(whenClause.Condition) is { } expression &&
-                MergePattern(expression, whenClause) is { } pattern)
+                Pattern.Identifier(whenClause.Condition) is { } identifier &&
+                MergePattern(identifier, whenClause) is { } pattern)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
@@ -36,25 +36,22 @@
             }
         }
 
-        private static PatternSyntax? MergePattern(ExpressionSyntax expression, WhenClauseSyntax whenClause)
+        private static PatternSyntax? MergePattern(IdentifierNameSyntax identifier, WhenClauseSyntax whenClause)
         {
             return whenClause switch
             {
-                { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchExpressionSyntax _ } }
-                    when AreSame(expression, designation)
-                        => pattern,
+                { Parent: SwitchExpressionArmSyntax { Pattern: { } pattern, Parent: SwitchExpressionSyntax _ } }
+                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
+                => mergePattern,
+                { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
+                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
+                => mergePattern,
                 { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchExpressionSyntax switchExpression } }
-                    when AreSame(expression, switchExpression.GoverningExpression)
-                        => pattern,
-                { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
-                    when AreSame(expression, designation)
-                        => pattern,
-                { Parent: CasePatternSwitchLabelSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
-                    when AreSame(expression, designation)
-                        => pattern,
+                when AreSame(identifier, switchExpression.GoverningExpression)
+                => pattern,
                 { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement } } }
-                    when AreSame(expression, switchStatement.Expression)
-                        => pattern,
+                when AreSame(identifier, switchStatement.Expression)
+                => pattern,
                 _ => null,
             };
 
