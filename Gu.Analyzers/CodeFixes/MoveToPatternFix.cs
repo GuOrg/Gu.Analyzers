@@ -46,7 +46,8 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
-                    Parse(expression) is var (member, property, pattern))
+                    Pattern.Identifier(expression) is { } member &&
+                    Parse(expression) is var (property, pattern))
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {
@@ -62,7 +63,8 @@
                              syntaxRoot.TryFindNode(additionalLocation, out PatternSyntax? mergeWith))
                     {
                         context.RegisterCodeFix(
-                            mergeWith is RecursivePatternSyntax
+                            mergeWith is RecursivePatternSyntax { PropertyPatternClause: { Subpatterns: { } subs } } &&
+                            subs.Any()
                                 ? $", {property}: {pattern}"
                                 : $"{{ {property}: {pattern} }}",
                             (e, c) =>
@@ -141,22 +143,22 @@
                     designation: declaration.Designation);
         }
 
-        private static (IdentifierNameSyntax, IdentifierNameSyntax, PatternSyntax)? Parse(ExpressionSyntax expression)
+        private static (IdentifierNameSyntax, PatternSyntax)? Parse(ExpressionSyntax expression)
         {
             return expression switch
             {
                 MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }
-                    => (m, p, True),
+                    => (p, True),
                 PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } }
-                    => (m, p, False),
+                    => (p, False),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
-                    => (m, p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
+                    => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
-                    => (m, p, Empty),
+                    => (p, Empty),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
-                    => (m, p, c),
+                    => (p, c),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } c }
-                => (m, p, c),
+                => (p, c),
                 _ => default,
             };
         }

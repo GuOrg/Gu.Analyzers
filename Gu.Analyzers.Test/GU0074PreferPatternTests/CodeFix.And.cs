@@ -679,7 +679,7 @@ namespace N
         bool M(Type type) => type.Name is { Length: 4 } name;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Length: 4");
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 4 }");
             }
 
             [Test]
@@ -708,6 +708,34 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+            }
+
+            [Test]
+            public static void MergeInRecursive()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.ReflectedType is { Name: { } name } &&
+                             ↓name.Length == 5;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.ReflectedType is { Name: { Length: 5 } name };
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 5 }");
             }
         }
     }

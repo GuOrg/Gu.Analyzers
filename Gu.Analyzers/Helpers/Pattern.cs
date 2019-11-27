@@ -40,6 +40,8 @@
                 { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
                 when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
                 => pattern,
+                { Pattern: RecursivePatternSyntax { } pattern }
+                => MergePattern(identifier, pattern),
                 { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
                 when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
                 => pattern,
