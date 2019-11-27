@@ -155,6 +155,8 @@
                     => (m, p, Empty),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
                     => (m, p, c),
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: DeclarationPatternSyntax c }
+                => (m, p, c),
                 _ => default,
             };
         }

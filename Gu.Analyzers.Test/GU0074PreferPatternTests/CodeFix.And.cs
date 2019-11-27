@@ -629,7 +629,7 @@ namespace N
             }
 
             [Test]
-            public static void ChainedIsType()
+            public static void LeftIsType()
             {
                 var before = @"
 namespace N
@@ -656,7 +656,7 @@ namespace N
             }
 
             [Test]
-            public static void ChainedIsObject()
+            public static void LeftIsEmptyPattern()
             {
                 var before = @"
 namespace N
@@ -680,6 +680,34 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Length: 4");
+            }
+
+            [Test]
+            public static void LeftIsTypeRightIsType()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.ReflectedType is Type reflectedType &&
+                             ↓reflectedType.Name is string name;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.ReflectedType is Type { Name: string name } reflectedType;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
             }
         }
     }

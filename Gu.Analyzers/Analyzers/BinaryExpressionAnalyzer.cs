@@ -63,6 +63,8 @@
                                 => e,
                             IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
                                 => e,
+                            IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } }
+                            => e,
                             IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax d } }
                                 => d,
                             _ => null,
