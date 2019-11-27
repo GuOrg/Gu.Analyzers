@@ -426,11 +426,10 @@ namespace N
 
     class C
     {
-        bool M(Type type) => type is { IsPublic: true, IsAbstract: true } &&
-                             type.Name == ""abc"";
+        bool M(Type type) => type is { IsPublic: true, Name: ""abc"" } &&
+                             type.IsAbstract;
     }
 }";
-                Assert.Inconclusive("tbd");
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Name: \"abc\"");
             }
 
