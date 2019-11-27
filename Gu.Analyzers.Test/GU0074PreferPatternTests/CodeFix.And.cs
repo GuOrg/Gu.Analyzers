@@ -627,6 +627,60 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ IsPublic: true }");
             }
+
+            [Test]
+            public static void ChainedIsType()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.Name is string name && ↓name.Length == 4;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.Name is string { Length: 4 } name;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 4 }");
+            }
+
+            [Test]
+            public static void ChainedIsObject()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.Name is { } name && ↓name.Length == 4;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(Type type) => type.Name is { Length: 4 } name;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", Length: 4");
+            }
         }
     }
 }
