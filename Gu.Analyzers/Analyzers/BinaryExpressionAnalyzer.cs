@@ -23,11 +23,10 @@
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is BinaryExpressionSyntax and &&
-                and.IsKind(SyntaxKind.LogicalAndExpression))
+                context.Node is BinaryExpressionSyntax { Left: { } left, Right: { } right, OperatorToken: { ValueText: "&&" } })
             {
-                Handle(and.Left);
-                Handle(and.Right);
+                Handle(left);
+                Handle(right);
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
@@ -40,7 +39,7 @@
                                 leftOrRight.GetLocation(),
                                 additionalLocations: new[] { mergeWith.GetLocation() }));
                     }
-                    else if (CanConvert(leftOrRight))
+                    else if (CanConvert(leftOrRight, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(
@@ -73,13 +72,15 @@
             };
         }
 
-        private static bool CanConvert(ExpressionSyntax candidate)
+        private static bool CanConvert(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (candidate)
             {
                 case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }:
                 case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } }:
                 case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }:
+                case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: MemberAccessExpressionSyntax memberAccess }
+                when semanticModel.GetTypeInfo(memberAccess, cancellationToken) is { Type: { TypeKind: TypeKind.Enum } }:
                 case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }:
                 case IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax { Token: { ValueText: "null" } } } }:
                     return true;
