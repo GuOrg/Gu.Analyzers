@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
-    using System.Reflection.Metadata;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -32,7 +31,7 @@
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
-                    if (Identifier(leftOrRight) is { } identifier &&
+                    if (Pattern.Identifier(leftOrRight) is { } identifier &&
                         FindMergePattern(identifier, and) is { } mergeWith)
                     {
                         context.ReportDiagnostic(
@@ -47,28 +46,6 @@
                             Diagnostic.Create(
                                 Descriptors.GU0074PreferPattern,
                                 leftOrRight.GetLocation()));
-                    }
-
-                    static SyntaxNode? Identifier(ExpressionSyntax candidate)
-                    {
-                        return candidate switch
-                        {
-                            MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
-                                => e,
-                            PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
-                                => e,
-                            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
-                                => e,
-                            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
-                                => e,
-                            IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
-                                => e,
-                            IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } }
-                            => e,
-                            IsPatternExpressionSyntax { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax d } }
-                                => d,
-                            _ => null,
-                        };
                     }
                 }
             }

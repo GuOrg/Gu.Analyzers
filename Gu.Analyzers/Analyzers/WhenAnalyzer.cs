@@ -21,7 +21,22 @@
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.WhenClause);
         }
 
-        internal static PatternSyntax? Pattern(ExpressionSyntax expression, WhenClauseSyntax whenClause)
+        private static void Handle(SyntaxNodeAnalysisContext context)
+        {
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is WhenClauseSyntax whenClause &&
+                Pattern.Identifier(whenClause.Condition) is { } expression &&
+                MergePattern(expression, whenClause) is { } pattern)
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.GU0074PreferPattern,
+                        whenClause.Condition.GetLocation(),
+                        additionalLocations: new[] { pattern.GetLocation() }));
+            }
+        }
+
+        private static PatternSyntax? MergePattern(ExpressionSyntax expression, WhenClauseSyntax whenClause)
         {
             return whenClause switch
             {
@@ -51,41 +66,6 @@
                     { x: IdentifierNameSyntax xn, y: SingleVariableDesignationSyntax yn } => xn.Identifier.ValueText == yn.Identifier.ValueText,
                     _ => false,
                 };
-            }
-        }
-
-        private static void Handle(SyntaxNodeAnalysisContext context)
-        {
-            if (!context.IsExcludedFromAnalysis() &&
-                context.Node is WhenClauseSyntax whenClause)
-            {
-                if (Expression(whenClause.Condition) is { } expression &&
-                    Pattern(expression, whenClause) is { } pattern)
-                {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptors.GU0074PreferPattern,
-                            whenClause.Condition.GetLocation(),
-                            additionalLocations: new[] { pattern.GetLocation() }));
-                }
-
-                static ExpressionSyntax? Expression(ExpressionSyntax candidate)
-                {
-                    return candidate switch
-                    {
-                        MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }
-                            => e,
-                        PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ } }
-                            => e,
-                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
-                            => e,
-                        BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
-                            => e,
-                        IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax _ }
-                            => e,
-                        _ => null,
-                    };
-                }
             }
         }
     }
