@@ -101,9 +101,9 @@
                             return old switch
                             {
                                 RecursivePatternSyntax recursive
-                                    => AddProperty(recursive, property, pattern),
+                                    => AddProperty(recursive, property, pattern.WithoutTrailingLineFeed()),
                                 DeclarationPatternSyntax declaration
-                                    => AddProperty(declaration, property, pattern),
+                                    => AddProperty(declaration, property, pattern.WithoutTrailingLineFeed()),
                                 _ => throw new NotSupportedException(),
                             };
                         }

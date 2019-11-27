@@ -303,6 +303,169 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
             }
+
+            [Test]
+            public static void LeftIsTypeDeclarationRightIsDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type type when ↓type.Name is string name => true,
+                _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: string name } type => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+            }
+
+            [Test]
+            public static void LeftIsTypeDeclarationRightIsPattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type type when ↓type.Name is { } name => true,
+                _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: { } name } type => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: { } name }");
+            }
+
+            [Test]
+            public static void LeftIsRecursiveWhenRightIsDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: string name } type when ↓name.Length == 5 => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: string { Length: 5 } name } type => true,
+                _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 5 }");
+            }
+
+            [Test]
+            public static void LeftIsRecursiveTypeDeclarationWhenRightIsPattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: { } name } type when ↓name.Length == 5 => true,
+            _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: { Length: 5 } name } type => true,
+            _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 5 }");
+            }
         }
     }
 }

@@ -29,7 +29,7 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
-                objectCreation.ArgumentList is { Arguments:{} arguments }  &&
+                objectCreation.ArgumentList is { Arguments: { } arguments } &&
                 arguments.Count > 0 &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
