@@ -629,6 +629,96 @@ namespace N
             }
 
             [Test]
+            public static void LeftIsTypeDeclarationWhenRightIsDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type type
+                when ↓type.Name is string name && ↓name.Length == 5
+                => true,
+            _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: string name } type
+                when name.Length == 5
+                => true,
+            _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+            }
+
+            [Test]
+            public static void LeftIsTypeDeclarationWhenRightIsPattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type type
+                when ↓type.Name is { } name && ↓name.Length == 5
+                => true,
+            _ => false,
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        bool M(object o)
+        {
+            return o switch
+            {
+                Type { Name: { } name } type
+                when name.Length == 5
+                => true,
+            _ => false,
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: { } name }");
+            }
+
+            [Test]
             public static void LeftIsType()
             {
                 var before = @"

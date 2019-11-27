@@ -42,12 +42,12 @@
                 { Parent: SwitchExpressionArmSyntax { Pattern: { } pattern, Parent: SwitchExpressionSyntax _ } }
                 when Pattern.MergePattern(identifier, pattern) is { } mergePattern
                 => mergePattern,
-                { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
-                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
-                => mergePattern,
                 { Parent: SwitchExpressionArmSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchExpressionSyntax switchExpression } }
                 when AreSame(identifier, switchExpression.GoverningExpression)
                 => pattern,
+                { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax _ } } }
+                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
+                => mergePattern,
                 { Parent: CasePatternSwitchLabelSyntax { Pattern: RecursivePatternSyntax pattern, Parent: SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement } } }
                 when AreSame(identifier, switchStatement.Expression)
                 => pattern,

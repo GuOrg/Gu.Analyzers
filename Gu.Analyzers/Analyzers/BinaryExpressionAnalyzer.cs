@@ -31,8 +31,8 @@
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
-                    if (Pattern.Identifier(leftOrRight) is { } property &&
-                        FindMergePattern(property, and) is { } mergeWith)
+                    if (Pattern.Identifier(leftOrRight) is { } identifier &&
+                        FindMergePattern(identifier, and) is { } mergeWith)
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(

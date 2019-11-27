@@ -80,14 +80,14 @@
                                         {
                                             _ = e.ReplaceNode(
                                                 binary,
-                                                x => x.Right.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                                x => x.Right.WithTriviaFrom(x));
                                         }
 
                                         if (binary.Right == expression)
                                         {
                                             _ = e.ReplaceNode(
                                                 binary,
-                                                x => x.Left.WithTrailingTrivia(SyntaxFactory.ElasticSpace));
+                                                x => x.Left.WithTriviaFrom(x));
                                         }
 
                                         break;
@@ -158,6 +158,8 @@
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
                 => (p, c),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } c }
+                => (p, c),
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: RecursivePatternSyntax c }
                 => (p, c),
                 _ => default,
             };

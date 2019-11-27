@@ -21,6 +21,8 @@
                 => e,
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } }
                 => e,
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, Pattern: RecursivePatternSyntax { PositionalPatternClause: null, PropertyPatternClause: { Subpatterns: { Count: 0 } } } }
+                => e,
                 _ => null,
             };
         }
