@@ -25,10 +25,10 @@
         {
             switch (context.Node)
             {
-                case ThrowStatementSyntax throwStatementSyntax when throwStatementSyntax.Expression is { } expression:
+                case ThrowStatementSyntax { Expression: { } expression }:
                     FindException<NotImplementedException>(context, expression, Descriptors.GU0090DoNotThrowNotImplementedException);
                     break;
-                case ThrowExpressionSyntax throwExpressionSyntax when throwExpressionSyntax.Expression is { } expression:
+                case ThrowExpressionSyntax { Expression: { } expression }:
                     FindException<NotImplementedException>(context, expression, Descriptors.GU0090DoNotThrowNotImplementedException);
                     break;
                 default:
