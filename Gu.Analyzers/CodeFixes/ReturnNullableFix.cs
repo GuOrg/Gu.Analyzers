@@ -117,11 +117,18 @@
                 };
             }
 
-            public override SyntaxNode VisitExpressionStatement(ExpressionStatementSyntax node)
+            public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
             {
                 if (node is { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } assignment } &&
                     left.Identifier.ValueText == this.parameter.Identifier.ValueText)
                 {
+                    if (node.Parent is BlockSyntax { Statements: { } statements, Parent: { } parent } &&
+                        statements[0] == node &&
+                        parent.IsEither(SyntaxKind.MethodDeclaration, SyntaxKind.LocalFunctionStatement))
+                    {
+                        return null;
+                    }
+
                     return SyntaxFactory.ReturnStatement(assignment.Right);
                 }
 

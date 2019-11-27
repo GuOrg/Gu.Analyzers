@@ -214,6 +214,67 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", AllowCompilationErrors.Yes);
         }
 
+        [TestCase("s = null")]
+        [TestCase("s = default")]
+        public static void AssignedNullInFirstStatement(string expression)
+        {
+            var before = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M1(bool b, ↓out string? s)
+        {
+            s = null;
+            return b &&
+                   M2(out s);
+        }
+
+#pragma warning disable GU0075
+        bool M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
+            {
+                s = string.Empty;
+                return true;
+            }
+
+            s = null;
+            return false;
+        }
+    }
+}".AssertReplace("s = null", expression);
+
+            var after = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        string? M1(bool b)
+        {
+            return b &&
+                   M2(out s) ? s : null;
+        }
+
+#pragma warning disable GU0075
+        bool M2(out string? s)
+        {
+            if (nameof(C).Length > 1)
+            {
+                s = string.Empty;
+                return true;
+            }
+
+            s = null;
+            return false;
+        }
+    }
+}".AssertReplace("s = null", expression);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", AllowCompilationErrors.Yes);
+        }
+
         [Test]
         public static void LocalFunction()
         {
