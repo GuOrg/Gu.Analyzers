@@ -24,7 +24,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is WhenClauseSyntax whenClause &&
-                Pattern.Identifier(whenClause.Condition) is { } identifier &&
+                Pattern.Identifier(whenClause.Condition, context.SemanticModel, context.CancellationToken) is { } identifier &&
                 MergePattern(identifier, whenClause) is { } pattern)
             {
                 context.ReportDiagnostic(

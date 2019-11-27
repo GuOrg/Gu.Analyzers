@@ -11,6 +11,51 @@
             private static readonly DiagnosticAnalyzer Analyzer = new WhenAnalyzer();
 
             [Test]
+            public static void RightEnum()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.Reflection;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type t when ↓t.MemberType == MemberTypes.NestedType:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.Reflection;
+
+    class C
+    {
+        bool M(object o)
+        {
+            switch (o)
+            {
+                case Type { MemberType: MemberTypes.NestedType } t:
+                    return true;
+                default: return false;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+            }
+
+            [Test]
             public static void SwitchStatementDeclarationPatternsUsesDesignation()
             {
                 var before = @"

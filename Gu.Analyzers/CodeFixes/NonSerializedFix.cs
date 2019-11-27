@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -21,11 +21,9 @@ namespace Gu.Analyzers
 
         private static readonly AttributeListSyntax NonSerialized = SyntaxFactory.AttributeList(NonSerializedList);
 
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } =
             ImmutableArray.Create(Descriptors.GU0050IgnoreEventsWhenSerializing.Id);
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

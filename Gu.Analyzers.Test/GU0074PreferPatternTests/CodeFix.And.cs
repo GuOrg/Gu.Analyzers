@@ -515,6 +515,35 @@ namespace N
             }
 
             [Test]
+            public static void RightEnum()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.Reflection;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true } && ↓type.MemberType == MemberTypes.NestedType && ↓type.IsAbstract;
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.Reflection;
+
+    class C
+    {
+        bool M(Type type) => type is { IsPublic: true, MemberType: MemberTypes.NestedType } && type.IsAbstract;
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: ", MemberType: MemberTypes.NestedType");
+            }
+
+            [Test]
             public static void WhenAndSwitchExpression()
             {
                 var before = @"

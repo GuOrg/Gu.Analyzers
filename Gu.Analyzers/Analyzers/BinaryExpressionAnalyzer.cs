@@ -31,7 +31,7 @@
 
                 void Handle(ExpressionSyntax leftOrRight)
                 {
-                    if (Pattern.Identifier(leftOrRight) is { } identifier &&
+                    if (Pattern.Identifier(leftOrRight, context.SemanticModel, context.CancellationToken) is { } identifier &&
                         FindMergePattern(identifier, and) is { } mergeWith)
                     {
                         context.ReportDiagnostic(

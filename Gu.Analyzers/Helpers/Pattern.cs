@@ -1,11 +1,12 @@
 ﻿namespace Gu.Analyzers
 {
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class Pattern
     {
-        internal static IdentifierNameSyntax? Identifier(ExpressionSyntax candidate)
+        internal static IdentifierNameSyntax? Identifier(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return candidate switch
             {
@@ -14,6 +15,9 @@
                 PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!" } }
                 => e,
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }
+                => e,
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: MemberAccessExpressionSyntax memberAccess }
+                when semanticModel.GetTypeInfo(memberAccess, cancellationToken) is { Type: { TypeKind: TypeKind.Enum } }
                 => e,
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax e, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
                 => e,

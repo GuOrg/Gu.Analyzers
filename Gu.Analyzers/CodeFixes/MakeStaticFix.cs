@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -14,12 +14,10 @@ namespace Gu.Analyzers
     [Shared]
     internal class MakeStaticFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS0708");
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => DocumentEditorFixAllProvider.Project;
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

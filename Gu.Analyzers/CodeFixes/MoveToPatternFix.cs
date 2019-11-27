@@ -42,11 +42,14 @@
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                                   .ConfigureAwait(false);
+                                                           .ConfigureAwait(false);
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                                      .ConfigureAwait(false);
+
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
-                    Pattern.Identifier(expression) is { } member &&
+                    Pattern.Identifier(expression, semanticModel, context.CancellationToken) is { } member &&
                     Parse(expression) is var (property, pattern))
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
@@ -153,6 +156,8 @@
                 => (p, False),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
                 => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: MemberAccessExpressionSyntax c }
+                => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia().WithTrailingTrivia(SyntaxFactory.Space))),
                 BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
                 => (p, Empty),
                 IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
