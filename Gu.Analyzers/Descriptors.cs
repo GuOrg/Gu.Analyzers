@@ -310,6 +310,15 @@
             isEnabledByDefault: true,
             description: "Prefer return nullable. Nicer for pattern matching.");
 
+        internal static readonly DiagnosticDescriptor GU0076MergePattern = Descriptors.Create(
+            id: "GU0076",
+            title: "Merge pattern.",
+            messageFormat: "Merge pattern.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: "Merge pattern.");
+
         internal static readonly DiagnosticDescriptor GU0080TestAttributeCountMismatch = Descriptors.Create(
             id: "GU0080",
             title: "Parameter count does not match attribute.",

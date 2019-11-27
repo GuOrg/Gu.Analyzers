@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -10,8 +11,9 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class BinaryExpressionAnalyzer : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptors.GU0074PreferPattern);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptors.GU0074PreferPattern,
+            Descriptors.GU0076MergePattern);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -23,7 +25,7 @@
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is BinaryExpressionSyntax { Left: { } left, Right: { } right, OperatorToken: { ValueText: "&&" } })
+                context.Node is BinaryExpressionSyntax { Left: { } left, Right: { } right, OperatorToken: { ValueText: "&&" } } and)
             {
                 Handle(left);
                 Handle(right);
@@ -35,7 +37,7 @@
                     {
                         context.ReportDiagnostic(
                             Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
+                                Descriptors.GU0076MergePattern,
                                 leftOrRight.GetLocation(),
                                 additionalLocations: new[] { mergeWith.GetLocation() }));
                     }
@@ -50,24 +52,26 @@
             }
         }
 
-        private static PatternSyntax? FindMergePattern(SyntaxNode identifier, ExpressionSyntax parent)
+        private static PatternSyntax? FindMergePattern(SyntaxNode identifier, BinaryExpressionSyntax parent)
         {
             return parent switch
             {
-                BinaryExpressionSyntax { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } }
-                when Pattern.MergePattern(identifier, left) is { } mergePattern
-                => mergePattern,
-                BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right }
-                when Pattern.MergePattern(identifier, right) is { } mergePattern
-                => mergePattern,
-                BinaryExpressionSyntax { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } recursive }
-                => FindMergePattern(identifier, recursive),
+                { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } }
+                    when Pattern.MergePattern(identifier, left) is { } mergePattern
+                    => mergePattern,
+                { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right }
+                    when Pattern.MergePattern(identifier, right) is { } mergePattern
+                    => mergePattern,
                 { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: { } pattern } } }
-                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
-                => mergePattern,
+                    => Pattern.MergePattern(identifier, pattern),
                 { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern } } }
-                when Pattern.MergePattern(identifier, pattern) is { } mergePattern
-                => mergePattern,
+                    => Pattern.MergePattern(identifier, pattern),
+                { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } left }
+                    when !left.Contains(identifier)
+                    => FindMergePattern(identifier, left),
+                { Parent: BinaryExpressionSyntax { Left: { } left, OperatorToken: { ValueText: "&&" } } gp }
+                    when left.Contains(identifier)
+                    => FindMergePattern(identifier, gp),
                 _ => null,
             };
         }

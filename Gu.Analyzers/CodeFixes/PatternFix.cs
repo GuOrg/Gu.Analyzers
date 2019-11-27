@@ -11,9 +11,9 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MoveToPatternFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(PatternFix))]
     [Shared]
-    internal class MoveToPatternFix : DocumentEditorCodeFixProvider
+    internal class PatternFix : DocumentEditorCodeFixProvider
     {
         private static readonly ConstantPatternSyntax True = ConstantPattern(SyntaxKind.TrueLiteralExpression, SyntaxKind.TrueKeyword);
 
@@ -35,7 +35,8 @@
             designation: default);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.GU0074PreferPattern.Id);
+            Descriptors.GU0074PreferPattern.Id,
+            Descriptors.GU0076MergePattern.Id);
 
         protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 

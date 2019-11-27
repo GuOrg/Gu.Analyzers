@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Test.GU0074PreferPatternTests
+﻿namespace Gu.Analyzers.Test.GU0076MergePatternTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -52,7 +52,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -95,7 +95,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -138,7 +138,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -181,7 +181,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -222,7 +222,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -263,7 +263,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -305,7 +305,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -346,7 +346,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
             }
 
             [Test]
@@ -387,7 +387,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: string name }");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
             }
 
             [Test]
@@ -428,7 +428,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Name: { } name }");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: { } name }");
             }
 
             [Test]
@@ -468,7 +468,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 5 }");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
             }
 
             [Test]
@@ -509,7 +509,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "{ Length: 5 }");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
             }
         }
     }

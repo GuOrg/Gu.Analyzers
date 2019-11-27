@@ -33,20 +33,18 @@
 
         internal static PatternSyntax? MergePattern(SyntaxNode identifier, IsPatternExpressionSyntax isPattern)
         {
-            if (isPattern.Contains(identifier))
-            {
-                return null;
-            }
-
             return isPattern switch
             {
                 { Pattern: RecursivePatternSyntax { Designation: null } pattern }
                 when AreSame(identifier, isPattern.Expression)
                 => pattern,
                 { Pattern: RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
-                when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
+                when AreSame(identifier, designation)
                 => pattern,
-                { Pattern: RecursivePatternSyntax { } pattern }
+                { Pattern: RecursivePatternSyntax pattern }
+                when AreSame(identifier, isPattern.Expression)
+                => pattern,
+                { Pattern: RecursivePatternSyntax pattern }
                 => MergePattern(identifier, pattern),
                 { Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax designation } pattern }
                 when AreSame(identifier, isPattern.Expression) || AreSame(identifier, designation)
@@ -57,11 +55,6 @@
 
         internal static PatternSyntax? MergePattern(SyntaxNode identifier, PatternSyntax pattern)
         {
-            if (pattern.Contains(identifier))
-            {
-                return null;
-            }
-
             return pattern switch
             {
                 RecursivePatternSyntax { Designation: SingleVariableDesignationSyntax designation }

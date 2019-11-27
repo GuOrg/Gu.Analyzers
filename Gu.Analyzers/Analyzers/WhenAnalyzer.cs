@@ -11,7 +11,7 @@
     internal class WhenAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptors.GU0074PreferPattern);
+            ImmutableArray.Create(Descriptors.GU0076MergePattern);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -29,7 +29,7 @@
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
-                        Descriptors.GU0074PreferPattern,
+                        Descriptors.GU0076MergePattern,
                         whenClause.Condition.GetLocation(),
                         additionalLocations: new[] { pattern.GetLocation() }));
             }

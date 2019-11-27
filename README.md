@@ -44,6 +44,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0073](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0073.md)| Member of non-public type should be internal.
 | [GU0074](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0074.md)| Prefer pattern.
 | [GU0075](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0075.md)| Prefer return nullable.
+| [GU0076](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0076.md)| Merge pattern.
 | [GU0080](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0080.md)| Parameter count does not match attribute.
 | [GU0081](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0081.md)| TestCase does not match parameters.
 | [GU0082](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0082.md)| TestCase is identical.
