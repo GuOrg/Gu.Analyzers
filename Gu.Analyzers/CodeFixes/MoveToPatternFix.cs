@@ -147,17 +147,17 @@
         {
             return expression switch
             {
-                MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }
-                    => (p, True),
-                PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p } }
-                    => (p, False),
-                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
-                    => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
-                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
-                    => (p, Empty),
-                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
-                    => (p, c),
-                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax m, Name: IdentifierNameSyntax p }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } c }
+                MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }
+                => (p, True),
+                PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p } }
+                => (p, False),
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
+                => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
+                BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+                => (p, Empty),
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
+                => (p, c),
+                IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax _ } c }
                 => (p, c),
                 _ => default,
             };
