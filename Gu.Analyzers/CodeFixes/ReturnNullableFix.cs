@@ -55,7 +55,7 @@
                     bool CanRewrite()
                     {
                         using var walker = ReturnValueWalker.Borrow(methodOrLocalFunction);
-                        foreach (var value in walker)
+                        foreach (var value in walker.ReturnValues)
                         {
                             switch (value)
                             {
