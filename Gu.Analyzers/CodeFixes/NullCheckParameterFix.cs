@@ -179,8 +179,6 @@
             return false;
         }
 
-
-
         private static bool IsThrow(StatementSyntax statement)
         {
             if (statement is ThrowStatementSyntax)
