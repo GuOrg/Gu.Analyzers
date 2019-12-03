@@ -62,6 +62,36 @@ namespace N
         }
 
         [Test]
+        public static void NoFixWhenLocalFunction()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M()
+        {
+            _ = Try(string.Empty, out _);
+
+            bool Try(string s, out string result)
+            {
+                if (s.Length > 2)
+                {
+                    result = s;
+                    return true;
+                }
+
+                result = ↓null;
+                return false;
+            }
+        }
+    }
+}";
+
+            RoslynAssert.NoFix(new PlaceholderAnalyzer(CS8625.Id), Fix, CS8625, before, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
         public static void AddNotNullWhenTrueWhenAssigningOutParameterWithNullLiteral()
         {
             var before = @"
@@ -328,7 +358,7 @@ namespace N
         }
 
         [Test]
-        public static void MakeOptionalParemeterNullable()
+        public static void MakeOptionalParameterNullable()
         {
             var before = @"
 namespace N
