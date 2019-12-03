@@ -17,12 +17,10 @@
     [Shared]
     internal class NullCheckParameterFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0012NullCheckParameter.Id,
             "CA1062");
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
@@ -81,9 +79,84 @@
                                 "Add null check.",
                                 (editor, cancellationToken) => editor.ReplaceNode(
                                     block,
-                                    x => WithNullCheck(x, parameter, cancellationToken)),
+                                    x => WithNullCheck(x, cancellationToken)),
                                 diagnostic.Id,
                                 diagnostic);
+                        }
+                        else if (methodDeclaration is { ExpressionBody: { Expression: { } expression } })
+                        {
+                            context.RegisterCodeFix(
+                                "Add null check.",
+                                (editor, cancellationToken) => editor.ReplaceNode(
+                                    methodDeclaration,
+                                    x => x.WithExpressionBody(null)
+                                          .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                                          .WithBody(
+                                              SyntaxFactory.Block(
+                                                        IfNullThrow(),
+                                                        Statement()))),
+                                diagnostic.Id,
+                                diagnostic);
+
+                            StatementSyntax Statement()
+                            {
+                                return methodDeclaration switch
+                                {
+                                    MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } => SyntaxFactory.ExpressionStatement(expression),
+                                    MethodDeclarationSyntax _ => SyntaxFactory.ReturnStatement(expression),
+                                    _ => SyntaxFactory.ExpressionStatement(expression),
+                                };
+                            }
+                        }
+
+                        IfStatementSyntax IfNullThrow()
+                        {
+                            return SyntaxFactory.IfStatement(
+                                                    SyntaxFactory.IsPatternExpression(
+                                                        SyntaxFactory.ParseName(parameter.Identifier.Text),
+                                                        SyntaxFactory.ConstantPattern(
+                                                            SyntaxFactory.LiteralExpression(
+                                                                SyntaxKind.NullLiteralExpression))),
+                                                    SyntaxFactory.Block(
+                                                        SyntaxFactory.ThrowStatement(
+                                                            SyntaxFactory.ParseExpression(
+                                                                $"new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames())))
+                                                .WithLeadingElasticLineFeed()
+                                                .WithTrailingLineFeed();
+                        }
+
+                        BlockSyntax WithNullCheck(BlockSyntax body, CancellationToken cancellationToken)
+                        {
+                            return body.WithStatements(body.Statements.Insert(FindPosition(), IfNullThrow()));
+
+                            int FindPosition()
+                            {
+                                var ordinal = parameterList.Parameters.IndexOf(parameter);
+                                if (ordinal <= 0)
+                                {
+                                    return 0;
+                                }
+
+                                var position = 0;
+                                foreach (var statement in body.Statements)
+                                {
+                                    if (statement is IfStatementSyntax ifStatement &&
+                                        IsThrow(ifStatement.Statement) &&
+                                        NullCheck.IsNullCheck(ifStatement.Condition, null, cancellationToken, out var value) &&
+                                        value is IdentifierNameSyntax nullChecked &&
+                                        parameterList.TryFind(nullChecked.Identifier.ValueText, out var other) &&
+                                        parameterList.Parameters.IndexOf(other) < ordinal)
+                                    {
+                                        position++;
+                                    }
+                                    else
+                                    {
+                                        return position;
+                                    }
+                                }
+
+                                return position;
+                            }
                         }
                     }
                 }
@@ -106,59 +179,7 @@
             return false;
         }
 
-        private static BlockSyntax WithNullCheck(BlockSyntax body, ParameterSyntax parameter, CancellationToken cancellationToken)
-        {
-            var nullCheck = SyntaxFactory.IfStatement(
-                                             SyntaxFactory.IsPatternExpression(
-                                                 SyntaxFactory.ParseName(parameter.Identifier.Text),
-                                                 SyntaxFactory.ConstantPattern(
-                                                     SyntaxFactory.LiteralExpression(
-                                                         SyntaxKind.NullLiteralExpression))),
-                                             SyntaxFactory.Block(
-                                                 SyntaxFactory.ThrowStatement(
-                                                     SyntaxFactory.ParseExpression(
-                                                         $"new System.ArgumentNullException(nameof({parameter.Identifier.Text}))").WithSimplifiedNames())))
-                                         .WithLeadingElasticLineFeed()
-                                         .WithTrailingLineFeed();
 
-            return body.WithStatements(body.Statements.Insert(FindPosition(), nullCheck));
-
-            int FindPosition()
-            {
-                if (parameter.Parent is ParameterListSyntax parameterList)
-                {
-                    var ordinal = parameterList.Parameters.IndexOf(parameter);
-                    if (ordinal <= 0)
-                    {
-                        return 0;
-                    }
-
-                    var position = 0;
-                    for (var i = 0; i < body.Statements.Count; i++)
-                    {
-                        var statement = body.Statements[i];
-                        if (statement is IfStatementSyntax ifStatement &&
-                            IsThrow(ifStatement.Statement) &&
-                            NullCheck.IsNullCheck(ifStatement.Condition, null, cancellationToken, out var value) &&
-                            value is IdentifierNameSyntax identifierName &&
-                            body.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                            methodDeclaration.TryFindParameter(identifierName.Identifier.ValueText, out var other) &&
-                            parameterList.Parameters.IndexOf(other) < ordinal)
-                        {
-                            position++;
-                        }
-                        else
-                        {
-                            return position;
-                        }
-                    }
-
-                    return position;
-                }
-
-                return 0;
-            }
-        }
 
         private static bool IsThrow(StatementSyntax statement)
         {

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
@@ -43,6 +43,76 @@ namespace N
             }
 
             _ = s.Length;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void ExpressionBody()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static int M(string s) => ↓s.Length;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public static class C
+    {
+        public static int M(string s)
+        {
+            if (s is null)
+            {
+                throw new System.ArgumentNullException(nameof(s));
+            }
+
+            return s.Length;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
+        public static void ExpressionBodyVoid()
+        {
+            var before = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M1(string s) => M2(↓s.Length);
+
+        private static void M2(int n)
+        {
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M1(string s)
+        {
+            if (s is null)
+            {
+                throw new System.ArgumentNullException(nameof(s));
+            }
+
+            M2(s.Length);
+        }
+
+        private static void M2(int n)
+        {
         }
     }
 }";
