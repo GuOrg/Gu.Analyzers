@@ -11,12 +11,10 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ObjectCreationAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0005ExceptionArgumentsPositions,
             Descriptors.GU0013TrowForCorrectParameter);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -27,33 +25,28 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
-                objectCreation.ArgumentList is { Arguments: { } arguments } &&
+                context.Node is ObjectCreationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } objectCreation &&
                 arguments.Count > 0 &&
+                context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
                 context.ContainingSymbol is IMethodSymbol method &&
                 ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
                 ctor.TryFindParameter("paramName", out var nameParameter))
             {
                 if (objectCreation.TryFindArgument(nameParameter, out var nameArgument) &&
-                    objectCreation.Parent is ThrowExpressionSyntax throwExpression &&
-                    throwExpression.Parent is BinaryExpressionSyntax binary &&
-                    binary.IsKind(SyntaxKind.CoalesceExpression) &&
+                    objectCreation.Parent is ThrowExpressionSyntax { Parent: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "??" } } } &&
                     nameArgument.TryGetStringValue(context.SemanticModel, context.CancellationToken, out var name) &&
-                    binary.Left is IdentifierNameSyntax identifierName &&
-                    identifierName.Identifier.ValueText != name)
+                    left.Identifier.ValueText != name)
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
                             Descriptors.GU0013TrowForCorrectParameter,
                             GetLocation(),
-                            ImmutableDictionary<string, string>.Empty.Add(nameof(IdentifierNameSyntax), identifierName.Identifier.ValueText)));
+                            ImmutableDictionary<string, string>.Empty.Add(nameof(IdentifierNameSyntax), left.Identifier.ValueText)));
 
                     Location GetLocation()
                     {
-                        return nameArgument.Expression is InvocationExpressionSyntax invocation &&
+                        return nameArgument is { Expression: InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 1 } } } invocation } &&
                                invocation.IsNameOf() &&
-                               invocation.ArgumentList != null &&
                                invocation.ArgumentList.Arguments.TrySingle(out var nameofArg)
                             ? nameofArg.GetLocation()
                             : nameArgument.GetLocation();
