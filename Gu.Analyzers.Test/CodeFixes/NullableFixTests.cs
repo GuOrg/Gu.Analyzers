@@ -395,6 +395,11 @@ namespace N
     class C
     {
         event Action ↓E;
+
+        private void OnE()
+        {
+            this.E?.Invoke();
+        }
     }
 }";
 
@@ -406,6 +411,11 @@ namespace N
     class C
     {
         event Action? E;
+
+        private void OnE()
+        {
+            this.E?.Invoke();
+        }
     }
 }";
             RoslynAssert.CodeFix(Fix, CS8618, before, after, compilationOptions: CompilationOptions);
