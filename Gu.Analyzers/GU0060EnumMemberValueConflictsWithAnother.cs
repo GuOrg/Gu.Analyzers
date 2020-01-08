@@ -74,8 +74,8 @@
                     switch (node)
                     {
                         case IdentifierNameSyntax identifier
-                            when semanticModel.GetSymbolSafe(identifier, cancellationToken) is { } symbol &&
-                                 symbol.ContainingType.TypeKind != TypeKind.Enum:
+                            when semanticModel.GetSymbolSafe(identifier, cancellationToken) is { ContainingType: { } containingType } &&
+                                 containingType.TypeKind != TypeKind.Enum:
                             return false;
                         case LiteralExpressionSyntax _:
                             return false;
