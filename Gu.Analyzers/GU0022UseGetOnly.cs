@@ -28,7 +28,7 @@
             }
 
             if (context.Node is AccessorDeclarationSyntax { Body: null } setter &&
-                context.ContainingSymbol is IMethodSymbol { DeclaredAccessibility: Accessibility.Private, AssociatedSymbol: IPropertySymbol { IsIndexer: false } property })
+                context.ContainingSymbol is IMethodSymbol { DeclaredAccessibility: Accessibility.Private, AssociatedSymbol: IPropertySymbol { IsIndexer: false, IsOverride: false, IsAbstract: false, ExplicitInterfaceImplementations: { Length: 0 } } property })
             {
                 using (var walker = MutationWalker.For(property, context.SemanticModel, context.CancellationToken))
                 {

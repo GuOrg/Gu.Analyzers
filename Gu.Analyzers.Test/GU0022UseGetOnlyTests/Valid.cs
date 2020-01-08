@@ -236,7 +236,7 @@ namespace N
         }
 
         [Test]
-        public static void ExplicitImplementation()
+        public static void ExplicitImplementationStatementBodies()
         {
             var code = @"
 namespace N
@@ -253,7 +253,32 @@ namespace N
         object IC.Value
         {
             get { return this.Value; }
-            set { this.Value = (T) value; }
+            set { this.Value = (T)value; }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ExplicitImplementationExpressionBodies()
+        {
+            var code = @"
+namespace N
+{
+    interface IC
+    {
+        object Value { get; set; }
+    }
+
+    class C<T> : IC
+    {
+        public T Value { get; private set; }
+
+        object IC.Value
+        {
+            get => this.Value;
+            set => this.Value = (T)value;
         }
     }
 }";
