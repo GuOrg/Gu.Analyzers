@@ -150,8 +150,8 @@
             {
                 return method switch
                 {
-                    MethodDeclarationSyntax m => UpdateCore(m).WithReturnType(parameter.Type.WithLeadingElasticSpace()),
-                    LocalFunctionStatementSyntax m => UpdateCore(m).WithReturnType(parameter.Type.WithLeadingElasticSpace()),
+                    MethodDeclarationSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
+                    LocalFunctionStatementSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
                     _ => throw new NotSupportedException($"Not handling {method.Kind()} yet."),
                 };
 
@@ -159,6 +159,16 @@
                     where T : SyntaxNode
                 {
                     return (T)new Rewriter(parameter).Visit(node);
+                }
+
+                TypeSyntax ReturnType()
+                {
+                    return parameter.Type switch
+                    {
+                        NullableTypeSyntax nullable => nullable,
+                        { } type => SyntaxFactory.NullableType(type),
+                        _ => throw new NotSupportedException($"Missing type."),
+                    };
                 }
             }
         }

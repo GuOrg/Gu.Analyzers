@@ -55,6 +55,51 @@ namespace N
         }
 
         [Test]
+        public static void InstanceMethodSingleGenericParameter()
+        {
+            var before = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M<T>(↓out T s)
+            where T : class, new()
+        {
+            if (nameof(C).Length > 1)
+            {
+                s = new T();
+                return true;
+            }
+
+            s = null;
+            return false;
+        }
+    }
+}";
+
+            var after = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        T? M<T>()
+            where T : class, new()
+        {
+            if (nameof(C).Length > 1)
+            {
+                return new T();
+            }
+
+            return null;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
+
+        [Test]
         public static void InstanceMethodTwoParameters()
         {
             var before = @"
