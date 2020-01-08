@@ -13,40 +13,52 @@
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0074PreferPattern,
-            Descriptors.GU0076MergePattern);
+            Descriptors.GU0076MergePattern,
+            Descriptors.GU0077PreferIsNull);
 
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => AnalyzeNode(c), SyntaxKind.LogicalAndExpression);
+            context.RegisterSyntaxNodeAction(c => AnalyzeNode(c), SyntaxKind.LogicalAndExpression, SyntaxKind.EqualsExpression);
         }
 
         private static void AnalyzeNode(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is BinaryExpressionSyntax { Left: { } left, Right: { } right, OperatorToken: { ValueText: "&&" } } and)
+                context.Node is BinaryExpressionSyntax binaryExpression)
             {
-                Handle(left);
-                Handle(right);
-
-                void Handle(ExpressionSyntax leftOrRight)
+                if (binaryExpression is { Left: { }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } })
                 {
-                    if (Pattern.Identifier(leftOrRight, context.SemanticModel, context.CancellationToken) is { } identifier &&
-                        FindMergePattern(identifier, and) is { } mergeWith)
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0077PreferIsNull,
+                            binaryExpression.GetLocation()));
+                }
+
+                if (binaryExpression is { Left: { } left, OperatorToken: { ValueText: "&&" }, Right: { } right } and)
+                {
+                    Handle(left);
+                    Handle(right);
+
+                    void Handle(ExpressionSyntax leftOrRight)
                     {
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0076MergePattern,
-                                leftOrRight.GetLocation(),
-                                additionalLocations: new[] { mergeWith.GetLocation() }));
-                    }
-                    else if (CanConvert(leftOrRight, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(
-                            Diagnostic.Create(
-                                Descriptors.GU0074PreferPattern,
-                                leftOrRight.GetLocation()));
+                        if (Pattern.Identifier(leftOrRight, context.SemanticModel, context.CancellationToken) is { } identifier &&
+                            FindMergePattern(identifier, and) is { } mergeWith)
+                        {
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0076MergePattern,
+                                    leftOrRight.GetLocation(),
+                                    additionalLocations: new[] { mergeWith.GetLocation() }));
+                        }
+                        else if (CanConvert(leftOrRight, context.SemanticModel, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0074PreferPattern,
+                                    leftOrRight.GetLocation()));
+                        }
                     }
                 }
             }

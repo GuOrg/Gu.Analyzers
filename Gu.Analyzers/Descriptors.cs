@@ -319,6 +319,15 @@
             isEnabledByDefault: true,
             description: "Merge pattern.");
 
+        internal static readonly DiagnosticDescriptor GU0077PreferIsNull = Descriptors.Create(
+            id: "GU0077",
+            title: "Prefer is null.",
+            messageFormat: "Prefer is null.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Info,
+            isEnabledByDefault: true,
+            description: "Prefer is null for consistency.");
+
         internal static readonly DiagnosticDescriptor GU0080TestAttributeCountMismatch = Descriptors.Create(
             id: "GU0080",
             title: "Parameter count does not match attribute.",
