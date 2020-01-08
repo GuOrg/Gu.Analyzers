@@ -1,4 +1,4 @@
-#pragma warning disable CA1055 // Uri return values should not be strings
+﻿#pragma warning disable CA1055 // Uri return values should not be strings
 #pragma warning disable CA1056 // Uri properties should not be strings
 #pragma warning disable CA1721 // Property names should not match get methods
 namespace Gu.Analyzers.Test
@@ -326,7 +326,7 @@ Or put this at the top of the file to disable all instances.
             public string Name { get; }
 
             public string Uri => "https://github.com/GuOrg/Gu.Analyzers/blob/master" + this.Name.Substring(SolutionDirectory.FullName.Length)
-                                                                                                             .Replace("\\", "/", StringComparison.Ordinal);
+                                                                                                .Replace("\\", "/", StringComparison.Ordinal);
 
             public static CodeFile Find(Type type)
             {
