@@ -60,10 +60,10 @@
                             switch (value)
                             {
                                 case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax statement }
-                                    when IsPreviousStatementAssigning(statement, parameter):
+                                    when IsPreviousStatementAssigning(statement, parameter!):
                                 case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
                                 case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ }
-                                    when left.Identifier.ValueText == parameter.Identifier.ValueText:
+                                    when left.Identifier.ValueText == parameter!.Identifier.ValueText:
                                     break;
                                 default:
                                     return false;

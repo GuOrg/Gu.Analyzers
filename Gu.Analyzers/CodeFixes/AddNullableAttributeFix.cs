@@ -43,8 +43,8 @@
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
                 {
-                    if (TryFindLocalOrParameter(out var identifierName) &&
-                        TryFindOutParameter(identifierName.Identifier.ValueText, out var outParameter))
+                    if (TryFindLocalOrParameter() is { } localOrParameter &&
+                        TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter))
                     {
                         if (diagnostic.Id == "CS8625" ||
                             diagnostic.Id == "CS8601")
@@ -74,7 +74,7 @@
                     if (expression.Parent is EqualsValueClauseSyntax { Parent: ParameterSyntax { } optionalParameter })
                     {
                         context.RegisterCodeFix(
-                            optionalParameter.Type.ToString() + "?",
+                            optionalParameter.Type + "?",
                             (editor, _) => editor.ReplaceNode(
                                 optionalParameter.Type,
                                 x => SyntaxFactory.NullableType(x)),
@@ -86,7 +86,7 @@
                         diagnostic.Id == "CS8600")
                     {
                         context.RegisterCodeFix(
-                            type.ToString() + "?",
+                            type + "?",
                             (editor, _) => editor.ReplaceNode(
                                 type,
                                 x => SyntaxFactory.NullableType(x)),
@@ -94,26 +94,20 @@
                             diagnostic);
                     }
 
-                    bool TryFindLocalOrParameter(out IdentifierNameSyntax result)
+                    IdentifierNameSyntax? TryFindLocalOrParameter()
                     {
-                        switch (expression.Parent)
+                        return expression switch
                         {
-                            case AssignmentExpressionSyntax { Left: IdentifierNameSyntax local }:
-                                result = local;
-                                return true;
-                            case ArgumentSyntax { Expression: IdentifierNameSyntax arg }:
-                                result = arg;
-                                return true;
-                            default:
-                                result = null!;
-                                return false;
-                        }
+                            { Parent: AssignmentExpressionSyntax { Left: IdentifierNameSyntax local } } => local,
+                            { Parent: ArgumentSyntax { Expression: IdentifierNameSyntax arg } } => arg,
+                            _ => null!,
+                        };
                     }
 
                     bool TryFindOutParameter(string name, out ParameterSyntax? result)
                     {
                         result = null!;
-                        return expression.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
+                        return expression!.FirstAncestor<MethodDeclarationSyntax>() is { } method &&
                                method.ReturnType == KnownSymbol.Boolean &&
                                method.TryFindParameter(name, out result) &&
                                result.Modifiers.Any(SyntaxKind.OutKeyword);

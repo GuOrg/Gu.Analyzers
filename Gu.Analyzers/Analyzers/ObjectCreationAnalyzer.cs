@@ -32,7 +32,7 @@
                 ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
                 ctor.TryFindParameter("paramName", out var nameParameter))
             {
-                if (objectCreation.TryFindArgument(nameParameter, out var nameArgument) &&
+                if (objectCreation.FindArgument(nameParameter) is { } nameArgument &&
                     objectCreation.Parent is ThrowExpressionSyntax { Parent: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "??" } } } &&
                     nameArgument.TryGetStringValue(context.SemanticModel, context.CancellationToken, out var name) &&
                     left.Identifier.ValueText != name)
