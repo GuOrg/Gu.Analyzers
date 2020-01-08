@@ -116,7 +116,7 @@
                     }
                 }
                 else if (diagnostic.Id == "CS8618" &&
-                         syntaxRoot.TryFindNode(diagnostic, out MemberDeclarationSyntax? member))
+                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MemberDeclarationSyntax? member))
                 {
                     if (FindType(member) is { } type)
                     {
