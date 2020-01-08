@@ -17,12 +17,10 @@
     [Shared]
     internal class TestMethodParametersFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0080TestAttributeCountMismatch.Id,
             Descriptors.GU0083TestCaseAttributeMismatchMethod.Id);
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

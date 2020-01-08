@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -15,11 +15,9 @@ namespace Gu.Analyzers
     [Shared]
     internal class ThrowForCorrectParameterFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0013TrowForCorrectParameter.Id);
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

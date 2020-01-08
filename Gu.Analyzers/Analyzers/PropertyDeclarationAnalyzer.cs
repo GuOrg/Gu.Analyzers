@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -11,12 +11,10 @@ namespace Gu.Analyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0008AvoidRelayProperties,
             Descriptors.GU0021CalculatedPropertyAllocates);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

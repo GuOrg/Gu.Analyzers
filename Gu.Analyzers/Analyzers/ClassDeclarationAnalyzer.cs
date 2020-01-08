@@ -10,12 +10,10 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ClassDeclarationAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0024SealTypeWithDefaultMember,
             Descriptors.GU0025SealTypeWithOverridenEquality);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

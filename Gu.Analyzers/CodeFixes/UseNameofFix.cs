@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -17,10 +17,8 @@ namespace Gu.Analyzers
     [Shared]
     internal class UseNameofFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(Descriptors.GU0006UseNameof.Id);
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

@@ -16,13 +16,11 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ConstructorAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0003CtorParameterNamesShouldMatch,
             Descriptors.GU0004AssignAllReadOnlyMembers,
             Descriptors.GU0014PreferParameter);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

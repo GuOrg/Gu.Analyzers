@@ -11,13 +11,11 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class SimpleAssignmentAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.GU0010DoNotAssignSameValue,
             Descriptors.GU0012NullCheckParameter,
             Descriptors.GU0015DoNotAssignMoreThanOnce);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

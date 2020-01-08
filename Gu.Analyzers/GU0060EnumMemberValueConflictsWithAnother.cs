@@ -13,11 +13,9 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
             ImmutableArray.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

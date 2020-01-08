@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.CodeFixes
+﻿namespace Gu.Analyzers.CodeFixes
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -33,7 +33,6 @@ namespace Gu.Analyzers.CodeFixes
                             SyntaxFactory.AttributeArgument(
                                 SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
 
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8600", "CS8601", "CS8625", "CS8653");
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)

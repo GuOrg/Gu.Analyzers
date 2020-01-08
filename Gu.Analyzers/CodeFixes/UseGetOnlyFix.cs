@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -24,12 +24,10 @@ namespace Gu.Analyzers
                                  .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken))),
                 SyntaxFactory.Token(SyntaxKind.CloseBraceToken));
 
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0021CalculatedPropertyAllocates.Id,
             Descriptors.GU0022UseGetOnly.Id);
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
