@@ -137,8 +137,8 @@
 
             public override SyntaxNode VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
             {
-                if (node is { ParameterList: { Parameters: { } paramaters } } &&
-                    paramaters.Any(x => x.IsEquivalentTo(this.parameter)))
+                if (node is { ParameterList: { Parameters: { } parameters } } &&
+                    parameters.Any(x => x.IsEquivalentTo(this.parameter)))
                 {
                     return base.VisitLocalFunctionStatement(node);
                 }
