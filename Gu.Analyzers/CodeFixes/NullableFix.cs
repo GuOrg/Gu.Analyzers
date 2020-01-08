@@ -1,7 +1,9 @@
-﻿namespace Gu.Analyzers.CodeFixes
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Globalization;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
@@ -33,7 +35,7 @@
                             SyntaxFactory.AttributeArgument(
                                 SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
 
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8600", "CS8601", "CS8625", "CS8653");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8600", "CS8601", "CS8618", "CS8625", "CS8653");
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -111,6 +113,34 @@
                                method.ReturnType == KnownSymbol.Boolean &&
                                method.TryFindParameter(name, out result) &&
                                result.Modifiers.Any(SyntaxKind.OutKeyword);
+                    }
+                }
+                else if (diagnostic.Id == "CS8618" &&
+                         syntaxRoot.TryFindNode(diagnostic, out MemberDeclarationSyntax? member))
+                {
+                    if (FindType(member) is { } type)
+                    {
+                        context.RegisterCodeFix(
+                            "Declare as nullable.",
+                            (editor, _) => editor.ReplaceNode(
+                                type,
+                                x => SyntaxFactory.NullableType(x)),
+                            "?",
+                            diagnostic);
+                    }
+
+                    TypeSyntax? FindType(MemberDeclarationSyntax candidate)
+                    {
+                        return candidate switch
+                        {
+                            EventDeclarationSyntax { Type: { } t } => t,
+                            EventFieldDeclarationSyntax { Declaration: { Type: { } t } } => t,
+                            ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax typeDeclaration }
+                            when Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Non-nullable event '(?<name>[^']+)' is uninitialized") is { Success: true } match &&
+                                 typeDeclaration.TryFindEvent(match.Groups["name"].Value, out member)
+                            => FindType(member),
+                            _ => null,
+                        };
                     }
                 }
             }

@@ -1,19 +1,19 @@
 ﻿namespace Gu.Analyzers.Test.CodeFixes
 {
-    using Gu.Analyzers.CodeFixes;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal static class AddNullableAttributeFixTests
+    internal static class NullableFixTests
     {
         private static readonly CodeFixProvider Fix = new NullableFix();
         private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
         private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
         private static readonly ExpectedDiagnostic CS8653 = ExpectedDiagnostic.Create("CS8653");
+        private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' is uninitialized. Consider declaring the event as nullable.");
         private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 
         [Test]
@@ -382,6 +382,33 @@ namespace N
     }
 }";
             RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
+        public static void MakeEventNullable()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        event Action ↓E;
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    class C
+    {
+        event Action? E;
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8618, before, after, compilationOptions: CompilationOptions);
         }
     }
 }
