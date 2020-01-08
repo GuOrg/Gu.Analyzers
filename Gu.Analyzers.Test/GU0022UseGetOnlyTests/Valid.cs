@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
+﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,21 +7,21 @@ namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
     {
         private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
 
-        private static readonly TestCase[] TestCases =
+        private static readonly TestCaseData[] TestCases =
         {
-            new TestCase("int", "A++;"),
-            new TestCase("int", "A--;"),
-            new TestCase("int", "A+=a;"),
-            new TestCase("int", "A-=a;"),
-            new TestCase("int", "A*=a;"),
-            new TestCase("int", "A/=a;"),
-            new TestCase("int", "A%=a;"),
-            new TestCase("int", "A = a;"),
-            new TestCase("bool", "A|=a;"),
+            new TestCaseData("int", "A++;"),
+            new TestCaseData("int", "A--;"),
+            new TestCaseData("int", "A+=a;"),
+            new TestCaseData("int", "A-=a;"),
+            new TestCaseData("int", "A*=a;"),
+            new TestCaseData("int", "A/=a;"),
+            new TestCaseData("int", "A%=a;"),
+            new TestCaseData("int", "A = a;"),
+            new TestCaseData("bool", "A|=a;"),
         };
 
         [TestCaseSource(nameof(TestCases))]
-        public static void UpdatedInMethodThis(TestCase data)
+        public static void UpdatedInMethodThis(string type, string statement)
         {
             var code = @"
 namespace N
@@ -35,14 +35,14 @@ namespace N
             this.A = a;
         }
     }
-}".AssertReplace("A = a;", data.Update)
-  .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", statement)
+  .AssertReplace("int", type);
 
             RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public static void UpdatedInMethodUnderscoreNames(TestCase data)
+        public static void UpdatedInMethodUnderscoreNames(string type, string statement)
         {
             var code = @"
 namespace N
@@ -56,14 +56,14 @@ namespace N
             A = a;
         }
     }
-}".AssertReplace("A = a;", data.Update)
-  .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", statement)
+  .AssertReplace("int", type);
 
             RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCaseSource(nameof(TestCases))]
-        public static void UpdatingOtherInstanceInCtor(TestCase data)
+        public static void UpdatingOtherInstanceInCtor(string type, string statement)
         {
             var code = @"
 namespace N
@@ -77,8 +77,8 @@ namespace N
 
         public int A { get; private set; }
     }
-}".AssertReplace("A = a;", data.Update)
-  .AssertReplace("int", data.Type);
+}".AssertReplace("A = a;", statement)
+  .AssertReplace("int", type);
 
             RoslynAssert.Valid(Analyzer, code);
         }
@@ -258,21 +258,6 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
-        }
-
-        internal class TestCase
-        {
-            public TestCase(string type, string update)
-            {
-                this.Type = type;
-                this.Update = update;
-            }
-
-            public string Type { get; }
-
-            public string Update { get; }
-
-            public override string ToString() => this.Update;
         }
     }
 }
