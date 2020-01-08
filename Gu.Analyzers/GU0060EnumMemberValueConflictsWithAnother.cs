@@ -26,8 +26,7 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is EnumDeclarationSyntax enumDeclaration &&
-                context.ContainingSymbol is INamedTypeSymbol enumSymbol)
+                context.Node is EnumDeclarationSyntax enumDeclaration)
             {
                 if (enumDeclaration.AttributeLists.TryFind(KnownSymbol.FlagsAttribute, context.SemanticModel, context.CancellationToken, out _))
                 {

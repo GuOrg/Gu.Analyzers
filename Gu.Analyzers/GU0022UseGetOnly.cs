@@ -22,12 +22,8 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is AccessorDeclarationSyntax { Body: null } setter &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is AccessorDeclarationSyntax { Body: null } setter &&
                 context.ContainingSymbol is IMethodSymbol { DeclaredAccessibility: Accessibility.Private, AssociatedSymbol: IPropertySymbol { IsIndexer: false, IsOverride: false, IsAbstract: false, ExplicitInterfaceImplementations: { Length: 0 } } property })
             {
                 using (var walker = MutationWalker.For(property, context.SemanticModel, context.CancellationToken))
@@ -49,11 +45,14 @@
         {
             switch (mutation)
             {
-                case AssignmentExpressionSyntax assignment when !MemberPath.TrySingle(assignment.Left, out _):
+                case AssignmentExpressionSyntax assignment
+                    when !MemberPath.TrySingle(assignment.Left, out _):
                     return true;
-                case PostfixUnaryExpressionSyntax unary when !MemberPath.TrySingle(unary.Operand, out _):
+                case PostfixUnaryExpressionSyntax unary
+                    when !MemberPath.TrySingle(unary.Operand, out _):
                     return true;
-                case PrefixUnaryExpressionSyntax unary when !MemberPath.TrySingle(unary.Operand, out _):
+                case PrefixUnaryExpressionSyntax unary
+                    when !MemberPath.TrySingle(unary.Operand, out _):
                     return true;
             }
 
