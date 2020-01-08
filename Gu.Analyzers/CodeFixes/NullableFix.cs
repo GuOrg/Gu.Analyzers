@@ -12,9 +12,9 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocsFix))]
     [Shared]
-    internal class AddNullableAttributeFix : DocumentEditorCodeFixProvider
+    internal class NullableFix : DocumentEditorCodeFixProvider
     {
-        private static readonly UsingDirectiveSyntax UsingSystemDiagnostcisCodeAnalysis = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Diagnostics.CodeAnalysis"));
+        private static readonly UsingDirectiveSyntax UsingSystemDiagnosticsCodeAnalysis = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System.Diagnostics.CodeAnalysis"));
         private static readonly AttributeListSyntax NotNullWhenTrue = SyntaxFactory.AttributeList(
             SyntaxFactory.SingletonSeparatedList(
                 SyntaxFactory.Attribute(
@@ -55,7 +55,7 @@
                                     outParameter!,
                                     x => outParameter!.WithAttributeList(NotNullWhenTrue)
                                                       .WithType(SyntaxFactory.NullableType(outParameter!.Type)))
-                                                     .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                                                     .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
                                 "[NotNullWhen(true)]",
                                 diagnostic);
                         }
@@ -65,13 +65,13 @@
                                 "[MaybeNullWhen(false)]",
                                 (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter!.WithAttributeList(MaybeNullWhenFalse))
                                                      .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
-                                                     .AddUsing(UsingSystemDiagnostcisCodeAnalysis),
+                                                     .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
                                 "[MaybeNullWhen(false)]",
                                 diagnostic);
                         }
                     }
 
-                    if (expression.Parent is EqualsValueClauseSyntax { Parent: ParameterSyntax { } optionalParameter })
+                    if (expression.Parent is EqualsValueClauseSyntax { Parent: ParameterSyntax optionalParameter })
                     {
                         context.RegisterCodeFix(
                             optionalParameter.Type + "?",

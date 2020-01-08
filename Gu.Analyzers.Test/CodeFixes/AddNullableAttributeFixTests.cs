@@ -9,7 +9,7 @@
 
     internal static class AddNullableAttributeFixTests
     {
-        private static readonly CodeFixProvider Fix = new AddNullableAttributeFix();
+        private static readonly CodeFixProvider Fix = new NullableFix();
         private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
         private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
