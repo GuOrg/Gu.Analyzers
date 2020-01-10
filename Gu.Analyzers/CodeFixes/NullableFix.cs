@@ -12,7 +12,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DocsFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(NullableFix))]
     [Shared]
     internal class NullableFix : DocumentEditorCodeFixProvider
     {
