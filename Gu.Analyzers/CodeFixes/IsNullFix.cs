@@ -28,7 +28,7 @@
                 if (syntaxRoot.TryFindNode(diagnostic, out BinaryExpressionSyntax? binaryExpression))
                 {
                     context.RegisterCodeFix(
-                        binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword)).ToString(),
+                        binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword).WithTrailingTrivia(SyntaxFactory.Space)).ToString(),
                         e => e.ReplaceNode(binaryExpression, x => x.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword))),
                         nameof(IsNullFix),
                         diagnostic);
