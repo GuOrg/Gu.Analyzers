@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
+    <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="Moq" Version="4.14.1" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="System.Reactive.PlatformServices" Version="4.3.2" />
+    <PackageReference Include="System.Reactive.PlatformServices" Version="4.4.1" />
   </ItemGroup>
 
 </Project>
