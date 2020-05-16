@@ -1,4 +1,4 @@
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
@@ -27,6 +27,32 @@ namespace N
         }
     }
 }".AssertReplace("stringBuilder.AppendLine(\"test\");", expression);
+
+                RoslynAssert.Valid(Analyzer, code);
+            }
+
+            [Test]
+            public static void StringBuilderChained()
+            {
+                var code = @"
+namespace N
+{
+    using System.Text;
+
+    public class C
+    {
+        public void M()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine(""// ReSharper disable RedundantNameQualifier"")
+                   .AppendLine($""namespace {this.GetType().Namespace}"")
+                   .AppendLine(""{"")
+                   .AppendLine(""    [BenchmarkDotNet.Attributes.MemoryDiagnoser]"")
+                   .AppendLine(""    public class AllBenchmarks"")
+                   .AppendLine(""    {"");
+            }
+    }
+}";
 
                 RoslynAssert.Valid(Analyzer, code);
             }
