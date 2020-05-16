@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputType>Exe</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Nullable>Enable</Nullable>
     <CodeAnalysisRuleSet>Gu.Analyzers.Benchmarks.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
@@ -9,6 +11,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\Gu.Analyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.1" />
@@ -21,8 +27,5 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0-beta.1" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.164" PrivateAssets="all" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
-  </ItemGroup>
+
 </Project>
