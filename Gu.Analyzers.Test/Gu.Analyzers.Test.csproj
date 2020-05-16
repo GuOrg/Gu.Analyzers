@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWpf>true</UseWpf>
     <Nullable>enable</Nullable>
-    <LangVersion>8</LangVersion>
+    <LangVersion>latest</LangVersion>
     <CodeAnalysisRuleSet>Gu.Analyzers.Test.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
