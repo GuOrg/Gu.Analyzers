@@ -10,8 +10,8 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptors.GU0011DoNotIgnoreReturnValue);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptors.GU0011DoNotIgnoreReturnValue);
 
         public override void Initialize(AnalysisContext context)
         {
