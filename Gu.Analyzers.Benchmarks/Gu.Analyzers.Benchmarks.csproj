@@ -12,14 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Gu.Analyzers\Gu.Analyzers.csproj" />
   </ItemGroup>
 
