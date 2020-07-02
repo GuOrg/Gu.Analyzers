@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Benchmarks.Benchmarks
+﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -16,11 +16,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
-        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
-                                                                                                    .GetTypes()
-                                                                                                    .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                                                                                    .ToArray();
+        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol)
+            .Assembly
+            .GetTypes()
+            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+            .ToArray();
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)

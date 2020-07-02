@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 #pragma warning disable 1717
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
@@ -9,9 +9,9 @@ namespace ValidCode
 
     internal sealed class LazyFoo : IDisposable
     {
-        private readonly IDisposable created;
+        private readonly IDisposable? created;
         private bool disposed;
-        private IDisposable lazyDisposable;
+        private IDisposable? lazyDisposable;
 
         internal LazyFoo(IDisposable injected)
         {

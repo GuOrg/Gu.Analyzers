@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 #pragma warning disable 1717
 #pragma warning disable SA1101 // Prefix local calls with this
 #pragma warning disable GU0011 // Don't ignore the return value.
@@ -12,8 +12,8 @@ namespace ValidCode
 
     internal class RecursiveFoo
     {
-        private IDisposable bar1;
-        private IDisposable bar2;
+        private IDisposable? bar1;
+        private IDisposable? bar2;
 
         internal RecursiveFoo()
         {
@@ -93,7 +93,7 @@ namespace ValidCode
             }
         }
 
-        internal IDisposable Bar1
+        internal IDisposable? Bar1
         {
             get
             {
@@ -116,7 +116,7 @@ namespace ValidCode
             }
         }
 
-        internal IDisposable Bar2
+        internal IDisposable? Bar2
         {
             get
             {
@@ -149,13 +149,13 @@ namespace ValidCode
             return RecursiveOut(2, out value);
         }
 
-        internal static bool RecursiveOut(double foo, out IDisposable value)
+        internal static bool RecursiveOut(double foo, out IDisposable? value)
         {
             value = null;
             return RecursiveOut(3.0, out value);
         }
 
-        internal static bool RecursiveOut(string foo, out IDisposable value)
+        internal static bool RecursiveOut(string foo, out IDisposable? value)
         {
             if (foo is null)
             {
@@ -166,7 +166,7 @@ namespace ValidCode
             return true;
         }
 
-        internal static bool RecursiveRef(ref IDisposable value)
+        internal static bool RecursiveRef(ref IDisposable? value)
         {
             return RecursiveRef(ref value);
         }
@@ -235,7 +235,7 @@ namespace ValidCode
 #pragma warning restore GU0015 // Don't assign same more than once.
         }
 
-        private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+        private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable>? values = null)
         {
             if (values is null)
             {

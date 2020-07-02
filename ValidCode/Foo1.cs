@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -36,13 +36,13 @@ namespace ValidCode
             });
         }
 
-        public event PropertyChangedEventHandler PropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged
         {
             add { this.PropertyChangedCore += value; }
             remove { this.PropertyChangedCore -= value; }
         }
 
-        private event PropertyChangedEventHandler PropertyChangedCore;
+        private event PropertyChangedEventHandler? PropertyChangedCore;
 
         internal IDisposable Disposable => this.subscription.Disposable;
 
@@ -90,7 +90,7 @@ namespace ValidCode
             return this.compositeDisposable.AddAndReturn(new Disposable()).ToString();
         }
 
-        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable>? disposables = null)
         {
             if (disposables is null)
             {
