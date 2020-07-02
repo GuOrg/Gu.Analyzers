@@ -1,4 +1,5 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode
 {
     using System;
     using System.Text;
