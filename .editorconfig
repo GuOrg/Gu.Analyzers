@@ -200,3 +200,6 @@ csharp_preserve_single_line_statements = true
 
 dotnet_diagnostic.CA1303.severity = none # Do not pass literals as localized parameters
 dotnet_diagnostic.CS8762.severity = none # Analyzer buggy (Parameter may not have a null value when exiting in some condition.)
+
+# CA1716: Rename type CodeFix.When so that it no longer conflicts with the reserved language keyword 'When'. Using a reserved keyword as the name of a type makes it harder for consumers in other languages to use the type.
+dotnet_diagnostic.CA1716.severity = none
