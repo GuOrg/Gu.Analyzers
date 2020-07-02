@@ -3,15 +3,15 @@
     using System;
     using System.Text;
 
-    public class StringBuilderCases
+    internal class StringBuilderCases
     {
-        public void M1(string typeName)
+        internal void M1(string typeName)
         {
             var errorBuilder = new StringBuilder();
             errorBuilder.AppendLine($"Found more than one match for {typeName}");
         }
 
-        public void M2(string typeName)
+        internal void M2(string typeName)
         {
             try
             {
