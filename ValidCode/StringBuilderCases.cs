@@ -2,7 +2,7 @@
 {
     using System.Text;
 
-    class StringBuilderCases
+    public class StringBuilderCases
     {
         public void M(string typeName)
         {

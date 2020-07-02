@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Benchmarks.Benchmarks
+﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -23,11 +23,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
             MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location),
         };
 
-        public static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
-                                                                                                    .GetTypes()
-                                                                                                    .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                                                                                    .ToArray();
+        public static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol)
+            .Assembly
+            .GetTypes()
+            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+            .ToArray();
 
         public static Solution AnalyzersProject { get; } = CodeFactory.CreateSolution(
             ProjectFile.Find("Gu.Analyzers.csproj"),
