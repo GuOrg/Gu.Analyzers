@@ -1,4 +1,4 @@
-// ReSharper disable UnusedMember.Local
+﻿// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable HeuristicUnreachableCode
 // ReSharper disable RedundantNameQualifier
@@ -83,7 +83,7 @@ namespace Gu.Analyzers.Benchmarks
             string FindCsFile()
             {
                 return Directory.EnumerateFiles(
-                                    AppDomain.CurrentDomain.BaseDirectory.Split(new[] { "\\bin\\" }, StringSplitOptions.RemoveEmptyEntries).First(),
+                                    AppDomain.CurrentDomain.BaseDirectory!.Split(new[] { "\\bin\\" }, StringSplitOptions.RemoveEmptyEntries).First(),
                                     $"{name}.cs",
                                     SearchOption.AllDirectories)
                                 .Single();

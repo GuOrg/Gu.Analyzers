@@ -84,7 +84,7 @@
                 ParameterSyntax CreateParameter(AttributeArgumentSyntax argument)
                 {
                     var i = ((AttributeArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
-                    if (current.Parameters.TryElementAt(i, out var parameter))
+                    if (current!.Parameters.TryElementAt(i, out var parameter))
                     {
                         if (parameter.Modifiers.Any(SyntaxKind.ParamsKeyword))
                         {

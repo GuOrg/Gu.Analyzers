@@ -11,11 +11,10 @@
             errorBuilder.AppendLine($"Found more than one match for {typeName}");
         }
 
-        public void M(string typeName)
+        public void M2(string typeName)
         {
             try
             {
-
             }
             catch (Exception)
             {
