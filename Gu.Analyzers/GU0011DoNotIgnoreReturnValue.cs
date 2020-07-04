@@ -68,7 +68,7 @@
                     return true;
                 }
 
-                if (ReferenceEquals(method.ContainingType, method.ReturnType) &&
+                if (Equals(method.ContainingType, method.ReturnType) &&
                     method.ContainingType == KnownSymbol.StringBuilder)
                 {
                     return true;
