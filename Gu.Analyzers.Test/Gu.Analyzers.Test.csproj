@@ -16,8 +16,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.0" />
-    <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.2.10" PrivateAssets="all" />
+    <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.1" />
+    <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="IDisposableAnalyzers" Version="3.4.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0" PrivateAssets="all" />
