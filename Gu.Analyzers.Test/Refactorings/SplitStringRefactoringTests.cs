@@ -1,8 +1,10 @@
-namespace Gu.Analyzers.Test.Refactorings
+﻿namespace Gu.Analyzers.Test.Refactorings
 {
     using Gu.Analyzers.Refactoring;
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis.CodeRefactorings;
+
     using NUnit.Framework;
 
     internal static class SplitStringRefactoringTests
@@ -256,6 +258,24 @@ namespace N
 }";
 
             RoslynAssert.Refactoring(Refactoring, before, after);
+        }
+
+        [Test]
+        public static void IgnoreVerbatim()
+        {
+            var code = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M()
+        {
+            var text = @""↓a\nb\nc\n"";
+        }
+    }
+}";
+
+            RoslynAssert.NoRefactoring(Refactoring, code);
         }
     }
 }

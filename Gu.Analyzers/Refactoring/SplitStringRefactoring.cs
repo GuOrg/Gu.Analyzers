@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Refactoring
+﻿namespace Gu.Analyzers.Refactoring
 {
     using System;
     using System.Collections.Generic;
@@ -22,6 +22,7 @@ namespace Gu.Analyzers.Refactoring
                                           .ConfigureAwait(false);
             if (syntaxRoot.FindNode(context.Span) is LiteralExpressionSyntax literal &&
                 literal.IsKind(SyntaxKind.StringLiteralExpression) &&
+                !literal.Token.IsVerbatimStringLiteral() &&
                 literal.Token.Text.IndexOf("\\n", StringComparison.Ordinal) < literal.Token.Text.Length - 3)
             {
                 context.RegisterRefactoring(
