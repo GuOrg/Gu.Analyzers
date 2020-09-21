@@ -38,7 +38,8 @@
                 {
                     var leadingWhiteSpace = SyntaxFactory.TriviaList(
                         SyntaxFactory.Whitespace(new string(' ', literal.FileLinePositionSpan(context.CancellationToken).StartLinePosition.Character)));
-                    var lines = Lines().ToImmutableArray();
+                    var lines = Lines()
+                        .ToImmutableArray();
 
                     var binaryExpression = SyntaxFactory.BinaryExpression(
                         SyntaxKind.AddExpression,
