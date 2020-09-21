@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers.Refactoring
 {
+    using System;
     using System.Composition;
     using System.Threading.Tasks;
 
@@ -19,57 +20,151 @@
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
 
-            if (syntaxRoot.FindNode(context.Span) is ParameterSyntax parameter &&
+            if (syntaxRoot.FindNode(context.Span).FirstAncestorOrSelf<ParameterSyntax>() is { } parameter &&
                 parameter is { Parent: ParameterListSyntax { Parent: ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax type } ctor } parameterList } &&
                 parameterList.Parameters.Count > 1)
             {
-                if (Assignment(parameter, ctor.Body.Statements) is { } assignment)
+                if (ShouldMoveAssignment(parameter, ctor) is { } moveAssignment)
                 {
-                    var indexOf = parameterList.Parameters.IndexOf(parameter);
-                    for (var i = indexOf - 1; i >= 0; i--)
-                    {
-                        if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } previous)
-                        {
-                            if (assignment.SpanStart < previous.SpanStart)
-                            {
-                                context.RegisterRefactoring(
-                                    CodeAction.Create(
-                                        "Move assignment to match parameter position.",
-                                        _ => Task.FromResult(context.Document.WithSyntaxRoot(
-                                                                 syntaxRoot.ReplaceNode(
-                                                                     ctor.Body,
-                                                                     ctor.Body.WithStatements(
-                                                                         ctor.Body.Statements.Move(
-                                                                             ctor.Body.Statements.IndexOf(assignment),
-                                                                             ctor.Body.Statements.IndexOf(previous))))))));
-                            }
-                        }
-                    }
+                    context.RegisterRefactoring(
+                        CodeAction.Create(
+                            "Move assignment to match parameter position.",
+                            _ => Task.FromResult(
+                                context.Document.WithSyntaxRoot(
+                                    syntaxRoot.ReplaceNode(
+                                        ctor.Body,
+                                        ctor.Body.WithStatements(
+                                            ctor.Body.Statements.Move(
+                                                ctor.Body.Statements.IndexOf(moveAssignment.From),
+                                                ctor.Body.Statements.IndexOf(moveAssignment.To)))))),
+                            "Move assignment to match parameter position."));
+                }
 
-                    for (var i = indexOf + 1; i < parameterList.Parameters.Count; i++)
-                    {
-                        if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } next)
-                        {
-                            if (assignment.SpanStart > next.SpanStart)
-                            {
-                                context.RegisterRefactoring(
-                                    CodeAction.Create(
-                                        "Move assignment to match parameter position.",
-                                        _ => Task.FromResult(context.Document.WithSyntaxRoot(
-                                                                 syntaxRoot.ReplaceNode(
-                                                                     ctor.Body,
-                                                                     ctor.Body.WithStatements(
-                                                                         ctor.Body.Statements.Move(
-                                                                             ctor.Body.Statements.IndexOf(assignment),
-                                                                             ctor.Body.Statements.IndexOf(next))))))));
-                            }
-                        }
-                    }
+                if (ShouldMoveParameter(parameter, ctor) is { } moveParameter)
+                {
+                    context.RegisterRefactoring(
+                        CodeAction.Create(
+                            "Move parameter to match assigned member position.",
+                            _ => Task.FromResult(
+                                context.Document.WithSyntaxRoot(
+                                    syntaxRoot.ReplaceNode(
+                                        ctor.ParameterList,
+                                        ctor.ParameterList.WithParameters(
+                                            Move(
+                                                ctor.ParameterList.Parameters,
+                                                ctor.ParameterList.Parameters.IndexOf(moveParameter.From),
+                                                ctor.ParameterList.Parameters.IndexOf(moveParameter.To)))))),
+                            "Move parameter to match assigned member position."));
+                }
+
+                static SeparatedSyntaxList<T> Move<T>(SeparatedSyntaxList<T> list, int oldIndex, int newIndex)
+                    where T : SyntaxNode
+                {
+                    var item = list[oldIndex];
+                    return list.RemoveAt(oldIndex)
+                               .Insert(Math.Min(newIndex, list.Count - 1), item);
                 }
             }
         }
 
-        private static StatementSyntax? Assignment(ParameterSyntax? parameter, SyntaxList<StatementSyntax> statements)
+        private static Move<StatementSyntax>? ShouldMoveAssignment(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
+        {
+            var parameterList = ctor.ParameterList;
+            if (Assignment(parameter, ctor.Body.Statements) is { } assignment)
+            {
+                var indexOf = parameterList.Parameters.IndexOf(parameter);
+                for (var i = indexOf - 1; i >= 0; i--)
+                {
+                    if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } previous)
+                    {
+                        if (assignment.SpanStart < previous.SpanStart)
+                        {
+                            return new Move<StatementSyntax>(assignment, previous);
+                        }
+                    }
+                }
+
+                for (var i = indexOf + 1; i < parameterList.Parameters.Count; i++)
+                {
+                    if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } next)
+                    {
+                        if (assignment.SpanStart > next.SpanStart)
+                        {
+                            return new Move<StatementSyntax>(assignment, next);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static Move<ParameterSyntax>? ShouldMoveParameter(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
+        {
+            var parameterList = ctor.ParameterList;
+            if (Member(parameter, ctor) is { } member)
+            {
+                var indexOf = parameterList.Parameters.IndexOf(parameter);
+                for (var i = indexOf - 1; i >= 0; i--)
+                {
+                    if (Member(parameterList.Parameters[i], ctor) is { } previous)
+                    {
+                        if (member.SpanStart < previous.SpanStart)
+                        {
+                            return new Move<ParameterSyntax>(parameter, parameterList.Parameters[i]);
+                        }
+                    }
+                }
+
+                for (var i = indexOf + 1; i < parameterList.Parameters.Count; i++)
+                {
+                    if (Member(parameterList.Parameters[i], ctor) is { } next)
+                    {
+                        if (member.SpanStart > next.SpanStart)
+                        {
+                            return new Move<ParameterSyntax>(parameter, parameterList.Parameters[i]);
+                        }
+                    }
+                }
+            }
+
+            return null;
+
+            static MemberDeclarationSyntax? Member(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
+            {
+                if (Assignment(parameter, ctor.Body.Statements) is { Expression: AssignmentExpressionSyntax assignment } &&
+                    Name(assignment.Left) is { } name &&
+                    ctor.Parent is TypeDeclarationSyntax type)
+                {
+                    foreach (var candidate in type.Members)
+                    {
+                        switch (candidate)
+                        {
+                            case FieldDeclarationSyntax { Declaration: { Variables: { Count: 1 } variables } }
+                                when variables[0].Identifier.ValueText == name:
+                                return candidate;
+                            case PropertyDeclarationSyntax { Identifier: { } identifier }
+                                when identifier.ValueText == name:
+                                return candidate;
+                        }
+                    }
+                }
+
+                return null;
+
+                static string? Name(ExpressionSyntax left)
+                {
+                    return left switch
+                    {
+                        IdentifierNameSyntax identifierName => identifierName.Identifier.ValueText,
+                        MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: IdentifierNameSyntax identifierName } => identifierName.Identifier.ValueText,
+                        _ => null,
+                    };
+                }
+            }
+        }
+
+        private static ExpressionStatementSyntax? Assignment(ParameterSyntax? parameter, SyntaxList<StatementSyntax> statements)
         {
             if (parameter is null)
             {
@@ -78,14 +173,27 @@
 
             foreach (var statement in statements)
             {
-                if (statement is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Right: IdentifierNameSyntax right } } &&
+                if (statement is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Right: IdentifierNameSyntax right } } expressionStatement &&
                     right.Identifier.ValueText == parameter.Identifier.ValueText)
                 {
-                    return statement;
+                    return expressionStatement;
                 }
             }
 
             return null;
+        }
+
+        private readonly struct Move<T>
+            where T : SyntaxNode
+        {
+            internal readonly T From;
+            internal readonly T To;
+
+            public Move(T @from, T to)
+            {
+                this.From = @from;
+                this.To = to;
+            }
         }
     }
 }
