@@ -3,7 +3,6 @@
     using System.Composition;
     using System.Threading.Tasks;
 
-    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
 
     using Microsoft.CodeAnalysis;
@@ -26,48 +25,46 @@
             {
                 if (Assignment(parameter, ctor.Body.Statements) is { } assignment)
                 {
-                    if (Assignment(ParameterAt(parameterList.Parameters.IndexOf(parameter) - 1), ctor.Body.Statements) is { } previous)
+                    var indexOf = parameterList.Parameters.IndexOf(parameter);
+                    for (var i = indexOf - 1; i >= 0; i--)
                     {
-                        if (assignment.SpanStart < previous.SpanStart)
+                        if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } previous)
                         {
-                            context.RegisterRefactoring(
-                                CodeAction.Create(
-                                    "Move assignment to match parameter position.",
-                                    _ => Task.FromResult(context.Document.WithSyntaxRoot(
-                                                             syntaxRoot.ReplaceNode(
-                                                                 ctor.Body,
-                                                                 ctor.Body.WithStatements(
-                                                                     ctor.Body.Statements.Move(
-                                                                     ctor.Body.Statements.IndexOf(assignment),
-                                                                     ctor.Body.Statements.IndexOf(previous))))))));
+                            if (assignment.SpanStart < previous.SpanStart)
+                            {
+                                context.RegisterRefactoring(
+                                    CodeAction.Create(
+                                        "Move assignment to match parameter position.",
+                                        _ => Task.FromResult(context.Document.WithSyntaxRoot(
+                                                                 syntaxRoot.ReplaceNode(
+                                                                     ctor.Body,
+                                                                     ctor.Body.WithStatements(
+                                                                         ctor.Body.Statements.Move(
+                                                                             ctor.Body.Statements.IndexOf(assignment),
+                                                                             ctor.Body.Statements.IndexOf(previous))))))));
+                            }
                         }
                     }
-                    else if (Assignment(ParameterAt(parameterList.Parameters.IndexOf(parameter) + 1), ctor.Body.Statements) is { } next)
+
+                    for (var i = indexOf + 1; i < parameterList.Parameters.Count; i++)
                     {
-                        if (assignment.SpanStart > next.SpanStart)
+                        if (Assignment(parameterList.Parameters[i], ctor.Body.Statements) is { } next)
                         {
-                            context.RegisterRefactoring(
-                                CodeAction.Create(
-                                    "Move assignment to match parameter position.",
-                                    _ => Task.FromResult(context.Document.WithSyntaxRoot(
-                                                             syntaxRoot.ReplaceNode(
-                                                                 ctor.Body,
-                                                                 ctor.Body.WithStatements(
-                                                                     ctor.Body.Statements.Move(
-                                                                         ctor.Body.Statements.IndexOf(assignment),
-                                                                         ctor.Body.Statements.IndexOf(next))))))));
+                            if (assignment.SpanStart > next.SpanStart)
+                            {
+                                context.RegisterRefactoring(
+                                    CodeAction.Create(
+                                        "Move assignment to match parameter position.",
+                                        _ => Task.FromResult(context.Document.WithSyntaxRoot(
+                                                                 syntaxRoot.ReplaceNode(
+                                                                     ctor.Body,
+                                                                     ctor.Body.WithStatements(
+                                                                         ctor.Body.Statements.Move(
+                                                                             ctor.Body.Statements.IndexOf(assignment),
+                                                                             ctor.Body.Statements.IndexOf(next))))))));
+                            }
                         }
                     }
-                }
-
-                ParameterSyntax? ParameterAt(int index)
-                {
-                    if (parameterList.Parameters.TryElementAt(index, out var result))
-                    {
-                        return result;
-                    }
-
-                    return null;
                 }
             }
         }
