@@ -7,6 +7,7 @@
 
     using NUnit.Framework;
 
+    [Ignore("RoslynAssert does not handle many.")]
     public static class ParameterRefactoringTests
     {
         private static readonly CodeRefactoringProvider Refactoring = new ParameterRefactoring();
