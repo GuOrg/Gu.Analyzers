@@ -19,3 +19,6 @@ dotnet_diagnostic.CA1062.severity = none
 dotnet_diagnostic.CA1720.severity = none
 
 
+
+# RS1029: Do not use reserved diagnostic IDs.
+dotnet_diagnostic.RS1029.severity = none

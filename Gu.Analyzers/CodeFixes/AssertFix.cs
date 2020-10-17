@@ -94,10 +94,7 @@
                                             expression: SyntaxFactory.IdentifierName("exception"),
                                             name: SyntaxFactory.IdentifierName("Message"))),
                                 },
-                                new[]
-                                {
-                                    SyntaxFactory.Token(SyntaxKind.CommaToken),
-                                }))),
+                                new[] { SyntaxFactory.Token(SyntaxKind.CommaToken) }))),
                     semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken));
             }
         }

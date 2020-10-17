@@ -28,7 +28,7 @@
                 context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { Identifier: { ValueText: "Throws" } } } } invocation)
             {
                 if (invocation.Parent is ExpressionStatementSyntax ||
-                    invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax {Identifier:{ValueText: "_" } } })
+                    invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } })
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0084AssertExceptionMessage, invocation.GetLocation()));
                 }

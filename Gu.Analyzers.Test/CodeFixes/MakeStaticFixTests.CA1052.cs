@@ -13,7 +13,7 @@
 
     internal static partial class MakeStaticFixTests
     {
-        private static DiagnosticAnalyzer Analyzxer = new FakeFxCopAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new FakeFxCopAnalyzer();
 
         // ReSharper disable once InconsistentNaming
         private static readonly ExpectedDiagnostic CA1052 = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
@@ -43,7 +43,7 @@ namespace N
         }
     }
 }".AssertReplace("public", modifier);
-            RoslynAssert.CodeFix(Analyzxer, Fix, CA1052, before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, CA1052, before, after);
         }
 
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
