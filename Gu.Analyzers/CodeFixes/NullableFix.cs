@@ -5,8 +5,10 @@
     using System.Globalization;
     using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -48,8 +50,19 @@
                     if (TryFindLocalOrParameter() is { } localOrParameter &&
                         TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter))
                     {
-                        if (diagnostic.Id == "CS8625" ||
-                            diagnostic.Id == "CS8601")
+                        if (diagnostic.Id == "CS8653" ||
+                            (diagnostic.Id == "CS8601" && IsDefault(expression)))
+                        {
+                            context.RegisterCodeFix(
+                                "[MaybeNullWhen(false)]",
+                                (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter!.WithAttributeList(MaybeNullWhenFalse))
+                                                     .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
+                                                     .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
+                                "[MaybeNullWhen(false)]",
+                                diagnostic);
+                        }
+                        else if (diagnostic.Id == "CS8625" ||
+                                 diagnostic.Id == "CS8601")
                         {
                             context.RegisterCodeFix(
                                 "[NotNullWhen(true)]",
@@ -59,16 +72,6 @@
                                                       .WithType(SyntaxFactory.NullableType(outParameter!.Type)))
                                                      .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
                                 "[NotNullWhen(true)]",
-                                diagnostic);
-                        }
-                        else if (diagnostic.Id == "CS8653")
-                        {
-                            context.RegisterCodeFix(
-                                "[MaybeNullWhen(false)]",
-                                (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter!.WithAttributeList(MaybeNullWhenFalse))
-                                                     .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
-                                                     .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
-                                "[MaybeNullWhen(false)]",
                                 diagnostic);
                         }
                     }
@@ -143,6 +146,16 @@
                         };
                     }
                 }
+            }
+
+            static bool IsDefault(ExpressionSyntax expression)
+            {
+                return expression switch
+                {
+                    LiteralExpressionSyntax { Token: { ValueText: "default" } } => true,
+                    DefaultExpressionSyntax _ => true,
+                    _ => false,
+                };
             }
         }
     }

@@ -22,3 +22,6 @@ dotnet_diagnostic.CA1720.severity = none
 
 # RS1029: Do not use reserved diagnostic IDs.
 dotnet_diagnostic.RS1029.severity = none
+
+# RS2008: Enable analyzer release tracking
+dotnet_diagnostic.RS2008.severity = none

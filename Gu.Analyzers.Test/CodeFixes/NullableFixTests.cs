@@ -309,7 +309,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8653, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
         }
 
         [Test]
@@ -354,7 +354,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8653, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
         }
 
         [Test]
