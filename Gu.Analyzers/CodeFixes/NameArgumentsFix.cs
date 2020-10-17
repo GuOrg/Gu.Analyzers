@@ -48,7 +48,7 @@
                 }
                 else if (diagnostic.Id == Descriptors.GU0009UseNamedParametersForBooleans.Id &&
                          syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? boolArgument) &&
-                         boolArgument.Parent is ArgumentListSyntax { } argumentList &&
+                         boolArgument.Parent is ArgumentListSyntax argumentList &&
                          !HasAnyNamedArgument(argumentList) &&
                          semanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out method))
                 {
@@ -63,10 +63,9 @@
 
         private static void ApplyFix(DocumentEditor editor, IMethodSymbol method, ArgumentListSyntax arguments, int startIndex)
         {
-            var withNames = arguments;
             for (var i = startIndex; i < arguments.Arguments.Count; i++)
             {
-                var argument = withNames.Arguments[i];
+                var argument = arguments.Arguments[i];
 
                 editor.ReplaceNode(
                     argument,
@@ -76,8 +75,6 @@
                                              .WithLeadingTriviaFrom(argument))
                             .WithTrailingTriviaFrom(argument));
             }
-
-            editor.ReplaceNode(arguments, withNames);
         }
 
         private static bool HasAnyNamedArgument(ArgumentListSyntax argumentList)
