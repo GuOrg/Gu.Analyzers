@@ -1,13 +1,17 @@
-namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes
 {
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis.CodeFixes;
+
     using NUnit.Framework;
 
-    internal static class MakeStaticFixTests
+    internal static partial class MakeStaticFixTests
     {
         private static readonly CodeFixProvider Fix = new MakeStaticFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS0708");
+
+        // ReSharper disable once InconsistentNaming
+        private static readonly ExpectedDiagnostic CS0708 = ExpectedDiagnostic.Create("CS0708");
 
         [TestCase("public")]
         [TestCase("internal")]
@@ -35,7 +39,7 @@ namespace N
         }
     }
 }".AssertReplace("public", modifier);
-            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Fix, CS0708, before, after);
         }
 
         [Test]
@@ -62,7 +66,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Fix, CS0708, before, after);
         }
 
         [Test]
@@ -97,7 +101,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Fix, CS0708, before, after);
         }
 
         [Test]
@@ -124,7 +128,7 @@ namespace N
         public static async Task M() => await Task.CompletedTask;
     }
 }";
-            RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Fix, CS0708, before, after);
         }
     }
 }

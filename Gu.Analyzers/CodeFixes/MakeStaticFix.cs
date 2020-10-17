@@ -14,7 +14,9 @@
     [Shared]
     internal class MakeStaticFix : DocumentEditorCodeFixProvider
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS0708");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            "CS0708",
+            "CA1052");
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => DocumentEditorFixAllProvider.Project;
 
@@ -31,6 +33,16 @@
                         "Make Static.",
                         (editor, _) => editor.ReplaceNode(
                             methodDeclaration,
+                            x => x.WithModifiers(MakeStatic(x.Modifiers))),
+                        "Make Static.",
+                        diagnostic);
+                }
+                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax? classDeclaration))
+                {
+                    context.RegisterCodeFix(
+                        "Make Static.",
+                        (editor, _) => editor.ReplaceNode(
+                            classDeclaration,
                             x => x.WithModifiers(MakeStatic(x.Modifiers))),
                         "Make Static.",
                         diagnostic);
