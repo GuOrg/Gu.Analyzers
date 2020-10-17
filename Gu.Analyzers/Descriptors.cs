@@ -364,6 +364,15 @@
             isEnabledByDefault: true,
             description: "TestCase Mismatches Method Parameters");
 
+        internal static readonly DiagnosticDescriptor GU0084AssertExceptionMessage = Create(
+            id: "GU0084",
+            title: "Assert exception message.",
+            messageFormat: "Assert exception message.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Hidden,
+            isEnabledByDefault: true,
+            description: "Test that the exception message is the expected with an assert.");
+
         internal static readonly DiagnosticDescriptor GU0090DoNotThrowNotImplementedException = Create(
             id: "GU0090",
             title: "Don't throw NotImplementedException.",

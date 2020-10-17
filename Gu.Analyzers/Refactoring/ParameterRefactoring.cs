@@ -189,7 +189,7 @@
             internal readonly T From;
             internal readonly T To;
 
-            public Move(T @from, T to)
+            internal Move(T @from, T to)
             {
                 this.From = @from;
                 this.To = to;
