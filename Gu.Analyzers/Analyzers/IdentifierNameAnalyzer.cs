@@ -1,6 +1,7 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -11,7 +12,8 @@ namespace Gu.Analyzers
     internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0017DoNotUseDiscarded);
+            Descriptors.GU0017DoNotUseDiscarded,
+            Descriptors.GU0018NameMock);
 
         public override void Initialize(AnalysisContext context)
         {

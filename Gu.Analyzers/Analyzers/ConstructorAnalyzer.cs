@@ -41,8 +41,11 @@
                     {
                         if (ShouldRename(parameter, walker, context, out var name))
                         {
-                            var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name), });
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch, parameter.Identifier.GetLocation(), properties));
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.GU0003CtorParameterNamesShouldMatch,
+                                    parameter.Identifier.GetLocation(),
+                                    ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", name) })));
                         }
                     }
 

@@ -157,6 +157,15 @@
             isEnabledByDefault: true,
             description: "Don't use discarded.");
 
+        internal static readonly DiagnosticDescriptor GU0018NameMock = Create(
+            id: "GU0018",
+            title: "Name mock",
+            messageFormat: "Name mock",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Name mock");
+
         internal static readonly DiagnosticDescriptor GU0020SortProperties = Create(
             id: "GU0020",
             title: "Sort properties.",
