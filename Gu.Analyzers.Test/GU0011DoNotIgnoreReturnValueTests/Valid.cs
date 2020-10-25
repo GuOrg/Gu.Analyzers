@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0011DontIgnoreReturnValueTests
+namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
