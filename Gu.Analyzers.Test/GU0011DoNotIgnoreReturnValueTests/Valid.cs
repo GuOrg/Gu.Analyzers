@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
+﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -377,6 +377,68 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ReturningThisMethodExpressionBody()
+        {
+            var c = @"
+namespace N
+{
+    public class C
+    {
+        public C M() => this;
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    public class C1
+    {
+        public void M()
+        {
+            var c1 = new C().M();
+            var c2 = new C();
+            c2.M();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, c, code);
+        }
+
+        [Test]
+        public static void ReturningThisMethodExpressionBodyDisposable()
+        {
+            var c = @"
+namespace N
+{
+    using System;
+
+    public class C : IDisposable
+    {
+        public C M() => this;
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    public class C1
+    {
+        public void M()
+        {
+            using var c1 = new C().M();
+            using var c2 = new C();
+            c2.M();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, c, code);
         }
     }
 }
