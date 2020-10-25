@@ -20,15 +20,14 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
-      FEATURE: Generate null checks for CA1062
-      BUGFIX GU0012: ignore out parameters.
+      FEATURE: Name mocks
     </PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/GuOrg/Gu.Analyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/GuOrg/Gu.Analyzers</RepositoryUrl>

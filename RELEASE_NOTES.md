@@ -1,3 +1,6 @@
+#### 1.8.0
+* FEATURE: Name mocks
+
 #### 1.5.5
 * FEATURE: GU0007 handle singletons.
 * BUGFIX GU0012: ignore out parameters.
