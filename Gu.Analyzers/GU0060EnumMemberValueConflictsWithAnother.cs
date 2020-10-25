@@ -13,8 +13,8 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
         public override void Initialize(AnalysisContext context)
         {

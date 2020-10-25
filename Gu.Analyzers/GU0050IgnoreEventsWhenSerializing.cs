@@ -23,12 +23,8 @@
 
         private static void HandleEventField(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is EventFieldDeclarationSyntax eventFieldDeclaration &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is EventFieldDeclarationSyntax eventFieldDeclaration &&
                 context.ContainingSymbol is IEventSymbol eventSymbol &&
                 HasSerializableAttribute(eventSymbol.ContainingType) &&
                 !Attribute.TryFind(eventFieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))

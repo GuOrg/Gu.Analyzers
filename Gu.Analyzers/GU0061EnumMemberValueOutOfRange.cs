@@ -22,14 +22,9 @@
 
         private void HandleEnumMember(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var enumMemberDeclaration = (EnumMemberDeclarationSyntax)context.Node;
-
-            if (context.ContainingSymbol?.ContainingSymbol is INamedTypeSymbol enumType &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is EnumMemberDeclarationSyntax enumMemberDeclaration &&
+                context.ContainingSymbol?.ContainingSymbol is INamedTypeSymbol enumType &&
                 enumType.EnumUnderlyingType.SpecialType == SpecialType.System_Int32 &&
                 enumMemberDeclaration.EqualsValue?.Value is BinaryExpressionSyntax leftShiftExpression &&
                 leftShiftExpression.Kind() == SyntaxKind.LeftShiftExpression &&

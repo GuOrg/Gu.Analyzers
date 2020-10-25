@@ -12,7 +12,6 @@
         private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
         private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
-        private static readonly ExpectedDiagnostic CS8653 = ExpectedDiagnostic.Create("CS8653");
         private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' is uninitialized. Consider declaring the event as nullable.");
         private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 

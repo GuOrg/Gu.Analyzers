@@ -1,4 +1,4 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -42,27 +42,25 @@ namespace Gu.Analyzers
 
         private static bool IsInitializedWithUninitialized(MemberDeclarationSyntax member, ExpressionSyntax value, SyntaxNodeAnalysisContext context, out FieldOrProperty other)
         {
-            using (var walker = Walker.Borrow(value, context.SemanticModel, context.CancellationToken))
+            using var walker = Walker.Borrow(value, context.SemanticModel, context.CancellationToken);
+            foreach (var identifierName in walker.IdentifierNames)
             {
-                foreach (var identifierName in walker.IdentifierNames)
+                if (!IsNameOf(identifierName) &&
+                    context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out var symbol) &&
+                    FieldOrProperty.TryCreate(symbol, out other) &&
+                    other.IsStatic &&
+                    Equals(other.ContainingType, context.ContainingSymbol.ContainingType) &&
+                    symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax? otherDeclaration))
                 {
-                    if (!IsNameOf(identifierName) &&
-                        context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ISymbol? symbol) &&
-                        FieldOrProperty.TryCreate(symbol, out other) &&
-                        other.IsStatic &&
-                        Equals(other.ContainingType, context.ContainingSymbol.ContainingType) &&
-                        symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax? otherDeclaration))
+                    if (otherDeclaration.SpanStart > context.Node.SpanStart &&
+                        IsInitialized(otherDeclaration))
                     {
-                        if (otherDeclaration.SpanStart > context.Node.SpanStart &&
-                            IsInitialized(otherDeclaration))
-                        {
-                            return true;
-                        }
+                        return true;
+                    }
 
-                        if (!IsInSamePart(member, otherDeclaration))
-                        {
-                            return true;
-                        }
+                    if (!IsInSamePart(member, otherDeclaration))
+                    {
+                        return true;
                     }
                 }
             }
