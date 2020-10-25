@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Generic;
@@ -21,7 +21,7 @@ namespace Gu.Analyzers.Test
                                .ToArray();
 
         private static readonly Solution Solution = CodeFactory.CreateSolution(
-            new FileInfo("C:\\Git\\Gu.State\\Gu.State.sln"),
+            new FileInfo("C:\\Git\\_GuOrg\\Gu.Inject\\Gu.Inject.sln"),
             AllAnalyzers,
             MetadataReferences.FromAttributes());
 

@@ -1,7 +1,9 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,12 +25,8 @@
 
         private static void HandleCreation(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 IsIgnored(objectCreation))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue, context.Node.GetLocation()));
@@ -37,12 +35,8 @@
 
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is InvocationExpressionSyntax invocation &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is InvocationExpressionSyntax invocation &&
                 IsIgnored(invocation) &&
                 !CanIgnore(invocation, context))
             {
@@ -52,8 +46,7 @@
 
         private static bool IsIgnored(SyntaxNode node)
         {
-            return node.Parent is ExpressionStatementSyntax expressionStatement &&
-                   expressionStatement.Parent is BlockSyntax;
+            return node.Parent is ExpressionStatementSyntax { Parent: BlockSyntax _ };
         }
 
         private static bool CanIgnore(InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context)
@@ -89,19 +82,23 @@
                     method = method.ReducedFrom;
                 }
 
-                if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? declaration) &&
-                    ReturnValueWalker.TrySingle(declaration, out var returnValue))
+                if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? declaration))
                 {
-                    if (returnValue is IdentifierNameSyntax { Identifier: { ValueText: { } valueText } } &&
-                        method.TryFindParameter(valueText, out _))
+                    using var walker = ReturnValueWalker.Borrow(declaration);
+                    foreach (var returnValue in walker.ReturnValues)
                     {
-                        return true;
+                        switch (returnValue)
+                        {
+                            case IdentifierNameSyntax { Identifier: { ValueText: { } valueText } }
+                                when method.TryFindParameter(valueText, out _):
+                            case ThisExpressionSyntax _:
+                                continue;
+                            default:
+                                return false;
+                        }
                     }
 
-                    if (returnValue is InstanceExpressionSyntax)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 return false;
