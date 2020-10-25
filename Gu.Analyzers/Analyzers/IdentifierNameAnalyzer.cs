@@ -12,8 +12,7 @@
     internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0017DoNotUseDiscarded,
-            Descriptors.GU0018NameMock);
+            Descriptors.GU0017DoNotUseDiscarded);
 
         public override void Initialize(AnalysisContext context)
         {

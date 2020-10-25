@@ -16,7 +16,6 @@
     internal class VariableDeclaratorAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0017DoNotUseDiscarded,
             Descriptors.GU0018NameMock);
 
         public override void Initialize(AnalysisContext context)
