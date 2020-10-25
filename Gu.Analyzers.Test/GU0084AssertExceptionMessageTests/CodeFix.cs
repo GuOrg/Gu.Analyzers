@@ -44,7 +44,42 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
+        }
+
+        [Test]
+        public static void ExplicitDiscardToInline()
+        {
+            var before = @"
+namespace N
+{
+    using NUnit.Framework;
+
+    public class C
+    {
+        [Test]
+        public void M()
+        {
+            _ = ↓Assert.Throws<SuccessException>(() => { });
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using NUnit.Framework;
+
+    public class C
+    {
+        [Test]
+        public void M()
+        {
+            Assert.AreEqual(""EXPECTED"", Assert.Throws<SuccessException>(() => { }).Message);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
         }
 
         [Test]
@@ -80,7 +115,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
         }
     }
 }

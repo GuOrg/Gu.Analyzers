@@ -29,12 +29,32 @@
                     Statement() is { } statement)
                 {
                     context.RegisterCodeFix(
-                        "Assert exception message.",
+                        "Assert exception message inline.",
+                        (editor, cancellationToken) =>
+                        {
+                            editor
+                                .ReplaceNode(
+                                    statement,
+                                    AssertMessage(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            invocation,
+                                            SyntaxFactory.IdentifierName("Message"))));
+                        },
+                        nameof(AssertFix),
+                        diagnostic);
+
+                    context.RegisterCodeFix(
+                        "Assert exception message via local variable.",
                         (editor, cancellationToken) =>
                         {
                             editor.InsertAfter(
                                 statement,
-                                AssertMessage());
+                                AssertMessage(
+                                    SyntaxFactory.MemberAccessExpression(
+                                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                                        expression: SyntaxFactory.IdentifierName("exception"),
+                                        name: SyntaxFactory.IdentifierName("Message"))));
                             editor
                                 .ReplaceNode(
                                     statement,
@@ -55,7 +75,7 @@
                         diagnostic);
                 }
 
-                StatementSyntax? Statement()
+                ExpressionStatementSyntax? Statement()
                 {
                     return invocation.Parent switch
                     {
@@ -64,38 +84,31 @@
                         _ => null,
                     };
                 }
-            }
 
-            ExpressionStatementSyntax AssertMessage()
-            {
-                return SyntaxFactory.ExpressionStatement(
-                    expression: SyntaxFactory.InvocationExpression(
-                        expression: SyntaxFactory.MemberAccessExpression(
-                            kind: SyntaxKind.SimpleMemberAccessExpression,
-                            expression: SyntaxFactory.IdentifierName("Assert"),
-                            name: SyntaxFactory.IdentifierName("AreEqual")),
-                        argumentList: SyntaxFactory.ArgumentList(
-                            arguments: SyntaxFactory.SeparatedList(
-                                new ArgumentSyntax[]
-                                {
-                                    SyntaxFactory.Argument(
-                                        nameColon: default,
-                                        refKindKeyword: default,
-                                        expression: SyntaxFactory.LiteralExpression(
-                                            kind: SyntaxKind.StringLiteralExpression,
-                                            token: SyntaxFactory.Literal(
-                                                text: "\"EXPECTED\"",
-                                                value: "EXPECTED"))),
-                                    SyntaxFactory.Argument(
-                                        nameColon: default,
-                                        refKindKeyword: default,
-                                        expression: SyntaxFactory.MemberAccessExpression(
-                                            kind: SyntaxKind.SimpleMemberAccessExpression,
-                                            expression: SyntaxFactory.IdentifierName("exception"),
-                                            name: SyntaxFactory.IdentifierName("Message"))),
-                                },
-                                new[] { SyntaxFactory.Token(SyntaxKind.CommaToken) }))),
-                    semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                ExpressionStatementSyntax AssertMessage(ExpressionSyntax exception)
+                {
+                    return SyntaxFactory.ExpressionStatement(
+                        expression: SyntaxFactory.InvocationExpression(
+                            expression: SyntaxFactory.MemberAccessExpression(
+                                kind: SyntaxKind.SimpleMemberAccessExpression,
+                                expression: SyntaxFactory.IdentifierName("Assert"),
+                                name: SyntaxFactory.IdentifierName("AreEqual")),
+                            argumentList: SyntaxFactory.ArgumentList(
+                                arguments: SyntaxFactory.SeparatedList(
+                                    new[]
+                                    {
+                                        SyntaxFactory.Argument(
+                                            expression: SyntaxFactory.LiteralExpression(
+                                                kind: SyntaxKind.StringLiteralExpression,
+                                                token: SyntaxFactory.Literal(
+                                                    text: "\"EXPECTED\"",
+                                                    value: "EXPECTED"))),
+                                        SyntaxFactory.Argument(
+                                            expression: exception),
+                                    },
+                                    new[] { SyntaxFactory.Token(SyntaxKind.CommaToken) }))),
+                        semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                }
             }
         }
     }
