@@ -1,5 +1,6 @@
 ﻿namespace Gu.Analyzers
 {
+    using System;
     using System.Collections.Immutable;
 
     using Gu.Roslyn.AnalyzerExtensions;
@@ -25,7 +26,8 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { Identifier: { ValueText: "Throws" } } } } invocation)
+                context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { } name } } invocation &&
+                name.Identifier.ValueText.StartsWith("Throws", StringComparison.InvariantCulture))
             {
                 if (invocation.Parent is ExpressionStatementSyntax ||
                     invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } })

@@ -48,7 +48,7 @@ namespace N
         }
 
         [Test]
-        public static void ExplicitDiscardToInline()
+        public static void AssertThrowsExplicitDiscardToInline()
         {
             var before = @"
 namespace N
@@ -76,6 +76,41 @@ namespace N
         public void M()
         {
             Assert.AreEqual(""EXPECTED"", Assert.Throws<SuccessException>(() => { }).Message);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
+        }
+
+        [Test]
+        public static void AssertThrowsAsyncExplicitDiscardToInline()
+        {
+            var before = @"
+namespace N
+{
+    using NUnit.Framework;
+
+    public class C
+    {
+        [Test]
+        public void M()
+        {
+            _ = ↓Assert.ThrowsAsync<SuccessException>(async () => { });
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using NUnit.Framework;
+
+    public class C
+    {
+        [Test]
+        public void M()
+        {
+            Assert.AreEqual(""EXPECTED"", Assert.ThrowsAsync<SuccessException>(async () => { }).Message);
         }
     }
 }";
