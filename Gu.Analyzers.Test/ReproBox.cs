@@ -10,7 +10,7 @@
 
     using NUnit.Framework;
 
-    [Explicit]
+    [Ignore("Only for digging out repros.")]
     internal static class ReproBox
     {
         // ReSharper disable once UnusedMember.Local

@@ -54,6 +54,7 @@
             if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method))
             {
                 if (method.ReturnsVoid ||
+                    method.ContainingType.IsAssignableTo(KnownSymbol.GuInjectKernel, context.Compilation) ||
                     method.ContainingType.IsAssignableTo(KnownSymbol.MoqMockOfT, context.Compilation) ||
                     method.ContainingType.IsAssignableTo(KnownSymbol.MoqIFluentInterface, context.Compilation) ||
                     method.ContainingType.IsAssignableTo(KnownSymbol.NinjectIFluentSyntax, context.Compilation))

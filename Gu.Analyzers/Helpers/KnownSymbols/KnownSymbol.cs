@@ -1,4 +1,4 @@
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 namespace Gu.Analyzers
 {
     using System.Threading;
@@ -47,6 +47,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType MoqMockOfT = new QualifiedType("Moq.Mock`1");
         internal static readonly QualifiedType MoqIFluentInterface = new QualifiedType("Moq.IFluentInterface");
         internal static readonly QualifiedType NinjectIFluentSyntax = new QualifiedType("Ninject.Syntax.IFluentSyntax");
+        internal static readonly QualifiedType GuInjectKernel = new QualifiedType("Gu.Inject.Kernel");
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
