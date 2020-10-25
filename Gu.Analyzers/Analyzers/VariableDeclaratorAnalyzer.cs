@@ -16,7 +16,8 @@
     internal class VariableDeclaratorAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0018NameMock);
+            Descriptors.GU0018aNameMock,
+            Descriptors.GU0018bNameMock);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -36,11 +37,24 @@
                 type == KnownSymbol.MoqMockOfT &&
                 ShouldRename(variable, typeArgument) is { } renameTo)
             {
-                context.ReportDiagnostic(
-                    Diagnostic.Create(
-                        Descriptors.GU0018NameMock,
-                        variable.Identifier.GetLocation(),
-                        ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("Name", renameTo) })));
+                if (variable.Identifier.ValueText == "mock")
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0018bNameMock,
+                            variable.Identifier.GetLocation(),
+                            ImmutableDictionary.CreateRange(
+                                new[] { new KeyValuePair<string, string>("Name", renameTo) })));
+                }
+                else
+                {
+                    context.ReportDiagnostic(
+                        Diagnostic.Create(
+                            Descriptors.GU0018aNameMock,
+                            variable.Identifier.GetLocation(),
+                            ImmutableDictionary.CreateRange(
+                                new[] { new KeyValuePair<string, string>("Name", renameTo) })));
+                }
             }
 
             static INamedTypeSymbol? Type(ISymbol symbol)
@@ -59,6 +73,8 @@
                 {
                     { TypeKind: TypeKind.Interface, IsGenericType: false }
                         when type.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{type.Name.Substring(1).ToFirstCharLower()}Mock",
+                    { TypeKind: TypeKind.Interface, IsGenericType: true, TypeArguments: { Length: 1 } arguments }
+                        when type.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{type.Name.Substring(1).ToFirstCharLower()}Of{arguments[0].Name}Mock",
                     _ => null,
                 };
 
