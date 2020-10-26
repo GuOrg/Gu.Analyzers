@@ -53,28 +53,8 @@
         {
             if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method))
             {
-                if (method.ReturnsVoid ||
-                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernel, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernelExtensions, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqMockOfT, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqIFluentInterface, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbols.NinjectIFluentSyntax, context.Compilation))
-                {
-                    return true;
-                }
-
                 if (Equals(method.ContainingType, method.ReturnType) &&
                     method.ContainingType == KnownSymbols.StringBuilder)
-                {
-                    return true;
-                }
-
-                if ((method.Name == "Add" ||
-                     method.Name == "Remove" ||
-                     method.Name == "RemoveAll" ||
-                     method.Name == "TryAdd" ||
-                     method.Name == "TryRemove") &&
-                    method.ReturnType.IsEither(KnownSymbols.Boolean, KnownSymbols.Int32, KnownSymbols.Int64))
                 {
                     return true;
                 }
@@ -99,11 +79,32 @@
                                 return false;
                         }
                     }
+                }
 
+                if (method.ReturnsVoid ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernel, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernelExtensions, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqMockOfT, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqIFluentInterface, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.NinjectIFluentSyntax, context.Compilation))
+                {
                     return true;
                 }
 
-                return false;
+                if (method.ReturnType.IsAssignableTo(KnownSymbols.IEnumerable, context.Compilation))
+                {
+                    return false;
+                }
+
+                if ((method.Name == "Add" ||
+                     method.Name == "Remove" ||
+                     method.Name == "RemoveAll" ||
+                     method.Name == "TryAdd" ||
+                     method.Name == "TryRemove") &&
+                    method.ReturnType.IsEither(KnownSymbols.Boolean, KnownSymbols.Int32, KnownSymbols.Int64))
+                {
+                    return true;
+                }
             }
 
             return true;
