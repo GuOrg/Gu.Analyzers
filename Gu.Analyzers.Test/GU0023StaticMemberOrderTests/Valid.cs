@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
+﻿namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -160,6 +160,31 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ExtensionMethod()
+        {
+            var ext = @"
+namespace N
+{
+    public static class Ext
+    {
+        public static string M1(this string text) => text;
+
+        public static string M2(this string text) => text;
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    public class C
+    {
+        private static readonly string F = string.Empty.M1().M2();
+    }
+}";
+            RoslynAssert.Valid(Analyzer, ext, code);
         }
     }
 }

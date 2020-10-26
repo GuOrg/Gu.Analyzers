@@ -12,7 +12,8 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptors.GU0023StaticMemberOrder);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptors.GU0023StaticMemberOrder);
 
         public override void Initialize(AnalysisContext context)
         {
