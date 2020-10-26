@@ -79,6 +79,8 @@
                                 return false;
                         }
                     }
+
+                    return true;
                 }
 
                 if (method.ReturnsVoid ||
