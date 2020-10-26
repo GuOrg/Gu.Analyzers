@@ -16,7 +16,7 @@
 
         public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
-        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol)
+        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbols)
             .Assembly
             .GetTypes()
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)

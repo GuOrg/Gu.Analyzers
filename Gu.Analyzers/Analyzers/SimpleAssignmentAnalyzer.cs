@@ -102,7 +102,7 @@
                     context.SemanticModel.TryGetType(assignment.Left, context.CancellationToken, out var type) &&
                     FieldOrProperty.TryCreate(left, out _))
                 {
-                    if (type == KnownSymbol.Boolean ||
+                    if (type == KnownSymbols.Boolean ||
                         type.TypeKind == TypeKind.Enum)
                     {
                         return false;

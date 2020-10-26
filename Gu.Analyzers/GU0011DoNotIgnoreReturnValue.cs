@@ -54,16 +54,17 @@
             if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method))
             {
                 if (method.ReturnsVoid ||
-                    method.ContainingType.IsAssignableTo(KnownSymbol.GuInjectKernel, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbol.MoqMockOfT, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbol.MoqIFluentInterface, context.Compilation) ||
-                    method.ContainingType.IsAssignableTo(KnownSymbol.NinjectIFluentSyntax, context.Compilation))
+                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernel, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.GuInjectKernelExtensions, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqMockOfT, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.MoqIFluentInterface, context.Compilation) ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.NinjectIFluentSyntax, context.Compilation))
                 {
                     return true;
                 }
 
                 if (Equals(method.ContainingType, method.ReturnType) &&
-                    method.ContainingType == KnownSymbol.StringBuilder)
+                    method.ContainingType == KnownSymbols.StringBuilder)
                 {
                     return true;
                 }
@@ -73,7 +74,7 @@
                      method.Name == "RemoveAll" ||
                      method.Name == "TryAdd" ||
                      method.Name == "TryRemove") &&
-                    method.ReturnType.IsEither(KnownSymbol.Boolean, KnownSymbol.Int32, KnownSymbol.Int64))
+                    method.ReturnType.IsEither(KnownSymbols.Boolean, KnownSymbols.Int32, KnownSymbols.Int64))
                 {
                     return true;
                 }

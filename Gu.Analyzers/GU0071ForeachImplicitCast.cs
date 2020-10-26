@@ -45,13 +45,13 @@
                 return null;
             }
 
-            if (enumerableType.Type == KnownSymbol.IEnumerable &&
-                enumerableType.ConvertedType == KnownSymbol.IEnumerable)
+            if (enumerableType.Type == KnownSymbols.IEnumerable &&
+                enumerableType.ConvertedType == KnownSymbols.IEnumerable)
             {
                 return true;
             }
 
-            if (enumerableType.Type.IsAssignableTo(KnownSymbol.IEnumerable, context.Compilation))
+            if (enumerableType.Type.IsAssignableTo(KnownSymbols.IEnumerable, context.Compilation))
             {
                 if (enumerableType.ConvertedType is INamedTypeSymbol namedType &&
                     namedType.TypeArguments.TrySingle(out var enumerableTypeArg))
@@ -60,7 +60,7 @@
                     return variableType.Equals(enumerableTypeArg);
                 }
 
-                return enumerableType.ConvertedType != KnownSymbol.IEnumerable;
+                return enumerableType.ConvertedType != KnownSymbols.IEnumerable;
             }
 
             if (enumerableType.ConvertedType.TryFindFirstMethodRecursive("GetEnumerator", out var method) &&

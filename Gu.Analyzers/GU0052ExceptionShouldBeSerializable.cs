@@ -29,8 +29,8 @@
 
             if (context.Node is ClassDeclarationSyntax classDeclaration &&
                 context.ContainingSymbol is INamedTypeSymbol type &&
-                type.IsAssignableTo(KnownSymbol.Exception, context.Compilation) &&
-                !Attribute.TryFind(classDeclaration, KnownSymbol.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
+                type.IsAssignableTo(KnownSymbols.Exception, context.Compilation) &&
+                !Attribute.TryFind(classDeclaration, KnownSymbols.SerializableAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0052ExceptionShouldBeSerializable, classDeclaration.Identifier.GetLocation()));
             }

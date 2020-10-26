@@ -4,7 +4,7 @@ namespace Gu.Analyzers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
 
-    internal static class KnownSymbol
+    internal static class KnownSymbols
     {
         internal static readonly QualifiedType Void = Create("System.Void");
         internal static readonly QualifiedType Object = Create("System.Object", "object");
@@ -48,6 +48,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType MoqIFluentInterface = new QualifiedType("Moq.IFluentInterface");
         internal static readonly QualifiedType NinjectIFluentSyntax = new QualifiedType("Ninject.Syntax.IFluentSyntax");
         internal static readonly QualifiedType GuInjectKernel = new QualifiedType("Gu.Inject.Kernel");
+        internal static readonly QualifiedType GuInjectKernelExtensions = new QualifiedType("Gu.Inject.KernelExtensions");
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {

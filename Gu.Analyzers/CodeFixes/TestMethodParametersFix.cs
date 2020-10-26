@@ -126,13 +126,13 @@
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _))
+                        if (semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestCaseAttribute, cancellationToken, out _))
                         {
                             attribute = candidate;
                             return true;
                         }
 
-                        if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestAttribute, cancellationToken, out _))
+                        if (semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestAttribute, cancellationToken, out _))
                         {
                             attribute = candidate;
                         }

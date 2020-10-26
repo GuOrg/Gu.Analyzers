@@ -14,8 +14,8 @@
     {
         private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
         {
-            KnownSymbol.Guid,
-            KnownSymbol.DateTime,
+            KnownSymbols.Guid,
+            KnownSymbols.DateTime,
         };
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =

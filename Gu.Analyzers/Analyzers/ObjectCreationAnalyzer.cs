@@ -29,7 +29,7 @@
                 arguments.Count > 0 &&
                 context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
                 context.ContainingSymbol is IMethodSymbol method &&
-                ctor.ContainingType.IsEither(KnownSymbol.ArgumentException, KnownSymbol.ArgumentNullException, KnownSymbol.ArgumentOutOfRangeException) &&
+                ctor.ContainingType.IsEither(KnownSymbols.ArgumentException, KnownSymbols.ArgumentNullException, KnownSymbols.ArgumentOutOfRangeException) &&
                 ctor.TryFindParameter("paramName", out var nameParameter))
             {
                 if (objectCreation.FindArgument(nameParameter) is { } nameArgument &&

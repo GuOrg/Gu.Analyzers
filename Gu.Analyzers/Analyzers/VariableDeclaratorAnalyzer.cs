@@ -34,7 +34,7 @@
                 Type(symbol) is { } type &&
                 type is { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
                 typeArguments[0] is INamedTypeSymbol typeArgument &&
-                type == KnownSymbol.MoqMockOfT &&
+                type == KnownSymbols.MoqMockOfT &&
                 ShouldRename(variable, typeArgument) is { } renameTo)
             {
                 if (variable.Identifier.ValueText == "mock")

@@ -28,7 +28,7 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is EnumDeclarationSyntax enumDeclaration)
             {
-                if (enumDeclaration.AttributeLists.TryFind(KnownSymbol.FlagsAttribute, context.SemanticModel, context.CancellationToken, out _))
+                if (enumDeclaration.AttributeLists.TryFind(KnownSymbols.FlagsAttribute, context.SemanticModel, context.CancellationToken, out _))
                 {
                     ulong bitSumOfLiterals = 0;
                     foreach (var enumMember in enumDeclaration.Members)

@@ -10,7 +10,7 @@ namespace Gu.Analyzers.Benchmarks
 
     internal static class BenchmarkTests
     {
-        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol)
+        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbols)
             .Assembly
             .GetTypes()
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)

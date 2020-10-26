@@ -23,7 +23,7 @@
             MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location),
         };
 
-        public static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol)
+        public static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbols)
             .Assembly
             .GetTypes()
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)

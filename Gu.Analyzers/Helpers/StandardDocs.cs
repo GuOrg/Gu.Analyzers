@@ -9,7 +9,7 @@ namespace Gu.Analyzers
     {
         private static readonly List<(QualifiedType, string)> Cache = new List<(QualifiedType, string)>
         {
-            (KnownSymbol.CancellationToken, "The <see cref=\"CancellationToken\"/> that cancels the operation."),
+            (KnownSymbols.CancellationToken, "The <see cref=\"CancellationToken\"/> that cancels the operation."),
         };
 
         internal static bool TryGet(ParameterSyntax parameter, [NotNullWhen(true)] out string? text)

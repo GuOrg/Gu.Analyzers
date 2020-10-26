@@ -57,9 +57,9 @@
 
             if (context.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, context.CancellationToken) is IMethodSymbol method)
             {
-                if (method.ContainingType == KnownSymbol.String ||
-                    method.ContainingType.IsAssignableTo(KnownSymbol.Tuple, context.Compilation) ||
-                    method.ContainingType == KnownSymbol.DependencyProperty)
+                if (method.ContainingType == KnownSymbols.String ||
+                    method.ContainingType.IsAssignableTo(KnownSymbols.Tuple, context.Compilation) ||
+                    method.ContainingType == KnownSymbols.DependencyProperty)
                 {
                     return false;
                 }

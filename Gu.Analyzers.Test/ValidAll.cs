@@ -11,7 +11,7 @@
 
     internal static class ValidAll
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols).Assembly
                                                                                                      .GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
                                                                                                      .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)

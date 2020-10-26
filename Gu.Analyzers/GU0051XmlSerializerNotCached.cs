@@ -28,7 +28,7 @@
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbol.XmlSerializer, context.CancellationToken, out var ctor) &&
+                context.SemanticModel.TryGetSymbol(objectCreation, KnownSymbols.XmlSerializer, context.CancellationToken, out var ctor) &&
                 IsLeakyConstructor(ctor))
             {
                 if (objectCreation.FirstAncestor<AssignmentExpressionSyntax>() is { Left: { } left } assignment)
@@ -65,12 +65,12 @@
         private static bool IsLeakyConstructor(IMethodSymbol ctor)
         {
             var parameters = ctor.Parameters;
-            if (parameters.Length == 1 && parameters[0].Type == KnownSymbol.Type)
+            if (parameters.Length == 1 && parameters[0].Type == KnownSymbols.Type)
             {
                 return false;
             }
 
-            if (parameters.Length == 2 && parameters[0].Type == KnownSymbol.Type && parameters[1].Type == KnownSymbol.String)
+            if (parameters.Length == 2 && parameters[0].Type == KnownSymbols.Type && parameters[1].Type == KnownSymbols.String)
             {
                 return false;
             }

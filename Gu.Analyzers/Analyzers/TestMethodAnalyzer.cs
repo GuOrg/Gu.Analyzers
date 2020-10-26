@@ -50,7 +50,7 @@
                 {
                     foreach (var candidate in attributeList.Attributes)
                     {
-                        if (context.SemanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, context.CancellationToken, out _))
+                        if (context.SemanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestCaseAttribute, context.CancellationToken, out _))
                         {
                             if (!CountMatches(testMethod, candidate))
                             {
@@ -80,13 +80,13 @@
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestAttribute, cancellationToken, out _))
+                    if (semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestAttribute, cancellationToken, out _))
                     {
                         attribute = candidate;
                         count++;
                     }
-                    else if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _) ||
-                             semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseSourceAttribute, cancellationToken, out _))
+                    else if (semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestCaseAttribute, cancellationToken, out _) ||
+                             semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestCaseSourceAttribute, cancellationToken, out _))
                     {
                         count++;
                     }
@@ -103,7 +103,7 @@
             {
                 foreach (var candidate in attributeList.Attributes)
                 {
-                    if (semanticModel.TryGetNamedType(candidate, KnownSymbol.NUnitTestCaseAttribute, cancellationToken, out _))
+                    if (semanticModel.TryGetNamedType(candidate, KnownSymbols.NUnitTestCaseAttribute, cancellationToken, out _))
                     {
                         if (attribute != null)
                         {
@@ -176,7 +176,7 @@
 
             bool IsTypeMatch(ITypeSymbol parameterType, AttributeArgumentSyntax argument)
             {
-                if (parameterType == KnownSymbol.Object)
+                if (parameterType == KnownSymbols.Object)
                 {
                     return true;
                 }

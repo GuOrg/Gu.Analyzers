@@ -27,7 +27,7 @@
                 context.Node is EventFieldDeclarationSyntax eventFieldDeclaration &&
                 context.ContainingSymbol is IEventSymbol eventSymbol &&
                 HasSerializableAttribute(eventSymbol.ContainingType) &&
-                !Attribute.TryFind(eventFieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
+                !Attribute.TryFind(eventFieldDeclaration.AttributeLists, KnownSymbols.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing, eventFieldDeclaration.GetLocation()));
             }
@@ -42,9 +42,9 @@
 
             if (context.Node is FieldDeclarationSyntax fieldDeclaration &&
                 context.ContainingSymbol is IFieldSymbol field &&
-                field.Type.IsAssignableTo(KnownSymbol.EventHandler, context.Compilation) &&
+                field.Type.IsAssignableTo(KnownSymbols.EventHandler, context.Compilation) &&
                 HasSerializableAttribute(field.ContainingType) &&
-                !Attribute.TryFind(fieldDeclaration.AttributeLists, KnownSymbol.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
+                !Attribute.TryFind(fieldDeclaration.AttributeLists, KnownSymbols.NonSerializedAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing, fieldDeclaration.GetLocation()));
             }
@@ -53,7 +53,7 @@
         private static bool HasSerializableAttribute(INamedTypeSymbol type)
         {
             return type.GetAttributes()
-                       .TryFirst(x => x.AttributeClass == KnownSymbol.SerializableAttribute, out _);
+                       .TryFirst(x => x.AttributeClass == KnownSymbols.SerializableAttribute, out _);
         }
     }
 }

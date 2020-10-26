@@ -113,7 +113,7 @@
                     {
                         result = null!;
                         return expression!.FirstAncestor<MethodDeclarationSyntax>() is { } method &&
-                               method.ReturnType == KnownSymbol.Boolean &&
+                               method.ReturnType == KnownSymbols.Boolean &&
                                method.TryFindParameter(name, out result) &&
                                result.Modifiers.Any(SyntaxKind.OutKeyword);
                     }

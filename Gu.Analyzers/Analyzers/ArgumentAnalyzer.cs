@@ -49,14 +49,14 @@
             return IsDisposePattern(methodSymbol) ||
                    IsConfigureAwait(methodSymbol) ||
                    IsAttachedSetMethod(methodSymbol, compilation) ||
-                   methodSymbol == KnownSymbol.NUnitAssert.AreEqual ||
-                   methodSymbol == KnownSymbol.XunitAssert.Equal;
+                   methodSymbol == KnownSymbols.NUnitAssert.AreEqual ||
+                   methodSymbol == KnownSymbols.XunitAssert.Equal;
         }
 
         private static bool IsConfigureAwait(IMethodSymbol methodSymbol)
         {
-            return (methodSymbol.ReceiverType == KnownSymbol.Task ||
-                    methodSymbol.ReceiverType == KnownSymbol.TaskOfT) &&
+            return (methodSymbol.ReceiverType == KnownSymbols.Task ||
+                    methodSymbol.ReceiverType == KnownSymbols.TaskOfT) &&
                    methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
                    parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
@@ -79,12 +79,12 @@
             if (method.IsStatic)
             {
                 return method.Parameters.Length == 2 &&
-                       method.Parameters[0].Type.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
+                       method.Parameters[0].Type.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
                        method.Name.StartsWith("Set", StringComparison.Ordinal);
             }
 
             return method is { IsExtensionMethod: true } &&
-                   method.ReceiverType.IsAssignableTo(KnownSymbol.DependencyObject, compilation) &&
+                   method.ReceiverType.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
                    method.Parameters.Length == 1 &&
                    method.Name.StartsWith("Set", StringComparison.Ordinal);
         }
