@@ -94,6 +94,7 @@
         private sealed class Walker : ExecutionWalker<Walker>
         {
             private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
+            private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>(SymbolComparer.Default);
 
             private Walker()
             {
@@ -137,6 +138,13 @@
             protected override void Clear()
             {
                 this.identifierNames.Clear();
+                this.symbols.Clear();
+            }
+
+            protected override bool TryGetTargetSymbol<TSource, TSymbol, TDeclaration>(TSource node, out Target<TSource, TSymbol, TDeclaration> target, string? caller = null, int line = 0)
+            {
+                return base.TryGetTargetSymbol(node, out target, caller, line) &&
+                       this.symbols.Add(target.Symbol);
             }
         }
     }
