@@ -37,7 +37,13 @@
                             SyntaxFactory.AttributeArgument(
                                 SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
 
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create("CS8600", "CS8601", "CS8618", "CS8625", "CS8653");
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            "CS8600",
+            "CS8601",
+            "CS8618",
+            "CS8625",
+            "CS8653",
+            "CS8765");
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -45,7 +51,51 @@
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
+                if (diagnostic.Id == "CS8618" &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MemberDeclarationSyntax? member))
+                {
+                    if (FindType(member) is { } type)
+                    {
+                        context.RegisterCodeFix(
+                            "Declare as nullable.",
+                            (editor, _) => editor.ReplaceNode(
+                                type,
+                                x => SyntaxFactory.NullableType(x)),
+                            "?",
+                            diagnostic);
+                    }
+
+                    TypeSyntax? FindType(MemberDeclarationSyntax candidate)
+                    {
+                        return candidate switch
+                        {
+                            EventDeclarationSyntax { Type: { } t } => t,
+                            EventFieldDeclarationSyntax { Declaration: { Type: { } t } } => t,
+                            ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax typeDeclaration }
+                                when Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Non-nullable event '(?<name>[^']+)' is uninitialized") is { Success: true } match &&
+                                     typeDeclaration.TryFindEvent(match.Groups["name"].Value, out member)
+                                => FindType(member),
+                            _ => null,
+                        };
+                    }
+                }
+                else if (diagnostic.Id == "CS8765" &&
+                         syntaxRoot.TryFindNodeOrAncestor<MethodDeclarationSyntax>(diagnostic, out var method))
+                {
+                    switch (method)
+                    {
+                        case { Identifier: { ValueText: "Equals" }, ParameterList: { Parameters: { Count: 1 } parameters } }:
+                            context.RegisterCodeFix(
+                                "Declare as nullable.",
+                                (editor, _) => editor.ReplaceNode(
+                                    parameters[0].Type,
+                                    x => SyntaxFactory.NullableType(x)),
+                                "?",
+                                diagnostic);
+                            break;
+                    }
+                }
+                else if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
                 {
                     if (TryFindLocalOrParameter() is { } localOrParameter &&
                         TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter))
@@ -116,34 +166,6 @@
                                method.ReturnType == KnownSymbols.Boolean &&
                                method.TryFindParameter(name, out result) &&
                                result.Modifiers.Any(SyntaxKind.OutKeyword);
-                    }
-                }
-                else if (diagnostic.Id == "CS8618" &&
-                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MemberDeclarationSyntax? member))
-                {
-                    if (FindType(member) is { } type)
-                    {
-                        context.RegisterCodeFix(
-                            "Declare as nullable.",
-                            (editor, _) => editor.ReplaceNode(
-                                type,
-                                x => SyntaxFactory.NullableType(x)),
-                            "?",
-                            diagnostic);
-                    }
-
-                    TypeSyntax? FindType(MemberDeclarationSyntax candidate)
-                    {
-                        return candidate switch
-                        {
-                            EventDeclarationSyntax { Type: { } t } => t,
-                            EventFieldDeclarationSyntax { Declaration: { Type: { } t } } => t,
-                            ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax typeDeclaration }
-                            when Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Non-nullable event '(?<name>[^']+)' is uninitialized") is { Success: true } match &&
-                                 typeDeclaration.TryFindEvent(match.Groups["name"].Value, out member)
-                            => FindType(member),
-                            _ => null,
-                        };
                     }
                 }
             }

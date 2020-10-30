@@ -13,6 +13,7 @@
         private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
         private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' is uninitialized. Consider declaring the event as nullable.");
+        private static readonly ExpectedDiagnostic CS8765 = ExpectedDiagnostic.Create("CS8765");
         private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 
         [Test]
@@ -418,6 +419,79 @@ namespace N
     }
 }";
             RoslynAssert.CodeFix(Fix, CS8618, before, after, compilationOptions: CompilationOptions);
+        }
+
+        [Test]
+        public static void Equals()
+        {
+            var before = @"
+namespace N
+{
+    using System;
+
+    public struct C : IEquatable<C>
+    {
+        public static bool operator ==(C left, C right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(C left, C right)
+        {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(C other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool ↓Equals(object obj)
+        {
+            return obj is C other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    using System;
+
+    public struct C : IEquatable<C>
+    {
+        public static bool operator ==(C left, C right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(C left, C right)
+        {
+            return !left.Equals(right);
+        }
+
+        public bool Equals(C other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is C other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Fix, CS8765, before, after, compilationOptions: CompilationOptions);
         }
     }
 }
