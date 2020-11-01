@@ -53,6 +53,11 @@
         {
             if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method))
             {
+                if (method.ReturnsVoid)
+                {
+                    return true;
+                }
+
                 if (Equals(method.ContainingType, method.ReturnType) &&
                     method.ContainingType == KnownSymbols.StringBuilder)
                 {

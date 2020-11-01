@@ -1,5 +1,8 @@
 ﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
+    using System;
+    using System.Collections.Generic;
+
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
@@ -439,6 +442,120 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, c, code);
+        }
+
+        [TestCase("xs.Add(1)")]
+        [TestCase("xs.Remove(1)")]
+        [TestCase("xs.RemoveAt(1)")]
+        [TestCase("xs.Clear()")]
+        public static void ListMethods(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+
+    public class C
+    {
+        public C()
+        {
+            var xs = new List<int>();
+            xs.Add(1);
+        }
+    }
+}".AssertReplace("xs.Add(1)", expression);
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [TestCase("xs.Add(1)")]
+        [TestCase("xs.RemoveAt(1)")]
+        [TestCase("xs.Clear()")]
+        public static void CustomListMethods(string expression)
+        {
+            var xs = @"
+namespace N
+{
+    using System.Collections;
+    using System.Collections.Generic;
+
+    public class Xs<T> : IList<T>
+    {
+        private readonly List<T> inner = new List<T>();
+
+        public T this[int index] { get => ((IList<T>)this.inner)[index]; set => ((IList<T>)this.inner)[index] = value; }
+
+        public int Count => ((ICollection<T>)this.inner).Count;
+
+        public bool IsReadOnly => ((ICollection<T>)this.inner).IsReadOnly;
+
+        public void Add(T item)
+        {
+            ((ICollection<T>)this.inner).Add(item);
+        }
+
+        public void Clear()
+        {
+            ((ICollection<T>)this.inner).Clear();
+        }
+
+        public bool Contains(T item)
+        {
+            return ((ICollection<T>)this.inner).Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            ((ICollection<T>)this.inner).CopyTo(array, arrayIndex);
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return ((IEnumerable<T>)this.inner).GetEnumerator();
+        }
+
+        public int IndexOf(T item)
+        {
+            return ((IList<T>)this.inner).IndexOf(item);
+        }
+
+        public void Insert(int index, T item)
+        {
+            ((IList<T>)this.inner).Insert(index, item);
+        }
+
+        public bool Remove(T item)
+        {
+            return ((ICollection<T>)this.inner).Remove(item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            ((IList<T>)this.inner).RemoveAt(index);
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return ((IEnumerable)this.inner).GetEnumerator();
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        public C()
+        {
+            var xs = new Xs<int>();
+            xs.Add(1);
+        }
+    }
+}".AssertReplace("xs.Add(1)", expression);
+            RoslynAssert.Valid(Analyzer, xs, code);
         }
     }
 }
