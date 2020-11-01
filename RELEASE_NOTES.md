@@ -1,4 +1,4 @@
-#### 
+#### 1.8.2
 * BUGFIX: GU0011 should not warn on void returning.
 
 #### 1.8.0
