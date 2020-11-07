@@ -5,8 +5,10 @@
     using System.Composition;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -28,7 +30,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
                     parameter is { Parent: ParameterListSyntax { Parent: { } methodOrLocalFunction } })
                 {
                     if (CanRewrite())
@@ -109,11 +112,13 @@
                     { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
                         when left.Identifier.ValueText == this.parameter.Identifier.ValueText
                         => node.WithExpression(left.WithoutTrailingTrivia()),
-                    _ => node.WithExpression(
-                        SyntaxFactory.ConditionalExpression(
-                            node.Expression,
-                            SyntaxFactory.IdentifierName(this.parameter.Identifier),
-                            SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression))),
+                    { Expression: { } expression }
+                        => node.WithExpression(
+                            SyntaxFactory.ConditionalExpression(
+                                expression,
+                                SyntaxFactory.IdentifierName(this.parameter.Identifier),
+                                SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression))),
+                    _ => node,
                 };
             }
 
@@ -140,7 +145,7 @@
                 if (node is { ParameterList: { Parameters: { } parameters } } &&
                     parameters.Any(x => x.IsEquivalentTo(this.parameter)))
                 {
-                    return base.VisitLocalFunctionStatement(node);
+                    return base.VisitLocalFunctionStatement(node)!;
                 }
 
                 return node;

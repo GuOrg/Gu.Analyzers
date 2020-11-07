@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -25,7 +27,7 @@
             {
                 if (diagnostic.Properties.TryGetValue("Name", out var name))
                 {
-                    if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is MemberAccessExpressionSyntax memberAccess)
+                    if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is MemberAccessExpressionSyntax memberAccess)
                     {
                         context.RegisterCodeFix(
                             "Prefer parameter.",
@@ -36,7 +38,7 @@
                             "Prefer parameter.",
                             diagnostic);
                     }
-                    else if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identifierName)
+                    else if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is IdentifierNameSyntax identifierName)
                     {
                         context.RegisterCodeFix(
                             "Prefer parameter.",

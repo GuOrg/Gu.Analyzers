@@ -5,8 +5,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -26,7 +28,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor<IdentifierNameSyntax>(diagnostic, out var identifierName))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor<IdentifierNameSyntax>(diagnostic, out var identifierName))
                 {
                     context.RegisterCodeFix(
                         "Use lambda.",

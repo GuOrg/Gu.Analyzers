@@ -25,7 +25,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax? invocation) &&
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax? invocation) &&
                     Statement() is { } statement)
                 {
                     context.RegisterCodeFix(
@@ -79,8 +80,8 @@
                 {
                     return invocation.Parent switch
                     {
-                        ExpressionStatementSyntax statement => statement,
-                        AssignmentExpressionSyntax { Parent: ExpressionStatementSyntax statement } => statement,
+                        ExpressionStatementSyntax s => s,
+                        AssignmentExpressionSyntax { Parent: ExpressionStatementSyntax s } => s,
                         _ => null,
                     };
                 }

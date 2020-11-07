@@ -20,8 +20,8 @@
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
 
-            if (syntaxRoot.FindNode(context.Span).FirstAncestorOrSelf<ParameterSyntax>() is { } parameter &&
-                parameter is { Parent: ParameterListSyntax { Parent: ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax type } ctor } parameterList } &&
+            if (syntaxRoot?.FindNode(context.Span).FirstAncestorOrSelf<ParameterSyntax>() is { } parameter &&
+                parameter is { Parent: ParameterListSyntax { Parent: ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax _ } ctor } parameterList } &&
                 parameterList.Parameters.Count > 1)
             {
                 if (ShouldMoveAssignment(parameter, ctor) is { } moveAssignment)

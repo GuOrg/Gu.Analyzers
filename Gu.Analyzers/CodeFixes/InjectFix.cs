@@ -8,8 +8,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -31,7 +33,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? node) &&
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? node) &&
                     diagnostic.Properties.TryGetValue(nameof(INamedTypeSymbol), out var typeName) &&
                     diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {

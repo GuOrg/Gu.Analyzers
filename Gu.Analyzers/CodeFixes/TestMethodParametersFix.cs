@@ -29,8 +29,10 @@
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax? parameterList) &&
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNode(diagnostic, out ParameterListSyntax? parameterList) &&
                     parameterList.Parent is MethodDeclarationSyntax candidate &&
+                    semanticModel is { } &&
                     TryFindTestAttribute(candidate, semanticModel, context.CancellationToken, out var attribute) &&
                     TryGetParameters(attribute, semanticModel, context.CancellationToken, out var parameters))
                 {
@@ -43,8 +45,10 @@
                         nameof(TestMethodParametersFix),
                         diagnostic);
                 }
-                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out attribute) &&
+                else if (syntaxRoot is { } &&
+                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out attribute) &&
                          attribute.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
+                         semanticModel is { } &&
                          TryGetParameters(attribute, semanticModel, context.CancellationToken, out parameters))
                 {
                     context.RegisterCodeFix(

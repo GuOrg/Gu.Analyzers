@@ -4,7 +4,9 @@
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -253,12 +255,11 @@
                 {
                     if (FieldOrProperty.TryCreate(candidate, out var fieldOrProperty))
                     {
-                        return Equals(fieldOrProperty.Type, type);
+                        return TypeSymbolComparer.Equal(fieldOrProperty.Type, type);
                     }
 
-                    if (candidate is IMethodSymbol method &&
-                        method.MethodKind == MethodKind.Ordinary &&
-                        Equals(method.ReturnType, type))
+                    if (candidate is IMethodSymbol { MethodKind: MethodKind.Ordinary } method &&
+                        TypeSymbolComparer.Equal(method.ReturnType, type))
                     {
                         return true;
                     }

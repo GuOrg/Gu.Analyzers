@@ -1,7 +1,9 @@
 ﻿namespace Gu.Analyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,14 +49,17 @@
             {
                 switch (member)
                 {
-                    case PropertyDeclarationSyntax property when IsStaticPublicOrInternal(property.Modifiers) &&
-                                                                 property.IsGetOnly() &&
-                                                                 IsInitializedWithContainingType(property.Initializer, context):
+                    case PropertyDeclarationSyntax { Initializer: { } initializer } property
+                        when IsStaticPublicOrInternal(property.Modifiers) &&
+                             property.IsGetOnly() &&
+                             IsInitializedWithContainingType(initializer, context):
                         return true;
-                    case FieldDeclarationSyntax field when IsStaticPublicOrInternal(field.Modifiers) &&
-                                                           field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
-                                                           field.Declaration is { } declaration &&
-                                                           declaration.Variables.TrySingle(out var variable) && IsInitializedWithContainingType(variable.Initializer, context):
+                    case FieldDeclarationSyntax { Declaration: { Variables: { Count: 1 } variables } } field
+                        when IsStaticPublicOrInternal(field.Modifiers) &&
+                             field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
+                             variables.TrySingle(out var variable) &&
+                             variable.Initializer is { } initializer &&
+                             IsInitializedWithContainingType(initializer, context):
                         return true;
                 }
             }
@@ -71,9 +76,9 @@
 
         private static bool IsInitializedWithContainingType(EqualsValueClauseSyntax initializer, SyntaxNodeAnalysisContext context)
         {
-            return initializer?.Value is ObjectCreationExpressionSyntax objectCreation &&
+            return initializer.Value is ObjectCreationExpressionSyntax objectCreation &&
                    context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var createdType) &&
-                   createdType.Equals(context.ContainingSymbol);
+                   SymbolComparer.Equal(createdType, context.ContainingSymbol);
         }
     }
 }

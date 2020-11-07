@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -83,9 +85,8 @@
                        method.Name.StartsWith("Set", StringComparison.Ordinal);
             }
 
-            return method is { IsExtensionMethod: true } &&
-                   method.ReceiverType.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
-                   method.Parameters.Length == 1 &&
+            return method is { ReceiverType: { } receiver, IsExtensionMethod: true, Parameters: { Length: 1 } } &&
+                   receiver.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
                    method.Name.StartsWith("Set", StringComparison.Ordinal);
         }
     }

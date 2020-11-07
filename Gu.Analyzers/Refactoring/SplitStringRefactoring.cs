@@ -20,7 +20,7 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-            if (syntaxRoot.FindNode(context.Span) is LiteralExpressionSyntax literal &&
+            if (syntaxRoot?.FindNode(context.Span) is LiteralExpressionSyntax literal &&
                 literal.IsKind(SyntaxKind.StringLiteralExpression) &&
                 !literal.Token.IsVerbatimStringLiteral() &&
                 literal.Token.Text.IndexOf("\\n", StringComparison.Ordinal) < literal.Token.Text.Length - 3)

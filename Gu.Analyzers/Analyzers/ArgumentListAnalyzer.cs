@@ -23,12 +23,8 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ArgumentListSyntax argumentList &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ArgumentListSyntax argumentList &&
                 argumentList.Arguments.Count > 0)
             {
                 if (ShouldNameArguments(context, argumentList))
@@ -55,7 +51,8 @@
                 return false;
             }
 
-            if (context.SemanticModel.GetSymbolSafe(argumentListSyntax.Parent, context.CancellationToken) is IMethodSymbol method)
+            if (argumentListSyntax.Parent is ExpressionSyntax parent &&
+                context.SemanticModel.GetSymbolSafe(parent, context.CancellationToken) is IMethodSymbol method)
             {
                 if (method.ContainingType == KnownSymbols.String ||
                     method.ContainingType.IsAssignableTo(KnownSymbols.Tuple, context.Compilation) ||
@@ -110,7 +107,8 @@
                 return true;
             }
 
-            if (context.SemanticModel.GetSymbolSafe(argumentList.Parent, context.CancellationToken) is IMethodSymbol method)
+            if (argumentList.Parent is ExpressionSyntax expression &&
+                context.SemanticModel.GetSymbolSafe(expression, context.CancellationToken) is IMethodSymbol method)
             {
                 if (method.Parameters.Length != argumentList.Arguments.Count)
                 {

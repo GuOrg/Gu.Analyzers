@@ -2,7 +2,9 @@
 {
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -55,7 +57,8 @@
 
                 if (TryGetWithParameterName(arguments, method.Parameters, out var argument) &&
                     argument.NameColon is null &&
-                    objectCreation.ArgumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
+                    objectCreation.ArgumentList is { } argumentList &&
+                    argumentList.Arguments.IndexOf(argument) != ctor.Parameters.IndexOf(nameParameter))
                 {
                     context.ReportDiagnostic(
                         Diagnostic.Create(
