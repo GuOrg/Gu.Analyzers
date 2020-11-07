@@ -84,18 +84,19 @@
                 {
                     switch (method)
                     {
-                        case { Identifier: { ValueText: "Equals" }, ParameterList: { Parameters: { Count: 1 } parameters } }:
+                        case { Identifier: { ValueText: "Equals" }, ParameterList: { Parameters: { Count: 1 } parameters } }
+                            when parameters[0].Type is { } type:
                             context.RegisterCodeFix(
                                 "Declare as nullable.",
                                 (editor, _) => editor.ReplaceNode(
-                                    parameters[0].Type,
+                                    type,
                                     x => SyntaxFactory.NullableType(x)),
                                 "?",
                                 diagnostic);
                             break;
                     }
                 }
-                else if (syntaxRoot.TryFindNode(diagnostic, out ExpressionSyntax? expression))
+                else if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ExpressionSyntax expression)
                 {
                     if (TryFindLocalOrParameter() is { } localOrParameter &&
                         TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter))

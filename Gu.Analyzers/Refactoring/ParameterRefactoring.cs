@@ -69,8 +69,8 @@
 
         private static Move<StatementSyntax>? ShouldMoveAssignment(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
         {
-            var parameterList = ctor.ParameterList;
-            if (Assignment(parameter, ctor.Body.Statements) is { } assignment)
+            if (ctor is { ParameterList: { } parameterList, Body: { Statements: { } statements } } &&
+                Assignment(parameter, statements) is { } assignment)
             {
                 var indexOf = parameterList.Parameters.IndexOf(parameter);
                 for (var i = indexOf - 1; i >= 0; i--)
@@ -132,7 +132,8 @@
 
             static MemberDeclarationSyntax? Member(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
             {
-                if (Assignment(parameter, ctor.Body.Statements) is { Expression: AssignmentExpressionSyntax assignment } &&
+                if (ctor is { Body: { Statements: { } statements } } &&
+                    Assignment(parameter, statements) is { Expression: AssignmentExpressionSyntax assignment } &&
                     Name(assignment.Left) is { } name &&
                     ctor.Parent is TypeDeclarationSyntax type)
                 {
