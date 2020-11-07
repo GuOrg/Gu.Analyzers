@@ -126,27 +126,27 @@
                         }
                     }
 
-                    if (expression.Parent is EqualsValueClauseSyntax { Parent: ParameterSyntax optionalParameter })
+                    switch (expression)
                     {
-                        context.RegisterCodeFix(
-                            optionalParameter.Type + "?",
-                            (editor, _) => editor.ReplaceNode(
-                                optionalParameter.Type,
-                                x => SyntaxFactory.NullableType(x)),
-                            "?",
-                            diagnostic);
-                    }
-
-                    if (expression is DeclarationExpressionSyntax { Type: { } type, Parent: ArgumentSyntax _ } &&
-                        diagnostic.Id == "CS8600")
-                    {
-                        context.RegisterCodeFix(
-                            type + "?",
-                            (editor, _) => editor.ReplaceNode(
-                                type,
-                                x => SyntaxFactory.NullableType(x)),
-                            "out?",
-                            diagnostic);
+                        case { Parent: EqualsValueClauseSyntax { Parent: ParameterSyntax { Type: { } type } } }:
+                            context.RegisterCodeFix(
+                                type + "?",
+                                (editor, _) => editor.ReplaceNode(
+                                    type,
+                                    x => SyntaxFactory.NullableType(x)),
+                                "?",
+                                diagnostic);
+                            break;
+                        case DeclarationExpressionSyntax { Type: { } type, Parent: ArgumentSyntax _ }
+                            when diagnostic.Id == "CS8600":
+                            context.RegisterCodeFix(
+                                type + "?",
+                                (editor, _) => editor.ReplaceNode(
+                                    type,
+                                    x => SyntaxFactory.NullableType(x)),
+                                "out?",
+                                diagnostic);
+                            break;
                     }
 
                     IdentifierNameSyntax? TryFindLocalOrParameter()

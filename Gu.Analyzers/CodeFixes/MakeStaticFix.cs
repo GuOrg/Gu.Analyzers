@@ -27,7 +27,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax? methodDeclaration))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax? methodDeclaration))
                 {
                     context.RegisterCodeFix(
                         "Make Static.",
@@ -37,7 +38,8 @@
                         "Make Static.",
                         diagnostic);
                 }
-                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax? classDeclaration))
+                else if (syntaxRoot is { } &&
+                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax? classDeclaration))
                 {
                     context.RegisterCodeFix(
                         "Make Static.",

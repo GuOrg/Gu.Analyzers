@@ -3,9 +3,11 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.AnalyzerExtensions.StyleCopComparers;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -25,7 +27,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor<BasePropertyDeclarationSyntax>(diagnostic, out var property))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor<BasePropertyDeclarationSyntax>(diagnostic, out var property))
                 {
                     context.RegisterCodeFix(
                         "Sort property.",
@@ -40,15 +43,17 @@
         {
             editor.TrackNode(property);
             _ = editor.ReplaceNode(
-                (TypeDeclarationSyntax)property.Parent,
-                syntax => WithMoved(syntax));
+                property.Parent!,
+                x => WithMoved(x));
 
-            SyntaxNode WithMoved(TypeDeclarationSyntax old)
+            SyntaxNode WithMoved(SyntaxNode old)
             {
                 return old switch
                 {
-                    ClassDeclarationSyntax classDeclaration => classDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property))),
-                    StructDeclarationSyntax structDeclaration => structDeclaration.WithMembers(SortPropertiesFix.WithMoved(old.Members, old.GetCurrentNode(property))),
+                    ClassDeclarationSyntax classDeclaration
+                        => classDeclaration.WithMembers(SortPropertiesFix.WithMoved(classDeclaration.Members, old.GetCurrentNode(property))),
+                    StructDeclarationSyntax structDeclaration
+                        => structDeclaration.WithMembers(SortPropertiesFix.WithMoved(structDeclaration.Members, old.GetCurrentNode(property))),
                     _ => old,
                 };
             }
@@ -86,7 +91,7 @@
             {
                 for (var i = triviaList.IndexOf(eol); i >= 0; i--)
                 {
-                    if (triviaList[i] is SyntaxTrivia trivia &&
+                    if (triviaList[i] is { } trivia &&
                         (trivia.IsKind(SyntaxKind.EndOfLineTrivia) || trivia.IsKind(SyntaxKind.WhitespaceTrivia)))
                     {
                         triviaList = triviaList.Remove(trivia);
@@ -101,7 +106,7 @@
             where T : MemberDeclarationSyntax
         {
             if (member.TryGetLeadingTrivia(out var triviaList) &&
-                triviaList.First() is SyntaxTrivia trivia &&
+                triviaList.First() is { } trivia &&
                 trivia.IsKind(SyntaxKind.EndOfLineTrivia))
             {
                 return member.WithLeadingTrivia(triviaList.Replace(trivia, SyntaxFactory.ElasticLineFeed));

@@ -3,8 +3,10 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -29,16 +31,11 @@
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) || token.IsMissing)
-                {
-                    continue;
-                }
-
                 if (diagnostic.Id == Descriptors.GU0001NameArguments.Id &&
-                    syntaxRoot.TryFindNode(diagnostic, out ArgumentListSyntax? arguments) &&
+                    syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ArgumentListSyntax { Parent: { } parent } arguments &&
                     !HasAnyNamedArgument(arguments) &&
-                    semanticModel.TryGetSymbol(arguments.Parent, context.CancellationToken, out IMethodSymbol? method))
+                    semanticModel is { } &&
+                    semanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method))
                 {
                     context.RegisterCodeFix(
                         "Name arguments",
@@ -47,9 +44,10 @@
                         diagnostic);
                 }
                 else if (diagnostic.Id == Descriptors.GU0009UseNamedParametersForBooleans.Id &&
-                         syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? boolArgument) &&
-                         boolArgument.Parent is ArgumentListSyntax argumentList &&
+                         syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax { Parent: ArgumentListSyntax { Parent: { } } argumentList } boolArgument &&
                          !HasAnyNamedArgument(argumentList) &&
+                         semanticModel is { } &&
+                         argumentList.Parent is { } &&
                          semanticModel.TryGetSymbol(argumentList.Parent, context.CancellationToken, out method))
                 {
                     context.RegisterCodeFix(

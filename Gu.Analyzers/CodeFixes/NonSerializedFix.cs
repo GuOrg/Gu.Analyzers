@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -31,7 +33,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out EventFieldDeclarationSyntax? eventField))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out EventFieldDeclarationSyntax? eventField))
                 {
                     context.RegisterCodeFix(
                         "[field:NonSerialized].",
@@ -44,7 +47,8 @@
                     continue;
                 }
 
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out FieldDeclarationSyntax? field))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out FieldDeclarationSyntax? field))
                 {
                     context.RegisterCodeFix(
                         "[NonSerialized].",

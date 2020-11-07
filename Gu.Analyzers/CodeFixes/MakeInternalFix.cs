@@ -3,6 +3,7 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -25,8 +26,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (token.IsKind(SyntaxKind.PublicKeyword))
+                if (syntaxRoot?.FindToken(diagnostic.Location.SourceSpan.Start) is { } token &&
+                    token.IsKind(SyntaxKind.PublicKeyword))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(

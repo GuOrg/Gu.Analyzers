@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -25,11 +27,13 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out BinaryExpressionSyntax? binaryExpression))
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is BinaryExpressionSyntax binaryExpression)
                 {
                     context.RegisterCodeFix(
                         binaryExpression.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword).WithTrailingTrivia(SyntaxFactory.Space)).ToString(),
-                        e => e.ReplaceNode(binaryExpression, x => x.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword))),
+                        e => e.ReplaceNode(
+                            binaryExpression,
+                            x => x.WithOperatorToken(SyntaxFactory.Token(SyntaxKind.IsKeyword))),
                         nameof(IsNullFix),
                         diagnostic);
                 }

@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -27,7 +29,8 @@
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is ParameterSyntax parameterSyntax &&
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ParameterSyntax parameterSyntax &&
+                    semanticModel is { } &&
                     semanticModel.TryGetSymbol(parameterSyntax, context.CancellationToken, out var parameter) &&
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {

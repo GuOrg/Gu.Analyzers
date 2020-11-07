@@ -25,7 +25,8 @@
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentListSyntax? argumentList))
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentListSyntax? argumentList))
                 {
                     if (diagnostic.Id == Descriptors.GU0002NamedArgumentPositionMatches.Id &&
                         HasWhitespaceTriviaOnly(argumentList))
