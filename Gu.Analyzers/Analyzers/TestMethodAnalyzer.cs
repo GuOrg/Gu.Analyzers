@@ -286,7 +286,7 @@
                         if (xn.Identifier.ValueText == yn.Identifier.ValueText &&
                             context.SemanticModel.TryGetSymbol(xn, context.CancellationToken, out var xs) &&
                             context.SemanticModel.TryGetSymbol(yn, context.CancellationToken, out var ys) &&
-                            xs.Equals(ys))
+                            SymbolComparer.Equal(xs, ys))
                         {
                             continue;
                         }
@@ -300,7 +300,7 @@
                         if (xma.Name.Identifier.ValueText == yma.Name.Identifier.ValueText &&
                             context.SemanticModel.TryGetSymbol(xma, context.CancellationToken, out var xs) &&
                             context.SemanticModel.TryGetSymbol(yma, context.CancellationToken, out var ys) &&
-                            xs.Equals(ys))
+                            SymbolComparer.Equal(xs, ys))
                         {
                             continue;
                         }

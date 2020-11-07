@@ -40,7 +40,8 @@
         private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
         {
             var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
-            if (enumerableType.Type is IErrorTypeSymbol)
+            if (enumerableType.Type is IErrorTypeSymbol ||
+                enumerableType.Type is null)
             {
                 return null;
             }
@@ -57,18 +58,19 @@
                     namedType.TypeArguments.TrySingle(out var enumerableTypeArg))
                 {
                     var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                    return variableType.Equals(enumerableTypeArg);
+                    return TypeSymbolComparer.Equal(variableType, enumerableTypeArg);
                 }
 
                 return enumerableType.ConvertedType != KnownSymbols.IEnumerable;
             }
 
-            if (enumerableType.ConvertedType.TryFindFirstMethodRecursive("GetEnumerator", out var method) &&
+            if (enumerableType.ConvertedType is { } &&
+                enumerableType.ConvertedType.TryFindFirstMethodRecursive("GetEnumerator", out var method) &&
                 method.ReturnType is INamedTypeSymbol returnType &&
                 returnType.TypeArguments.TrySingle(out var enumeratorTypeArg))
             {
                 var variableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Type, context.CancellationToken).Type;
-                return variableType.Equals(enumeratorTypeArg);
+                return TypeSymbolComparer.Equal(variableType, enumeratorTypeArg);
             }
 
             return null;

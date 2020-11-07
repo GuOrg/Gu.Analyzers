@@ -29,7 +29,8 @@
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is VariableDeclaratorSyntax variable &&
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is VariableDeclaratorSyntax variable &&
+                    semanticModel is { } &&
                     semanticModel.TryGetSymbol(variable, context.CancellationToken, out var symbol) &&
                     diagnostic.Properties.TryGetValue("Name", out var name))
                 {

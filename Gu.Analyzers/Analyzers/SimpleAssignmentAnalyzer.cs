@@ -32,7 +32,7 @@
                 if (context.SemanticModel.TryGetSymbol(right, context.CancellationToken, out var rightSymbol) &&
                     AreSame(left, right) &&
                     assignment.FirstAncestorOrSelf<InitializerExpressionSyntax>() is null &&
-                    leftSymbol.Equals(rightSymbol))
+                    SymbolComparer.Equal(leftSymbol, rightSymbol))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0010DoNotAssignSameValue, assignment.GetLocation()));
                 }
@@ -133,16 +133,14 @@
                             return false;
                         }
 
-                        using (var nameWalker = IdentifierNameWalker.Borrow(assignment.Right))
+                        using var nameWalker = IdentifierNameWalker.Borrow(assignment.Right);
+                        foreach (var name in nameWalker.IdentifierNames)
                         {
-                            foreach (var name in nameWalker.IdentifierNames)
+                            if (left.Name == name.Identifier.ValueText &&
+                                context.SemanticModel.TryGetSymbol(name, context.CancellationToken, out var symbol) &&
+                                SymbolComparer.Equal(symbol, left))
                             {
-                                if (left.Name == name.Identifier.ValueText &&
-                                    context.SemanticModel.TryGetSymbol(name, context.CancellationToken, out var symbol) &&
-                                    symbol.Equals(left))
-                                {
-                                    return false;
-                                }
+                                return false;
                             }
                         }
 

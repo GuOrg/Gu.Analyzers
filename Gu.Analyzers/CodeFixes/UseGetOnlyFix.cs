@@ -37,6 +37,8 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Id == Descriptors.GU0021CalculatedPropertyAllocates.Id &&
+                    syntaxRoot is { } &&
+                    semanticModel is { } &&
                     syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax? objectCreation) &&
                     objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax? property) &&
                     property.Parent is TypeDeclarationSyntax containingType &&
@@ -51,12 +53,13 @@
 
                     bool IsUnsafe()
                     {
-                        return objectCreation is { ArgumentList: { Arguments: { } arguments }, Initializer: var initializer } &&
+                        return objectCreation is { ArgumentList: { Arguments: { } arguments } } &&
                                (IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
-                                IsAnyInitializerMutable(semanticModel, initializer, context.CancellationToken));
+                                IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken));
                     }
                 }
                 else if (diagnostic.Id == Descriptors.GU0022UseGetOnly.Id &&
+                         syntaxRoot is { } &&
                          syntaxRoot.TryFindNode(diagnostic, out AccessorDeclarationSyntax? setter))
                 {
                     context.RegisterCodeFix(
@@ -98,7 +101,7 @@
                                                         .WithAccessorList(GetOnlyAccessorList));
         }
 
-        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax initializer, CancellationToken cancellationToken)
+        private static bool IsAnyInitializerMutable(SemanticModel semanticModel, InitializerExpressionSyntax? initializer, CancellationToken cancellationToken)
         {
             if (initializer is null)
             {

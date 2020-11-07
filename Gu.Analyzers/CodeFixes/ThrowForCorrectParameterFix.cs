@@ -24,7 +24,7 @@
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument) &&
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax argument &&
                     diagnostic.Properties.TryGetValue(nameof(IdentifierNameSyntax), out var name))
                 {
                     context.RegisterCodeFix(
@@ -39,11 +39,12 @@
                     {
                         return old switch
                         {
-                            LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression) => SyntaxFactory.ParseExpression($"nameof({name})"),
-                            IdentifierNameSyntax identifierName when identifierName.Parent is ArgumentSyntax candidate &&
-                                                                          candidate.Parent is ArgumentListSyntax argumentList &&
-                                                                          argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                                                          invocation.IsNameOf() => identifierName.WithIdentifier(SyntaxFactory.Identifier(name)),
+                            LiteralExpressionSyntax literal
+                                when literal.IsKind(SyntaxKind.StringLiteralExpression)
+                                => SyntaxFactory.ParseExpression($"nameof({name})"),
+                            IdentifierNameSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } identifierName
+                                when invocation.IsNameOf()
+                                => identifierName.WithIdentifier(SyntaxFactory.Identifier(name)),
                             _ => throw new InvalidOperationException("Failed updating parameter name."),
                         };
                     }

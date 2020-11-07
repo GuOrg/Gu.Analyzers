@@ -50,7 +50,7 @@
                     context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out var symbol) &&
                     FieldOrProperty.TryCreate(symbol, out other) &&
                     other.IsStatic &&
-                    Equals(other.ContainingType, context.ContainingSymbol.ContainingType) &&
+                    TypeSymbolComparer.Equal(other.ContainingType, context.ContainingSymbol.ContainingType) &&
                     symbol.TrySingleDeclaration(context.CancellationToken, out MemberDeclarationSyntax? otherDeclaration))
                 {
                     if (otherDeclaration.SpanStart > context.Node.SpanStart &&

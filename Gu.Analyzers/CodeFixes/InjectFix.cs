@@ -286,7 +286,7 @@
                     node.Name.Identifier.ValueText == expected.Name.Identifier.ValueText &&
                     this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var nodeSymbol) &&
                     this.semanticModel.TryGetSymbol(this.identifierName, this.cancellationToken, out var expectedSymbol) &&
-                    nodeSymbol.Equals(expectedSymbol) &&
+                    SymbolComparer.Equal(nodeSymbol, expectedSymbol) &&
                     GU0007PreferInjecting.IsRootValid(node, this.semanticModel, this.cancellationToken))
                 {
                     result = node;
