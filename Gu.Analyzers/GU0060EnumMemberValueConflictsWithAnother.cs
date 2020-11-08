@@ -106,7 +106,11 @@
         // see http://stackoverflow.com/a/10022661/1012936
         private static ulong UnboxUMaxInt(object a)
         {
-            return a is ulong ? (ulong)a : (ulong)Convert.ToInt64(a, CultureInfo.InvariantCulture);
+            return a switch
+            {
+                ulong ul => ul,
+                _ => (ulong)Convert.ToInt64(a, CultureInfo.InvariantCulture),
+            };
         }
     }
 }

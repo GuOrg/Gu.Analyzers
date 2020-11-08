@@ -30,6 +30,7 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot is { } &&
+                    semanticModel is { } &&
                     syntaxRoot.TryFindNodeOrAncestor(diagnostic, out BaseMethodDeclarationSyntax? methodDeclaration))
                 {
                     if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
@@ -55,13 +56,13 @@
                                 nameof(DocsFix),
                                 diagnostic);
                         }
-                        else
+                        else if (parameter.Type is { })
                         {
                             context.RegisterCodeFix(
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     docs,
-                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{CrefType(parameter)}\"/>.")),
+                                    x => x.WithParamText(parameter.Identifier.ValueText, $"The <see cref=\"{CrefType(parameter.Type)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
@@ -104,13 +105,13 @@
                                 text,
                                 diagnostic);
                         }
-                        else
+                        else if (parameter.Type is { })
                         {
                             context.RegisterCodeFix(
                                 "Generate useless xml documentation for parameter.",
                                 (editor, _) => editor.ReplaceNode(
                                     element,
-                                    x => WithText(x, $"The <see cref=\"{CrefType(parameter)}\"/>.")),
+                                    x => WithText(x, $"The <see cref=\"{CrefType(parameter.Type)}\"/>.")),
                                 nameof(DocsFix),
                                 diagnostic);
                         }
@@ -119,7 +120,9 @@
                              syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax? operatorDeclaration) &&
                              operatorDeclaration.ParameterList is { Parameters: { Count: 2 } } parameterList &&
                              parameterList.Parameters.TryElementAt(0, out var left) &&
-                             parameterList.Parameters.TryElementAt(1, out var right))
+                             left is { Type: { } leftType } &&
+                             parameterList.Parameters.TryElementAt(1, out var right) &&
+                             right is { Type: { } rightType })
                     {
                         if (operatorDeclaration.OperatorToken.IsKind(SyntaxKind.EqualsEqualsToken))
                         {
@@ -130,8 +133,8 @@
                                     x => x.WithDocumentationText(
                                         StringBuilderPool.Borrow()
                                                          .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</summary>")
-                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(left)}\"/>.</param>")
-                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(right)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(leftType)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(rightType)}\"/>.</param>")
                                                          .AppendLine("/// <returns>True if <paramref name=\"left\"/> is equal to <paramref name=\"right\"/>.</returns>")
                                                          .Return())),
                                 nameof(DocsFix),
@@ -146,8 +149,8 @@
                                     x => x.WithDocumentationText(
                                         StringBuilderPool.Borrow()
                                                          .AppendLine("/// <summary>Check if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</summary>")
-                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(left)}\"/>.</param>")
-                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(right)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"left\">The left <see cref=\"{CrefType(leftType)}\"/>.</param>")
+                                                         .AppendLine($"/// <param name=\"right\">The right <see cref=\"{CrefType(rightType)}\"/>.</param>")
                                                          .AppendLine("/// <returns>True if <paramref name=\"left\"/> is not equal to <paramref name=\"right\"/>.</returns>")
                                                          .Return())),
                                 nameof(DocsFix),
@@ -172,9 +175,9 @@
                     }
                 }
 
-                static string CrefType(ParameterSyntax parameter)
+                static string CrefType(TypeSyntax type)
                 {
-                    return SyntaxFactory.TypeCref(parameter.Type)
+                    return SyntaxFactory.TypeCref(type)
                                         .ToString()
                                         .Replace('<', '{')
                                         .Replace('>', '}');
@@ -210,9 +213,8 @@
 
                         text = $"The type of the elements in <paramref name=\"{parameter.Identifier.Text}\"/>.";
                     }
-                    else if (semanticModel.TryGetType(parameter.Type, cancellationToken, out var type) &&
-                             type is INamedTypeSymbol namedType &&
-                             namedType.IsGenericType &&
+                    else if (parameter.Type is { } parameterType &&
+                             semanticModel.GetType(parameterType, cancellationToken) is INamedTypeSymbol { IsGenericType: true } type &&
                              type.Interfaces.TrySingle(x => x.MetadataName == "IEnumerable`1", out _))
                     {
                         if (text != null)
@@ -228,7 +230,7 @@
 
             return text != null;
 
-            bool IsParameterType(TypeSyntax typeSyntax)
+            bool IsParameterType(TypeSyntax? typeSyntax)
             {
                 return typeSyntax is SimpleNameSyntax simple &&
                        simple.Identifier.Text == typeParameter.Identifier.Text;
