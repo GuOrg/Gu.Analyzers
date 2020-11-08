@@ -7,7 +7,9 @@
     using System.Globalization;
     using System.Linq;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -183,7 +185,7 @@
             static bool IsMatch(IdentifierNameSyntax left, ParameterSyntax right, out string? newName)
             {
                 newName = null;
-                if (Equals(left.Identifier.ValueText, right.Identifier.ValueText))
+                if (IsMatch(left.Identifier.ValueText, right.Identifier.ValueText))
                 {
                     return true;
                 }
@@ -195,7 +197,7 @@
 
                 return false;
 
-                static bool Equals(string memberName, string parameterName)
+                static bool IsMatch(string memberName, string parameterName)
                 {
                     if (memberName.StartsWith("_", StringComparison.OrdinalIgnoreCase))
                     {
@@ -444,15 +446,19 @@
                                      variables.LastOrDefault() is { Initializer: null }:
                                 foreach (var variable in variables)
                                 {
-                                    this.unassigned.Add(this.semanticModel.GetDeclaredSymbol(variable, this.cancellationToken));
+                                    if (this.semanticModel.GetDeclaredSymbol(variable, this.cancellationToken) is { } symbol)
+                                    {
+                                        this.unassigned.Add(symbol);
+                                    }
                                 }
 
                                 break;
                             case PropertyDeclarationSyntax { Modifiers: { } modifiers, ExpressionBody: null, AccessorList: { Accessors: { Count: 1 } accessors }, Initializer: null } property
                                 when accessors[0] is { Keyword: { ValueText: "get" }, Body: null } &&
                                      !modifiers.Any(SyntaxKind.AbstractKeyword) &&
-                                     isStatic == modifiers.Any(SyntaxKind.StaticKeyword):
-                                this.unassigned.Add(this.semanticModel.GetDeclaredSymbol(property, this.cancellationToken));
+                                     isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
+                                     this.semanticModel.GetDeclaredSymbol(property, this.cancellationToken) is { } type:
+                                this.unassigned.Add(type);
                                 break;
                         }
                     }

@@ -52,6 +52,7 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (diagnostic.Id == "CS8618" &&
+                    syntaxRoot is { } &&
                     syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MemberDeclarationSyntax? member))
                 {
                     if (FindType(member) is { } type)
@@ -80,6 +81,7 @@
                     }
                 }
                 else if (diagnostic.Id == "CS8765" &&
+                         syntaxRoot is { } &&
                          syntaxRoot.TryFindNodeOrAncestor<MethodDeclarationSyntax>(diagnostic, out var method))
                 {
                     switch (method)
@@ -99,7 +101,8 @@
                 else if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ExpressionSyntax expression)
                 {
                     if (TryFindLocalOrParameter() is { } localOrParameter &&
-                        TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter))
+                        TryFindOutParameter(localOrParameter.Identifier.ValueText, out var outParameter) &&
+                        outParameter is { Type: { } })
                     {
                         if (diagnostic.Id == "CS8653" ||
                             (diagnostic.Id == "CS8601" && IsDefault(expression)))
@@ -120,7 +123,7 @@
                                 (editor, _) => editor.ReplaceNode(
                                     outParameter!,
                                     x => outParameter!.WithAttributeList(NotNullWhenTrue)
-                                                      .WithType(SyntaxFactory.NullableType(outParameter!.Type)))
+                                                      .WithType(SyntaxFactory.NullableType(outParameter.Type)))
                                                      .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
                                 "[NotNullWhen(true)]",
                                 diagnostic);
