@@ -4,8 +4,10 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -49,12 +51,14 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
+                if (syntaxRoot is { } &&
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
+                    semanticModel is { } &&
                     Pattern.Identifier(expression, semanticModel, context.CancellationToken) is { } member &&
 #pragma warning disable SA1008 // Opening parenthesis should be spaced correctly
                     //// ReSharper disable PatternAlwaysOfType
                     Parse(expression) is (IdentifierNameSyntax property, PatternSyntax pattern))
-                    //// ReSharper restore PatternAlwaysOfType
+                //// ReSharper restore PatternAlwaysOfType
 #pragma warning restore SA1008 // Opening parenthesis should be spaced correctly
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
@@ -68,7 +72,7 @@
                             diagnostic);
                     }
                     else if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
-                             syntaxRoot.TryFindNode(additionalLocation, out PatternSyntax? mergeWith))
+                             syntaxRoot.FindNode(additionalLocation.SourceSpan) is PatternSyntax mergeWith)
                     {
                         context.RegisterCodeFix(
                             mergeWith is RecursivePatternSyntax { PropertyPatternClause: { Subpatterns: { } subs } } &&
@@ -135,7 +139,7 @@
                             leading: default,
                             kind: SyntaxKind.OpenBraceToken,
                             trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
-                        subpatterns: SyntaxFactory.SingletonSeparatedList<SubpatternSyntax>(
+                        subpatterns: SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.Subpattern(
                                 nameColon: SyntaxFactory.NameColon(
                                     name: property.WithoutTrivia(),
@@ -191,7 +195,7 @@
                             leading: default,
                             kind: SyntaxKind.OpenBraceToken,
                             trailing: SyntaxFactory.TriviaList(SyntaxFactory.Space)),
-                        subpatterns: SyntaxFactory.SingletonSeparatedList<SubpatternSyntax>(
+                        subpatterns: SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.Subpattern(
                                 nameColon: SyntaxFactory.NameColon(
                                     name: property.WithoutTrivia(),
