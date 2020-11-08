@@ -76,12 +76,11 @@
                     {
                         if (replaceNode.FirstAncestor<ConstructorDeclarationSyntax>() is null)
                         {
-                            if (fieldAccess is null)
+                            fieldAccess ??= WithField(editor, ctor, parameterSyntax);
+                            if (fieldAccess is { })
                             {
-                                fieldAccess = WithField(editor, ctor, parameterSyntax);
+                                editor.ReplaceNode(replaceNode, fieldAccess.WithLeadingTrivia(replaceNode.GetLeadingTrivia()));
                             }
-
-                            editor.ReplaceNode(replaceNode, fieldAccess.WithLeadingTrivia(replaceNode.GetLeadingTrivia()));
                         }
                         else
                         {
@@ -155,60 +154,64 @@
             }
         }
 
-        private static ExpressionSyntax WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
+        private static ExpressionSyntax? WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
         {
-            var underscoreFields = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
-            var name = underscoreFields
-                           ? "_" + parameter.Identifier.ValueText
-                           : parameter.Identifier.ValueText;
-            var containingType = (TypeDeclarationSyntax)ctor.Parent;
-            var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
-            while (declaredSymbol.MemberNames.Contains(name))
+            if (ctor is { Body: { }, Parent: TypeDeclarationSyntax containingType } &&
+                editor.SemanticModel.GetDeclaredSymbol(containingType) is { } declaredSymbol)
             {
-                name += "_";
+                var underscoreFields = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
+                var name = underscoreFields
+                               ? "_" + parameter.Identifier.ValueText
+                               : parameter.Identifier.ValueText;
+                while (declaredSymbol.MemberNames.Contains(name))
+                {
+                    name += "_";
+                }
+
+                var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
+                      name,
+                      accessibility: Accessibility.Private,
+                      modifiers: DeclarationModifiers.ReadOnly,
+                      type: parameter.Type);
+                var members = containingType.Members;
+                if (members.TryFirst(x => x is FieldDeclarationSyntax, out var field))
+                {
+                    editor.InsertBefore(field, new[] { newField });
+                }
+                else if (members.TryFirst(out field))
+                {
+                    editor.InsertBefore(field, new[] { newField });
+                }
+                else
+                {
+                    _ = editor.AddMember(containingType, newField);
+                }
+
+                var fieldAccess = underscoreFields
+                                           ? SyntaxFactory.IdentifierName(name)
+                                           : SyntaxFactory.ParseExpression($"this.{name}");
+
+                var assignStatement = SyntaxFactory.ExpressionStatement(
+                                                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
+                                                                     fieldAccess,
+                                                                     SyntaxFactory.IdentifierName(parameter.Identifier)))
+                                                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                if (ctor.Body.Statements.Any())
+                {
+                    editor.InsertBefore(
+                        ctor.Body.Statements.First(),
+                        assignStatement);
+                }
+                else
+                {
+                    editor.ReplaceNode(ctor.Body, ctor.Body.WithStatements(ctor.Body.Statements.Add(assignStatement)));
+                }
+
+                return fieldAccess;
             }
 
-            var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
-                  name,
-                  accessibility: Accessibility.Private,
-                  modifiers: DeclarationModifiers.ReadOnly,
-                  type: parameter.Type);
-            var members = containingType.Members;
-            if (members.TryFirst(x => x is FieldDeclarationSyntax, out var field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else if (members.TryFirst(out field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else
-            {
-                _ = editor.AddMember(containingType, newField);
-            }
-
-            var fieldAccess = underscoreFields
-                                       ? SyntaxFactory.IdentifierName(name)
-                                       : SyntaxFactory.ParseExpression($"this.{name}");
-
-            var assignStatement = SyntaxFactory.ExpressionStatement(
-                                                             (ExpressionSyntax)editor.Generator.AssignmentStatement(
-                                                                 fieldAccess,
-                                                                 SyntaxFactory.IdentifierName(parameter.Identifier)))
-                                                         .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                         .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-            if (ctor.Body.Statements.Any())
-            {
-                editor.InsertBefore(
-                    ctor.Body.Statements.First(),
-                    assignStatement);
-            }
-            else
-            {
-                editor.ReplaceNode(ctor.Body, ctor.Body.WithStatements(ctor.Body.Statements.Add(assignStatement)));
-            }
-
-            return fieldAccess;
+            return null;
         }
 
         private class ReplaceNodes : CSharpSyntaxWalker
