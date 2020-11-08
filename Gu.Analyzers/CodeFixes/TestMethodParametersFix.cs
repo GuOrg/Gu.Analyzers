@@ -6,8 +6,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -71,8 +73,8 @@
                 return true;
             }
 
-            if (testCase.ArgumentList is { } argumentList &&
-                !argumentList.Arguments.Any(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression)) &&
+            if (testCase.ArgumentList is { Arguments: { } arguments } argumentList &&
+                !arguments.Any(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression)) &&
                 testCase.TryFirstAncestor(out MethodDeclarationSyntax? method) &&
                 method.ParameterList is { } current)
             {
@@ -87,32 +89,40 @@
 
                 ParameterSyntax CreateParameter(AttributeArgumentSyntax argument)
                 {
-                    var i = ((AttributeArgumentListSyntax)argument.Parent).Arguments.IndexOf(argument);
-                    if (current!.Parameters.TryElementAt(i, out var parameter))
+                    if (argument is { Expression: { } expression } &&
+                        semanticModel.GetType(expression, cancellationToken) is { } type)
                     {
-                        if (parameter.Modifiers.Any(SyntaxKind.ParamsKeyword))
+                        var i = arguments.IndexOf(argument);
+
+                        if (current!.Parameters.TryElementAt(i, out var parameter))
                         {
+                            if (parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
+                                parameter.Type is ArrayTypeSyntax arrayType)
+                            {
+                                return parameter.WithType(
+                                    arrayType.WithElementType(
+                                        SyntaxFactory.ParseTypeName(type.ToMinimalDisplayString(semanticModel, argument.SpanStart))));
+                            }
+
                             return parameter.WithType(
-                                ((ArrayTypeSyntax)parameter.Type).WithElementType(
-                                    SyntaxFactory.ParseTypeName(
-                                        semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
-                                                     .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart))));
+                                SyntaxFactory.ParseTypeName(type.ToMinimalDisplayString(semanticModel, argument.SpanStart))
+                                             .WithTriviaFrom(parameter.Type));
                         }
 
-                        return parameter.WithType(
+                        return SyntaxFactory.Parameter(
+                            default,
+                            default,
                             SyntaxFactory.ParseTypeName(
-                                             semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
-                                                          .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart))
-                                         .WithTriviaFrom(parameter.Type));
+                                type.ToMinimalDisplayString(semanticModel, argument.SpanStart)),
+                            SyntaxFactory.Identifier("arg" + i),
+                            null);
                     }
 
                     return SyntaxFactory.Parameter(
                         default,
                         default,
-                        SyntaxFactory.ParseTypeName(
-                            semanticModel.GetTypeInfo(argument.Expression, cancellationToken)
-                                         .Type.ToMinimalDisplayString(semanticModel, argument.SpanStart)),
-                        SyntaxFactory.Identifier("arg" + i),
+                        SyntaxFactory.ParseTypeName("object"),
+                        SyntaxFactory.Identifier("arg"),
                         null);
                 }
             }
