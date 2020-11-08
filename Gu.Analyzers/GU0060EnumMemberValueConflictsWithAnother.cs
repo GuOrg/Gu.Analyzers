@@ -4,7 +4,9 @@
     using System.Collections.Immutable;
     using System.Globalization;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -33,16 +35,21 @@
                     ulong bitSumOfLiterals = 0;
                     foreach (var enumMember in enumDeclaration.Members)
                     {
-                        var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
-                        var notDerivedFromOther =
-                            !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
-                        var value = UnboxUMaxInt(symbol.ConstantValue);
-                        if (notDerivedFromOther && (bitSumOfLiterals & value) != 0)
+                        if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
-                        }
+                            var value = UnboxUMaxInt(constantValue);
+                            if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
+                                (bitSumOfLiterals & value) != 0)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
+                            }
 
-                        bitSumOfLiterals |= value;
+                            bitSumOfLiterals |= value;
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
                 else
@@ -50,15 +57,21 @@
                     using var enumValuesSet = PooledSet<ulong>.Borrow();
                     foreach (var enumMember in enumDeclaration.Members)
                     {
-                        var symbol = context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken);
-                        var notDerivedFromOther = !IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken);
-                        var value = UnboxUMaxInt(symbol.ConstantValue);
-                        if (notDerivedFromOther && enumValuesSet.Contains(value))
+                        if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
-                        }
+                            var value = UnboxUMaxInt(constantValue);
+                            if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
+                                enumValuesSet.Contains(value))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
+                            }
 
-                        enumValuesSet.Add(value);
+                            enumValuesSet.Add(value);
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
             }
