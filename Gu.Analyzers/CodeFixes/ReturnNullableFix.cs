@@ -81,10 +81,20 @@
 
         private static bool IsPreviousStatementAssigning(StatementSyntax statement, ParameterSyntax parameter)
         {
-            return statement.Parent is BlockSyntax { Statements: { } statements } &&
+            return Statements() is { } statements &&
                    statements.TryElementAt(statements.IndexOf(statement) - 1, out var previous) &&
                    previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } } &&
                    left.Identifier.ValueText == parameter.Identifier.ValueText;
+
+            SyntaxList<StatementSyntax>? Statements()
+            {
+                return statement.Parent switch
+                {
+                    BlockSyntax { Statements: { } ss } => ss,
+                    SwitchSectionSyntax { Statements: { } ss } => ss,
+                    _ => null,
+                };
+            }
         }
 
         private class Rewriter : CSharpSyntaxRewriter
@@ -108,6 +118,7 @@
                 return node switch
                 {
                     { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
+                    { Parent: SwitchSectionSyntax { Statements: { Count: 1 } }, Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => node.WithExpression(SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)),
                     { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
                     { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
                         when left.Identifier.ValueText == this.parameter.Identifier.ValueText

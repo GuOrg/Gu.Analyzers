@@ -142,6 +142,51 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
         }
 
+        [Test]
+        public static void Switch()
+        {
+            var before = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        bool M(object o, ↓out string? s)
+        {
+            s = null;
+            switch (o)
+            {
+                case string text:
+                    s = text;
+                    return true;
+                default:
+                    return false;
+            }
+        }
+    }
+}";
+
+            var after = @"
+#nullable enable
+namespace N
+{
+    class C
+    {
+        string? M(object o)
+        {
+            switch (o)
+            {
+                case string text:
+                    return text;
+                default:
+                    return null;
+            }
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+        }
+
         [Ignore("tbd")]
         [TestCase("s != null")]
         [TestCase("s is { }")]
