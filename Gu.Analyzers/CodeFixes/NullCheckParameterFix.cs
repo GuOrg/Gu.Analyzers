@@ -6,8 +6,10 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -27,7 +29,12 @@
                                           .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                var node = syntaxRoot?.FindNode(diagnostic.Location.SourceSpan);
+
+                if (node is null)
+                {
+                    continue;
+                }
 
                 if (diagnostic.Id == "CA1062")
                 {
@@ -56,8 +63,8 @@
                 {
                     var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                      .ConfigureAwait(false);
-                    if (parameter.Parent is ParameterListSyntax parameterList &&
-                        parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration)
+                    if (parameter.Parent is ParameterListSyntax { Parent: BaseMethodDeclarationSyntax methodDeclaration } parameterList &&
+                        semanticModel is { })
                     {
                         using var walker = AssignmentExecutionWalker.Borrow(methodDeclaration, SearchScope.Member, semanticModel, context.CancellationToken);
                         if (TryFirstAssignedWith(parameter, walker.Assignments, out var assignedValue) &&
@@ -102,9 +109,9 @@
                             {
                                 return methodDeclaration switch
                                 {
-                                    MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } => SyntaxFactory.ExpressionStatement(expression),
+                                    MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } => SyntaxFactory.ExpressionStatement(expression!),
                                     MethodDeclarationSyntax _ => SyntaxFactory.ReturnStatement(expression),
-                                    _ => SyntaxFactory.ExpressionStatement(expression),
+                                    _ => SyntaxFactory.ExpressionStatement(expression!),
                                 };
                             }
                         }
