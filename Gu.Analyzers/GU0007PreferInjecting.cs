@@ -68,7 +68,7 @@
             if (!context.IsExcludedFromAnalysis() &&
                 !context.ContainingSymbol.IsStatic &&
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                Inject.TryFindConstructor(objectCreation, out _) &&
+                Inject.FindConstructor(objectCreation) is { } &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
                 injectable != Inject.Injectable.No &&
                 context.SemanticModel.TryGetNamedType(objectCreation, context.CancellationToken, out var createdType) &&
@@ -110,7 +110,7 @@
                 !context.ContainingSymbol.IsStatic &&
                 context.Node is MemberAccessExpressionSyntax { Expression: { } expression } memberAccess &&
                 !expression.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) &&
-                Inject.TryFindConstructor(memberAccess, out _) &&
+                Inject.FindConstructor(memberAccess) is { } &&
                 IsRootValid(memberAccess, context.SemanticModel, context.CancellationToken) &&
                 TryGetMemberType(memberAccess, context.SemanticModel, context.CancellationToken, out var memberType) &&
                 IsInjectable(memberType) &&
@@ -161,7 +161,7 @@
             switch (expression)
             {
                 case IdentifierNameSyntax identifierName:
-                    return Inject.TryFindConstructor(identifierName, out _)
+                    return Inject.FindConstructor(identifierName) is { }
                         ? Inject.Injectable.Safe
                         : Inject.Injectable.No;
                 case ObjectCreationExpressionSyntax nestedObjectCreation:

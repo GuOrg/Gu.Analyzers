@@ -49,7 +49,7 @@
 
         private static void Fix(DocumentEditor editor, ExpressionSyntax expression, string typeName, CancellationToken cancellationToken)
         {
-            if (Inject.TryFindConstructor(expression, out var ctor))
+            if (Inject.FindConstructor(expression) is { } ctor)
             {
                 var type = SyntaxFactory.ParseTypeName(typeName);
                 var parameterSyntax = SyntaxFactory.Parameter(

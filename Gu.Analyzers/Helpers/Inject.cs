@@ -1,6 +1,5 @@
-namespace Gu.Analyzers
+﻿namespace Gu.Analyzers
 {
-    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -15,13 +14,17 @@ namespace Gu.Analyzers
             Unsafe,
         }
 
-        internal static bool TryFindConstructor(SyntaxNode node, [NotNullWhen(true)] out ConstructorDeclarationSyntax? ctor)
+        internal static ConstructorDeclarationSyntax? FindConstructor(SyntaxNode node)
         {
-            ctor = null;
-            return node.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration) &&
-                   !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword) &&
-                   classDeclaration.Members.TrySingleOfType<MemberDeclarationSyntax, ConstructorDeclarationSyntax>(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ctor) &&
-                   !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword);
+            if (node.TryFirstAncestor(out ClassDeclarationSyntax? classDeclaration) &&
+                !classDeclaration.Modifiers.Any(SyntaxKind.PartialKeyword) &&
+                classDeclaration.Members.TrySingleOfType<MemberDeclarationSyntax, ConstructorDeclarationSyntax>(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out var ctor) &&
+                !ctor.Modifiers.Any(SyntaxKind.PrivateKeyword))
+            {
+                return ctor;
+            }
+
+            return null;
         }
     }
 }
