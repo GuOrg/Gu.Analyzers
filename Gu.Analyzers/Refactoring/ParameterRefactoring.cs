@@ -24,7 +24,8 @@
                 parameter is { Parent: ParameterListSyntax { Parent: ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax _ } ctor } parameterList } &&
                 parameterList.Parameters.Count > 1)
             {
-                if (ShouldMoveAssignment(parameter, ctor) is { } moveAssignment)
+                if (ctor.Body is { } &&
+                    ShouldMoveAssignment(parameter, ctor) is { } moveAssignment)
                 {
                     context.RegisterRefactoring(
                         CodeAction.Create(

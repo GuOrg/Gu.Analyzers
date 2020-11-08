@@ -4,7 +4,9 @@
     using System.Composition;
     using System.Linq;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -41,12 +43,22 @@
 
                         static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
                         {
-                            if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                            if (old.Parent is { } &&
+                                editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
                             {
                                 return old.WithArguments(
                                     SyntaxFactory.SeparatedList(
-                                        old.Arguments.OrderBy(x => ParameterIndex(method, x)),
+                                        old.Arguments.OrderBy(x => Index(x)),
                                         old.Arguments.GetSeparators()));
+
+                                int Index(ArgumentSyntax argument)
+                                {
+                                    return argument switch
+                                    {
+                                        { NameColon: { Name: { } } } => ParameterIndex(method, argument.NameColon.Name.Identifier.ValueText),
+                                        _ => old.Arguments.IndexOf(argument),
+                                    };
+                                }
                             }
 
                             return old;
@@ -65,7 +77,8 @@
 
                         static ArgumentListSyntax Replacement(ArgumentListSyntax old, DocumentEditor editor)
                         {
-                            if (editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
+                            if (old.Parent is { } &&
+                                editor.SemanticModel.GetSpeculativeSymbolInfo(old.SpanStart, old.Parent, SpeculativeBindingOption.BindAsExpression).Symbol is IMethodSymbol method)
                             {
                                 var arguments = new ArgumentSyntax[old.Arguments.Count];
                                 var messageIndex = ParameterIndex(method, "message");
@@ -98,11 +111,6 @@
                     }
                 }
             }
-        }
-
-        private static int ParameterIndex(IMethodSymbol method, ArgumentSyntax argument)
-        {
-            return ParameterIndex(method, argument.NameColon.Name.Identifier.ValueText);
         }
 
         private static int ParameterIndex(IMethodSymbol method, string name)

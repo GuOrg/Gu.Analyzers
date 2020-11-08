@@ -69,6 +69,11 @@
                     method = method.ReducedFrom;
                 }
 
+                if (method is null)
+                {
+                    return true;
+                }
+
                 if (method.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? declaration))
                 {
                     using var walker = ReturnValueWalker.Borrow(declaration);
