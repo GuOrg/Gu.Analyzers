@@ -44,13 +44,11 @@ namespace ValidCode
 
         private event PropertyChangedEventHandler? PropertyChangedCore;
 
-        internal IDisposable Disposable => this.subscription.Disposable;
+        internal IDisposable? Disposable => this.subscription.Disposable;
 
-#pragma warning disable IDISP012 // Property should not return created disposable.
 #pragma warning disable GU0021 // Calculated property allocates reference type.
         internal IDisposable CreateDisposableProperty => new Disposable();
 #pragma warning restore GU0021 // Calculated property allocates reference type.
-#pragma warning restore IDISP012 // Property should not return created disposable.
 
         internal string Text => this.AddAndReturnToString();
 
