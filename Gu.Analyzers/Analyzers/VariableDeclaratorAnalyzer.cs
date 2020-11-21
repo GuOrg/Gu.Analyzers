@@ -35,7 +35,7 @@
                 type is { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
                 typeArguments[0] is INamedTypeSymbol typeArgument &&
                 type == KnownSymbols.MoqMockOfT &&
-                ShouldRename(variable, typeArgument) is { } renameTo)
+                ShouldRename(variable) is { } renameTo)
             {
                 if (variable.Identifier.ValueText == "mock")
                 {
@@ -67,7 +67,7 @@
                 };
             }
 
-            string? ShouldRename(VariableDeclaratorSyntax current, INamedTypeSymbol typeArgument)
+            string? ShouldRename(VariableDeclaratorSyntax current)
             {
                 if (symbol is ILocalSymbol &&
                     current.FirstAncestor<MethodDeclarationSyntax>() is { } method)
@@ -77,8 +77,8 @@
                     {
                         if (declarator != current &&
                             context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out ILocalSymbol? local) &&
-                            local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
-                           SymbolEqualityComparer.Default.Equals(typeArguments[0], typeArgument))
+                            local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } args } &&
+                           SymbolEqualityComparer.Default.Equals(args[0], typeArgument))
                         {
                             return null;
                         }
