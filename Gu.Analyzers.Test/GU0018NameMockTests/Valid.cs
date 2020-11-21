@@ -38,6 +38,36 @@ namespace N
         }
 
         [Test]
+        public static void TwoLocalsSuffixed()
+        {
+            var iPlc = @"
+namespace N
+{
+    public interface IPlc
+    {
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Moq;
+    using NUnit.Framework;
+
+    public class C
+    {
+        [Test]
+        public void M()
+        {
+            var plcMock1 = new Mock<IPlc>(MockBehavior.Strict);
+            var plcMock2 = new Mock<IPlc>(MockBehavior.Strict);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, iPlc, code);
+        }
+
+        [Test]
         public static void LocalGeneric()
         {
             var iPlc = @"

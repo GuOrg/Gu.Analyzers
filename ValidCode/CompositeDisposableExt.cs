@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -14,7 +14,9 @@ namespace ValidCode
                 disposable.Add(item);
             }
 
+#pragma warning disable CS8603 // Possible null reference return.
             return item;
+#pragma warning restore CS8603 // Possible null reference return.
         }
     }
 }

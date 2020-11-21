@@ -62,19 +62,41 @@
                 return symbol switch
                 {
                     ILocalSymbol local => local.Type as INamedTypeSymbol,
-                    IFieldSymbol { DeclaredAccessibility: Accessibility.Private, IsStatic: false } field => field.Type as INamedTypeSymbol,
+                    IFieldSymbol field => field.Type as INamedTypeSymbol,
                     _ => null,
                 };
             }
 
-            static string? ShouldRename(VariableDeclaratorSyntax current, INamedTypeSymbol type)
+            string? ShouldRename(VariableDeclaratorSyntax current, INamedTypeSymbol typeArgument)
             {
-                var expectedName = type switch
+                if (symbol.DeclaredAccessibility != Accessibility.Private ||
+                    symbol.IsStatic)
+                {
+                    return null;
+                }
+
+                if (symbol is ILocalSymbol &&
+                    current.FirstAncestor<MethodDeclarationSyntax>() is { } method)
+                {
+                    using var walker = VariableDeclaratorWalker.Borrow(method);
+                    foreach (var declarator in walker.VariableDeclarators)
+                    {
+                        if (declarator != current &&
+                            context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out ILocalSymbol? local) &&
+                            local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
+                           SymbolEqualityComparer.Default.Equals(typeArguments[0], typeArgument))
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+                var expectedName = typeArgument switch
                 {
                     { TypeKind: TypeKind.Interface, IsGenericType: false }
-                        when type.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{type.Name.Substring(1).ToFirstCharLower()}Mock",
+                        when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Mock",
                     { TypeKind: TypeKind.Interface, IsGenericType: true, TypeArguments: { Length: 1 } arguments }
-                        when type.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{type.Name.Substring(1).ToFirstCharLower()}Of{arguments[0].Name}Mock",
+                        when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Of{arguments[0].Name}Mock",
                     _ => null,
                 };
 
