@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
+﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -324,6 +324,28 @@ namespace N
         private static bool Id(bool self) => self;
     }
 }";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void SchedulerOperationConfigureAwait()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
+
+    internal class C
+    {
+        internal static async Task SleepAsync(IScheduler scheduler, TimeSpan dueTime)
+        {
+            await scheduler.Sleep(dueTime).ConfigureAwait(false);
+        }
+    }
+}
+";
             RoslynAssert.Valid(Analyzer, code);
         }
     }

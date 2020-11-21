@@ -57,9 +57,7 @@
 
         private static bool IsConfigureAwait(IMethodSymbol methodSymbol)
         {
-            return (methodSymbol.ReceiverType == KnownSymbols.Task ||
-                    methodSymbol.ReceiverType == KnownSymbols.TaskOfT) &&
-                   methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
+            return methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
                    parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
 
