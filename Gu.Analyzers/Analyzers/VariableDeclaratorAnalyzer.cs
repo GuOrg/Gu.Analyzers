@@ -62,7 +62,7 @@
                 return symbol switch
                 {
                     ILocalSymbol local => local.Type as INamedTypeSymbol,
-                    IFieldSymbol field => field.Type as INamedTypeSymbol,
+                    IFieldSymbol { DeclaredAccessibility: Accessibility.Private, IsStatic: false } field => field.Type as INamedTypeSymbol,
                     _ => null,
                 };
             }

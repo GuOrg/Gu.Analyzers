@@ -96,5 +96,30 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, iPlc, code);
         }
+
+        [Test]
+        public static void PublicField()
+        {
+            var iPlc = @"
+namespace N
+{
+    public interface IPlc
+    {
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Moq;
+    using NUnit.Framework;
+
+    public class C
+    {
+        public static readonly Mock<IPlcClient> PlcClientMock = new Mock<IPlc>(MockBehavior.Strict);
+    }
+}";
+            RoslynAssert.Valid(Analyzer, iPlc, code);
+        }
     }
 }
