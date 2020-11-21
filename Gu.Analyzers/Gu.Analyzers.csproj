@@ -20,7 +20,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>1.8.3</Version>
+    <Version>1.8.4</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
