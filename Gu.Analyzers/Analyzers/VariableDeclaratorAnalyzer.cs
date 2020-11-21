@@ -69,12 +69,6 @@
 
             string? ShouldRename(VariableDeclaratorSyntax current, INamedTypeSymbol typeArgument)
             {
-                if (symbol.DeclaredAccessibility != Accessibility.Private ||
-                    symbol.IsStatic)
-                {
-                    return null;
-                }
-
                 if (symbol is ILocalSymbol &&
                     current.FirstAncestor<MethodDeclarationSyntax>() is { } method)
                 {
@@ -85,6 +79,25 @@
                             context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out ILocalSymbol? local) &&
                             local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
                            SymbolEqualityComparer.Default.Equals(typeArguments[0], typeArgument))
+                        {
+                            return null;
+                        }
+                    }
+                }
+
+                if (symbol is IFieldSymbol field)
+                {
+                    if (field.DeclaredAccessibility != Accessibility.Private ||
+                        field.IsStatic)
+                    {
+                        return null;
+                    }
+
+                    foreach (var other in field.ContainingType.GetMembers())
+                    {
+                        if (!SymbolEqualityComparer.Default.Equals(other, symbol) &&
+                            other is IFieldSymbol otherField &&
+                            SymbolEqualityComparer.Default.Equals(otherField.Type, field.Type))
                         {
                             return null;
                         }
