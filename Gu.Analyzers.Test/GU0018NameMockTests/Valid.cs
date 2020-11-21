@@ -116,7 +116,7 @@ namespace N
 
     public class C
     {
-        public static readonly Mock<IPlcClient> PlcClientMock = new Mock<IPlc>(MockBehavior.Strict);
+        public static readonly Mock<IPlc> PlcClientMock = new Mock<IPlc>(MockBehavior.Strict);
     }
 }";
             RoslynAssert.Valid(Analyzer, iPlc, code);
