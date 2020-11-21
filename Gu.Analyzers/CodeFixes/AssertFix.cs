@@ -31,7 +31,7 @@
                 {
                     context.RegisterCodeFix(
                         "Assert exception message inline.",
-                        (editor, cancellationToken) =>
+                        editor =>
                         {
                             editor
                                 .ReplaceNode(
@@ -42,12 +42,12 @@
                                             invocation,
                                             SyntaxFactory.IdentifierName("Message"))));
                         },
-                        nameof(AssertFix),
+                        "Assert exception message inline.",
                         diagnostic);
 
                     context.RegisterCodeFix(
                         "Assert exception message via local variable.",
-                        (editor, cancellationToken) =>
+                        editor =>
                         {
                             editor.InsertAfter(
                                 statement,
@@ -72,7 +72,7 @@
                                                             .EqualsValueClause(
                                                                 value: invocation))))));
                         },
-                        nameof(AssertFix),
+                        "Assert exception message via local variable.",
                         diagnostic);
                 }
 

@@ -69,8 +69,7 @@
 
         private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
         {
-            if (method is null ||
-                !method.ReturnsVoid ||
+            if (!method.ReturnsVoid ||
                 method.AssociatedSymbol != null)
             {
                 return false;

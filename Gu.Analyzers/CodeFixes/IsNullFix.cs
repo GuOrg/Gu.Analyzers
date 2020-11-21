@@ -18,7 +18,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.GU0077PreferIsNull.Id);
 
-        protected override DocumentEditorFixAllProvider? FixAllProvider() => DocumentEditorFixAllProvider.Solution;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => DocumentEditorFixAllProvider.Solution;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {

@@ -93,20 +93,13 @@
                     return;
                 }
 
-                if (ctor.ParameterList is null)
+                if (ctor.ParameterList.Parameters.TryFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out var existing))
                 {
-                    editor.ReplaceNode(ctor, ctor.WithParameterList(SyntaxFactory.ParameterList(SyntaxFactory.SingletonSeparatedList(parameterSyntax))));
+                    editor.InsertBefore(existing, parameterSyntax);
                 }
                 else
                 {
-                    if (ctor.ParameterList.Parameters.TryFirst(p => p.Default != null || p.Modifiers.Any(SyntaxKind.ParamsKeyword), out var existing))
-                    {
-                        editor.InsertBefore(existing, parameterSyntax);
-                    }
-                    else
-                    {
-                        editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
-                    }
+                    editor.ReplaceNode(ctor.ParameterList, ctor.ParameterList.AddParameters(parameterSyntax));
                 }
             }
         }
@@ -139,14 +132,11 @@
 
             string UniqueName(string candidate)
             {
-                if (parameterList != null)
+                foreach (var p in parameterList.Parameters)
                 {
-                    foreach (var p in parameterList.Parameters)
+                    if (p.Identifier.ValueText == candidate)
                     {
-                        if (p.Identifier.ValueText == candidate)
-                        {
-                            return UniqueName(candidate + "_");
-                        }
+                        return UniqueName(candidate + "_");
                     }
                 }
 
