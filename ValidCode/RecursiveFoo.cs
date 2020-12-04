@@ -1,6 +1,5 @@
 ﻿// ReSharper disable All
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 namespace ValidCode
@@ -15,7 +14,6 @@ namespace ValidCode
 
         internal RecursiveFoo()
         {
-#pragma warning disable GU0015 // Don't assign same more than once.
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -24,7 +22,6 @@ namespace ValidCode
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
             value = value;
-#pragma warning restore GU0015 // Don't assign same more than once.
         }
 
         internal IDisposable RecursiveProperty => this.RecursiveProperty;

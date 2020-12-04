@@ -1,6 +1,4 @@
-﻿#pragma warning disable CA1055 // Uri return values should not be strings
-#pragma warning disable CA1056 // Uri properties should not be strings
-#pragma warning disable CA1721 // Property names should not match get methods
+﻿#pragma warning disable CA1056 // Uri properties should not be strings
 namespace Gu.Analyzers.Test
 {
     using System;
@@ -234,7 +232,7 @@ namespace Gu.Analyzers.Test
 | Topic    | Value
 | :--      | :--
 | Id       | {descriptor.Id}
-| Severity | {descriptor.DefaultSeverity.ToString()}
+| Severity | {descriptor.DefaultSeverity}
 | Enabled  | {(descriptor.IsEnabledByDefault ? "True" : "False")}
 | Category | {descriptor.Category}
 | Code     | [<TYPENAME>](<URL>)
@@ -325,7 +323,7 @@ Or put this at the top of the file to disable all instances.
 
             public string Name { get; }
 
-            public string Uri => "https://github.com/GuOrg/Gu.Analyzers/blob/master" + this.Name.Substring(SolutionDirectory.FullName.Length)
+            public string Uri => "https://github.com/GuOrg/Gu.Analyzers/blob/master" + this.Name[SolutionDirectory.FullName.Length..]
                                                                                                 .Replace("\\", "/", StringComparison.Ordinal);
 
             public static CodeFile Find(Type type)

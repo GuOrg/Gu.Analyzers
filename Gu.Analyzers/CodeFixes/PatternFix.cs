@@ -55,11 +55,9 @@
                     syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionSyntax? expression) &&
                     semanticModel is { } &&
                     Pattern.Identifier(expression, semanticModel, context.CancellationToken) is { } member &&
-#pragma warning disable SA1008 // Opening parenthesis should be spaced correctly
                     //// ReSharper disable PatternAlwaysOfType
                     Parse(expression) is (IdentifierNameSyntax property, PatternSyntax pattern))
-                //// ReSharper restore PatternAlwaysOfType
-#pragma warning restore SA1008 // Opening parenthesis should be spaced correctly
+                    //// ReSharper restore PatternAlwaysOfType
                 {
                     if (diagnostic.AdditionalLocations.Count == 0)
                     {

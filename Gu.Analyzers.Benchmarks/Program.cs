@@ -4,7 +4,6 @@
 // ReSharper disable RedundantNameQualifier
 
 #pragma warning disable CS0162, IDE0051 // Unreachable code detected
-#pragma warning disable GU0011 // Don't ignore the return value.
 namespace Gu.Analyzers.Benchmarks
 {
     using System;
