@@ -66,6 +66,7 @@
                 }
             }
 
+            other = default;
             return false;
 
             static bool IsInitialized(MemberDeclarationSyntax declaration)
