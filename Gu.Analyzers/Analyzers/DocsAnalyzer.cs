@@ -49,17 +49,16 @@
 
                 bool IsAutoPrefix()
                 {
-                    switch (text.ToString())
+                    return text.ToString() switch
                     {
-                        case "The ":
-                        case "The left ":
-                        case "The right ":
-                        case "The first ":
-                        case "The other ":
-                            return true;
-                        default:
-                            return false;
-                    }
+                        "The " or
+                            "The left " or
+                            "The right " or
+                            "The first " or
+                            "The other "
+                            => true,
+                        _ => false,
+                    };
                 }
 
                 bool IsAutoSuffix()
