@@ -5,8 +5,11 @@
     using System.IO;
     using System.Linq;
     using System.Text;
+
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis.Diagnostics;
+
     using NUnit.Framework;
 
     [Explicit("Script")]
@@ -78,7 +81,7 @@
                        .AppendLine("        {")
                        .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
                        .AppendLine("        }");
-                if (!ReferenceEquals(analyzer, AllAnalyzers[^1]))
+                if (!ReferenceEquals(analyzer, AllAnalyzers[AllAnalyzers.Count - 1]))
                 {
                     builder.AppendLine();
                 }
