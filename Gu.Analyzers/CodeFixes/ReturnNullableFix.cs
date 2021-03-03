@@ -106,7 +106,7 @@
                 this.parameter = parameter;
             }
 
-            public override SyntaxNode VisitParameterList(ParameterListSyntax node)
+            public override SyntaxNode? VisitParameterList(ParameterListSyntax node)
             {
                 return node.RemoveNode(
                     node.Parameters.Single(x => x.IsEquivalentTo(this.parameter)),

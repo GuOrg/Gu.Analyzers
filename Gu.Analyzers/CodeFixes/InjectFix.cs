@@ -223,7 +223,7 @@
 
             internal List<SyntaxNode> Nodes { get; } = new List<SyntaxNode>();
 
-            public sealed override void Visit(SyntaxNode node)
+            public sealed override void Visit(SyntaxNode? node)
             {
                 base.Visit(node);
             }

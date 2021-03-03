@@ -33,7 +33,7 @@
                             "Prefer parameter.",
                             (editor, _) => editor.ReplaceNode(
                                 memberAccess,
-                                SyntaxFactory.IdentifierName(name)
+                                SyntaxFactory.IdentifierName(name!)
                                              .WithLeadingTriviaFrom(memberAccess)),
                             "Prefer parameter.",
                             diagnostic);
@@ -44,7 +44,7 @@
                             "Prefer parameter.",
                             (editor, _) => editor.ReplaceNode(
                                 identifierName,
-                                identifierName.WithIdentifier(SyntaxFactory.Identifier(name))
+                                identifierName.WithIdentifier(SyntaxFactory.Identifier(name!))
                                               .WithLeadingTriviaFrom(identifierName)),
                             "Prefer parameter.",
                             diagnostic);

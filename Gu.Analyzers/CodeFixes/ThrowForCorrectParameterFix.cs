@@ -44,7 +44,7 @@
                                 => SyntaxFactory.ParseExpression($"nameof({name})"),
                             IdentifierNameSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } identifierName
                                 when invocation.IsNameOf()
-                                => identifierName.WithIdentifier(SyntaxFactory.Identifier(name)),
+                                => identifierName.WithIdentifier(SyntaxFactory.Identifier(name!)),
                             _ => throw new InvalidOperationException("Failed updating parameter name."),
                         };
                     }
