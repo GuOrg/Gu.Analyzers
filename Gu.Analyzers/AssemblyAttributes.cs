@@ -2,4 +2,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: CLSCompliant(false)]
-[assembly: SuppressMessage("HostError", "CS8033", Justification = "Analyzer getting it wrong.")]
+[assembly: SuppressMessage("Roslyn.HostError", "CS8033", Justification = "Analyzer getting it wrong.")]
