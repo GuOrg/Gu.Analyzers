@@ -3,7 +3,9 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,7 +26,7 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.ContainingSymbol.IsStatic)
+            if (context.ContainingSymbol is { IsStatic: true })
             {
                 switch (context.Node)
                 {

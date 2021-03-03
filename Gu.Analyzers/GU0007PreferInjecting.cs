@@ -66,7 +66,7 @@
         private static void HandleObjectCreation(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                !context.ContainingSymbol.IsStatic &&
+                context.ContainingSymbol is { IsStatic: false } &&
                 context.Node is ObjectCreationExpressionSyntax objectCreation &&
                 Inject.FindConstructor(objectCreation) is { } &&
                 CanInject(objectCreation, context.SemanticModel, context.CancellationToken) is var injectable &&
@@ -80,7 +80,7 @@
                     Diagnostic.Create(
                         Descriptors.GU0007PreferInjecting,
                         objectCreation.GetLocation(),
-                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
+                        ImmutableDictionary<string, string?>.Empty.Add(nameof(INamedTypeSymbol), typeName)
                                                                  .Add(nameof(Inject.Injectable), injectable.ToString()),
                         typeName));
             }
@@ -107,7 +107,7 @@
         private static void HandleMemberAccess(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                !context.ContainingSymbol.IsStatic &&
+                context.ContainingSymbol is { IsStatic: false } &&
                 context.Node is MemberAccessExpressionSyntax { Expression: { } expression } memberAccess &&
                 !expression.IsEither(SyntaxKind.ThisExpression, SyntaxKind.BaseExpression) &&
                 Inject.FindConstructor(memberAccess) is { } &&
@@ -122,8 +122,8 @@
                     Diagnostic.Create(
                         Descriptors.GU0007PreferInjecting,
                         memberAccess.Name.GetLocation(),
-                        ImmutableDictionary<string, string>.Empty.Add(nameof(INamedTypeSymbol), typeName)
-                                                                           .Add(nameof(Inject.Injectable), injectable.ToString()),
+                        ImmutableDictionary<string, string?>.Empty.Add(nameof(INamedTypeSymbol), typeName)
+                                                                 .Add(nameof(Inject.Injectable), injectable.ToString()),
                         typeName));
             }
         }

@@ -39,8 +39,8 @@
                     diagnostic.Properties.TryGetValue(nameof(Inject.Injectable), out var injectable))
                 {
                     context.RegisterCodeFix(
-                        $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLowerInvariant() : injectable.ToUpperInvariant())}.",
-                        (editor, cancellationToken) => Fix(editor, node, typeName, cancellationToken),
+                        $"Inject {(injectable == nameof(Inject.Injectable.Safe) ? injectable.ToLowerInvariant() : injectable!.ToUpperInvariant())}.",
+                        (editor, cancellationToken) => Fix(editor, node, typeName!, cancellationToken),
                         nameof(InjectFix),
                         diagnostic);
                 }

@@ -43,7 +43,7 @@
                         Diagnostic.Create(
                             Descriptors.GU0013TrowForCorrectParameter,
                             GetLocation(),
-                            ImmutableDictionary<string, string>.Empty.Add(nameof(IdentifierNameSyntax), left.Identifier.ValueText)));
+                            ImmutableDictionary<string, string?>.Empty.Add(nameof(IdentifierNameSyntax), left.Identifier.ValueText)));
 
                     Location GetLocation()
                     {

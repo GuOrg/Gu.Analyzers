@@ -44,7 +44,7 @@
                             }
                             else
                             {
-                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string>("member", symbol.Name) });
+                                var properties = ImmutableDictionary.CreateRange(new[] { new KeyValuePair<string, string?>("member", symbol.Name) });
                                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0006UseNameof, literal.GetLocation(), properties));
                             }
 

@@ -44,7 +44,7 @@
                             Descriptors.GU0018bNameMock,
                             variable.Identifier.GetLocation(),
                             ImmutableDictionary.CreateRange(
-                                new[] { new KeyValuePair<string, string>("Name", renameTo) })));
+                                new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
                 }
                 else
                 {
@@ -53,7 +53,7 @@
                             Descriptors.GU0018aNameMock,
                             variable.Identifier.GetLocation(),
                             ImmutableDictionary.CreateRange(
-                                new[] { new KeyValuePair<string, string>("Name", renameTo) })));
+                                new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
                 }
             }
 
