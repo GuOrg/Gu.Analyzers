@@ -4,7 +4,6 @@
     <LangVersion>latest</LangVersion>
     <Nullable>Enable</Nullable>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <NoWarn>$(NoWarn);CS8033</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
