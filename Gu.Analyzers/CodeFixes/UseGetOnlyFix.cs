@@ -42,7 +42,7 @@
                     syntaxRoot.TryFindNode(diagnostic, out ObjectCreationExpressionSyntax? objectCreation) &&
                     objectCreation.TryFirstAncestor(out PropertyDeclarationSyntax? property) &&
                     property.Parent is TypeDeclarationSyntax containingType &&
-                    containingType.Members.TrySingleOfType<MemberDeclarationSyntax, ConstructorDeclarationSyntax>(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out ConstructorDeclarationSyntax? ctor) &&
+                    containingType.Members.TrySingleOfType<MemberDeclarationSyntax, ConstructorDeclarationSyntax>(x => !x.Modifiers.Any(SyntaxKind.StaticKeyword), out var ctor) &&
                     ctor.Body != null)
                 {
                     context.RegisterCodeFix(
@@ -78,6 +78,11 @@
             ObjectCreationExpressionSyntax objectCreation,
             CancellationToken cancellationToken)
         {
+            if (ctor.Body is null)
+            {
+                return;
+            }
+
             var qualifyPropertyAccess = await editor.OriginalDocument.QualifyPropertyAccessAsync(cancellationToken).ConfigureAwait(false);
             var member = qualifyPropertyAccess != CodeStyleResult.No
                 ? SyntaxFactory.MemberAccessExpression(

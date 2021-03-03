@@ -94,7 +94,8 @@
                     {
                         var i = arguments.IndexOf(argument);
 
-                        if (current!.Parameters.TryElementAt(i, out var parameter))
+                        if (current.Parameters.TryElementAt(i, out var parameter) &&
+                            parameter.Type is { })
                         {
                             if (parameter.Modifiers.Any(SyntaxKind.ParamsKeyword) &&
                                 parameter.Type is ArrayTypeSyntax arrayType)
