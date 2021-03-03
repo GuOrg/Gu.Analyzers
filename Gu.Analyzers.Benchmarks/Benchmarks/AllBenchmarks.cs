@@ -8,9 +8,15 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentListAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ArgumentListAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark AssertAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.AssertAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark BinaryExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.BinaryExpressionAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark ClassDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ClassDeclarationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ConstructorAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ConstructorAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark DocsAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.DocsAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ExceptionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.ExceptionAnalyzer());
 
@@ -29,6 +35,10 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         private static readonly Gu.Roslyn.Asserts.Benchmark StringLiteralExpressionAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.StringLiteralExpressionAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark TestMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.TestMethodAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark VariableDeclaratorAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.VariableDeclaratorAnalyzer());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark WhenAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.WhenAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark GU0007PreferInjectingBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new Gu.Analyzers.GU0007PreferInjecting());
 
@@ -71,6 +81,18 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
+        public void AssertAnalyzer()
+        {
+            AssertAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void BinaryExpressionAnalyzer()
+        {
+            BinaryExpressionAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
         public void ClassDeclarationAnalyzer()
         {
             ClassDeclarationAnalyzerBenchmark.Run();
@@ -80,6 +102,12 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void ConstructorAnalyzer()
         {
             ConstructorAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void DocsAnalyzer()
+        {
+            DocsAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
@@ -134,6 +162,18 @@ namespace Gu.Analyzers.Benchmarks.Benchmarks
         public void TestMethodAnalyzer()
         {
             TestMethodAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void VariableDeclaratorAnalyzer()
+        {
+            VariableDeclaratorAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void WhenAnalyzer()
+        {
+            WhenAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
