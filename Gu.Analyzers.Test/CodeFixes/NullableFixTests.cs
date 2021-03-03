@@ -381,7 +381,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8600, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
         }
 
         [Test]
