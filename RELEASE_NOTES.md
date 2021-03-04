@@ -1,3 +1,6 @@
+#### 1.8.5
+* BUGFIX: Handle roslyn reporting different error.
+
 #### 1.8.2
 * BUGFIX: GU0011 should not warn on void returning.
 
