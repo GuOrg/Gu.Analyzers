@@ -26,7 +26,7 @@
     <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="IDisposableAnalyzers" Version="3.4.15" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.9.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="NUnit" Version="3.13.2" />
