@@ -26,13 +26,16 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>1.8.5</Version>
+    <Version>2.0.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <DevelopmentDependency>true</DevelopmentDependency>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      2.0.0
+      BREAKING: For VS2022+ now.
+      BUGFIX: AD0001 -&gt; Could not load file or assembly
       1.8.5
       BUGFIX: Handle roslyn reporting different error.
       1.8.4
