@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test
 {
     using System;
     using System.Collections.Generic;
@@ -10,12 +10,13 @@ namespace Gu.Analyzers.Test
 
     internal static class HandlesRecursion
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(Descriptors)
-                                                                                 .Assembly
-                                                                                 .GetTypes()
-                                                                                 .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                 .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-                                                                                 .ToArray();
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
+            typeof(Descriptors)
+                .Assembly
+                .GetTypes()
+                .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+                .ToArray();
 
         [Test]
         public static void NotEmpty()

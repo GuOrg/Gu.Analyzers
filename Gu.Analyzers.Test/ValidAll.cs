@@ -11,11 +11,13 @@
 
     internal static class ValidAll
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols).Assembly
-                                                                                                     .GetTypes()
-                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-                                                                                                     .ToImmutableArray();
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers =
+            typeof(KnownSymbols)
+                .Assembly
+                .GetTypes()
+                .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+                .ToImmutableArray();
 
         private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("Gu.Analyzers.csproj"),
