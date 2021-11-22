@@ -1,6 +1,6 @@
 // ReSharper disable RedundantNameQualifier
 // ReSharper disable InconsistentNaming
-namespace Gu.Analyzers.Benchmarks.Benchmarks
+namespace Gu.Analyzers.Benchmarks
 {
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
     public class IdentifierNameAnalyzerBenchmarks

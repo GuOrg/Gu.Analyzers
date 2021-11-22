@@ -4,7 +4,6 @@ namespace Gu.Analyzers.Benchmarks
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Gu.Analyzers.Benchmarks.Benchmarks;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 

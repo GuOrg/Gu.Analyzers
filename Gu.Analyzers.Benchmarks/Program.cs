@@ -12,7 +12,6 @@ namespace Gu.Analyzers.Benchmarks
     using System.Linq;
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
-    using Gu.Analyzers.Benchmarks.Benchmarks;
 
     internal class Program
     {

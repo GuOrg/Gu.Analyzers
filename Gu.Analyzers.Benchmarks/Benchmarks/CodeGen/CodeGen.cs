@@ -1,15 +1,12 @@
-﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
+﻿namespace Gu.Analyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using System.Text;
-
     using Gu.Roslyn.Asserts;
-
     using Microsoft.CodeAnalysis.Diagnostics;
-
     using NUnit.Framework;
 
     [Explicit("Script")]

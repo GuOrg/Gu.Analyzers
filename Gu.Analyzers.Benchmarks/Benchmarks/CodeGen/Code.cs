@@ -1,4 +1,4 @@
-﻿namespace Gu.Analyzers.Benchmarks.Benchmarks
+﻿namespace Gu.Analyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;

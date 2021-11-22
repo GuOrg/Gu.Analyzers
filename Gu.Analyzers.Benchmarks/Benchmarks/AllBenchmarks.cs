@@ -1,5 +1,5 @@
 // ReSharper disable RedundantNameQualifier
-namespace Gu.Analyzers.Benchmarks.Benchmarks
+namespace Gu.Analyzers.Benchmarks
 {
     [BenchmarkDotNet.Attributes.MemoryDiagnoser]
     public class AllBenchmarks
