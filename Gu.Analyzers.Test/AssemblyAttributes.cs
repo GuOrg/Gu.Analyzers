@@ -6,7 +6,7 @@ using Gu.Roslyn.Asserts;
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
 [assembly: TransitiveMetadataReferences(typeof(Gu.Analyzers.Test.ValidAll))]
-[assembly: TransitiveMetadataReferences(typeof(System.Reactive.Concurrency.DispatcherScheduler))]
+[assembly: TransitiveMetadataReferences(typeof(System.Reactive.Concurrency.DefaultScheduler))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),
     typeof(System.Net.WebClient),
