@@ -6,8 +6,8 @@
     {
         internal static readonly DiagnosticDescriptor GU0001NameArguments = Create(
             id: "GU0001",
-            title: "Name the arguments.",
-            messageFormat: "Name the arguments.",
+            title: "Name the argument",
+            messageFormat: "Name the argument",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,

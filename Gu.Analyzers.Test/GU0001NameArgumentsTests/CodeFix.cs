@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -47,7 +47,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the arguments."), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the argument"), code);
         }
 
         [Test]
