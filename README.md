@@ -24,9 +24,9 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0012](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md)| Check if parameter is null
 | [GU0013](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md)| Throw for correct parameter
 | [GU0014](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md)| Prefer using parameter
-| [GU0015](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md)| Don't assign same more than once.
-| [GU0016](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md)| Prefer lambda.
-| [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded.
+| [GU0015](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md)| Don't assign same more than once
+| [GU0016](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md)| Prefer lambda
+| [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded
 | [GU0018a](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018a.md)| Name mock
 | [GU0018b](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018b.md)| Name mock
 | [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties.

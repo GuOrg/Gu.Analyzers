@@ -468,7 +468,7 @@ namespace N
             [Test]
             public static void ChainedPropertyOnInjected()
             {
-                var CCode = @"
+                var c1 = @"
 namespace N
 {
     public class C1
@@ -481,7 +481,7 @@ namespace N
         }
     }
 }";
-                var C1Code = @"
+                var c2 = @"
 namespace N
 {
     public class C2
@@ -526,7 +526,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { CCode, C1Code, bazCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, bazCode, before }, after, fixTitle: "Inject safe.");
             }
         }
     }

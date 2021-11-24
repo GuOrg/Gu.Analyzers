@@ -132,8 +132,8 @@
 
         internal static readonly DiagnosticDescriptor GU0015DoNotAssignMoreThanOnce = Create(
             id: "GU0015",
-            title: "Don't assign same more than once.",
-            messageFormat: "Don't assign same more than once.",
+            title: "Don't assign same more than once",
+            messageFormat: "Don't assign same more than once",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: false,
@@ -141,8 +141,8 @@
 
         internal static readonly DiagnosticDescriptor GU0016PreferLambda = Create(
             id: "GU0016",
-            title: "Prefer lambda.",
-            messageFormat: "Prefer lambda to reduce allocations.",
+            title: "Prefer lambda",
+            messageFormat: "Prefer lambda to reduce allocations",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: false,
@@ -150,8 +150,8 @@
 
         internal static readonly DiagnosticDescriptor GU0017DoNotUseDiscarded = Create(
             id: "GU0017",
-            title: "Don't use discarded.",
-            messageFormat: "Don't use discarded.",
+            title: "Don't use discarded",
+            messageFormat: "Don't use discarded",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -164,7 +164,7 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Name mock");
+            description: "Name mock.");
 
         internal static readonly DiagnosticDescriptor GU0018bNameMock = Create(
             id: "GU0018b",
@@ -173,7 +173,7 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
-            description: "Name mock");
+            description: "Name mock.");
 
         internal static readonly DiagnosticDescriptor GU0020SortProperties = Create(
             id: "GU0020",

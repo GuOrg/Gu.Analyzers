@@ -57,7 +57,7 @@ namespace N
     {
         internal C()
         {
-#pragma warning disable GU0015 // Don't assign same more than once.
+#pragma warning disable GU0015 // Don't assign same more than once
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -66,7 +66,7 @@ namespace N
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
             // value = value;
-#pragma warning restore GU0015 // Don't assign same more than once.
+#pragma warning restore GU0015 // Don't assign same more than once
         }
 
         internal int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
@@ -95,7 +95,7 @@ namespace N
 
         internal void Meh()
         {
-#pragma warning disable GU0015 // Don't assign same more than once.
+#pragma warning disable GU0015 // Don't assign same more than once
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -104,7 +104,7 @@ namespace N
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(1);
             // value = value;
-#pragma warning restore GU0015 // Don't assign same more than once.
+#pragma warning restore GU0015 // Don't assign same more than once
         }
 
         private static IReadOnlyList<IDisposable> Flatten(IReadOnlyList<IDisposable> source, List<IDisposable> result = null)

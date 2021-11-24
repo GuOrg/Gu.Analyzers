@@ -22,7 +22,7 @@
 * FEATURE: MakeStaticFix
 
 #### 1.4.0
-* FEATURE: GU0017 don't use discarded.
+* FEATURE: GU0017 Don't use discarded
 
 #### 1.3.2
 * BUGFIX: Garbage docs for SA1611.
