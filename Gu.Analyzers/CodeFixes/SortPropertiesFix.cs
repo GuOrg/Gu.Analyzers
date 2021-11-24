@@ -51,9 +51,11 @@
                 return old switch
                 {
                     ClassDeclarationSyntax classDeclaration
-                        => classDeclaration.WithMembers(SortPropertiesFix.WithMoved(classDeclaration.Members, old.GetCurrentNode(property))),
+                        when old.GetCurrentNode(property) is { } node
+                        => classDeclaration.WithMembers(SortPropertiesFix.WithMoved(classDeclaration.Members, node)),
                     StructDeclarationSyntax structDeclaration
-                        => structDeclaration.WithMembers(SortPropertiesFix.WithMoved(structDeclaration.Members, old.GetCurrentNode(property))),
+                        when old.GetCurrentNode(property) is { } node
+                        => structDeclaration.WithMembers(SortPropertiesFix.WithMoved(structDeclaration.Members, node)),
                     _ => old,
                 };
             }
