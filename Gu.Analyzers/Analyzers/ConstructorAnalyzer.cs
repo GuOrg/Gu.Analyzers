@@ -316,14 +316,14 @@
 
         private class CtorWalker : PooledWalker<CtorWalker>
         {
-            private readonly List<ISymbol> unassigned = new List<ISymbol>();
-            private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
-            private readonly List<ArgumentSyntax> arguments = new List<ArgumentSyntax>();
-            private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
-            private readonly List<MemberAccessExpressionSyntax> memberAccesses = new List<MemberAccessExpressionSyntax>();
-            private readonly List<ConditionalAccessExpressionSyntax> conditionalAccesses = new List<ConditionalAccessExpressionSyntax>();
-            private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new List<BinaryExpressionSyntax>();
-            private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
+            private readonly List<ISymbol> unassigned = new();
+            private readonly List<AssignmentExpressionSyntax> assignments = new();
+            private readonly List<ArgumentSyntax> arguments = new();
+            private readonly List<InvocationExpressionSyntax> invocations = new();
+            private readonly List<MemberAccessExpressionSyntax> memberAccesses = new();
+            private readonly List<ConditionalAccessExpressionSyntax> conditionalAccesses = new();
+            private readonly List<BinaryExpressionSyntax> binaryExpressionSyntaxes = new();
+            private readonly HashSet<SyntaxNode> visited = new();
 
             private SemanticModel semanticModel = null!;
             private CancellationToken cancellationToken;

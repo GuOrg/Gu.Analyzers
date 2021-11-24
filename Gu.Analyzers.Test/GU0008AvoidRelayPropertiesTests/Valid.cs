@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
 
     internal static class Valid
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
 
         [TestCase("public int Value { get; set; }")]
         [TestCase("public int Value { get; } = 1;")]

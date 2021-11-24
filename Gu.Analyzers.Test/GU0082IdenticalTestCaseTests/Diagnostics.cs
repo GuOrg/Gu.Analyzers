@@ -7,7 +7,7 @@ namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
 
     internal static class Diagnostics
     {
-        private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
+        private static readonly TestMethodAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0082IdenticalTestCase);
 
         [Test]

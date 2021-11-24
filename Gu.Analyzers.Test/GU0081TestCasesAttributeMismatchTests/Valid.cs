@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
 
     internal static class Valid
     {
-        private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
+        private static readonly TestMethodAnalyzer Analyzer = new();
 
         [Test]
         public static void TestCaseAttribute()

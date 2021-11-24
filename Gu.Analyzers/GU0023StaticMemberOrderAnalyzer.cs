@@ -96,8 +96,8 @@
 
         private sealed class Walker : ExecutionWalker<Walker>
         {
-            private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
-            private readonly HashSet<ISymbol> symbols = new HashSet<ISymbol>(SymbolComparer.Default);
+            private readonly List<IdentifierNameSyntax> identifierNames = new();
+            private readonly HashSet<ISymbol> symbols = new(SymbolComparer.Default);
 
             private Walker()
             {

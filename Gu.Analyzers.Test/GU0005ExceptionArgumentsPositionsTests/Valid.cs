@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
 
     internal static class Valid
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
+        private static readonly ObjectCreationAnalyzer Analyzer = new();
 
         [Test]
         public static void ArgumentExceptionWithMessageAndNameof()

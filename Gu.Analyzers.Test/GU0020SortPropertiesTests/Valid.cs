@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 
     internal static class Valid
     {
-        private static readonly GU0020SortProperties Analyzer = new GU0020SortProperties();
+        private static readonly GU0020SortProperties Analyzer = new();
 
         [Test]
         public static void WithCustomEvent()

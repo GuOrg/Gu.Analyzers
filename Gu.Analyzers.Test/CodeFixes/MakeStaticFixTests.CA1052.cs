@@ -49,7 +49,7 @@ namespace N
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class FakeFxCopAnalyzer : DiagnosticAnalyzer
         {
-            internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("CA1052", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            internal static readonly DiagnosticDescriptor Descriptor = new("CA1052", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
                 Descriptor);

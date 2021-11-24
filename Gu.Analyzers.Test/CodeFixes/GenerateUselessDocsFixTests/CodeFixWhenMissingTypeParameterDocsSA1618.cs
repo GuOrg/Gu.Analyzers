@@ -199,7 +199,7 @@ namespace N
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
         {
-            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+            private static readonly DiagnosticDescriptor Descriptor = new(
                 "SA1618",
                 "Title",
                 "Message",

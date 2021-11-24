@@ -5,7 +5,7 @@
 
     internal static class Valid
     {
-        private static readonly ArgumentAnalyzer Analyzer = new ArgumentAnalyzer();
+        private static readonly ArgumentAnalyzer Analyzer = new();
 
         [Test]
         public static void UsesNamedParameter()

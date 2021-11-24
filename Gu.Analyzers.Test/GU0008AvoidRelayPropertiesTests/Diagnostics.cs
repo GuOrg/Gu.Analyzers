@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
 
     internal static class Diagnostics
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0008AvoidRelayProperties);
 
         [TestCase("this.bar.Value;")]

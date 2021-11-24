@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
 
     internal static class Valid
     {
-        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
+        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
 
         [TestCase("internal class C")]
         [TestCase("internal struct S")]

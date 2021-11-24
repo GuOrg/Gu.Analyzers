@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 
     internal static class Valid
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
+        private static readonly ArgumentListAnalyzer Analyzer = new();
 
         [TestCase("new C(a, b)")]
         [TestCase("new C(a: a, b: b)")]

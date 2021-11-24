@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
 
     internal static class Valid
     {
-        private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new GU0061EnumMemberValueOutOfRange();
+        private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new();
 
         [Test]
         public static void BitShiftWithinRange()

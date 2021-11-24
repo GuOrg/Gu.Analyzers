@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 
     internal static class Valid
     {
-        private static readonly GU0071ForeachImplicitCast Analyzer = new GU0071ForeachImplicitCast();
+        private static readonly GU0071ForeachImplicitCast Analyzer = new();
 
         [TestCase("int[]")]
         [TestCase("List<int>")]

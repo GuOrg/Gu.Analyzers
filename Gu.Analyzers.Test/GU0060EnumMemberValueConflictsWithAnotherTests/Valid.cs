@@ -5,7 +5,7 @@
 
     internal static class Valid
     {
-        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
+        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new();
 
         [Test]
         public static void ExplicitAlias()

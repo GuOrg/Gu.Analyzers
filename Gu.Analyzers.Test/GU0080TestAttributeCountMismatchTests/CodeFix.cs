@@ -6,7 +6,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 
     internal static class CodeFix
     {
-        private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
+        private static readonly TestMethodAnalyzer Analyzer = new();
         private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch);
 

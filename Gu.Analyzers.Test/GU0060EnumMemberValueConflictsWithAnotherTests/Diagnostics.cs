@@ -5,7 +5,7 @@
 
     internal static class Diagnostics
     {
-        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new GU0060EnumMemberValueConflictsWithAnother();
+        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
         [Test]

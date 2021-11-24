@@ -5,8 +5,8 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
 
     internal static class CodeFix
     {
-        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new GU0072AllTypesShouldBeInternal();
-        private static readonly MakeInternalFix Fix = new MakeInternalFix();
+        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
+        private static readonly MakeInternalFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal);
 
         [Test]

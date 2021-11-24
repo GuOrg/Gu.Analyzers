@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 
     internal static partial class Valid
     {
-        private static readonly GU0007PreferInjecting Analyzer = new GU0007PreferInjecting();
+        private static readonly GU0007PreferInjecting Analyzer = new();
 
         private const string Bar = @"
 namespace N

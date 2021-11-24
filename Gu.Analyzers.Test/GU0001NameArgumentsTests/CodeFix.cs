@@ -5,8 +5,8 @@ namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
 
     internal static class CodeFix
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new ArgumentListAnalyzer();
-        private static readonly NameArgumentsFix Fix = new NameArgumentsFix();
+        private static readonly ArgumentListAnalyzer Analyzer = new();
+        private static readonly NameArgumentsFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
 
         [Test]

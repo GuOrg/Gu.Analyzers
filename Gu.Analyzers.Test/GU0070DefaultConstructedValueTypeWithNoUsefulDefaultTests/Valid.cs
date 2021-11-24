@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefault
 
     internal static class Valid
     {
-        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new GU0070DefaultConstructedValueTypeWithNoUsefulDefault();
+        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new();
 
         [Test]
         public static void DefaultValueForGuidCreatedWithDefaultValueExpression()

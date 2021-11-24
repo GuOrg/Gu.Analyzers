@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 
     internal static class Valid
     {
-        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new GU0050IgnoreEventsWhenSerializing();
+        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new();
 
         [Test]
         public static void IgnoredEvent()

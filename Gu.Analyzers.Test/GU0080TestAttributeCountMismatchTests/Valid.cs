@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 
     internal static class Valid
     {
-        private static readonly TestMethodAnalyzer Analyzer = new TestMethodAnalyzer();
+        private static readonly TestMethodAnalyzer Analyzer = new();
 
         [TestCase("[Test]")]
         [TestCase("[Test(Author = \"Author\")]")]

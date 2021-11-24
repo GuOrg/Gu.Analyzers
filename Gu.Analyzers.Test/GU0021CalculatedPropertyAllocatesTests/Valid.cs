@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
 
     internal static class Valid
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
 
         [Test]
         public static void ArrowAdd()

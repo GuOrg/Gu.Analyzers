@@ -5,8 +5,8 @@ namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 
     internal static class CodeFix
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly RenameConstructorParameterFix Fix = new RenameConstructorParameterFix();
+        private static readonly ConstructorAnalyzer Analyzer = new();
+        private static readonly RenameConstructorParameterFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch);
 
         [Test]

@@ -5,7 +5,7 @@
 
     internal static class Valid
     {
-        private static readonly GU0022UseGetOnly Analyzer = new GU0022UseGetOnly();
+        private static readonly GU0022UseGetOnly Analyzer = new();
 
         private static readonly TestCaseData[] TestCases =
         {

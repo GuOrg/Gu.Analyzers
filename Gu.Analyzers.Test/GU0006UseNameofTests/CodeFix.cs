@@ -5,8 +5,8 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
 
     internal static class CodeFix
     {
-        private static readonly StringLiteralExpressionAnalyzer Analyzer = new StringLiteralExpressionAnalyzer();
-        private static readonly UseNameofFix Fix = new UseNameofFix();
+        private static readonly StringLiteralExpressionAnalyzer Analyzer = new();
+        private static readonly UseNameofFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0006UseNameof);
 
         [Test]

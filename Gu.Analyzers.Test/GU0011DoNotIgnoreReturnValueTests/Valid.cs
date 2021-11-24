@@ -8,7 +8,7 @@
 
     internal static partial class Valid
     {
-        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
+        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
 
         [Test]
         public static void ChainedCtor()

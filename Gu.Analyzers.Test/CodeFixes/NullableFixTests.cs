@@ -14,7 +14,7 @@
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
         private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' must contain a non-null value when exiting constructor. Consider declaring the event as nullable.");
         private static readonly ExpectedDiagnostic CS8765 = ExpectedDiagnostic.Create("CS8765");
-        private static readonly CSharpCompilationOptions CompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
+        private static readonly CSharpCompilationOptions CompilationOptions = new(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 
         [Test]
         public static void AddNotNullWhenAndUsing()

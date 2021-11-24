@@ -9,7 +9,7 @@
     internal static class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
-        private static readonly T Analyzer = new T();
+        private static readonly T Analyzer = new();
 
         [Test]
         public static void WhenPrivate()

@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 
     internal static class Diagnostics
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0010DoNotAssignSameValue);
 
         [TestCase("this.A = this.A;")]

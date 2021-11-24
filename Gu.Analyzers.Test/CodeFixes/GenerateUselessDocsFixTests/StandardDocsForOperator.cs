@@ -195,7 +195,7 @@ namespace N
         [DiagnosticAnalyzer(LanguageNames.CSharp)]
         private class FakeAnalyzer : DiagnosticAnalyzer
         {
-            private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor("CS1591", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+            private static readonly DiagnosticDescriptor Descriptor = new("CS1591", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 
             public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
                 Descriptor);

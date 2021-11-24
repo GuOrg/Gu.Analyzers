@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0006UseNameofTests
 
     internal static class Valid
     {
-        private static readonly StringLiteralExpressionAnalyzer Analyzer = new StringLiteralExpressionAnalyzer();
+        private static readonly StringLiteralExpressionAnalyzer Analyzer = new();
 
         [Test]
         public static void WhenThrowingArgumentException()

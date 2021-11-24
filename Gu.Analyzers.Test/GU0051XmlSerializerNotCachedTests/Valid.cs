@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 
     internal static class Valid
     {
-        private static readonly GU0051XmlSerializerNotCached Analyzer = new GU0051XmlSerializerNotCached();
+        private static readonly GU0051XmlSerializerNotCached Analyzer = new();
 
         [Test]
         public static void NoCreationsOfTheSerializer()

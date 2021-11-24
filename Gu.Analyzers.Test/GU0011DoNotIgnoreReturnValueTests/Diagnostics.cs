@@ -5,7 +5,7 @@
 
     internal static class Diagnostics
     {
-        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new GU0011DoNotIgnoreReturnValue();
+        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue);
 
         [TestCase("ints.Select(x => x);")]

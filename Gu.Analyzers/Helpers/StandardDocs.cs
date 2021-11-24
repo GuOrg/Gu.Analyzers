@@ -7,7 +7,7 @@ namespace Gu.Analyzers
 
     internal static class StandardDocs
     {
-        private static readonly List<(QualifiedType, string)> Cache = new List<(QualifiedType, string)>
+        private static readonly List<(QualifiedType, string)> Cache = new()
         {
             (KnownSymbols.CancellationToken, "The <see cref=\"CancellationToken\"/> that cancels the operation."),
         };

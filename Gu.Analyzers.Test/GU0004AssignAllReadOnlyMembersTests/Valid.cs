@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 
     internal static class Valid
     {
-        private static readonly ConstructorAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly ConstructorAnalyzer Analyzer = new();
 
         [Test]
         public static void ConstructorSettingProperties()

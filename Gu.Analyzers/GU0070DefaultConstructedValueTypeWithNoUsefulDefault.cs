@@ -12,7 +12,7 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class GU0070DefaultConstructedValueTypeWithNoUsefulDefault : DiagnosticAnalyzer
     {
-        private static readonly List<QualifiedType> KnownTypes = new List<QualifiedType>
+        private static readonly List<QualifiedType> KnownTypes = new()
         {
             KnownSymbols.Guid,
             KnownSymbols.DateTime,

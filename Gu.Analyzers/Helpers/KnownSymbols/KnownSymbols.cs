@@ -11,7 +11,7 @@ namespace Gu.Analyzers
         internal static readonly QualifiedType Boolean = Create("System.Boolean", "bool");
         internal static readonly QualifiedType Int32 = Create("System.Int32", "int");
         internal static readonly QualifiedType Int64 = Create("System.Int64", "long");
-        internal static readonly StringType String = new StringType();
+        internal static readonly StringType String = new();
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
         internal static readonly QualifiedType Type = Create("System.Type");
         internal static readonly QualifiedType Guid = Create("System.Guid");
@@ -28,27 +28,27 @@ namespace Gu.Analyzers
 
         internal static readonly QualifiedType FlagsAttribute = Create("System.FlagsAttribute");
 
-        internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
+        internal static readonly StringBuilderType StringBuilder = new();
 
-        internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
-        internal static readonly TaskType Task = new TaskType();
-        internal static readonly QualifiedType CancellationToken = new QualifiedType(typeof(CancellationToken).FullName!);
-        internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
-        internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
+        internal static readonly IEnumerableType IEnumerable = new();
+        internal static readonly TaskType Task = new();
+        internal static readonly QualifiedType CancellationToken = new(typeof(CancellationToken).FullName!);
+        internal static readonly QualifiedType TaskOfT = new("System.Threading.Tasks.Task`1");
+        internal static readonly XmlSerializerType XmlSerializer = new();
 
-        internal static readonly DependencyPropertyType DependencyProperty = new DependencyPropertyType();
-        internal static readonly DependencyObjectType DependencyObject = new DependencyObjectType();
+        internal static readonly DependencyPropertyType DependencyProperty = new();
+        internal static readonly DependencyObjectType DependencyObject = new();
 
-        internal static readonly NUnitAssertType NUnitAssert = new NUnitAssertType();
-        internal static readonly QualifiedType NUnitTestAttribute = new QualifiedType("NUnit.Framework.TestAttribute");
-        internal static readonly QualifiedType NUnitTestCaseAttribute = new QualifiedType("NUnit.Framework.TestCaseAttribute");
-        internal static readonly QualifiedType NUnitTestCaseSourceAttribute = new QualifiedType("NUnit.Framework.TestCaseSourceAttribute");
-        internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
-        internal static readonly QualifiedType MoqMockOfT = new QualifiedType("Moq.Mock`1");
-        internal static readonly QualifiedType MoqIFluentInterface = new QualifiedType("Moq.IFluentInterface");
-        internal static readonly QualifiedType NinjectIFluentSyntax = new QualifiedType("Ninject.Syntax.IFluentSyntax");
-        internal static readonly QualifiedType GuInjectKernel = new QualifiedType("Gu.Inject.Kernel");
-        internal static readonly QualifiedType GuInjectKernelExtensions = new QualifiedType("Gu.Inject.KernelExtensions");
+        internal static readonly NUnitAssertType NUnitAssert = new();
+        internal static readonly QualifiedType NUnitTestAttribute = new("NUnit.Framework.TestAttribute");
+        internal static readonly QualifiedType NUnitTestCaseAttribute = new("NUnit.Framework.TestCaseAttribute");
+        internal static readonly QualifiedType NUnitTestCaseSourceAttribute = new("NUnit.Framework.TestCaseSourceAttribute");
+        internal static readonly XunitAssertType XunitAssert = new();
+        internal static readonly QualifiedType MoqMockOfT = new("Moq.Mock`1");
+        internal static readonly QualifiedType MoqIFluentInterface = new("Moq.IFluentInterface");
+        internal static readonly QualifiedType NinjectIFluentSyntax = new("Ninject.Syntax.IFluentSyntax");
+        internal static readonly QualifiedType GuInjectKernel = new("Gu.Inject.Kernel");
+        internal static readonly QualifiedType GuInjectKernelExtensions = new("Gu.Inject.KernelExtensions");
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {

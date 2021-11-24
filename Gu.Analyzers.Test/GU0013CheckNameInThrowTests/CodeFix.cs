@@ -5,8 +5,8 @@ namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
 
     internal static class CodeFix
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
-        private static readonly ThrowForCorrectParameterFix Fix = new ThrowForCorrectParameterFix();
+        private static readonly ObjectCreationAnalyzer Analyzer = new();
+        private static readonly ThrowForCorrectParameterFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0013TrowForCorrectParameter);
 
         [Test]

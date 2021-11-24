@@ -5,7 +5,7 @@ namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 
     internal static class Valid
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
 
         [Test]
         public static void ConstructorSettingProperties()
