@@ -14,7 +14,7 @@ steps:
   displayName: build
   inputs:
     command: 'build'
-    arguments: '--configuration $(buildConfiguration) --no-restore'
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: test
