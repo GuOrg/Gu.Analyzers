@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
+﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -27,8 +27,7 @@ namespace N
     }
 }";
 
-            var message = "The following readonly members are not assigned:\r\n" +
-                          "N.C.B";
+            var message = "The following readonly members are not assigned: B";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), code);
         }
 

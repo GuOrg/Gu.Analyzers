@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
+﻿namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -44,7 +44,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The position of a named arguments and parameters should match."), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The position of a named arguments and parameters should match"), code);
         }
 
         [Test]

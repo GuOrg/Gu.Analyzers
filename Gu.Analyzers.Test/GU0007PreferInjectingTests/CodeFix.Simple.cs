@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -48,7 +48,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar."), before, Bar);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar"), before, Bar);
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
@@ -82,7 +82,7 @@ namespace N
         }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
                 RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
@@ -116,7 +116,7 @@ namespace N
         public Bar Bar { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
                 RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 
@@ -150,7 +150,7 @@ namespace N
         public Bar Bar { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
                 RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
             }
 

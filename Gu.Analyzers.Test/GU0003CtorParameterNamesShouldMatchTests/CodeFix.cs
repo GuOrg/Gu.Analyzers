@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -57,7 +57,7 @@ namespace N
         public int D { get; }
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Name the parameter to match the assigned member.");
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Name the parameter to match the assigned member");
             RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Rename to 'a'");
         }
 

@@ -15,17 +15,17 @@
 
         internal static readonly DiagnosticDescriptor GU0002NamedArgumentPositionMatches = Create(
             id: "GU0002",
-            title: "The position of a named argument should match.",
-            messageFormat: "The position of a named arguments and parameters should match.",
+            title: "The position of a named argument should match",
+            messageFormat: "The position of a named arguments and parameters should match",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
-            description: "The position of a named argument should match.");
+            description: "The position of a named argument should match parameter position.");
 
         internal static readonly DiagnosticDescriptor GU0003CtorParameterNamesShouldMatch = Create(
             id: "GU0003",
-            title: "Name the parameter to match the assigned member.",
-            messageFormat: "Name the parameter to match the assigned member.",
+            title: "Name the parameter to match the assigned member",
+            messageFormat: "Name the parameter to match the assigned member",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -34,7 +34,7 @@
         internal static readonly DiagnosticDescriptor GU0004AssignAllReadOnlyMembers = Create(
             id: "GU0004",
             title: "Assign all readonly members.",
-            messageFormat: "The following readonly members are not assigned:\r\n{0}",
+            messageFormat: "The following readonly members are not assigned: {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -42,8 +42,8 @@
 
         internal static readonly DiagnosticDescriptor GU0005ExceptionArgumentsPositions = Create(
             id: "GU0005",
-            title: "Use correct argument positions.",
-            messageFormat: "Use correct argument positions.",
+            title: "Use correct argument positions",
+            messageFormat: "Use correct argument positions",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -52,7 +52,7 @@
         internal static readonly DiagnosticDescriptor GU0006UseNameof = Create(
             id: "GU0006",
             title: "Use nameof.",
-            messageFormat: "Use nameof.",
+            messageFormat: "Use nameof",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -61,7 +61,7 @@
         internal static readonly DiagnosticDescriptor GU0007PreferInjecting = Create(
             id: "GU0007",
             title: "Prefer injecting.",
-            messageFormat: "Prefer injecting {0}.",
+            messageFormat: "Prefer injecting {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: false,

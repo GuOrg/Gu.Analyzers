@@ -11,10 +11,10 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | Id       | Title
 | :--      | :--
 | [GU0001](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0001.md)| Name the argument
-| [GU0002](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0002.md)| The position of a named argument should match.
-| [GU0003](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0003.md)| Name the parameter to match the assigned member.
+| [GU0002](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0002.md)| The position of a named argument should match
+| [GU0003](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0003.md)| Name the parameter to match the assigned member
 | [GU0004](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0004.md)| Assign all readonly members.
-| [GU0005](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0005.md)| Use correct argument positions.
+| [GU0005](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0005.md)| Use correct argument positions
 | [GU0006](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0006.md)| Use nameof.
 | [GU0007](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0007.md)| Prefer injecting.
 | [GU0008](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md)| Avoid relay properties.

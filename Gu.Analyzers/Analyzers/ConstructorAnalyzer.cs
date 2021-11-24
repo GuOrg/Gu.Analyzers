@@ -130,7 +130,7 @@
                         Diagnostic.Create(
                             Descriptors.GU0004AssignAllReadOnlyMembers,
                             constructorDeclaration.Identifier.GetLocation(),
-                            string.Join(Environment.NewLine, walker.Unassigned.Select(x => x.ToDisplayString()))));
+                            string.Join(", ", walker.Unassigned.Select(x => x.Name))));
                 }
             }
         }
