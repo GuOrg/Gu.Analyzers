@@ -33,7 +33,7 @@
 
         internal static readonly DiagnosticDescriptor GU0004AssignAllReadOnlyMembers = Create(
             id: "GU0004",
-            title: "Assign all readonly members.",
+            title: "Assign all readonly members",
             messageFormat: "The following readonly members are not assigned: {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
