@@ -7,12 +7,12 @@
     {
         internal static class Simple
         {
-            private const string Bar = @"
+            private const string C1 = @"
 namespace N
 {
-    public class Bar
+    public class C1
     {
-        public void Baz()
+        public void M()
         {
         }
     }
@@ -24,13 +24,13 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public Foo()
+        public C()
         {
-            this.bar = ↓new Bar();
+            this.f = ↓new C1();
         }
     }
 }";
@@ -38,18 +38,18 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class Foo
+    public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public Foo(Bar bar)
+        public C(C1 f)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting Bar"), before, Bar);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting C1"), before, C1);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -60,11 +60,11 @@ namespace N
 {
     public class C
     {
-        private readonly Bar _bar;
+        private readonly C1 _f;
 
         public C()
         {
-            _bar = ↓new Bar();
+            _f = ↓new C1();
         }
     }
 }";
@@ -74,16 +74,16 @@ namespace N
 {
     public class C
     {
-        private readonly Bar _bar;
+        private readonly C1 _f;
 
-        public C(Bar bar)
+        public C(C1 f)
         {
-            _bar = bar;
+            _f = f;
         }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -96,10 +96,10 @@ namespace N
     {
         public C()
         {
-            this.Bar = ↓new Bar();
+            this.P = ↓new C1();
         }
 
-        public Bar Bar { get; }
+        public C1 P { get; }
     }
 }";
 
@@ -108,16 +108,16 @@ namespace N
 {
     public class C
     {
-        public C(Bar bar)
+        public C(C1 p)
         {
-            this.Bar = bar;
+            this.P = p;
         }
 
-        public Bar Bar { get; }
+        public C1 P { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -130,10 +130,10 @@ namespace N
     {
         public C()
         {
-            Bar = ↓new Bar();
+            P = ↓new C1();
         }
 
-        public Bar Bar { get; }
+        public C1 P { get; }
     }
 }";
 
@@ -142,16 +142,16 @@ namespace N
 {
     public class C
     {
-        public C(Bar bar)
+        public C(C1 p)
         {
-            Bar = bar;
+            P = p;
         }
 
-        public Bar Bar { get; }
+        public C1 P { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting Bar");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, Bar }, after, fixTitle: "Inject safe.");
+                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -160,13 +160,13 @@ namespace N
                 var c1 = @"
 namespace N
 {
-    public class C1
+    public class C2
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public C1(Bar bar)
+        public C2(C1 f)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
@@ -174,10 +174,10 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class C3 : C1
+    public class C3 : C2
     {
         public C3()
-           : base(↓new Bar())
+           : base(↓new C1())
         {
         }
     }
@@ -186,30 +186,30 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : C1
+    public class C3 : C2
     {
-        public C3(Bar bar)
-           : base(bar)
+        public C3(C1 c1)
+           : base(c1)
         {
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, Bar, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, C1, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenNotInjectingChainedNameCollision()
             {
-                var fooCode = @"
+                var c2 = @"
 namespace N
 {
-    public class C1
+    public class C2
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public C1(int value, Bar bar)
+        public C2(int value, C1 f)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
@@ -217,10 +217,10 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class C3 : C1
+    public class C3 : C2
     {
-        public C3(int bar)
-           : base(bar, ↓new Bar())
+        public C3(int c1)
+           : base(c1, ↓new C1())
         {
         }
     }
@@ -229,15 +229,15 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : C1
+    public class C3 : C2
     {
-        public C3(int bar, Bar bar_)
-           : base(bar, bar_)
+        public C3(int c1, C1 c1_)
+           : base(c1, c1_)
         {
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, Bar, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, C1, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -248,11 +248,11 @@ namespace N
 {
     public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
         public C(int value = 1)
         {
-            this.bar = ↓new Bar();
+            this.f = ↓new C1();
         }
     }
 }";
@@ -262,15 +262,15 @@ namespace N
 {
     public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public C(Bar bar, int value = 1)
+        public C(C1 f, int value = 1)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -281,11 +281,11 @@ namespace N
 {
     public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
         public C(params int[] values)
         {
-            this.bar = ↓new Bar();
+            this.f = ↓new C1();
         }
     }
 }";
@@ -295,37 +295,37 @@ namespace N
 {
     public class C
     {
-        private readonly Bar bar;
+        private readonly C1 f;
 
-        public C(Bar bar, params int[] values)
+        public C(C1 f, params int[] values)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void WhenNotInjectingChainedGeneric()
             {
-                var fooCode = @"
+                var c2 = @"
 namespace N
 {
-    public class C1
+    public class C2
     {
-        private readonly C2<int> c2;
+        private readonly C3<int> f;
 
-        public C1(C2<int> c2)
+        public C2(C3<int> f)
         {
-            this.c2 = c2;
+            this.f = f;
         }
     }
 }";
-                var barCode = @"
+                var c3 = @"
 namespace N
 {
-    public class C2<T>
+    public class C3<T>
     {
     }
 }";
@@ -333,10 +333,10 @@ namespace N
                 var before = @"
 namespace N
 {
-    public class C3 : C1
+    public class C4 : C2
     {
-        public C3()
-           : base(↓new C2<int>())
+        public C4()
+           : base(↓new C3<int>())
         {
         }
     }
@@ -345,15 +345,15 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : C1
+    public class C4 : C2
     {
-        public C3(C2<int> c2)
-           : base(c2)
+        public C4(C3<int> c3)
+           : base(c3)
         {
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, c3, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
@@ -408,44 +408,44 @@ namespace N
                 var c1 = @"
 namespace N
 {
-    public class C1
+    public class C2
     {
-        private readonly C2 bar;
+        private readonly C3 f;
 
-        public C1(C2 bar)
+        public C2(C3 f)
         {
-            this.bar = bar;
+            this.f = f;
         }
     }
 }";
                 var c2 = @"
 namespace N
 {
-    public class C2
+    public class C3
     {
-        private readonly Baz baz;
+        private readonly C4 f;
 
-        public C2(Baz baz)
+        public C3(C4 f)
         {
-            this.baz = baz;
+            this.f = f;
         }
     }
 }";
 
-                var bazCode = @"
+                var c4 = @"
 namespace N
 {
-    public class Baz
+    public class C4
     {
     }
 }";
                 var before = @"
 namespace N
 {
-    public class C3 : C1
+    public class C5 : C2
     {
-        public C3(Baz baz)
-           : base(↓new C2(baz))
+        public C5(C4 c4)
+           : base(↓new C3(c4))
         {
         }
     }
@@ -454,21 +454,21 @@ namespace N
                 var after = @"
 namespace N
 {
-    public class C3 : C1
+    public class C5 : C2
     {
-        public C3(Baz baz, C2 c2)
-           : base(c2)
+        public C5(C4 c4, C3 c3)
+           : base(c3)
         {
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, bazCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, c4, before }, after, fixTitle: "Inject safe.");
             }
 
             [Test]
             public static void ChainedPropertyOnInjected()
             {
-                var fooCode = @"
+                var CCode = @"
 namespace N
 {
     public class C1
@@ -481,7 +481,7 @@ namespace N
         }
     }
 }";
-                var barCode = @"
+                var C1Code = @"
 namespace N
 {
     public class C2
@@ -526,7 +526,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { fooCode, barCode, bazCode, before }, after, fixTitle: "Inject safe.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { CCode, C1Code, bazCode, before }, after, fixTitle: "Inject safe.");
             }
         }
     }
