@@ -1,6 +1,6 @@
 ﻿// ReSharper disable All
 #pragma warning disable 1717, CA2011
-#pragma warning disable GU0011 // Don't ignore the return value.
+#pragma warning disable GU0011 // Don't ignore the returned value
 #pragma warning disable GU0010 // Assigning same value
 namespace ValidCode
 {

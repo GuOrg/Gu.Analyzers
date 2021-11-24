@@ -28,7 +28,7 @@ namespace N
     }
 }".AssertReplace("ints.Select(x => x);", linq);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the return value."), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the returned value"), code);
         }
 
         [Test]

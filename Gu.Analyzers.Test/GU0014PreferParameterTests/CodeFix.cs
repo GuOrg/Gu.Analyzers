@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0014PreferParameterTests
+﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -43,7 +43,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Prefer using parameter."), before, after, fixTitle: "Prefer parameter.");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Prefer using parameter"), before, after, fixTitle: "Prefer parameter.");
         }
 
         [Test]

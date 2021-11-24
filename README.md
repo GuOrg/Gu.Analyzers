@@ -20,10 +20,10 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0008](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md)| Avoid relay properties
 | [GU0009](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0009.md)| Name the boolean argument
 | [GU0010](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0010.md)| Assigning same value
-| [GU0011](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0011.md)| Don't ignore the return value.
-| [GU0012](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md)| Check if parameter is null.
-| [GU0013](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md)| Throw for correct parameter.
-| [GU0014](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md)| Prefer using parameter.
+| [GU0011](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0011.md)| Don't ignore the returned value
+| [GU0012](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md)| Check if parameter is null
+| [GU0013](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md)| Throw for correct parameter
+| [GU0014](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0014.md)| Prefer using parameter
 | [GU0015](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0015.md)| Don't assign same more than once.
 | [GU0016](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0016.md)| Prefer lambda.
 | [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded.

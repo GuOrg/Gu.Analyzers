@@ -96,17 +96,17 @@
 
         internal static readonly DiagnosticDescriptor GU0011DoNotIgnoreReturnValue = Create(
             id: "GU0011",
-            title: "Don't ignore the return value.",
-            messageFormat: "Don't ignore the return value.",
+            title: "Don't ignore the returned value",
+            messageFormat: "Don't ignore the returned value",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Don't ignore the return value.");
+            description: "Don't ignore the returned value.");
 
         internal static readonly DiagnosticDescriptor GU0012NullCheckParameter = Create(
             id: "GU0012",
-            title: "Check if parameter is null.",
-            messageFormat: "Check if parameter is null.",
+            title: "Check if parameter is null",
+            messageFormat: "Check if parameter is null",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -114,8 +114,8 @@
 
         internal static readonly DiagnosticDescriptor GU0013TrowForCorrectParameter = Create(
             id: "GU0013",
-            title: "Throw for correct parameter.",
-            messageFormat: "Throw for correct parameter.",
+            title: "Throw for correct parameter",
+            messageFormat: "Throw for correct parameter",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -123,8 +123,8 @@
 
         internal static readonly DiagnosticDescriptor GU0014PreferParameter = Create(
             id: "GU0014",
-            title: "Prefer using parameter.",
-            messageFormat: "Prefer using parameter.",
+            title: "Prefer using parameter",
+            messageFormat: "Prefer using parameter",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
