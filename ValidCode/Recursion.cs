@@ -1,5 +1,5 @@
 ﻿// ReSharper disable All
-#pragma warning disable 1717
+#pragma warning disable 1717, CA2011
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 namespace ValidCode
@@ -7,12 +7,12 @@ namespace ValidCode
     using System;
     using System.Collections.Generic;
 
-    internal class RecursiveFoo
+    internal class Recursion
     {
         private IDisposable? bar1;
         private IDisposable? bar2;
 
-        internal RecursiveFoo()
+        internal Recursion()
         {
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;

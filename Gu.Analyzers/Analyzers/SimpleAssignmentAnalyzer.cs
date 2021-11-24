@@ -98,7 +98,7 @@
 
             if (assignment.TryFirstAncestor<MemberDeclarationSyntax>(out var member))
             {
-                if (!(member is ConstructorDeclarationSyntax) &&
+                if (member is not ConstructorDeclarationSyntax &&
                     context.SemanticModel.TryGetType(assignment.Left, context.CancellationToken, out var type) &&
                     FieldOrProperty.TryCreate(left, out _))
                 {
