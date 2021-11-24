@@ -15,11 +15,11 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0003](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0003.md)| Name the parameter to match the assigned member
 | [GU0004](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0004.md)| Assign all readonly members
 | [GU0005](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0005.md)| Use correct argument positions
-| [GU0006](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0006.md)| Use nameof.
-| [GU0007](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0007.md)| Prefer injecting.
-| [GU0008](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md)| Avoid relay properties.
-| [GU0009](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0009.md)| Name the boolean parameter.
-| [GU0010](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0010.md)| Assigning same value.
+| [GU0006](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0006.md)| Use nameof
+| [GU0007](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0007.md)| Prefer injecting
+| [GU0008](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0008.md)| Avoid relay properties
+| [GU0009](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0009.md)| Name the boolean argument
+| [GU0010](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0010.md)| Assigning same value
 | [GU0011](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0011.md)| Don't ignore the return value.
 | [GU0012](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0012.md)| Check if parameter is null.
 | [GU0013](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0013.md)| Throw for correct parameter.

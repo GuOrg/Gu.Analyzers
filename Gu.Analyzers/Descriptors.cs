@@ -51,7 +51,7 @@
 
         internal static readonly DiagnosticDescriptor GU0006UseNameof = Create(
             id: "GU0006",
-            title: "Use nameof.",
+            title: "Use nameof",
             messageFormat: "Use nameof",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
@@ -60,7 +60,7 @@
 
         internal static readonly DiagnosticDescriptor GU0007PreferInjecting = Create(
             id: "GU0007",
-            title: "Prefer injecting.",
+            title: "Prefer injecting",
             messageFormat: "Prefer injecting {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
@@ -69,8 +69,8 @@
 
         internal static readonly DiagnosticDescriptor GU0008AvoidRelayProperties = Create(
             id: "GU0008",
-            title: "Avoid relay properties.",
-            messageFormat: "Avoid relay properties.",
+            title: "Avoid relay properties",
+            messageFormat: "Avoid relay properties",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: false,
@@ -78,16 +78,16 @@
 
         internal static readonly DiagnosticDescriptor GU0009UseNamedParametersForBooleans = Create(
             id: "GU0009",
-            title: "Name the boolean parameter.",
-            messageFormat: "The boolean parameter is not named.",
+            title: "Name the boolean argument",
+            messageFormat: "Name the boolean argument",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The unnamed boolean parameters aren't obvious about their purpose. Consider naming the boolean argument for clarity.");
+            description: "The unnamed boolean argument aren't obvious about their purpose. Consider naming the boolean argument for clarity.");
 
         internal static readonly DiagnosticDescriptor GU0010DoNotAssignSameValue = Create(
             id: "GU0010",
-            title: "Assigning same value.",
+            title: "Assigning same value",
             messageFormat: "Assigning made to same, did you mean to assign something else?",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Error,

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
+﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -56,7 +56,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("The boolean parameter is not named."), before, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Name the boolean argument"), before, after);
         }
 
         [Test]
