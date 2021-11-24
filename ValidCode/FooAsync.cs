@@ -6,14 +6,14 @@ namespace ValidCode
 
     internal static class FooAsync
     {
-        internal static async Task<string> Bar1Async()
+        internal static async Task<string?> Bar1Async()
         {
             using var stream = await ReadAsync(string.Empty);
             using var reader = new StreamReader(stream);
             return reader.ReadLine();
         }
 
-        internal static async Task<string> Bar2Async()
+        internal static async Task<string?> Bar2Async()
         {
             using var stream = await ReadAsync(string.Empty).ConfigureAwait(false);
             using var reader = new StreamReader(stream);

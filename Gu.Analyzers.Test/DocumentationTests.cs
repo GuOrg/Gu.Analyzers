@@ -34,7 +34,7 @@ namespace Gu.Analyzers.Test
                                                                                            .ToArray();
 
         private static DirectoryInfo SolutionDirectory => SolutionFile.Find("Gu.Analyzers.sln")
-                                                                      .Directory;
+                                                                      .Directory!;
 
         private static DirectoryInfo DocumentsDirectory => SolutionDirectory.EnumerateDirectories("documentation", SearchOption.TopDirectoryOnly)
                                                                             .Single();
@@ -70,7 +70,7 @@ namespace Gu.Analyzers.Test
         public void Title(DescriptorInfo descriptorInfo)
         {
             var expected = $"## {descriptorInfo.Descriptor.Title}";
-            var actual = descriptorInfo.DocumentationFile.AllLines
+            var actual = descriptorInfo.DocumentationFile.AllLines!
                                        .Skip(1)
                                        .First()
                                        .Replace("`", string.Empty, StringComparison.OrdinalIgnoreCase);
@@ -86,7 +86,7 @@ namespace Gu.Analyzers.Test
                                          .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                                          .First();
             DumpIfDebug(expected);
-            var actual = descriptorInfo.DocumentationFile.AllLines
+            var actual = descriptorInfo.DocumentationFile.AllLines!
                                        .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
                                        .Skip(1)
                                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
@@ -144,8 +144,8 @@ namespace Gu.Analyzers.Test
                                                           .Distinct()
                                                           .OrderBy(x => x.Id))
             {
-                builder.Append($"| [{descriptor.Id}]({descriptor.HelpLinkUri})")
-                       .AppendLine($"| {descriptor.Title}");
+                builder.Append(CultureInfo.InvariantCulture, $"| [{descriptor.Id}]({descriptor.HelpLinkUri})")
+                       .AppendLine(CultureInfo.InvariantCulture, $"| {descriptor.Title}");
             }
 
             var expected = builder.ToString();
@@ -336,7 +336,7 @@ Or put this at the top of the file to disable all instances.
             {
                 var fileName = Cache.Values.Select(x => Path.GetDirectoryName(x.Name))
                                     .Distinct()
-                                    .SelectMany(d => Directory.EnumerateFiles(d, name, SearchOption.TopDirectoryOnly))
+                                    .SelectMany(d => Directory.EnumerateFiles(d!, name, SearchOption.TopDirectoryOnly))
                                     .FirstOrDefault() ??
                                Directory.EnumerateFiles(SolutionDirectory.FullName, name, SearchOption.AllDirectories)
                                         .First();

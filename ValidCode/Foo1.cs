@@ -88,7 +88,7 @@ namespace ValidCode
 
         internal string AddAndReturnToString()
         {
-            return this.compositeDisposable.AddAndReturn(new Disposable()).ToString();
+            return this.compositeDisposable.AddAndReturn(new Disposable()).ToString()!;
         }
 
         private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable>? disposables = null)

@@ -97,7 +97,9 @@
         private sealed class Walker : ExecutionWalker<Walker>
         {
             private readonly List<IdentifierNameSyntax> identifierNames = new();
+#pragma warning disable RS1024 // Compare symbols correctly
             private readonly HashSet<ISymbol> symbols = new(SymbolComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
 
             private Walker()
             {
