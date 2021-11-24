@@ -312,8 +312,8 @@
 
         internal static readonly DiagnosticDescriptor GU0074PreferPattern = Create(
             id: "GU0074",
-            title: "Prefer pattern.",
-            messageFormat: "Prefer pattern.",
+            title: "Prefer pattern",
+            messageFormat: "Prefer pattern",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -321,17 +321,17 @@
 
         internal static readonly DiagnosticDescriptor GU0075PreferReturnNullable = Create(
             id: "GU0075",
-            title: "Prefer return nullable.",
-            messageFormat: "Prefer return nullable.",
+            title: "Prefer return nullable",
+            messageFormat: "Prefer return nullable",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
-            description: "Prefer return nullable. Nicer for pattern matching.");
+            description: "Prefer return nullable Nicer for pattern matching.");
 
         internal static readonly DiagnosticDescriptor GU0076MergePattern = Create(
             id: "GU0076",
-            title: "Merge pattern.",
-            messageFormat: "Merge pattern.",
+            title: "Merge pattern",
+            messageFormat: "Merge pattern",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
@@ -339,8 +339,8 @@
 
         internal static readonly DiagnosticDescriptor GU0077PreferIsNull = Create(
             id: "GU0077",
-            title: "Prefer is null.",
-            messageFormat: "Prefer is null.",
+            title: "Prefer is null",
+            messageFormat: "Prefer is null",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
@@ -348,8 +348,8 @@
 
         internal static readonly DiagnosticDescriptor GU0080TestAttributeCountMismatch = Create(
             id: "GU0080",
-            title: "Parameter count does not match attribute.",
-            messageFormat: "Parameters {0} does not match attribute {1}.",
+            title: "Parameter count does not match attribute",
+            messageFormat: "Parameters {0} does not match attribute {1}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -357,8 +357,8 @@
 
         internal static readonly DiagnosticDescriptor GU0081TestCasesAttributeMismatch = Create(
             id: "GU0081",
-            title: "TestCase does not match parameters.",
-            messageFormat: "TestCase {0} does not match parameters {1}.",
+            title: "TestCase does not match parameters",
+            messageFormat: "TestCase {0} does not match parameters {1}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -366,21 +366,21 @@
 
         internal static readonly DiagnosticDescriptor GU0082IdenticalTestCase = Create(
             id: "GU0082",
-            title: "TestCase is identical.",
-            messageFormat: "TestCase is identical {0}.",
+            title: "TestCase is identical to other",
+            messageFormat: "TestCase is identical {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "TestCase is identical.");
+            description: "TestCase is identical to other.");
 
         internal static readonly DiagnosticDescriptor GU0083TestCaseAttributeMismatchMethod = Create(
             id: "GU0083",
             title: "TestCase Arguments Mismatch Method Parameters",
-            messageFormat: "TestCase arguments {0} does not match method parameters {1}.",
+            messageFormat: "TestCase arguments {0} does not match method parameters {1}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "TestCase Mismatches Method Parameters");
+            description: "TestCase Mismatches Method Parameters.");
 
         internal static readonly DiagnosticDescriptor GU0084AssertExceptionMessage = Create(
             id: "GU0084",
