@@ -28,7 +28,7 @@ namespace N
 
             var expectedDiagnostic = ExpectedDiagnostic.CreateFromCodeWithErrorsIndicated(
                 diagnosticId: "GU0060",
-                message: "Enum member value conflicts with another.",
+                message: "Enum member value conflicts with another",
                 code: code,
                 cleanedSources: out code);
             RoslynAssert.Diagnostics(Analyzer, expectedDiagnostic, code);

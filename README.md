@@ -29,21 +29,21 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded
 | [GU0018a](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018a.md)| Name mock
 | [GU0018b](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018b.md)| Name mock
-| [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties.
-| [GU0021](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md)| Calculated property allocates reference type.
-| [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only.
-| [GU0023](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md)| Static members that initialize with other static members depend on document order.
-| [GU0024](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md)| Seal type with default member.
-| [GU0025](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0025.md)| Seal type with overridden equality.
-| [GU0050](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md)| Ignore events when serializing.
-| [GU0051](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md)| Cache the XmlSerializer.
-| [GU0052](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md)| Mark exception with [Serializable].
-| [GU0060](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0060.md)| Enum member value conflict.
-| [GU0061](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0061.md)| Enum member value out of range.
+| [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties
+| [GU0021](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md)| Calculated property allocates reference type
+| [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only
+| [GU0023](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0023.md)| Static members that initialize with other static members depend on document order
+| [GU0024](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0024.md)| Seal type with default member
+| [GU0025](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0025.md)| Seal type with overridden equality
+| [GU0050](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0050.md)| Ignore events when serializing
+| [GU0051](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0051.md)| Cache the XmlSerializer
+| [GU0052](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0052.md)| Mark exception with [Serializable]
+| [GU0060](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0060.md)| Enum member value conflict
+| [GU0061](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0061.md)| Enum member value out of range
 | [GU0070](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0070.md)| Default-constructed value type with no useful default
 | [GU0071](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0071.md)| Implicit casting done by the foreach
-| [GU0072](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0072.md)| All types should be internal.
-| [GU0073](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0073.md)| Member of non-public type should be internal.
+| [GU0072](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0072.md)| All types should be internal
+| [GU0073](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0073.md)| Member of non-public type should be internal
 | [GU0074](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0074.md)| Prefer pattern.
 | [GU0075](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0075.md)| Prefer return nullable.
 | [GU0076](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0076.md)| Merge pattern.

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -34,7 +34,7 @@ namespace N
         internal readonly int F;
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0073MemberShouldBeInternal).WithMessage("Member F of non-public type C should be internal.");
+            var expectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0073MemberShouldBeInternal).WithMessage("Member F of non-public type C should be internal");
             RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Make internal.");
         }
 

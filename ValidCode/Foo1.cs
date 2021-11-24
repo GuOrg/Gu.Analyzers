@@ -49,9 +49,9 @@ namespace ValidCode
 
         internal IDisposable? Disposable => this.subscription.Disposable;
 
-#pragma warning disable GU0021 // Calculated property allocates reference type.
+#pragma warning disable GU0021 // Calculated property allocates reference type
         internal IDisposable CreateDisposableProperty => new Disposable();
-#pragma warning restore GU0021 // Calculated property allocates reference type.
+#pragma warning restore GU0021 // Calculated property allocates reference type
 
         internal string Text => this.AddAndReturnToString();
 

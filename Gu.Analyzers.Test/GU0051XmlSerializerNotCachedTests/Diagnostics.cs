@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
+﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -30,7 +30,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The serializer is not cached."), code);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The serializer is not cached"), code);
         }
 
         [Test]

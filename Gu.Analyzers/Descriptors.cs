@@ -177,8 +177,8 @@
 
         internal static readonly DiagnosticDescriptor GU0020SortProperties = Create(
             id: "GU0020",
-            title: "Sort properties.",
-            messageFormat: "Move property.",
+            title: "Sort properties",
+            messageFormat: "Move property",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -186,8 +186,8 @@
 
         internal static readonly DiagnosticDescriptor GU0021CalculatedPropertyAllocates = Create(
             id: "GU0021",
-            title: "Calculated property allocates reference type.",
-            messageFormat: "Calculated property allocates reference type.",
+            title: "Calculated property allocates reference type",
+            messageFormat: "Calculated property allocates reference type",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -195,8 +195,8 @@
 
         internal static readonly DiagnosticDescriptor GU0022UseGetOnly = Create(
             id: "GU0022",
-            title: "Use get-only.",
-            messageFormat: "Use get-only.",
+            title: "Use get-only",
+            messageFormat: "Use get-only",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -204,7 +204,7 @@
 
         internal static readonly DiagnosticDescriptor GU0023StaticMemberOrder = Create(
             id: "GU0023",
-            title: "Static members that initialize with other static members depend on document order.",
+            title: "Static members that initialize with other static members depend on document order",
             messageFormat: "Member '{0}' must be declared before '{1}'",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
@@ -213,8 +213,8 @@
 
         internal static readonly DiagnosticDescriptor GU0024SealTypeWithDefaultMember = Create(
             id: "GU0024",
-            title: "Seal type with default member.",
-            messageFormat: "Seal type with default member.",
+            title: "Seal type with default member",
+            messageFormat: "Seal type with default member",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
@@ -222,8 +222,8 @@
 
         internal static readonly DiagnosticDescriptor GU0025SealTypeWithOverridenEquality = Create(
             id: "GU0025",
-            title: "Seal type with overridden equality.",
-            messageFormat: "Seal type with overridden equality.",
+            title: "Seal type with overridden equality",
+            messageFormat: "Seal type with overridden equality",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
@@ -231,8 +231,8 @@
 
         internal static readonly DiagnosticDescriptor GU0050IgnoreEventsWhenSerializing = Create(
             id: "GU0050",
-            title: "Ignore events when serializing.",
-            messageFormat: "Ignore events when serializing.",
+            title: "Ignore events when serializing",
+            messageFormat: "Ignore events when serializing",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -240,8 +240,8 @@
 
         internal static readonly DiagnosticDescriptor GU0051XmlSerializerNotCached = Create(
             id: "GU0051",
-            title: "Cache the XmlSerializer.",
-            messageFormat: "The serializer is not cached.",
+            title: "Cache the XmlSerializer",
+            messageFormat: "The serializer is not cached",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -249,8 +249,8 @@
 
         internal static readonly DiagnosticDescriptor GU0052ExceptionShouldBeSerializable = Create(
             id: "GU0052",
-            title: "Mark exception with [Serializable].",
-            messageFormat: "Mark exception with [Serializable].",
+            title: "Mark exception with [Serializable]",
+            messageFormat: "Mark exception with [Serializable]",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -258,26 +258,26 @@
 
         internal static readonly DiagnosticDescriptor GU0060EnumMemberValueConflictsWithAnother = Create(
             id: "GU0060",
-            title: "Enum member value conflict.",
-            messageFormat: "Enum member value conflicts with another.",
+            title: "Enum member value conflict",
+            messageFormat: "Enum member value conflicts with another",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member");
+            description: "The enum member has a value shared with the other enum member, but it's not explicitly declared as its alias. To fix this, assign a enum member.");
 
         internal static readonly DiagnosticDescriptor GU0061EnumMemberValueOutOfRange = Create(
             id: "GU0061",
-            title: "Enum member value out of range.",
+            title: "Enum member value out of range",
             messageFormat: "Enum member value will overflow",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The enum member value will overflow at runtime. Probably not intended. Change enum type to long (int is default)");
+            description: "The enum member value will overflow at runtime. Probably not intended. Change enum type to long (int is default).");
 
         internal static readonly DiagnosticDescriptor GU0070DefaultConstructedValueTypeWithNoUsefulDefault = Create(
             id: "GU0070",
             title: "Default-constructed value type with no useful default",
-            messageFormat: "Default constructed value type was created, which is likely not what was intended.",
+            messageFormat: "Default constructed value type was created, which is likely not what was intended",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -290,12 +290,12 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "If an explicit type is used, the compiler inserts a cast. This was possibly useful in the pre-generic C# 1.0 era, but now it's a misfeature");
+            description: "If an explicit type is used, the compiler inserts a cast. This was possibly useful in the pre-generic C# 1.0 era, but now it's a misfeature.");
 
         internal static readonly DiagnosticDescriptor GU0072AllTypesShouldBeInternal = Create(
             id: "GU0072",
-            title: "All types should be internal.",
-            messageFormat: "All types should be internal.",
+            title: "All types should be internal",
+            messageFormat: "All types should be internal",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: false,
@@ -303,8 +303,8 @@
 
         internal static readonly DiagnosticDescriptor GU0073MemberShouldBeInternal = Create(
             id: "GU0073",
-            title: "Member of non-public type should be internal.",
-            messageFormat: "Member {0} of non-public type {1} should be internal.",
+            title: "Member of non-public type should be internal",
+            messageFormat: "Member {0} of non-public type {1} should be internal",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,

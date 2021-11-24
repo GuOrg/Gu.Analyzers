@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -36,7 +36,7 @@ namespace N
         public event EventHandler SomeEvent;
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing.");
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing");
             RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "[field:NonSerialized].");
         }
 
