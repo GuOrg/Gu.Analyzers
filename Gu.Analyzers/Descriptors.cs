@@ -384,8 +384,8 @@
 
         internal static readonly DiagnosticDescriptor GU0084AssertExceptionMessage = Create(
             id: "GU0084",
-            title: "Assert exception message.",
-            messageFormat: "Assert exception message.",
+            title: "Assert exception message",
+            messageFormat: "Assert exception message",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Hidden,
             isEnabledByDefault: true,
@@ -393,8 +393,8 @@
 
         internal static readonly DiagnosticDescriptor GU0090DoNotThrowNotImplementedException = Create(
             id: "GU0090",
-            title: "Don't throw NotImplementedException.",
-            messageFormat: "Don't throw NotImplementedException.",
+            title: "Don't throw NotImplementedException",
+            messageFormat: "Don't throw NotImplementedException",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -402,8 +402,8 @@
 
         internal static readonly DiagnosticDescriptor GU0100WrongCrefType = Create(
             id: "GU0100",
-            title: "Wrong cref type.",
-            messageFormat: "Wrong cref type, expected {0}.",
+            title: "Wrong cref type",
+            messageFormat: "Wrong cref type, expected {0}",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
