@@ -6,11 +6,19 @@ variables:
 
 steps:
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: restore
   inputs:
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/restore'
+    command: 'restore'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
+  displayName: build
   inputs:
-    configuration: '$(buildConfiguration)'
+    command: 'build'
+    arguments: '--configuration $(buildConfiguration) --no-restore'
+
+- task: DotNetCoreCLI@2
+  displayName: test
+  inputs:
+    command: 'test'
+    arguments: '--configuration $(buildConfiguration) --no-build'
