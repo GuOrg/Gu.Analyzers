@@ -23,7 +23,6 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <AppendTargetFrameworkToOutputDirectory>false</AppendTargetFrameworkToOutputDirectory>
   </PropertyGroup>
   
   <PropertyGroup>
