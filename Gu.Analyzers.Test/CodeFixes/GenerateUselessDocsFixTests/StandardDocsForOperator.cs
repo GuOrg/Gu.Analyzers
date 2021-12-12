@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
@@ -37,7 +37,7 @@ namespace N
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {
@@ -81,7 +81,7 @@ namespace N
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {
@@ -126,7 +126,7 @@ namespace N
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {
@@ -170,7 +170,7 @@ namespace N
         }
 
         /// <inheritdoc/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is null)
             {

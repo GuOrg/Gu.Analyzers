@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -431,10 +431,10 @@ namespace N
         {
             if (s2 is null)
             {
-                throw new System.ArgumentNullException(nameof(s1));
+                throw new ArgumentNullException(nameof(s1));
             }
 
-            this.s1 = s1 ?? throw new System.ArgumentNullException(nameof(s2));
+            this.s1 = s1 ?? throw new ArgumentNullException(nameof(s2));
             this.s2 = s2 + ""abc"";
         }
     }

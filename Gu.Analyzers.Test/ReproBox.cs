@@ -21,9 +21,7 @@
                                .ToArray();
 
         private static readonly Solution Solution = CodeFactory.CreateSolution(
-            new FileInfo("C:\\Git\\_GuOrg\\Gu.Inject\\Gu.Inject.sln"),
-            AllAnalyzers,
-            MetadataReferences.FromAttributes());
+            new FileInfo("C:\\Git\\_GuOrg\\Gu.Inject\\Gu.Inject.sln"));
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void SolutionRepro(DiagnosticAnalyzer analyzer)

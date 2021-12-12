@@ -301,7 +301,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", AllowCompilationErrors.Yes);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
         }
 
         [TestCase("s = null")]
@@ -362,7 +362,7 @@ namespace N
         }
     }
 }".AssertReplace("s = null", expression);
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", AllowCompilationErrors.Yes);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
         }
 
         [Test]

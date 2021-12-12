@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0006UseNameofTests
+﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -102,7 +102,7 @@ namespace N
     {
         private int value;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int Squared => this.Value*this.Value;
 
@@ -126,7 +126,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -143,7 +143,7 @@ namespace N
     {
         private int value;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int Squared => this.Value*this.Value;
 
@@ -167,7 +167,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

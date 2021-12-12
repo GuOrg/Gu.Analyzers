@@ -39,9 +39,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
-            var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
-            RoslynAssert.NoDiagnostics(diagnostics);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -173,11 +171,11 @@ namespace N
 #pragma warning restore GU0012
     }
 }";
-            RoslynAssert.Valid(analyzer, c, validationErrorToStringConverter);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, c, validationErrorToStringConverter);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public static async Task InSetAndRaise(DiagnosticAnalyzer analyzer)
+        public static void InSetAndRaise(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
 namespace N.Core
@@ -217,11 +215,11 @@ namespace N.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public static async Task InOnPropertyChanged(DiagnosticAnalyzer analyzer)
+        public static void InOnPropertyChanged(DiagnosticAnalyzer analyzer)
         {
             var viewModelBaseCode = @"
 namespace N.Core
@@ -269,11 +267,11 @@ namespace N.Client
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { viewModelBaseCode, testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public static async Task InProperty(DiagnosticAnalyzer analyzer)
+        public static void InProperty(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace N
@@ -346,7 +344,7 @@ namespace N
         }
     }
 }";
-            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, MetadataReferences.FromAttributes()).ConfigureAwait(false);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
         }
     }
 }

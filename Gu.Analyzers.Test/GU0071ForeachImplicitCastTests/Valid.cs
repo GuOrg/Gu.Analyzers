@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
+﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -56,7 +56,7 @@ namespace N
         [Test]
         public static void MultipleIEnumerableInterfaces()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections;
@@ -94,9 +94,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(Analyzer), MetadataReferences.FromAttributes());
-            var diagnostics = Analyze.GetDiagnostics(Analyzer, sln);
-            RoslynAssert.NoDiagnostics(diagnostics);
+            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
 
         [Test]

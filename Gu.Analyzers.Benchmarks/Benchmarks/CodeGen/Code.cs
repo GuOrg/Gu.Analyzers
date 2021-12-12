@@ -1,38 +1,11 @@
 ﻿namespace Gu.Analyzers.Benchmarks
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.Linq;
-    using System.Net;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.Diagnostics;
 
     public static class Code
     {
-        private static readonly IReadOnlyList<MetadataReference> MetadataReferences = new[]
-        {
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location).WithAliases(ImmutableArray.Create("global", "corlib")),
-            MetadataReference.CreateFromFile(typeof(System.Diagnostics.Debug).Assembly.Location).WithAliases(ImmutableArray.Create("global", "system")),
-            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(WebClient).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(System.Xml.Serialization.XmlSerializer).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(CSharpCompilation).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location),
-        };
-
-        public static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbols)
-            .Assembly
-            .GetTypes()
-            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
-            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-            .ToArray();
-
         public static Solution AnalyzersProject { get; } = CodeFactory.CreateSolution(
-            ProjectFile.Find("Gu.Analyzers.csproj"),
-            AllAnalyzers,
-            MetadataReferences);
+            ProjectFile.Find("Gu.Analyzers.csproj"));
     }
 }

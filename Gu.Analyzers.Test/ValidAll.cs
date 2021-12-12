@@ -20,14 +20,10 @@
                 .ToImmutableArray();
 
         private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("Gu.Analyzers.csproj"),
-            AllAnalyzers,
-            MetadataReferences.FromAttributes());
+            ProjectFile.Find("Gu.Analyzers.csproj"));
 
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("ValidCode.csproj"),
-            AllAnalyzers,
-            MetadataReferences.FromAttributes());
+            ProjectFile.Find("ValidCode.csproj"));
 
         [Test]
         public static void NotEmpty()
@@ -44,7 +40,7 @@
                 analyzer is BinaryExpressionAnalyzer ||
                 analyzer is GU0007PreferInjecting)
             {
-                Analyze.GetDiagnostics(AnalyzerProjectSln, analyzer);
+                Analyze.GetDiagnostics(analyzer, AnalyzerProjectSln);
             }
             else
             {
@@ -53,13 +49,11 @@
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public static async Task ValidCodeProject(DiagnosticAnalyzer analyzer)
+        public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
-            if (analyzer is SimpleAssignmentAnalyzer ||
-                analyzer is ParameterAnalyzer)
+            if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer)
             {
-                await Analyze.GetDiagnosticsAsync(ValidCodeProjectSln, analyzer)
-                             .ConfigureAwait(false);
+                _ = Analyze.GetDiagnostics(analyzer, ValidCodeProjectSln);
             }
             else
             {
@@ -98,9 +92,7 @@ namespace N
         }
     }
 }";
-            var sln = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer, SuppressWarnings.FromAttributes()), MetadataReferences.FromAttributes());
-            var diagnostics = Analyze.GetDiagnostics(analyzer, sln);
-            RoslynAssert.NoDiagnostics(diagnostics);
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
         }
     }
 }

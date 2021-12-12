@@ -3,7 +3,6 @@
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
     internal static class NullableFixTests
@@ -14,7 +13,6 @@
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
         private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' must contain a non-null value when exiting constructor. Consider declaring the event as nullable.");
         private static readonly ExpectedDiagnostic CS8765 = ExpectedDiagnostic.Create("CS8765");
-        private static readonly CSharpCompilationOptions CompilationOptions = new(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable);
 
         [Test]
         public static void AddNotNullWhenAndUsing()
@@ -58,7 +56,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8625, before, after);
         }
 
         [Test]
@@ -88,7 +86,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(new PlaceholderAnalyzer(CS8625.Id), Fix, CS8625, before, compilationOptions: CompilationOptions);
+            RoslynAssert.NoFix(new PlaceholderAnalyzer(CS8625.Id), Fix, CS8625, before);
         }
 
         [Test]
@@ -137,7 +135,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8625, before, after);
         }
 
         [Test]
@@ -174,7 +172,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after);
         }
 
         [Test]
@@ -219,7 +217,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after);
         }
 
         [Test]
@@ -264,7 +262,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8600, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8600, before, after);
         }
 
         [Test]
@@ -309,7 +307,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after);
         }
 
         [Test]
@@ -354,7 +352,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8601, before, after);
         }
 
         [Test]
@@ -381,7 +379,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8625, before, after);
         }
 
         [Test]
@@ -418,7 +416,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8618, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8618, before, after);
         }
 
         [Test]
@@ -491,7 +489,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8765, before, after, compilationOptions: CompilationOptions);
+            RoslynAssert.CodeFix(Fix, CS8765, before, after);
         }
     }
 }
