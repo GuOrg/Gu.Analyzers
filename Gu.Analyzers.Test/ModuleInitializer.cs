@@ -14,7 +14,8 @@
                     typeof(ModuleInitializer),
                     typeof(System.Windows.Window),
                     typeof(System.Reactive.Linq.Observable),
-                    typeof(Moq.Mock)));
+                    typeof(Moq.Mock),
+                    typeof(Ninject.StandardKernel)));
         }
     }
 }

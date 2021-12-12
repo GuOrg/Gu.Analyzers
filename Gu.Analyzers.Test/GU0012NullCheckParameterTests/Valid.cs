@@ -17,8 +17,6 @@
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         private readonly string text;
@@ -38,13 +36,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
-        private readonly string text;
+        private readonly string? text;
 
-        public C(string text = null)
+        public C(string? text = null)
         {
             this.text = text;
         }
@@ -59,8 +55,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         private readonly int i;
@@ -80,8 +74,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public bool M(out string text)
