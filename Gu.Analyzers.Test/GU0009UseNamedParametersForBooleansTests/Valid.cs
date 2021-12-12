@@ -13,9 +13,6 @@
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-
     public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
@@ -38,9 +35,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-
     public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns = true)
@@ -63,7 +57,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -85,7 +78,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.Collections.Generic;
 
     public class C
     {
@@ -104,9 +96,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-
     public class C
     {
         public void Floof(int howMuch, bool useFluffyBuns)
@@ -129,9 +118,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-
     public class C
     {
         public void Floof(params bool[] useFluffyBuns)
@@ -206,8 +192,9 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [Test]
-        public static void DoNotWarnOnConfigureAwait()
+        [TestCase("Task")]
+        [TestCase("Task<int>")]
+        public static void DoNotWarnOnConfigureAwait(string expression)
         {
             var code = @"
 namespace N
@@ -216,17 +203,13 @@ namespace N
 
     public class C
     {
-        public void M()
+        public void M(Task<int> task)
         {
-            Task<int> a = null;
-            Task b = null;
-            a.ConfigureAwait(false);
-            a.ConfigureAwait(true);
-            b.ConfigureAwait(false);
-            b.ConfigureAwait(true);
+            task.ConfigureAwait(false);
+            task.ConfigureAwait(true);
         }
     }
-}";
+}".AssertReplace("Task<int>", expression);
             RoslynAssert.Valid(Analyzer, code);
         }
 
@@ -261,7 +244,6 @@ namespace N
 namespace N
 {
     using System.Windows;
-    using System.Windows.Controls;
 
     public static class C
     {
@@ -286,7 +268,6 @@ namespace N
 namespace N
 {
     using System.Windows.Controls;
-    using System.Windows.Controls.Primitives;
 
     public class Baz
     {

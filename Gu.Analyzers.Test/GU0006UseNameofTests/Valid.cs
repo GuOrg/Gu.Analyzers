@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0006UseNameofTests
+﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -61,7 +61,7 @@ namespace N
     [System.Diagnostics.DebuggerDisplay(""{Name}"")]
     public class C
     {
-        public string Name { get; }
+        public string Name => string.Empty;
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -97,12 +97,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public C()
         {
+#pragma warning disable CS0219
             var text = ""text"";
         }
     }

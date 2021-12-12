@@ -40,6 +40,7 @@ namespace N
     using System.Text;
     public class C
     {
+#pragma warning disable CS0169
         private int value;
 
         public void M()

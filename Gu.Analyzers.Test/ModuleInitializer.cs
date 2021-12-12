@@ -12,7 +12,9 @@
             Settings.Default = Settings.Default.WithMetadataReferences(
                 MetadataReferences.Transitive(
                     typeof(ModuleInitializer),
-                    typeof(System.Windows.Window)));
+                    typeof(System.Windows.Window),
+                    typeof(System.Reactive.Linq.Observable),
+                    typeof(Moq.Mock)));
         }
     }
 }

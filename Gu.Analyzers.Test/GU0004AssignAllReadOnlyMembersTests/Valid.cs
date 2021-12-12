@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
+﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -258,11 +258,13 @@ namespace N
         public static void ConstructorSettingReadonlyFieldIgnoringMutable()
         {
             var code = @"
+#pragma warning disable CS0169
 namespace N
 {
     public class C
     {
         private readonly int a;
+
         private bool disposed;
 
         public C(int a)
@@ -299,6 +301,7 @@ namespace N
         public static void ConstructorSettingReadonlyFieldIgnoringInitialized()
         {
             var code = @"
+#pragma warning disable CS0414
 namespace N
 {
     public class C

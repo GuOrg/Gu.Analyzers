@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -68,7 +68,7 @@ namespace N
             }
 
             [TestCase("int")]
-            [TestCase("Abstract")]
+            [TestCase("Abstract?")]
             public static void WhenNewNotInjectable(string type)
             {
                 var @abstract = @"
@@ -102,10 +102,10 @@ namespace N
 
         public C1()
         {
-            bar = new C2(default(int));
+            bar = new C2(default);
         }
     }
-}".AssertReplace("default(int)", $"default({type})");
+}";
                 RoslynAssert.Valid(Analyzer, @abstract, c2, code);
             }
 
@@ -183,7 +183,7 @@ namespace N
 
     public class C
     {
-        private ServiceLocator locator;
+        private ServiceLocator? locator;
 
         public C()
         {

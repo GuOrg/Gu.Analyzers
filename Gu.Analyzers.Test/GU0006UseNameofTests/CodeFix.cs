@@ -187,11 +187,11 @@ namespace N
 
     public static class C
     {
-        private static string name;
+        private static string? name;
 
-        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static event EventHandler<PropertyChangedEventArgs>? StaticPropertyChanged;
 
-        public static string Name
+        public static string? Name
         {
             get
             {
@@ -220,11 +220,11 @@ namespace N
 
     public static class C
     {
-        private static string name;
+        private static string? name;
 
-        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static event EventHandler<PropertyChangedEventArgs>? StaticPropertyChanged;
 
-        public static string Name
+        public static string? Name
         {
             get
             {
@@ -258,12 +258,12 @@ namespace N
 
     public class C
     {
-        private static string name;
+        private static string? name;
         private int value;
 
-        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static event EventHandler<PropertyChangedEventArgs>? StaticPropertyChanged;
 
-        public static string Name
+        public static string? Name
         {
             get
             {
@@ -304,12 +304,12 @@ namespace N
 
     public class C
     {
-        private static string name;
+        private static string? name;
         private int value;
 
-        public static event EventHandler<PropertyChangedEventArgs> StaticPropertyChanged;
+        public static event EventHandler<PropertyChangedEventArgs>? StaticPropertyChanged;
 
-        public static string Name
+        public static string? Name
         {
             get
             {
@@ -473,7 +473,7 @@ namespace N
             P = p;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int P { get; }
 
@@ -499,7 +499,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -521,7 +521,7 @@ namespace N
             P = p;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int P { get; }
 
@@ -547,7 +547,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

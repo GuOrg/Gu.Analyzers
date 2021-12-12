@@ -81,6 +81,7 @@ namespace N
             public static void WhenReturningSameInstance()
             {
                 var ensure = @"
+#nullable disable
 namespace N
 {
     using System;

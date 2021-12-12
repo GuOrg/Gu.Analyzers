@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -180,7 +180,7 @@ namespace N
         {
         }
 
-        public string M()
+        public string? M()
         {
             return Singleton.↓Instance.ToString();
         }
@@ -199,7 +199,7 @@ namespace N
             this.singleton = singleton;
         }
 
-        public string M()
+        public string? M()
         {
             return this.singleton.ToString();
         }
@@ -220,7 +220,7 @@ namespace N
         {
         }
 
-        public string M() => Singleton.↓Instance.ToString();
+        public string? M() => Singleton.↓Instance.ToString();
     }
 }";
 
@@ -236,7 +236,7 @@ namespace N
             this.singleton = singleton;
         }
 
-        public string M() => this.singleton.ToString();
+        public string? M() => this.singleton.ToString();
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");

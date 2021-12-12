@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
+﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -160,6 +160,7 @@ namespace N
         public static void SetSameMemberOnOtherInstanceRecursive()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     public class C

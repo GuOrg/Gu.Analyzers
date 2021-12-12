@@ -64,6 +64,7 @@ namespace N
         public static void Using()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -95,6 +96,7 @@ namespace N
         public static void RealisticExtensionMethodClass()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -453,7 +455,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -544,8 +545,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public C()

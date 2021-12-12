@@ -57,6 +57,7 @@ namespace N
         public static void NotSettingGetOnlyPropertyInOneCtor()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -95,6 +96,7 @@ namespace N
         public static void NotSettingReadOnlyField()
         {
             var code = @"
+#pragma warning disable CS0169
 namespace N
 {
     public class C
