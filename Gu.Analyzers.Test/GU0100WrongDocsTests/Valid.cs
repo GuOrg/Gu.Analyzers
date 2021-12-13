@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0100WrongDocsTests
+﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -13,6 +13,7 @@ namespace Gu.Analyzers.Test.GU0100WrongDocsTests
         public static void WhenCorrect(string cref)
         {
             var code = @"
+#pragma warning disable CS8019
 namespace N
 {
     using System.Text;
@@ -40,6 +41,7 @@ namespace N
         public static void WhenListOfInt(string cref)
         {
             var code = @"
+#pragma warning disable CS8019
 namespace N
 {
     using System;
@@ -66,6 +68,7 @@ namespace N
         public static void WhenListOfC(string cref)
         {
             var code = @"
+#pragma warning disable CS8019
 namespace N
 {
     using System;
@@ -116,7 +119,6 @@ namespace N
 namespace N
 {
     using System.Text;
-    using System.Collections.Generic;
 
     class C
     {

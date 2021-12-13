@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0100WrongDocsTests
+﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -136,7 +136,7 @@ namespace N
     {
         private int value;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int Square => this.value * this.value;
 
@@ -160,7 +160,7 @@ namespace N
         /// 
         /// </summary>
         /// <param name=""propertyName"">The <see cref=""↓int""/>.</param>
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -177,7 +177,7 @@ namespace N
     {
         private int value;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int Square => this.value * this.value;
 
@@ -201,7 +201,7 @@ namespace N
         /// 
         /// </summary>
         /// <param name=""propertyName"">The <see cref=""string""/>.</param>
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
