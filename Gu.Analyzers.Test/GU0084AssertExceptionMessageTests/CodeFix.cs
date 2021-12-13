@@ -38,7 +38,7 @@ namespace N
         public void M()
         {
             var exception = Assert.Throws<SuccessException>(() => { });
-            Assert.AreEqual(""EXPECTED"", exception.Message);
+            Assert.AreEqual(""EXPECTED"", exception!.Message);
         }
     }
 }";
@@ -73,7 +73,7 @@ namespace N
         [Test]
         public void M()
         {
-            Assert.AreEqual(""EXPECTED"", Assert.Throws<SuccessException>(() => { }).Message);
+            Assert.AreEqual(""EXPECTED"", Assert.Throws<SuccessException>(() => { })!.Message);
         }
     }
 }";
@@ -84,6 +84,7 @@ namespace N
         public static void AssertThrowsAsyncExplicitDiscardToInline()
         {
             var before = @"
+#pragma warning disable CS1998
 namespace N
 {
     using NUnit.Framework;
@@ -99,6 +100,7 @@ namespace N
 }";
 
             var after = @"
+#pragma warning disable CS1998
 namespace N
 {
     using NUnit.Framework;
@@ -108,7 +110,7 @@ namespace N
         [Test]
         public void M()
         {
-            Assert.AreEqual(""EXPECTED"", Assert.ThrowsAsync<SuccessException>(async () => { }).Message);
+            Assert.AreEqual(""EXPECTED"", Assert.ThrowsAsync<SuccessException>(async () => { })!.Message);
         }
     }
 }";
@@ -144,7 +146,7 @@ namespace N
         public void M()
         {
             var exception = Assert.Throws<SuccessException>(() => { });
-            Assert.AreEqual(""EXPECTED"", exception.Message);
+            Assert.AreEqual(""EXPECTED"", exception!.Message);
         }
     }
 }";

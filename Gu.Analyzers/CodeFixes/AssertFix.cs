@@ -23,6 +23,8 @@
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
 
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                             .ConfigureAwait(false)!;
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot is { } &&
@@ -39,7 +41,7 @@
                                     AssertMessage(
                                         SyntaxFactory.MemberAccessExpression(
                                             SyntaxKind.SimpleMemberAccessExpression,
-                                            invocation,
+                                            Bang(invocation),
                                             SyntaxFactory.IdentifierName("Message"))));
                         },
                         "Assert exception message inline.",
@@ -54,7 +56,7 @@
                                 AssertMessage(
                                     SyntaxFactory.MemberAccessExpression(
                                         kind: SyntaxKind.SimpleMemberAccessExpression,
-                                        expression: SyntaxFactory.IdentifierName("exception"),
+                                        expression: Bang(SyntaxFactory.IdentifierName("exception")),
                                         name: SyntaxFactory.IdentifierName("Message"))));
                             editor
                                 .ReplaceNode(
@@ -65,8 +67,7 @@
                                             variables: SyntaxFactory
                                                 .SingletonSeparatedList(
                                                     SyntaxFactory.VariableDeclarator(
-                                                        identifier: SyntaxFactory.Identifier(
-                                                            "exception"),
+                                                        identifier: SyntaxFactory.Identifier("exception"),
                                                         argumentList: default,
                                                         initializer: SyntaxFactory
                                                             .EqualsValueClause(
@@ -109,6 +110,18 @@
                                     },
                                     new[] { SyntaxFactory.Token(SyntaxKind.CommaToken) }))),
                         semicolonToken: SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+                }
+
+                ExpressionSyntax Bang(ExpressionSyntax expression)
+                {
+                    if ((semanticModel?.GetNullableContext(context.Span.Start) & NullableContext.AnnotationsEnabled) != 0)
+                    {
+                        return SyntaxFactory.PostfixUnaryExpression(
+                            SyntaxKind.SuppressNullableWarningExpression,
+                            expression);
+                    }
+
+                    return expression;
                 }
             }
         }

@@ -198,7 +198,7 @@ namespace N
         /// <summary>
         /// 
         /// </summary>
-        /// <param name=""propertyName"">The <see cref=""string""/>.</param>
+        /// <param name=""propertyName"">The <see cref=""string?""/>.</param>
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

@@ -109,7 +109,7 @@
                         {
                             context.RegisterCodeFix(
                                 "[MaybeNullWhen(false)]",
-                                (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter!.WithAttributeList(MaybeNullWhenFalse))
+                                (editor, _) => editor.ReplaceNode(outParameter!, x => outParameter.WithAttributeList(MaybeNullWhenFalse))
                                                      .ReplaceNode(expression, x => SyntaxFactory.ParseExpression("default!"))
                                                      .AddUsing(UsingSystemDiagnosticsCodeAnalysis),
                                 "[MaybeNullWhen(false)]",
