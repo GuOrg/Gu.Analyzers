@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
@@ -202,13 +201,13 @@ namespace N.Core
             var testCode = @"
 namespace N.Client
 {
-    internal class Foo : N.Core.ViewModelBase
+    internal class C : N.Core.ViewModelBase
     {
         private int value2;
 
-        public int Value1 { get; set; }
+        internal int Value1 { get; set; }
 
-        public int Value2
+        internal int Value2
         {
             get { return this.value2; }
             set { this.TrySet(ref this.value2, value); }
@@ -241,13 +240,13 @@ namespace N.Core
             var testCode = @"
 namespace N.Client
 {
-    internal class Foo : N.Core.ViewModelBase
+    internal class C : N.Core.ViewModelBase
     {
         private int value2;
 
-        public int Value1 { get; set; }
+        internal int Value1 { get; set; }
 
-        public int Value2
+        internal int Value2
         {
             get
             {
@@ -279,17 +278,17 @@ namespace N
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    internal class Foo
+    internal class C : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public int Value1 => this.Value1;
+        internal int Value1 => this.Value1;
 
-        public int Value2 => Value2;
+        internal int Value2 => Value2;
 
-        public int Value3 => this.Value1;
+        internal int Value3 => this.Value1;
 
-        public int Value4
+        internal int Value4
         {
             get
             {
@@ -308,7 +307,7 @@ namespace N
             }
         }
 
-        public int Value5
+        internal int Value5
         {
             get => this.Value5;
             set
@@ -323,7 +322,7 @@ namespace N
             }
         }
 
-        public int Value6
+        internal int Value6
         {
             get => this.Value5;
             set
