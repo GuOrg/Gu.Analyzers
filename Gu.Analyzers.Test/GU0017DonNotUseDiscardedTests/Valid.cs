@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
+﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -35,6 +35,7 @@ namespace N
     {
         public C()
         {
+#pragma warning disable CS0219
             var _ = 1;
         }
     }

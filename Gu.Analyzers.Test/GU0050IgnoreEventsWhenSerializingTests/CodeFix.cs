@@ -18,9 +18,11 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        ↓public event EventHandler SomeEvent;
+        ↓public event EventHandler? E;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
 
@@ -30,10 +32,12 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
         [field: NonSerialized]
-        public event EventHandler SomeEvent;
+        public event EventHandler? E;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing");
@@ -49,27 +53,29 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
-        ↓public event EventHandler SomeEvent;
+        ↓public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
 
@@ -79,28 +85,30 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
         [field: NonSerialized]
-        public event EventHandler SomeEvent;
+        public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -115,7 +123,7 @@ namespace N
 {
     using System;
 
-    class BarAttribute : Attribute
+    class SomeAttribute : Attribute
     {
     }
 }";
@@ -125,28 +133,30 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
-        ↓[Bar]
-        public event EventHandler SomeEvent;
+        ↓[Some]
+        public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
 
@@ -156,29 +166,31 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
-        [Bar]
+        [Some]
         [field: NonSerialized]
-        public event EventHandler SomeEvent;
+        public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, before }, after);
@@ -194,14 +206,14 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        ↓private EventHandler someEvent;
+        ↓private EventHandler? e;
 
-        public event EventHandler SomeEvent
+        public event EventHandler? E
         {
-            add { this.someEvent += value; }
-            remove { this.someEvent -= value; }
+            add { this.e += value; }
+            remove { this.e -= value; }
         }
     }
 }";
@@ -212,15 +224,15 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
         [NonSerialized]
-        private EventHandler someEvent;
+        private EventHandler? e;
 
-        public event EventHandler SomeEvent
+        public event EventHandler? E
         {
-            add { this.someEvent += value; }
-            remove { this.someEvent -= value; }
+            add { this.e += value; }
+            remove { this.e -= value; }
         }
     }
 }";
@@ -237,29 +249,33 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
-        ↓public event EventHandler Event1;
+        ↓public event EventHandler? E1;
 
-        ↓public event EventHandler Event2;
+        ↓public event EventHandler? E2;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M1() =>  this.E1?.Invoke(this, EventArgs.Empty);
+
+        public void M2() =>  this.E2?.Invoke(this, EventArgs.Empty);
     }
 }";
 
@@ -269,31 +285,35 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
         [field: NonSerialized]
-        public event EventHandler Event1;
+        public event EventHandler? E1;
 
         [field: NonSerialized]
-        public event EventHandler Event2;
+        public event EventHandler? E2;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M1() =>  this.E1?.Invoke(this, EventArgs.Empty);
+
+        public void M2() =>  this.E2?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
+﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -13,19 +13,8 @@ namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
-
     public class C
     {
-        public C(int a, int b, int c, int d)
-        {
-            for(int i = 0; i < 100; ++i)
-            {
-            
-            }
-        }
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -37,21 +26,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
-
-        public C(int a, int b, int c, int d)
-        {
-            for(int i = 0; i < 100; ++i)
-            {
-            
-            }
-        }
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -63,8 +42,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
@@ -76,7 +53,7 @@ namespace N
             serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
         }
 
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -94,15 +71,13 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
 
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -121,13 +96,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {

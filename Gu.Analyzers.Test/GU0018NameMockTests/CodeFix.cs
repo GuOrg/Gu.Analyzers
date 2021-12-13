@@ -167,7 +167,7 @@ namespace N
 
     public class C
     {
-        private Mock<IPlc> ↓_wrongMock;
+        private Mock<IPlc>? ↓_wrongMock;
 
         [SetUp]
         public void M()
@@ -185,7 +185,7 @@ namespace N
 
     public class C
     {
-        private Mock<IPlc> _plcMock;
+        private Mock<IPlc>? _plcMock;
 
         [SetUp]
         public void M()

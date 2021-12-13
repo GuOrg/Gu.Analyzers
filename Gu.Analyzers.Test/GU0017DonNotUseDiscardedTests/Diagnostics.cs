@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
+﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -18,6 +18,7 @@ namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
             var code = @"
 namespace N
 {
+#pragma warning disable CS8019
     using System;
 
     public class C

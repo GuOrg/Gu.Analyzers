@@ -14,13 +14,11 @@
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -39,12 +37,9 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
-
     public class C
     {
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -62,13 +57,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {
@@ -87,15 +80,13 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Collections.Generic;
     using System.Xml.Serialization;
 
     public class C
     {
-        private static XmlSerializer serializer;
+        private static XmlSerializer? serializer;
     
-        public C(int a, int b, int c, int d)
+        public C()
         {
             for(int i = 0; i < 100; ++i)
             {

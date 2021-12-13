@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests
+﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -28,7 +28,7 @@ namespace N
             return !Equals(left, right);
         }
 
-        public override bool Equals(object obj) => obj is C other && this.Equals(other);
+        public override bool Equals(object? obj) => obj is C other && this.Equals(other);
 
         public override int GetHashCode() => this.P;
 

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0014PreferParameterTests
+﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
@@ -16,8 +16,6 @@ namespace Gu.Analyzers.Test.GU0014PreferParameterTests
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         private readonly string text;

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,9 +17,9 @@ namespace N
 
     public class C
     {
-        private EventHandler someEvent;
+        private EventHandler? someEvent;
 
-        public event EventHandler SomeEvent
+        public event EventHandler? SomeEvent
         {
             add { this.someEvent += value; }
             remove { this.someEvent -= value; }
@@ -250,7 +250,7 @@ namespace N
             this.D = d;
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int A
         {
@@ -308,7 +308,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

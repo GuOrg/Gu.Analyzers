@@ -115,7 +115,7 @@ namespace N
 
     public class C
     {
-        private Mock<IPlc> _plcMock;
+        private Mock<IPlc>? _plcMock;
 
         [SetUp]
         public void M()
@@ -146,8 +146,8 @@ namespace N
 
     public class C
     {
-        private Mock<IPlc> _plcMock1;
-        private Mock<IPlc> _plcMock2;
+        private Mock<IPlc>? _plcMock1;
+        private Mock<IPlc>? _plcMock2;
 
         [SetUp]
         public void M()
@@ -175,7 +175,6 @@ namespace N
 namespace N
 {
     using Moq;
-    using NUnit.Framework;
 
     public class C
     {

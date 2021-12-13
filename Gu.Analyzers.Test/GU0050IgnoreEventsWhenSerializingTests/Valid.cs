@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -16,28 +16,30 @@ namespace N
     using System;
 
     [Serializable]
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
         [field:NonSerialized]
-        public event EventHandler SomeEvent;
+        public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -55,7 +57,9 @@ namespace N
     public class C
     {
         [field:NonSerialized]
-        public event EventHandler E;
+        public event EventHandler? E;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -73,9 +77,9 @@ namespace N
     public class C
     {
         [NonSerialized]
-        private EventHandler e;
+        private EventHandler? e;
 
-        public event EventHandler E
+        public event EventHandler? E
         {
             add { this.e += value; }
             remove { this.e -= value; }
@@ -93,27 +97,30 @@ namespace N
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(int a, int b, int c, int d)
+        public C(int p1, int p2, int p3, int p4)
         {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
+            this.P1 = p1;
+            this.P2 = p2;
+            this.P3 = p3;
+            this.P4 = p4;
         }
 
-        public event EventHandler SomeEvent;
+        [field:NonSerialized]
+        public event EventHandler? E;
 
-        public int A { get; }
+        public int P1 { get; }
 
-        public int B { get; protected set;}
+        public int P2 { get; protected set;}
 
-        public int C { get; internal set; }
+        public int P3 { get; internal set; }
 
-        public int D { get; set; }
+        public int P4 { get; set; }
 
-        public int E => A;
+        public int P5 => P1;
+
+        public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.Valid(Analyzer, code);

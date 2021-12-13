@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
+﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -106,7 +106,7 @@ namespace N
             Console.CancelKeyPress += ↓OnCancelKeyPress;
         }
 
-        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        private static void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
         {
         }
     }
@@ -124,7 +124,7 @@ namespace N
             Console.CancelKeyPress += (sender, e) => OnCancelKeyPress(sender, e);
         }
 
-        private static void OnCancelKeyPress(object sender, ConsoleCancelEventArgs e)
+        private static void OnCancelKeyPress(object? sender, ConsoleCancelEventArgs e)
         {
         }
     }

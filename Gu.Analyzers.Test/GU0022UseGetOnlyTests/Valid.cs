@@ -101,6 +101,8 @@ namespace N
         public event EventHandler E;
 
         public int A { get; private set; }
+
+        public void M() => this.E.Invoke(this, EventArgs.Empty);
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -241,19 +243,19 @@ namespace N
             var code = @"
 namespace N
 {
-    interface IC
+    interface I
     {
-        object Value { get; set; }
+        object? Value { get; set; }
     }
 
-    class C<T> : IC
+    class C<T> : I
     {
-        public T Value { get; private set; }
+        public T? Value { get; private set; }
 
-        object IC.Value
+        object? I.Value
         {
             get { return this.Value; }
-            set { this.Value = (T)value; }
+            set { this.Value = (T?)value; }
         }
     }
 }";
@@ -266,19 +268,19 @@ namespace N
             var code = @"
 namespace N
 {
-    interface IC
+    interface I
     {
-        object Value { get; set; }
+        object? Value { get; set; }
     }
 
-    class C<T> : IC
+    class C<T> : I
     {
-        public T Value { get; private set; }
+        public T? Value { get; private set; }
 
-        object IC.Value
+        object? I.Value
         {
             get => this.Value;
-            set => this.Value = (T)value;
+            set => this.Value = (T?)value;
         }
     }
 }";

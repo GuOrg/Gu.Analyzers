@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
+﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -14,8 +14,6 @@ namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         private readonly int value;
@@ -86,7 +84,7 @@ namespace N
 {
     public class C
     {
-        public static bool TryGet(int i, out string text)
+        public static bool TryGet(int i, out string? text)
         {
             text = null;
             if (i > 10)
@@ -110,7 +108,7 @@ namespace N
 {
     public class C
     {
-        public static bool TryGet(int i, out string text)
+        public static bool TryGet(int i, out string? text)
         {
             if (i > 10)
             {
@@ -286,6 +284,7 @@ namespace N
         public static void WhenUsingTheValue2()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     public class C
