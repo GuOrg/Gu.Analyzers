@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Immutable;
     using System.Linq;
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;

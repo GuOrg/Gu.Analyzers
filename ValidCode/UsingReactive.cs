@@ -6,7 +6,6 @@ namespace ValidCode
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using Moq;
 
     internal abstract class UsingReactive : IDisposable
     {
