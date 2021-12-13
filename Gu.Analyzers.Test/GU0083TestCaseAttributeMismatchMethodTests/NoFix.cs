@@ -1,13 +1,12 @@
-namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     internal static class NoFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
+        private static readonly TestMethodParametersFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
         [TestCase("[TestCase(\"a\", ↓1, null)]")]

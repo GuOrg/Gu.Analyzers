@@ -1,14 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.CodeFixes
 {
     using Gu.Roslyn.Asserts;
-
-    using Microsoft.CodeAnalysis.CodeFixes;
-
     using NUnit.Framework;
 
     internal static partial class MakeStaticFixTests
     {
-        private static readonly CodeFixProvider Fix = new MakeStaticFix();
+        private static readonly MakeStaticFix Fix = new();
 
         // ReSharper disable once InconsistentNaming
         private static readonly ExpectedDiagnostic CS0708 = ExpectedDiagnostic.Create("CS0708");

@@ -1,15 +1,13 @@
-namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
+﻿namespace Gu.Analyzers.Test.GU0024SealTypeWithDefaultMemberTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
+        private static readonly ClassDeclarationAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0024SealTypeWithDefaultMember);
-        private static readonly CodeFixProvider Fix = new MakeSealedFix();
+        private static readonly MakeSealedFix Fix = new();
 
         [Test]
         public static void Field()

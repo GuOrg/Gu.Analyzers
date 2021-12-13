@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
+        private static readonly ClassDeclarationAnalyzer Analyzer = new();
 
         [Test]
         public static void WhenSealed()

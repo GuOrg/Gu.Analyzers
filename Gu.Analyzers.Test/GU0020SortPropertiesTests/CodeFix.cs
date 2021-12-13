@@ -1,14 +1,12 @@
-namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0020SortProperties();
-        private static readonly CodeFixProvider Fix = new SortPropertiesFix();
+        private static readonly GU0020SortProperties Analyzer = new();
+        private static readonly SortPropertiesFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0020SortProperties);
 
         [Test]

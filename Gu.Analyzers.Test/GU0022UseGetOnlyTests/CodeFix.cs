@@ -1,14 +1,12 @@
-namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
+﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0022UseGetOnly();
-        private static readonly CodeFixProvider Fix = new UseGetOnlyFix();
+        private static readonly GU0022UseGetOnly Analyzer = new();
+        private static readonly UseGetOnlyFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0022UseGetOnly);
 
         [Test]

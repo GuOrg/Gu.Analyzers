@@ -13,7 +13,7 @@
 
     internal static partial class MakeStaticFixTests
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FakeFxCopAnalyzer();
+        private static readonly FakeFxCopAnalyzer Analyzer = new();
 
         // ReSharper disable once InconsistentNaming
         private static readonly ExpectedDiagnostic CA1052 = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);

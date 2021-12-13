@@ -1,9 +1,8 @@
-namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,8 +10,8 @@ namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
 
     internal static class CodeFixWhenMissingTypeParameterDocsSA1618
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FakeStyleCopAnalyzer();
-        private static readonly CodeFixProvider Fix = new DocsFix();
+        private static readonly FakeStyleCopAnalyzer Analyzer = new();
+        private static readonly DocsFix Fix = new();
 
         [Test]
         public static void ForFirstParameterWhenSummaryOnly()

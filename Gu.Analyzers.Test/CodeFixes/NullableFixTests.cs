@@ -1,13 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.CodeFixes
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     internal static class NullableFixTests
     {
-        private static readonly CodeFixProvider Fix = new NullableFix();
+        private static readonly NullableFix Fix = new();
         private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
         private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
         private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");

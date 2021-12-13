@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0018NameMockTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new VariableDeclaratorAnalyzer();
+        private static readonly VariableDeclaratorAnalyzer Analyzer = new();
 
         [Test]
         public static void LocalSuffixed()

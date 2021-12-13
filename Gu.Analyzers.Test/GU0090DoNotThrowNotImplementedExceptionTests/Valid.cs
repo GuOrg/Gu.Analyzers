@@ -1,12 +1,11 @@
-namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
+﻿namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ExceptionAnalyzer();
+        private static readonly ExceptionAnalyzer Analyzer = new();
 
         [Test]
         public static void Rethrowing()

@@ -1,13 +1,12 @@
-namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
+﻿namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
         private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly CodeFixProvider Fix = new TestMethodParametersFix();
+        private static readonly TestMethodParametersFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch);
 
         [TestCase("string text")]

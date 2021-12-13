@@ -1,12 +1,11 @@
-namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
+﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new SimpleAssignmentAnalyzer();
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce);
 
         [Test]

@@ -1,14 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
-        private static readonly CodeFixProvider Fix = new DocsFix();
+        private static readonly DocsAnalyzer Analyzer = new();
+        private static readonly DocsFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongCrefType);
 
         [TestCase("string")]

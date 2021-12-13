@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
+        private static readonly IdentifierNameAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0017DoNotUseDiscarded);
 
         [TestCase("var o = ↓_ + 3;")]

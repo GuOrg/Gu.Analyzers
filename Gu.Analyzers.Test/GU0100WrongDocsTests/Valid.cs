@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DocsAnalyzer();
+        private static readonly DocsAnalyzer Analyzer = new();
 
         [TestCase("StringBuilder")]
         [TestCase("System.Text.StringBuilder")]

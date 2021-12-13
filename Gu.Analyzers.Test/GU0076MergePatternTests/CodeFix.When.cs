@@ -1,14 +1,13 @@
 ﻿namespace Gu.Analyzers.Test.GU0076MergePatternTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class When
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new WhenAnalyzer();
+            private static readonly WhenAnalyzer Analyzer = new();
 
             [Test]
             public static void RightEnum()

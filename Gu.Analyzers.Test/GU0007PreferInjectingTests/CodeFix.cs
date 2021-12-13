@@ -1,13 +1,11 @@
 namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
 
     internal static partial class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0007PreferInjecting();
-        private static readonly CodeFixProvider Fix = new InjectFix();
+        private static readonly GU0007PreferInjecting Analyzer = new();
+        private static readonly InjectFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0007PreferInjecting);
     }
 }

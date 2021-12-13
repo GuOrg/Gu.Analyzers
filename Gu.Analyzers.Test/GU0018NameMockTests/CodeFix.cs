@@ -1,15 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0018NameMockTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new VariableDeclaratorAnalyzer();
-        private static readonly CodeFixProvider Fix = new RenameFix();
+        private static readonly VariableDeclaratorAnalyzer Analyzer = new();
+        private static readonly RenameFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0018aNameMock);
 
         [Test]

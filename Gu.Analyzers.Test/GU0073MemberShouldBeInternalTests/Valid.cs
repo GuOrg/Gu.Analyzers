@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0073MemberShouldBeInternal();
+        private static readonly GU0073MemberShouldBeInternal Analyzer = new();
 
         [TestCase("internal readonly int F;")]
         [TestCase("internal event Action? E;")]

@@ -1,14 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0075PreferReturnNullable
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ParameterAnalyzer();
-        private static readonly CodeFixProvider Fix = new ReturnNullableFix();
+        private static readonly ParameterAnalyzer Analyzer = new();
+        private static readonly ReturnNullableFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0075PreferReturnNullable);
 
         [Test]

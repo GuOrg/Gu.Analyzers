@@ -1,8 +1,5 @@
 ﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
 {
-    using System;
-    using System.Collections.Generic;
-
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 

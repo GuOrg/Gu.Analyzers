@@ -1,12 +1,11 @@
 ﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new IdentifierNameAnalyzer();
+        private static readonly IdentifierNameAnalyzer Analyzer = new();
 
         [Test]
         public static void DiscardSymbol()

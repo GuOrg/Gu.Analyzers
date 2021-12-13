@@ -1,14 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0073MemberShouldBeInternal();
-        private static readonly CodeFixProvider Fix = new MakeInternalFix();
+        private static readonly GU0073MemberShouldBeInternal Analyzer = new();
+        private static readonly MakeInternalFix Fix = new();
 
         [Test]
         public static void Messages()

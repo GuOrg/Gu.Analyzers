@@ -1,18 +1,16 @@
 ﻿namespace Gu.Analyzers.Test.GU0074PreferPatternTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
-        private static readonly CodeFixProvider Fix = new PatternFix();
+        private static readonly PatternFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0074PreferPattern);
 
         public static class And
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new BinaryExpressionAnalyzer();
+            private static readonly BinaryExpressionAnalyzer Analyzer = new();
 
             [Test]
             public static void True()

@@ -1,14 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
-        private static readonly CodeFixProvider Fix = new UseParameterFix();
+        private static readonly ConstructorAnalyzer Analyzer = new();
+        private static readonly UseParameterFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0014PreferParameter);
 
         [Test]

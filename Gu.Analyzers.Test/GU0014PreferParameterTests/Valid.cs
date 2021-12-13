@@ -2,12 +2,11 @@
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ConstructorAnalyzer();
+        private static readonly ConstructorAnalyzer Analyzer = new();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.GU0014PreferParameter;
 
         [Test]

@@ -3,7 +3,6 @@
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,8 +10,8 @@
 
     internal static class StandardDocsForOperator
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FakeAnalyzer();
-        private static readonly CodeFixProvider Fix = new DocsFix();
+        private static readonly FakeAnalyzer Analyzer = new();
+        private static readonly DocsFix Fix = new();
 
         [Test]
         public static void OperatorEquals()

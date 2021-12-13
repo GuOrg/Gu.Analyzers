@@ -1,12 +1,11 @@
-namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
+﻿namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new GU0052ExceptionShouldBeSerializable();
+        private static readonly GU0052ExceptionShouldBeSerializable Analyzer = new();
 
         [Test]
         public static void WhenNoBaseClass()

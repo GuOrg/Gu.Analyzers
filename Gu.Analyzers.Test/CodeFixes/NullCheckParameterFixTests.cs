@@ -3,7 +3,6 @@
     using System.Collections.Immutable;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -11,8 +10,8 @@
 
     internal static class NullCheckParameterFixTests
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FakeFxCopAnalyzer();
-        private static readonly CodeFixProvider Fix = new NullCheckParameterFix();
+        private static readonly FakeFxCopAnalyzer Analyzer = new();
+        private static readonly NullCheckParameterFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
 
         [Test]
