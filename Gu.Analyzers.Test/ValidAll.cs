@@ -34,16 +34,13 @@
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void AnalyzerProject(DiagnosticAnalyzer analyzer)
         {
-            if (analyzer is SimpleAssignmentAnalyzer ||
-                analyzer is ParameterAnalyzer ||
-                analyzer is BinaryExpressionAnalyzer ||
-                analyzer is GU0007PreferInjecting)
+            if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer or BinaryExpressionAnalyzer or GU0007PreferInjecting)
             {
                 Analyze.GetDiagnostics(analyzer, AnalyzerProjectSln);
             }
             else
             {
-                RoslynAssert.Valid(analyzer, AnalyzerProjectSln);
+                RoslynAssert.NoAnalyzerDiagnostics(analyzer, AnalyzerProjectSln);
             }
         }
 
