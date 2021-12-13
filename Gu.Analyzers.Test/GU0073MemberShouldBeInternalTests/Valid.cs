@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -9,7 +9,7 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         private static readonly DiagnosticAnalyzer Analyzer = new GU0073MemberShouldBeInternal();
 
         [TestCase("internal readonly int F;")]
-        [TestCase("internal event Action E;")]
+        [TestCase("internal event Action? E;")]
         [TestCase("internal C() { }")]
         [TestCase("internal int P { get; }")]
         [TestCase("internal void M() { }")]
@@ -19,36 +19,38 @@ namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
         public static void InternalClass(string member)
         {
             var code = @"
+#pragma warning disable CS0067, CS0649, CS8019
 namespace N
 {
     using System;
 
     internal class C
     {
-        internal readonly int I; 
+        internal readonly int F; 
     }
-}".AssertReplace("internal readonly int I;", member);
+}".AssertReplace("internal readonly int F;", member);
 
             RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("public readonly int F;")]
-        [TestCase("public event Action E;")]
+        [TestCase("public event Action? E;")]
         [TestCase("public C() { }")]
         [TestCase("public int P { get; }")]
         [TestCase("public void M() { }")]
         public static void PublicClass(string member)
         {
             var code = @"
+#pragma warning disable CS0067, CS0649, CS8019
 namespace N
 {
     using System;
 
     public class C
     {
-        public readonly int I;
+        public readonly int F;
     }
-}".AssertReplace("public readonly int I;", member);
+}".AssertReplace("public readonly int F;", member);
 
             RoslynAssert.Valid(Analyzer, code);
         }
@@ -57,18 +59,19 @@ namespace N
         public static void InterfaceEvent()
         {
             var code = @"
+#pragma warning disable CS0067
 namespace N
 {
     using System;
 
-    internal class C : IC
+    internal class C : I
     {
-        public event Action E;
+        public event Action? E;
     }
 
-    public interface IC
+    public interface I
     {
-        event Action E;
+        event Action? E;
     }
 }";
 
@@ -79,24 +82,25 @@ namespace N
         public static void ExplicitInterfaceEvent()
         {
             var code = @"
+#pragma warning disable CS0067
 namespace N
 {
     using System;
 
-    internal class C : IC
+    internal class C : I
     {
-        private event Action E;
+        private event Action? E;
 
-        event Action IC.E
+        event Action? I.E
         {
             add => this.E += value;
             remove => this.E -= value;
         }
     }
 
-    public interface IC
+    public interface I
     {
-        event Action E;
+        event Action? E;
     }
 }";
 
@@ -107,18 +111,19 @@ namespace N
         public static void OverridingEvent()
         {
             var code = @"
+#pragma warning disable CS0067
 namespace N
 {
     using System;
 
     internal class C : Abstract
     {
-        public override event Action E;
+        public override event Action? E;
     }
 
     public abstract class Abstract
     {
-        public abstract event Action E;
+        public abstract event Action? E;
     }
 }";
 

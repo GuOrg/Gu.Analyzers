@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
+﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -95,7 +95,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class A
@@ -117,7 +116,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     class Lol

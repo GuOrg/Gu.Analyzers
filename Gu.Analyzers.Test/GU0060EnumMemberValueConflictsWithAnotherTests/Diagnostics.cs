@@ -121,8 +121,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public enum E
     {
         A,

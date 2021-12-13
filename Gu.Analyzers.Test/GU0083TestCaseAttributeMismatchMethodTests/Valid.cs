@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -308,6 +308,7 @@ namespace N
         public static void GenericFixtureWithTestCase(string constraints)
         {
             var code = @"
+#pragma warning disable CS8019
 namespace N
 {
     using System;

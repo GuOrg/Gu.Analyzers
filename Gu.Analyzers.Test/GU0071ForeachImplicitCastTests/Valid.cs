@@ -14,6 +14,7 @@
         public static void VarInAForeach(string type)
         {
             var code = @"
+#pragma warning disable CS8019
 namespace N
 {
     using System.Collections.Generic;
@@ -60,7 +61,6 @@ namespace N
 namespace N
 {
     using System.Collections;
-    using System.Collections.Generic;
 
     class C : IEnumerable<IEnumerable<char>>, IEnumerable<int>
     {
@@ -124,10 +124,9 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
-    class C
+    class C1
     {
         public IEnumerator<int> GetEnumerator()
         {
@@ -135,11 +134,11 @@ namespace N
         }
     }
 
-    public class A
+    public class C2
     {
         public void F()
         {
-            foreach(int a in new C())
+            foreach(int a in new C1())
             {
             }
         }

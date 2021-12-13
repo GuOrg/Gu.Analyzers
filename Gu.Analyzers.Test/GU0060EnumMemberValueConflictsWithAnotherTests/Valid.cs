@@ -51,8 +51,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public enum Bad
     {
         None,
@@ -70,8 +68,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public enum Bad
     {
         None,
@@ -89,8 +85,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public enum E
     {
         None = 0,

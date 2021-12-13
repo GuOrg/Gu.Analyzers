@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
+﻿namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -14,8 +14,6 @@ namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
             var code = @"
 namespace N
 {
-    using System;
-
     public enum EnumHigh
     {
         None = 0,

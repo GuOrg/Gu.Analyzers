@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -14,8 +14,6 @@ namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
-
     internal class C
     {
     }
@@ -35,8 +33,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
-
     internal class C1
     {
         private class C2

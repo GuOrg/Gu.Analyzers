@@ -14,6 +14,7 @@
         public static void Messages()
         {
             var before = @"
+#pragma warning disable CS0649
 namespace N
 {
     using System;
@@ -25,6 +26,7 @@ namespace N
 }";
 
             var after = @"
+#pragma warning disable CS0649
 namespace N
 {
     using System;
@@ -41,7 +43,7 @@ namespace N
         [TestCase("readonly int F;")]
         [TestCase("static readonly int F;")]
         [TestCase("C() { }")]
-        [TestCase("event Action E;")]
+        [TestCase("event Action? E;")]
         [TestCase("int P { get; }")]
         [TestCase("void M() { }")]
         [TestCase("enum E { }")]
@@ -50,6 +52,7 @@ namespace N
         public static void InternalClass(string member)
         {
             var before = @"
+#pragma warning disable CS0067, CS0649
 namespace N
 {
     using System;
@@ -61,6 +64,7 @@ namespace N
 }".AssertReplace("readonly int F;", member);
 
             var after = @"
+#pragma warning disable CS0067, CS0649
 namespace N
 {
     using System;

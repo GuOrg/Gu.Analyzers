@@ -15,7 +15,6 @@
         public static void InstanceMethodSingleParameter()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -35,7 +34,6 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -58,7 +56,6 @@ namespace N
         public static void InstanceMethodSingleGenericParameter()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -79,7 +76,6 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -103,7 +99,6 @@ namespace N
         public static void InstanceMethodTwoParameters()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -123,7 +118,6 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -146,7 +140,6 @@ namespace N
         public static void Switch()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -167,7 +160,6 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -194,7 +186,6 @@ namespace N
         public static void ReturnNotNull(string expression)
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -220,7 +211,6 @@ namespace N
 }".AssertReplace("s != null", expression);
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -251,7 +241,6 @@ namespace N
         public static void ReturnAssignedViaOut()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -277,7 +266,6 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -309,7 +297,6 @@ namespace N
         public static void AssignedNullInFirstStatement(string expression)
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
@@ -337,7 +324,6 @@ namespace N
 }".AssertReplace("s = null", expression);
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
@@ -369,13 +355,13 @@ namespace N
         public static void LocalFunction()
         {
             var before = @"
-#nullable enable
 namespace N
 {
     class C
     {
         void Outer()
         {
+#pragma warning disable CS8321
             bool M(↓out string? s)
             {
                 if (nameof(C).Length > 1)
@@ -392,13 +378,13 @@ namespace N
 }";
 
             var after = @"
-#nullable enable
 namespace N
 {
     class C
     {
         void Outer()
         {
+#pragma warning disable CS8321
             string? M()
             {
                 if (nameof(C).Length > 1)
