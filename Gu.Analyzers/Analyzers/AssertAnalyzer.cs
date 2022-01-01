@@ -1,39 +1,38 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System;
+using System.Collections.Immutable;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+internal class AssertAnalyzer : DiagnosticAnalyzer
 {
-    using System;
-    using System.Collections.Immutable;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        Descriptors.GU0084AssertExceptionMessage);
 
-    using Gu.Roslyn.AnalyzerExtensions;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class AssertAnalyzer : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext context)
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0084AssertExceptionMessage);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.InvocationExpression);
+    }
 
-        public override void Initialize(AnalysisContext context)
+    private static void Handle(SyntaxNodeAnalysisContext context)
+    {
+        if (!context.IsExcludedFromAnalysis() &&
+            context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { } name } } invocation &&
+            name.Identifier.ValueText.StartsWith("Throws", StringComparison.InvariantCulture))
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.InvocationExpression);
-        }
-
-        private static void Handle(SyntaxNodeAnalysisContext context)
-        {
-            if (!context.IsExcludedFromAnalysis() &&
-                context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { } name } } invocation &&
-                name.Identifier.ValueText.StartsWith("Throws", StringComparison.InvariantCulture))
+            if (invocation.Parent is ExpressionStatementSyntax ||
+                invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } })
             {
-                if (invocation.Parent is ExpressionStatementSyntax ||
-                    invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } })
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0084AssertExceptionMessage, invocation.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0084AssertExceptionMessage, invocation.GetLocation()));
             }
         }
     }

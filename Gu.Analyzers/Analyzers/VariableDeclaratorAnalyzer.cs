@@ -1,135 +1,134 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.CodeFixExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+internal class VariableDeclaratorAnalyzer : DiagnosticAnalyzer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        Descriptors.GU0018aNameMock,
+        Descriptors.GU0018bNameMock);
 
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.CodeFixExtensions;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class VariableDeclaratorAnalyzer : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext context)
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0018aNameMock,
-            Descriptors.GU0018bNameMock);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.VariableDeclarator);
+    }
 
-        public override void Initialize(AnalysisContext context)
+    private static void Handle(SyntaxNodeAnalysisContext context)
+    {
+        if (!context.IsExcludedFromAnalysis() &&
+            context.Node is VariableDeclaratorSyntax variable &&
+            context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out var symbol) &&
+            Type(symbol) is { } type &&
+            type is { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
+            typeArguments[0] is INamedTypeSymbol typeArgument &&
+            type == KnownSymbols.MoqMockOfT &&
+            ShouldRename(variable) is { } renameTo)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.VariableDeclarator);
+            if (variable.Identifier.ValueText == "mock")
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.GU0018bNameMock,
+                        variable.Identifier.GetLocation(),
+                        ImmutableDictionary.CreateRange(
+                            new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
+            }
+            else
+            {
+                context.ReportDiagnostic(
+                    Diagnostic.Create(
+                        Descriptors.GU0018aNameMock,
+                        variable.Identifier.GetLocation(),
+                        ImmutableDictionary.CreateRange(
+                            new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
+            }
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext context)
+        static INamedTypeSymbol? Type(ISymbol symbol)
         {
-            if (!context.IsExcludedFromAnalysis() &&
-                context.Node is VariableDeclaratorSyntax variable &&
-                context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out var symbol) &&
-                Type(symbol) is { } type &&
-                type is { IsGenericType: true, TypeArguments: { Length: 1 } typeArguments } &&
-                typeArguments[0] is INamedTypeSymbol typeArgument &&
-                type == KnownSymbols.MoqMockOfT &&
-                ShouldRename(variable) is { } renameTo)
+            return symbol switch
             {
-                if (variable.Identifier.ValueText == "mock")
-                {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptors.GU0018bNameMock,
-                            variable.Identifier.GetLocation(),
-                            ImmutableDictionary.CreateRange(
-                                new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
-                }
-                else
-                {
-                    context.ReportDiagnostic(
-                        Diagnostic.Create(
-                            Descriptors.GU0018aNameMock,
-                            variable.Identifier.GetLocation(),
-                            ImmutableDictionary.CreateRange(
-                                new[] { new KeyValuePair<string, string?>("Name", renameTo) })));
-                }
-            }
+                ILocalSymbol local => local.Type as INamedTypeSymbol,
+                IFieldSymbol field => field.Type as INamedTypeSymbol,
+                _ => null,
+            };
+        }
 
-            static INamedTypeSymbol? Type(ISymbol symbol)
+        string? ShouldRename(VariableDeclaratorSyntax current)
+        {
+            if (symbol is ILocalSymbol &&
+                current.FirstAncestor<MethodDeclarationSyntax>() is { } method)
             {
-                return symbol switch
+                using var walker = VariableDeclaratorWalker.Borrow(method);
+                foreach (var declarator in walker.VariableDeclarators)
                 {
-                    ILocalSymbol local => local.Type as INamedTypeSymbol,
-                    IFieldSymbol field => field.Type as INamedTypeSymbol,
-                    _ => null,
-                };
-            }
-
-            string? ShouldRename(VariableDeclaratorSyntax current)
-            {
-                if (symbol is ILocalSymbol &&
-                    current.FirstAncestor<MethodDeclarationSyntax>() is { } method)
-                {
-                    using var walker = VariableDeclaratorWalker.Borrow(method);
-                    foreach (var declarator in walker.VariableDeclarators)
-                    {
-                        if (declarator != current &&
-                            context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out ILocalSymbol? local) &&
-                            local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } args } &&
-                           SymbolEqualityComparer.Default.Equals(args[0], typeArgument))
-                        {
-                            return null;
-                        }
-                    }
-                }
-
-                if (symbol is IFieldSymbol field)
-                {
-                    if (field.DeclaredAccessibility != Accessibility.Private ||
-                        field.IsStatic)
+                    if (declarator != current &&
+                        context.SemanticModel.TryGetSymbol(variable, context.CancellationToken, out ILocalSymbol? local) &&
+                        local.Type is INamedTypeSymbol { IsGenericType: true, TypeArguments: { Length: 1 } args } &&
+                        SymbolEqualityComparer.Default.Equals(args[0], typeArgument))
                     {
                         return null;
                     }
+                }
+            }
 
-                    foreach (var other in field.ContainingType.GetMembers())
+            if (symbol is IFieldSymbol field)
+            {
+                if (field.DeclaredAccessibility != Accessibility.Private ||
+                    field.IsStatic)
+                {
+                    return null;
+                }
+
+                foreach (var other in field.ContainingType.GetMembers())
+                {
+                    if (!SymbolEqualityComparer.Default.Equals(other, symbol) &&
+                        other is IFieldSymbol otherField &&
+                        SymbolEqualityComparer.Default.Equals(otherField.Type, field.Type))
                     {
-                        if (!SymbolEqualityComparer.Default.Equals(other, symbol) &&
-                            other is IFieldSymbol otherField &&
-                            SymbolEqualityComparer.Default.Equals(otherField.Type, field.Type))
-                        {
-                            return null;
-                        }
+                        return null;
                     }
                 }
-
-                var expectedName = typeArgument switch
-                {
-                    { TypeKind: TypeKind.Interface, IsGenericType: false }
-                        when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Mock",
-                    { TypeKind: TypeKind.Interface, IsGenericType: true, TypeArguments: { Length: 1 } arguments }
-                        when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Of{arguments[0].Name}Mock",
-                    _ => null,
-                };
-
-                if (expectedName is null)
-                {
-                    return null;
-                }
-
-                if (current.Identifier.ValueText.IsParts("_", expectedName) ||
-                    current.Identifier.ValueText == expectedName)
-                {
-                    return null;
-                }
-
-                return expectedName;
-
-                string Prefix() => current.Identifier.ValueText.StartsWith("_", StringComparison.InvariantCulture)
-                    ? "_"
-                    : string.Empty;
             }
+
+            var expectedName = typeArgument switch
+            {
+                { TypeKind: TypeKind.Interface, IsGenericType: false }
+                    when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Mock",
+                { TypeKind: TypeKind.Interface, IsGenericType: true, TypeArguments: { Length: 1 } arguments }
+                    when typeArgument.Name.StartsWith("I", StringComparison.InvariantCulture) => $"{Prefix()}{typeArgument.Name.Substring(1).ToFirstCharLower()}Of{arguments[0].Name}Mock",
+                _ => null,
+            };
+
+            if (expectedName is null)
+            {
+                return null;
+            }
+
+            if (current.Identifier.ValueText.IsParts("_", expectedName) ||
+                current.Identifier.ValueText == expectedName)
+            {
+                return null;
+            }
+
+            return expectedName;
+
+            string Prefix() => current.Identifier.ValueText.StartsWith("_", StringComparison.InvariantCulture)
+                ? "_"
+                : string.Empty;
         }
     }
 }

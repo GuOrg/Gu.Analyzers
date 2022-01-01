@@ -1,15 +1,14 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class NUnitAssertType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod AreEqual;
 
-    internal class NUnitAssertType : QualifiedType
+    internal NUnitAssertType()
+        : base("NUnit.Framework.Assert")
     {
-        internal readonly QualifiedMethod AreEqual;
-
-        internal NUnitAssertType()
-            : base("NUnit.Framework.Assert")
-        {
-            this.AreEqual = new QualifiedMethod(this, nameof(this.AreEqual));
-        }
+        this.AreEqual = new QualifiedMethod(this, nameof(this.AreEqual));
     }
 }

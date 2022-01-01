@@ -1,191 +1,190 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System;
+using System.Collections.Immutable;
+using System.Composition;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.CodeFixExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ReturnNullableFix))]
+[Shared]
+internal class ReturnNullableFix : DocumentEditorCodeFixProvider
 {
-    using System;
-    using System.Collections.Immutable;
-    using System.Composition;
-    using System.Linq;
-    using System.Threading.Tasks;
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+        Descriptors.GU0075PreferReturnNullable.Id);
 
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.CodeFixExtensions;
+    protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ReturnNullableFix))]
-    [Shared]
-    internal class ReturnNullableFix : DocumentEditorCodeFixProvider
+    protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.GU0075PreferReturnNullable.Id);
+        var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
+                                      .ConfigureAwait(false);
 
-        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
-
-        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
+        foreach (var diagnostic in context.Diagnostics)
         {
-            var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
-
-            foreach (var diagnostic in context.Diagnostics)
+            if (syntaxRoot is { } &&
+                syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
+                parameter is { Parent: ParameterListSyntax { Parent: { } methodOrLocalFunction } })
             {
-                if (syntaxRoot is { } &&
-                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ParameterSyntax? parameter) &&
-                    parameter is { Parent: ParameterListSyntax { Parent: { } methodOrLocalFunction } })
+                if (CanRewrite())
                 {
-                    if (CanRewrite())
-                    {
-                        context.RegisterCodeFix(
-                            "Return nullable",
-                            (editor, _) => editor.ReplaceNode(
-                                methodOrLocalFunction,
-                                x => Rewriter.Update(parameter, x)),
-                            "Return nullable",
-                            diagnostic);
-                    }
-                    else
-                    {
-                        context.RegisterCodeFix(
-                            "UNSAFE Return nullable",
-                            (editor, _) => editor.ReplaceNode(
-                                methodOrLocalFunction,
-                                x => Rewriter.Update(parameter, x)),
-                            "UNSAFE Return nullable",
-                            diagnostic);
-                    }
+                    context.RegisterCodeFix(
+                        "Return nullable",
+                        (editor, _) => editor.ReplaceNode(
+                            methodOrLocalFunction,
+                            x => Rewriter.Update(parameter, x)),
+                        "Return nullable",
+                        diagnostic);
+                }
+                else
+                {
+                    context.RegisterCodeFix(
+                        "UNSAFE Return nullable",
+                        (editor, _) => editor.ReplaceNode(
+                            methodOrLocalFunction,
+                            x => Rewriter.Update(parameter, x)),
+                        "UNSAFE Return nullable",
+                        diagnostic);
+                }
 
-                    bool CanRewrite()
+                bool CanRewrite()
+                {
+                    using var walker = ReturnValueWalker.Borrow(methodOrLocalFunction);
+                    foreach (var value in walker.ReturnValues)
                     {
-                        using var walker = ReturnValueWalker.Borrow(methodOrLocalFunction);
-                        foreach (var value in walker.ReturnValues)
+                        switch (value)
                         {
-                            switch (value)
-                            {
-                                case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax statement }
-                                    when IsPreviousStatementAssigning(statement, parameter!):
-                                case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
-                                case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ }
-                                    when left.Identifier.ValueText == parameter!.Identifier.ValueText:
-                                    break;
-                                default:
-                                    return false;
-                            }
+                            case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax statement }
+                                when IsPreviousStatementAssigning(statement, parameter!):
+                            case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
+                            case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ }
+                                when left.Identifier.ValueText == parameter!.Identifier.ValueText:
+                                break;
+                            default:
+                                return false;
                         }
-
-                        return true;
                     }
+
+                    return true;
                 }
             }
         }
+    }
 
-        private static bool IsPreviousStatementAssigning(StatementSyntax statement, ParameterSyntax parameter)
+    private static bool IsPreviousStatementAssigning(StatementSyntax statement, ParameterSyntax parameter)
+    {
+        return Statements() is { } statements &&
+               statements.TryElementAt(statements.IndexOf(statement) - 1, out var previous) &&
+               previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } } &&
+               left.Identifier.ValueText == parameter.Identifier.ValueText;
+
+        SyntaxList<StatementSyntax>? Statements()
         {
-            return Statements() is { } statements &&
-                   statements.TryElementAt(statements.IndexOf(statement) - 1, out var previous) &&
-                   previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } } &&
-                   left.Identifier.ValueText == parameter.Identifier.ValueText;
-
-            SyntaxList<StatementSyntax>? Statements()
+            return statement.Parent switch
             {
-                return statement.Parent switch
-                {
-                    BlockSyntax { Statements: { } ss } => ss,
-                    SwitchSectionSyntax { Statements: { } ss } => ss,
-                    _ => null,
-                };
-            }
+                BlockSyntax { Statements: { } ss } => ss,
+                SwitchSectionSyntax { Statements: { } ss } => ss,
+                _ => null,
+            };
+        }
+    }
+
+    private class Rewriter : CSharpSyntaxRewriter
+    {
+        private readonly ParameterSyntax parameter;
+
+        private Rewriter(ParameterSyntax parameter)
+        {
+            this.parameter = parameter;
         }
 
-        private class Rewriter : CSharpSyntaxRewriter
+        public override SyntaxNode? VisitParameterList(ParameterListSyntax node)
         {
-            private readonly ParameterSyntax parameter;
+            return node.RemoveNode(
+                node.Parameters.Single(x => x.IsEquivalentTo(this.parameter)),
+                SyntaxRemoveOptions.AddElasticMarker);
+        }
 
-            private Rewriter(ParameterSyntax parameter)
+        public override SyntaxNode? VisitReturnStatement(ReturnStatementSyntax node)
+        {
+            return node switch
             {
-                this.parameter = parameter;
-            }
+                { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
+                { Parent: SwitchSectionSyntax { Statements: { Count: 1 } }, Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => node.WithExpression(SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)),
+                { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
+                { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
+                    when left.Identifier.ValueText == this.parameter.Identifier.ValueText
+                    => node.WithExpression(left.WithoutTrailingTrivia()),
+                { Expression: { } expression }
+                    => node.WithExpression(
+                        SyntaxFactory.ConditionalExpression(
+                            expression,
+                            SyntaxFactory.IdentifierName(this.parameter.Identifier),
+                            SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression))),
+                _ => node,
+            };
+        }
 
-            public override SyntaxNode? VisitParameterList(ParameterListSyntax node)
+        public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
+        {
+            if (node is { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } assignment } &&
+                left.Identifier.ValueText == this.parameter.Identifier.ValueText)
             {
-                return node.RemoveNode(
-                    node.Parameters.Single(x => x.IsEquivalentTo(this.parameter)),
-                    SyntaxRemoveOptions.AddElasticMarker);
-            }
-
-            public override SyntaxNode? VisitReturnStatement(ReturnStatementSyntax node)
-            {
-                return node switch
+                if (node.Parent is BlockSyntax { Statements: { } statements, Parent: { } parent } &&
+                    statements[0] == node &&
+                    parent.IsEither(SyntaxKind.MethodDeclaration, SyntaxKind.LocalFunctionStatement))
                 {
-                    { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
-                    { Parent: SwitchSectionSyntax { Statements: { Count: 1 } }, Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => node.WithExpression(SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)),
-                    { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
-                    { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
-                        when left.Identifier.ValueText == this.parameter.Identifier.ValueText
-                        => node.WithExpression(left.WithoutTrailingTrivia()),
-                    { Expression: { } expression }
-                        => node.WithExpression(
-                            SyntaxFactory.ConditionalExpression(
-                                expression,
-                                SyntaxFactory.IdentifierName(this.parameter.Identifier),
-                                SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression))),
-                    _ => node,
+                    return null;
+                }
+
+                return SyntaxFactory.ReturnStatement(assignment.Right);
+            }
+
+            return base.VisitExpressionStatement(node);
+        }
+
+        public override SyntaxNode VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
+        {
+            if (node is { ParameterList: { Parameters: { } parameters } } &&
+                parameters.Any(x => x.IsEquivalentTo(this.parameter)))
+            {
+                return base.VisitLocalFunctionStatement(node)!;
+            }
+
+            return node;
+        }
+
+        internal static SyntaxNode Update(ParameterSyntax parameter, SyntaxNode method)
+        {
+            return method switch
+            {
+                MethodDeclarationSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
+                LocalFunctionStatementSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
+                _ => throw new NotSupportedException($"Not handling {method.Kind()} yet."),
+            };
+
+            T UpdateCore<T>(T node)
+                where T : SyntaxNode
+            {
+                return (T)new Rewriter(parameter).Visit(node);
+            }
+
+            TypeSyntax ReturnType()
+            {
+                return parameter.Type switch
+                {
+                    NullableTypeSyntax nullable => nullable,
+                    { } type => SyntaxFactory.NullableType(type),
+                    _ => throw new NotSupportedException($"Missing type."),
                 };
-            }
-
-            public override SyntaxNode? VisitExpressionStatement(ExpressionStatementSyntax node)
-            {
-                if (node is { Expression: AssignmentExpressionSyntax { Left: IdentifierNameSyntax left } assignment } &&
-                    left.Identifier.ValueText == this.parameter.Identifier.ValueText)
-                {
-                    if (node.Parent is BlockSyntax { Statements: { } statements, Parent: { } parent } &&
-                        statements[0] == node &&
-                        parent.IsEither(SyntaxKind.MethodDeclaration, SyntaxKind.LocalFunctionStatement))
-                    {
-                        return null;
-                    }
-
-                    return SyntaxFactory.ReturnStatement(assignment.Right);
-                }
-
-                return base.VisitExpressionStatement(node);
-            }
-
-            public override SyntaxNode VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
-            {
-                if (node is { ParameterList: { Parameters: { } parameters } } &&
-                    parameters.Any(x => x.IsEquivalentTo(this.parameter)))
-                {
-                    return base.VisitLocalFunctionStatement(node)!;
-                }
-
-                return node;
-            }
-
-            internal static SyntaxNode Update(ParameterSyntax parameter, SyntaxNode method)
-            {
-                return method switch
-                {
-                    MethodDeclarationSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
-                    LocalFunctionStatementSyntax m => UpdateCore(m).WithReturnType(ReturnType().WithTriviaFrom(m.ReturnType)),
-                    _ => throw new NotSupportedException($"Not handling {method.Kind()} yet."),
-                };
-
-                T UpdateCore<T>(T node)
-                    where T : SyntaxNode
-                {
-                    return (T)new Rewriter(parameter).Visit(node);
-                }
-
-                TypeSyntax ReturnType()
-                {
-                    return parameter.Type switch
-                    {
-                        NullableTypeSyntax nullable => nullable,
-                        { } type => SyntaxFactory.NullableType(type),
-                        _ => throw new NotSupportedException($"Missing type."),
-                    };
-                }
             }
         }
     }

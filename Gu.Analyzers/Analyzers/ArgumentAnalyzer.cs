@@ -1,90 +1,89 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System;
+using System.Collections.Immutable;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+internal class ArgumentAnalyzer : DiagnosticAnalyzer
 {
-    using System;
-    using System.Collections.Immutable;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        Descriptors.GU0009UseNamedParametersForBooleans);
 
-    using Gu.Roslyn.AnalyzerExtensions;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class ArgumentAnalyzer : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext context)
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0009UseNamedParametersForBooleans);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.Argument);
+    }
 
-        public override void Initialize(AnalysisContext context)
+    private static void Handle(SyntaxNodeAnalysisContext context)
+    {
+        if (!context.IsExcludedFromAnalysis() &&
+            context.Node is ArgumentSyntax { Expression: { } expression, Parent: ArgumentListSyntax { Parent: { } parent } } argument)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.Argument);
-        }
-
-        private static void Handle(SyntaxNodeAnalysisContext context)
-        {
-            if (!context.IsExcludedFromAnalysis() &&
-                context.Node is ArgumentSyntax { Expression: { } expression, Parent: ArgumentListSyntax { Parent: { } parent } } argument)
+            if (ShouldName())
             {
-                if (ShouldName())
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans, argument.GetLocation()));
-                }
-            }
-
-            bool ShouldName()
-            {
-                return argument.NameColon is null &&
-                       expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
-                       !argument.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
-                       context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
-                       method.FindParameter(argument) is { Type: { SpecialType: SpecialType.System_Boolean } } parameter &&
-                       parameter.OriginalDefinition.Type.SpecialType == SpecialType.System_Boolean &&
-                       !IsIgnored(method, context.Compilation);
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans, argument.GetLocation()));
             }
         }
 
-        private static bool IsIgnored(IMethodSymbol methodSymbol, Compilation compilation)
+        bool ShouldName()
         {
-            return IsDisposePattern(methodSymbol) ||
-                   IsConfigureAwait(methodSymbol) ||
-                   IsAttachedSetMethod(methodSymbol, compilation) ||
-                   methodSymbol == KnownSymbols.NUnitAssert.AreEqual ||
-                   methodSymbol == KnownSymbols.XunitAssert.Equal;
+            return argument.NameColon is null &&
+                   expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
+                   !argument.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
+                   context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
+                   method.FindParameter(argument) is { Type: { SpecialType: SpecialType.System_Boolean } } parameter &&
+                   parameter.OriginalDefinition.Type.SpecialType == SpecialType.System_Boolean &&
+                   !IsIgnored(method, context.Compilation);
+        }
+    }
+
+    private static bool IsIgnored(IMethodSymbol methodSymbol, Compilation compilation)
+    {
+        return IsDisposePattern(methodSymbol) ||
+               IsConfigureAwait(methodSymbol) ||
+               IsAttachedSetMethod(methodSymbol, compilation) ||
+               methodSymbol == KnownSymbols.NUnitAssert.AreEqual ||
+               methodSymbol == KnownSymbols.XunitAssert.Equal;
+    }
+
+    private static bool IsConfigureAwait(IMethodSymbol methodSymbol)
+    {
+        return methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
+               parameters[0].Type.SpecialType == SpecialType.System_Boolean;
+    }
+
+    private static bool IsDisposePattern(IMethodSymbol methodSymbol)
+    {
+        return methodSymbol is { Name: "Dispose", Parameters: { Length: 1 } parameters } &&
+               parameters[0].Type.SpecialType == SpecialType.System_Boolean;
+    }
+
+    private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
+    {
+        if (!method.ReturnsVoid ||
+            method.AssociatedSymbol != null)
+        {
+            return false;
         }
 
-        private static bool IsConfigureAwait(IMethodSymbol methodSymbol)
+        if (method.IsStatic)
         {
-            return methodSymbol is { Name: "ConfigureAwait", Parameters: { Length: 1 } parameters } &&
-                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
-        }
-
-        private static bool IsDisposePattern(IMethodSymbol methodSymbol)
-        {
-            return methodSymbol is { Name: "Dispose", Parameters: { Length: 1 } parameters } &&
-                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
-        }
-
-        private static bool IsAttachedSetMethod(IMethodSymbol method, Compilation compilation)
-        {
-            if (!method.ReturnsVoid ||
-                method.AssociatedSymbol != null)
-            {
-                return false;
-            }
-
-            if (method.IsStatic)
-            {
-                return method.Parameters.Length == 2 &&
-                       method.Parameters[0].Type.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
-                       method.Name.StartsWith("Set", StringComparison.Ordinal);
-            }
-
-            return method is { ReceiverType: { } receiver, IsExtensionMethod: true, Parameters: { Length: 1 } } &&
-                   receiver.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
+            return method.Parameters.Length == 2 &&
+                   method.Parameters[0].Type.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
                    method.Name.StartsWith("Set", StringComparison.Ordinal);
         }
+
+        return method is { ReceiverType: { } receiver, IsExtensionMethod: true, Parameters: { Length: 1 } } &&
+               receiver.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
+               method.Name.StartsWith("Set", StringComparison.Ordinal);
     }
 }

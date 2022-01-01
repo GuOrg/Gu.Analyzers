@@ -1,15 +1,14 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class XunitAssertType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Equal;
 
-    internal class XunitAssertType : QualifiedType
+    internal XunitAssertType()
+        : base("Xunit.Assert")
     {
-        internal readonly QualifiedMethod Equal;
-
-        internal XunitAssertType()
-            : base("Xunit.Assert")
-        {
-            this.Equal = new QualifiedMethod(this, nameof(this.Equal));
-        }
+        this.Equal = new QualifiedMethod(this, nameof(this.Equal));
     }
 }

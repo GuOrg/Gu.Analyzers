@@ -1,38 +1,37 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System.Collections.Immutable;
+using System.Composition;
+using System.Threading.Tasks;
+
+using Gu.Roslyn.CodeFixExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeSealedFix))]
+[Shared]
+internal class MakeSealedFix : DocumentEditorCodeFixProvider
 {
-    using System.Collections.Immutable;
-    using System.Composition;
-    using System.Threading.Tasks;
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+        Descriptors.GU0024SealTypeWithDefaultMember.Id,
+        Descriptors.GU0025SealTypeWithOverridenEquality.Id);
 
-    using Gu.Roslyn.CodeFixExtensions;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MakeSealedFix))]
-    [Shared]
-    internal class MakeSealedFix : DocumentEditorCodeFixProvider
+    protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.GU0024SealTypeWithDefaultMember.Id,
-            Descriptors.GU0025SealTypeWithOverridenEquality.Id);
+        var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
+                                      .ConfigureAwait(false);
 
-        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
+        foreach (var diagnostic in context.Diagnostics)
         {
-            var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
-
-            foreach (var diagnostic in context.Diagnostics)
+            if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ClassDeclarationSyntax classDeclaration)
             {
-                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ClassDeclarationSyntax classDeclaration)
-                {
-                    context.RegisterCodeFix(
-                        "Make sealed.",
-                        (editor, _) => editor.Seal(classDeclaration),
-                        "Make sealed.",
-                        diagnostic);
-                }
+                context.RegisterCodeFix(
+                    "Make sealed.",
+                    (editor, _) => editor.Seal(classDeclaration),
+                    "Make sealed.",
+                    diagnostic);
             }
         }
     }

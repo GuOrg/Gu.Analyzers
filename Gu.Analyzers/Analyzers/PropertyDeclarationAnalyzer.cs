@@ -1,84 +1,83 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System.Collections.Immutable;
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
 {
-    using System.Collections.Immutable;
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        Descriptors.GU0008AvoidRelayProperties,
+        Descriptors.GU0021CalculatedPropertyAllocates);
 
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext context)
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0008AvoidRelayProperties,
-            Descriptors.GU0021CalculatedPropertyAllocates);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.PropertyDeclaration);
+    }
 
-        public override void Initialize(AnalysisContext context)
+    private static void Handle(SyntaxNodeAnalysisContext context)
+    {
+        if (context.IsExcludedFromAnalysis())
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.PropertyDeclaration);
+            return;
         }
 
-        private static void Handle(SyntaxNodeAnalysisContext context)
+        if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
+            context.ContainingSymbol is IPropertySymbol { GetMethod: { } } property &&
+            ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
         {
-            if (context.IsExcludedFromAnalysis())
+            if (property is { Type: { IsReferenceType: true }, SetMethod: null } &&
+                returnValue is ObjectCreationExpressionSyntax)
             {
-                return;
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
             }
-
-            if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-                context.ContainingSymbol is IPropertySymbol { GetMethod: { } } property &&
-                ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
+            else if (returnValue is MemberAccessExpressionSyntax memberAccess &&
+                     IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
             {
-                if (property is { Type: { IsReferenceType: true }, SetMethod: null } &&
-                    returnValue is ObjectCreationExpressionSyntax)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
-                }
-                else if (returnValue is MemberAccessExpressionSyntax memberAccess &&
-                         IsRelayReturn(memberAccess, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0008AvoidRelayProperties, memberAccess.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0008AvoidRelayProperties, memberAccess.GetLocation()));
             }
         }
+    }
 
-        private static bool IsRelayReturn(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private static bool IsRelayReturn(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        return memberAccess switch
         {
-            return memberAccess switch
-            {
-                { Expression: IdentifierNameSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
-                { Expression: MemberAccessExpressionSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
-                _ => false,
-            };
+            { Expression: IdentifierNameSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
+            { Expression: MemberAccessExpressionSyntax expression, Name: IdentifierNameSyntax _ } => IsAssignedWithInjected(expression),
+            _ => false,
+        };
 
-            bool IsAssignedWithInjected(ExpressionSyntax candidate)
-            {
-                return semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol? member) &&
-                       FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
-                       memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                       IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken);
-            }
+        bool IsAssignedWithInjected(ExpressionSyntax candidate)
+        {
+            return semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol? member) &&
+                   FieldOrProperty.TryCreate(member, out FieldOrProperty fieldOrProperty) &&
+                   memberAccess.TryFirstAncestor<TypeDeclarationSyntax>(out var typeDeclaration) &&
+                   IsInjected(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken);
         }
+    }
 
-        private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, SearchScope.Instance, semanticModel, cancellationToken))
         {
-            using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, SearchScope.Instance, semanticModel, cancellationToken))
+            foreach (var assignment in walker.Assignments)
             {
-                foreach (var assignment in walker.Assignments)
+                if (assignment.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _) &&
+                    semanticModel.GetSymbolSafe(assignment.Right, cancellationToken) is IParameterSymbol)
                 {
-                    if (assignment.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _) &&
-                        semanticModel.GetSymbolSafe(assignment.Right, cancellationToken) is IParameterSymbol)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
-
-            return false;
         }
+
+        return false;
     }
 }

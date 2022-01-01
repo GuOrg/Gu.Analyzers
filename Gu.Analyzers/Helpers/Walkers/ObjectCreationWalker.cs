@@ -1,31 +1,30 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System.Collections.Generic;
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+internal sealed class ObjectCreationWalker : PooledWalker<ObjectCreationWalker>
 {
-    using System.Collections.Generic;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    private readonly List<ObjectCreationExpressionSyntax> objectCreations = new();
 
-    internal sealed class ObjectCreationWalker : PooledWalker<ObjectCreationWalker>
+    private ObjectCreationWalker()
     {
-        private readonly List<ObjectCreationExpressionSyntax> objectCreations = new();
+    }
 
-        private ObjectCreationWalker()
-        {
-        }
+    internal IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
 
-        internal IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
+    public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+    {
+        this.objectCreations.Add(node);
+        base.VisitObjectCreationExpression(node);
+    }
 
-        public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-        {
-            this.objectCreations.Add(node);
-            base.VisitObjectCreationExpression(node);
-        }
+    internal static ObjectCreationWalker BorrowAndVisit(SyntaxNode scope) => BorrowAndVisit(scope, () => new ObjectCreationWalker());
 
-        internal static ObjectCreationWalker BorrowAndVisit(SyntaxNode scope) => BorrowAndVisit(scope, () => new ObjectCreationWalker());
-
-        protected override void Clear()
-        {
-            this.objectCreations.Clear();
-        }
+    protected override void Clear()
+    {
+        this.objectCreations.Clear();
     }
 }

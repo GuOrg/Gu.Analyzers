@@ -1,19 +1,18 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class StringBuilderType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod AppendLine;
+    internal readonly QualifiedMethod Append;
+    internal readonly QualifiedMethod AppendFormat;
 
-    internal class StringBuilderType : QualifiedType
+    internal StringBuilderType()
+        : base("System.Text.StringBuilder")
     {
-        internal readonly QualifiedMethod AppendLine;
-        internal readonly QualifiedMethod Append;
-        internal readonly QualifiedMethod AppendFormat;
-
-        internal StringBuilderType()
-            : base("System.Text.StringBuilder")
-        {
-            this.AppendLine = new QualifiedMethod(this, nameof(this.AppendLine));
-            this.Append = new QualifiedMethod(this, nameof(this.Append));
-            this.AppendFormat = new QualifiedMethod(this, nameof(this.AppendFormat));
-        }
+        this.AppendLine = new QualifiedMethod(this, nameof(this.AppendLine));
+        this.Append = new QualifiedMethod(this, nameof(this.Append));
+        this.AppendFormat = new QualifiedMethod(this, nameof(this.AppendFormat));
     }
 }

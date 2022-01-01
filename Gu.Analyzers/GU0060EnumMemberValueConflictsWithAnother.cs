@@ -1,116 +1,115 @@
-﻿namespace Gu.Analyzers
+﻿namespace Gu.Analyzers;
+
+using System;
+using System.Collections.Immutable;
+using System.Globalization;
+using System.Threading;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+[DiagnosticAnalyzer(LanguageNames.CSharp)]
+internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
 {
-    using System;
-    using System.Collections.Immutable;
-    using System.Globalization;
-    using System.Threading;
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+        Descriptors.GU0060EnumMemberValueConflictsWithAnother);
 
-    using Gu.Roslyn.AnalyzerExtensions;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
+    public override void Initialize(AnalysisContext context)
     {
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.GU0060EnumMemberValueConflictsWithAnother);
+        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
+        context.EnableConcurrentExecution();
+        context.RegisterSyntaxNodeAction(x => Handle(x), SyntaxKind.EnumDeclaration);
+    }
 
-        public override void Initialize(AnalysisContext context)
+    private static void Handle(SyntaxNodeAnalysisContext context)
+    {
+        if (!context.IsExcludedFromAnalysis() &&
+            context.Node is EnumDeclarationSyntax enumDeclaration)
         {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(x => Handle(x), SyntaxKind.EnumDeclaration);
-        }
-
-        private static void Handle(SyntaxNodeAnalysisContext context)
-        {
-            if (!context.IsExcludedFromAnalysis() &&
-                context.Node is EnumDeclarationSyntax enumDeclaration)
+            if (enumDeclaration.AttributeLists.TryFind(KnownSymbols.FlagsAttribute, context.SemanticModel, context.CancellationToken, out _))
             {
-                if (enumDeclaration.AttributeLists.TryFind(KnownSymbols.FlagsAttribute, context.SemanticModel, context.CancellationToken, out _))
+                ulong bitSumOfLiterals = 0;
+                foreach (var enumMember in enumDeclaration.Members)
                 {
-                    ulong bitSumOfLiterals = 0;
-                    foreach (var enumMember in enumDeclaration.Members)
+                    if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
                     {
-                        if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
+                        var value = UnboxUMaxInt(constantValue);
+                        if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
+                            (bitSumOfLiterals & value) != 0)
                         {
-                            var value = UnboxUMaxInt(constantValue);
-                            if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
-                                (bitSumOfLiterals & value) != 0)
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
-                            }
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
+                        }
 
-                            bitSumOfLiterals |= value;
-                        }
-                        else
-                        {
-                            return;
-                        }
+                        bitSumOfLiterals |= value;
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
-                else
+            }
+            else
+            {
+                using var enumValuesSet = PooledSet<ulong>.Borrow();
+                foreach (var enumMember in enumDeclaration.Members)
                 {
-                    using var enumValuesSet = PooledSet<ulong>.Borrow();
-                    foreach (var enumMember in enumDeclaration.Members)
+                    if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
                     {
-                        if (context.SemanticModel.GetDeclaredSymbol(enumMember, context.CancellationToken) is { ConstantValue: { } constantValue })
+                        var value = UnboxUMaxInt(constantValue);
+                        if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
+                            enumValuesSet.Contains(value))
                         {
-                            var value = UnboxUMaxInt(constantValue);
-                            if (!IsDerivedFromOtherEnumMembers(enumMember, context.SemanticModel, context.CancellationToken) &&
-                                enumValuesSet.Contains(value))
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
-                            }
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0060EnumMemberValueConflictsWithAnother, enumMember.GetLocation()));
+                        }
 
-                            enumValuesSet.Add(value);
-                        }
-                        else
-                        {
-                            return;
-                        }
+                        enumValuesSet.Add(value);
+                    }
+                    else
+                    {
+                        return;
                     }
                 }
             }
         }
+    }
 
-        private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
+    private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        if (enumMember is { EqualsValue: { Value: { } value } } &&
+            !value.IsKind(SyntaxKind.NumericLiteralExpression))
         {
-            if (enumMember is { EqualsValue: { Value: { } value } } &&
-                !value.IsKind(SyntaxKind.NumericLiteralExpression))
+            foreach (var node in value.DescendantNodesAndSelf())
             {
-                foreach (var node in value.DescendantNodesAndSelf())
+                switch (node)
                 {
-                    switch (node)
-                    {
-                        case IdentifierNameSyntax identifier
-                            when semanticModel.GetSymbolSafe(identifier, cancellationToken) is { ContainingType: { } containingType } &&
-                                 containingType.TypeKind != TypeKind.Enum:
-                            return false;
-                        case LiteralExpressionSyntax _:
-                            return false;
-                    }
+                    case IdentifierNameSyntax identifier
+                        when semanticModel.GetSymbolSafe(identifier, cancellationToken) is { ContainingType: { } containingType } &&
+                             containingType.TypeKind != TypeKind.Enum:
+                        return false;
+                    case LiteralExpressionSyntax _:
+                        return false;
                 }
-
-                return true;
             }
 
-            return false;
+            return true;
         }
 
-        // unboxes a boxed integral value to ulong, regardless of the original boxed type
-        // negative values are converted to their U2 representation
-        // see http://stackoverflow.com/a/10022661/1012936
-        private static ulong UnboxUMaxInt(object a)
+        return false;
+    }
+
+    // unboxes a boxed integral value to ulong, regardless of the original boxed type
+    // negative values are converted to their U2 representation
+    // see http://stackoverflow.com/a/10022661/1012936
+    private static ulong UnboxUMaxInt(object a)
+    {
+        return a switch
         {
-            return a switch
-            {
-                ulong ul => ul,
-                _ => (ulong)Convert.ToInt64(a, CultureInfo.InvariantCulture),
-            };
-        }
+            ulong ul => ul,
+            _ => (ulong)Convert.ToInt64(a, CultureInfo.InvariantCulture),
+        };
     }
 }

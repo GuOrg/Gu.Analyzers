@@ -1,27 +1,26 @@
-namespace Gu.Analyzers
+namespace Gu.Analyzers;
+
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+internal static class StandardDocs
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-    internal static class StandardDocs
+    private static readonly List<(QualifiedType, string)> Cache = new()
     {
-        private static readonly List<(QualifiedType, string)> Cache = new()
-        {
-            (KnownSymbols.CancellationToken, "The <see cref=\"CancellationToken\"/> that cancels the operation."),
-        };
+        (KnownSymbols.CancellationToken, "The <see cref=\"CancellationToken\"/> that cancels the operation."),
+    };
 
-        internal static bool TryGet(ParameterSyntax parameter, [NotNullWhen(true)] out string? text)
+    internal static bool TryGet(ParameterSyntax parameter, [NotNullWhen(true)] out string? text)
+    {
+        if (Cache.TryFirst(x => parameter.Type == x.Item1, out var tuple))
         {
-            if (Cache.TryFirst(x => parameter.Type == x.Item1, out var tuple))
-            {
-                text = tuple.Item2;
-                return true;
-            }
-
-            text = null;
-            return false;
+            text = tuple.Item2;
+            return true;
         }
+
+        text = null;
+        return false;
     }
 }
