@@ -21,4 +21,17 @@ class C
 }";
         RoslynAssert.Valid(Analyzer, code);
     }
+
+    [Test]
+    public static void Index()
+    {
+        var code = @"
+namespace N;
+
+class C
+{
+    public int M(int[] xs) => xs[1];
+}";
+        RoslynAssert.Valid(Analyzer, code);
+    }
 }

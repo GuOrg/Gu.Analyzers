@@ -25,7 +25,8 @@ internal class RangeAnalyzer : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is BracketedArgumentListSyntax { } range &&
+            context.Node is BracketedArgumentListSyntax { Arguments: { Count: 1 } arguments } range &&
+            arguments[0] is { Expression: RangeExpressionSyntax { } } &&
             Allocates(range))
         {
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0026RangeAllocation, range.GetLocation()));
