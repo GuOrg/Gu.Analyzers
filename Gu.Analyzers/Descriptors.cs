@@ -238,6 +238,15 @@ internal static class Descriptors
         isEnabledByDefault: true,
         description: "Seal type with overridden equality.");
 
+    internal static readonly DiagnosticDescriptor GU0026RangeAllocation = Create(
+        id: "GU0026",
+        title: "Range operator allocates",
+        messageFormat: "Range operator allocates",
+        category: AnalyzerCategory.Correctness,
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: "Range operator on array or string allocates.");
+
     internal static readonly DiagnosticDescriptor GU0050IgnoreEventsWhenSerializing = Create(
         id: "GU0050",
         title: "Ignore events when serializing",
