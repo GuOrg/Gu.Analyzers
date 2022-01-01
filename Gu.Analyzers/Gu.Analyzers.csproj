@@ -26,12 +26,15 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      2.0.1
+      GU0019: Warn on IEnumerable&lt;struct&gt;.FirstOrDefault()
+      GU0026: Warn on array[1..] as it allocates
       2.0.0
       BREAKING: For VS2022+ now.
       BUGFIX: AD0001 -&gt; Could not load file or assembly
