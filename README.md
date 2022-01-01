@@ -29,6 +29,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 | [GU0017](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0017.md)| Don't use discarded
 | [GU0018a](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018a.md)| Name mock
 | [GU0018b](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0018b.md)| Name mock
+| [GU0019](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0019.md)| LinqOrDefault when IEnumerable<struct>
 | [GU0020](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0020.md)| Sort properties
 | [GU0021](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0021.md)| Calculated property allocates reference type
 | [GU0022](https://github.com/GuOrg/Gu.Analyzers/blob/master/documentation/GU0022.md)| Use get-only

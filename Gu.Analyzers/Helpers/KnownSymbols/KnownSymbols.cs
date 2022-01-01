@@ -31,6 +31,7 @@ internal static class KnownSymbols
     internal static readonly StringBuilderType StringBuilder = new();
 
     internal static readonly IEnumerableType IEnumerable = new();
+    internal static readonly EnumerableType Enumerable = new();
     internal static readonly TaskType Task = new();
     internal static readonly QualifiedType CancellationToken = new(typeof(CancellationToken).FullName!);
     internal static readonly QualifiedType TaskOfT = new("System.Threading.Tasks.Task`1");

@@ -1,4 +1,4 @@
-namespace Gu.Analyzers;
+﻿namespace Gu.Analyzers;
 
 using Gu.Roslyn.AnalyzerExtensions;
 

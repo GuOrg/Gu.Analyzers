@@ -40,8 +40,7 @@ internal class GU0071ForeachImplicitCast : DiagnosticAnalyzer
     private static bool? EnumeratorTypeMatchesTheVariableType(SyntaxNodeAnalysisContext context, ForEachStatementSyntax forEachStatement)
     {
         var enumerableType = context.SemanticModel.GetTypeInfoSafe(forEachStatement.Expression, context.CancellationToken);
-        if (enumerableType.Type is IErrorTypeSymbol ||
-            enumerableType.Type is null)
+        if (enumerableType.Type is IErrorTypeSymbol or null)
         {
             return null;
         }
