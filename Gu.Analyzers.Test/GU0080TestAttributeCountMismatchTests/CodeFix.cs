@@ -1,19 +1,19 @@
-﻿namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
+﻿namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
+    private static readonly TestMethodParametersFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch);
 
-    internal static class CodeFix
+    [TestCase("string text")]
+    [TestCase("string text, int index, bool value")]
+    public static void TestAttributeAndParameter(string parameters)
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly TestMethodParametersFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0080TestAttributeCountMismatch);
-
-        [TestCase("string text")]
-        [TestCase("string text, int index, bool value")]
-        public static void TestAttributeAndParameter(string parameters)
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -27,7 +27,7 @@ namespace N
     }
 }".AssertReplace("string text", parameters);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -40,13 +40,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void TestCaseAttributeAndParameter()
-        {
-            var before = @"
+    [Test]
+    public static void TestCaseAttributeAndParameter()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -60,7 +60,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -73,16 +73,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [TestCase("int i, int j")]
-        [TestCase("string i, int j")]
-        [TestCase("string i, int j, int k")]
-        [TestCase("string i,string j, int k, int l")]
-        public static void TestCaseAttributeAndTooManyParameters(string parameters)
-        {
-            var before = @"
+    [TestCase("int i, int j")]
+    [TestCase("string i, int j")]
+    [TestCase("string i, int j, int k")]
+    [TestCase("string i,string j, int k, int l")]
+    public static void TestCaseAttributeAndTooManyParameters(string parameters)
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -96,7 +96,7 @@ namespace N
     }
 }".AssertReplace("int i, int j", parameters);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -110,13 +110,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -129,7 +129,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

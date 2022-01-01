@@ -1,29 +1,29 @@
-﻿namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
+﻿namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0052ExceptionShouldBeSerializable Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void WhenNoBaseClass()
     {
-        private static readonly GU0052ExceptionShouldBeSerializable Analyzer = new();
-
-        [Test]
-        public static void WhenNoBaseClass()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
     {
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenSerializable()
-        {
-            var code = @"
+    [Test]
+    public static void WhenSerializable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -37,13 +37,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenSerializableAndObsoleteSameList()
-        {
-            var code = @"
+    [Test]
+    public static void WhenSerializableAndObsoleteSameList()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -57,13 +57,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenSerializableAndObsoleteDifferentLists()
-        {
-            var code = @"
+    [Test]
+    public static void WhenSerializableAndObsoleteDifferentLists()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -78,13 +78,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExtendedWithAttribute()
-        {
-            var code = @"
+    [Test]
+    public static void ExtendedWithAttribute()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -107,7 +107,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

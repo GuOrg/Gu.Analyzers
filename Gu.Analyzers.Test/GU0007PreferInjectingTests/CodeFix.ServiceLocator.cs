@@ -1,13 +1,13 @@
-namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace Gu.Analyzers.Test.GU0007PreferInjectingTests;
 
-    internal static partial class CodeFix
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
+{
+    internal static class ServiceLocatorTests
     {
-        internal static class ServiceLocatorTests
-        {
-            private const string Bar = @"
+        private const string Bar = @"
 namespace N
 {
     public class Bar
@@ -22,7 +22,7 @@ namespace N
     }
 }";
 
-            private const string AbstractC = @"
+        private const string AbstractC = @"
 namespace N
 {
     public abstract class AbstractC
@@ -36,7 +36,7 @@ namespace N
     }
 }";
 
-            private const string ServiceLocator = @"
+        private const string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator
@@ -53,10 +53,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void AssigningThisFieldInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningThisFieldInCtor()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -70,7 +70,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -83,13 +83,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void AssigningUnderscoreFieldInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningUnderscoreFieldInCtor()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -103,7 +103,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -116,13 +116,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingFieldInitializationWithNameCollision()
-            {
-                var enumCode = @"
+        [Test]
+        public static void WhenNotInjectingFieldInitializationWithNameCollision()
+        {
+            var enumCode = @"
 namespace N
 {
     public enum Meh
@@ -130,7 +130,7 @@ namespace N
         Bar
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C
@@ -147,7 +147,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -163,13 +163,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, enumCode, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, enumCode, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void FieldInitializationAndBaseCall()
-            {
-                var before = @"
+        [Test]
+        public static void FieldInitializationAndBaseCall()
+        {
+            var before = @"
 namespace N
 {
     public class C : AbstractC
@@ -184,7 +184,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C : AbstractC
@@ -198,13 +198,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void FieldInitializationAndBaseCallUnderscoreNames()
-            {
-                var before = @"
+        [Test]
+        public static void FieldInitializationAndBaseCallUnderscoreNames()
+        {
+            var before = @"
 namespace N
 {
     public class C : AbstractC
@@ -219,7 +219,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C : AbstractC
@@ -233,13 +233,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingMethodInjectedLocator()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingMethodInjectedLocator()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -255,7 +255,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -273,13 +273,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInMethod()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInMethod()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -298,7 +298,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -318,13 +318,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInLambdaClosure()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInLambdaClosure()
+        {
+            var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -341,7 +341,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -357,13 +357,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInTwoMethods()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInTwoMethods()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -387,7 +387,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -412,13 +412,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInMethodUnderscoreNames()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInMethodUnderscoreNames()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -437,7 +437,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -457,13 +457,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInMethodAndBaseCall()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInMethodAndBaseCall()
+        {
+            var before = @"
 namespace N
 {
     public class C : AbstractC
@@ -483,7 +483,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C : AbstractC
@@ -504,13 +504,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenUsingLocatorInStaticMethod()
-            {
-                var before = @"
+        [Test]
+        public static void WhenUsingLocatorInStaticMethod()
+        {
+            var before = @"
 namespace N
 {
     public class C : AbstractC
@@ -530,7 +530,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C : AbstractC
@@ -549,8 +549,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Bar, ServiceLocator, AbstractC, before }, after, fixTitle: "Inject safe.");
         }
     }
 }

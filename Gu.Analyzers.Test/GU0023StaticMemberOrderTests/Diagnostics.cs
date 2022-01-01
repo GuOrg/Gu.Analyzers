@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
+﻿namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0023StaticMemberOrderAnalyzer Analyzer = new();
 
-    internal static class Diagnostics
+    [Test]
+    public static void Message()
     {
-        private static readonly GU0023StaticMemberOrderAnalyzer Analyzer = new();
-
-        [Test]
-        public static void Message()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -20,13 +20,13 @@ namespace N
         public static readonly int Value2 = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'N.C.Value2' must be declared before 'N.C.Value1'"), code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.Create("GU0023", "Member 'N.C.Value2' must be declared before 'N.C.Value1'"), code);
+    }
 
-        [Test]
-        public static void StaticFieldInitializedWithField()
-        {
-            var code = @"
+    [Test]
+    public static void StaticFieldInitializedWithField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -36,13 +36,13 @@ namespace N
         public static readonly int Value2 = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstFieldInitializedWithField()
-        {
-            var code = @"
+    [Test]
+    public static void ConstFieldInitializedWithField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -52,13 +52,13 @@ namespace N
         public const int Value2 = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyInitializedWithProperty()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyInitializedWithProperty()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -68,13 +68,13 @@ namespace N
         public static int Value2 { get; } = 2;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldInitializedWithFieldViaMethod()
-        {
-            var code = @"
+    [Test]
+    public static void FieldInitializedWithFieldViaMethod()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -86,13 +86,13 @@ namespace N
         private static int Id(int value) => value;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void DefaultFieldUsingStaticField()
-        {
-            var code = @"
+    [Test]
+    public static void DefaultFieldUsingStaticField()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -104,13 +104,13 @@ namespace N
         public string Text { get; set; } = text;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void PartialSameDocument()
-        {
-            var code = @"
+    [Test]
+    public static void PartialSameDocument()
+    {
+        var code = @"
 namespace N
 {
     partial class C
@@ -122,13 +122,13 @@ namespace N
        private static int F2 = 1;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void PartialDifferentDocuments()
-        {
-            var code1 = @"
+    [Test]
+    public static void PartialDifferentDocuments()
+    {
+        var code1 = @"
 namespace N
 {
     partial class C
@@ -137,7 +137,7 @@ namespace N
     }
 }";
 
-            var code2 = @"
+        var code2 = @"
 namespace N
 {
     partial class C
@@ -145,7 +145,6 @@ namespace N
        private static int F2 = 1;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, code1, code2);
-        }
+        RoslynAssert.Diagnostics(Analyzer, code1, code2);
     }
 }

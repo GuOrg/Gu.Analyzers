@@ -1,16 +1,16 @@
-namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests;
 
-    internal static partial class CodeFixWhenMissingParameterDocsSA1611
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFixWhenMissingParameterDocsSA1611
+{
+    internal static class SpecialType
     {
-        internal static class SpecialType
+        [Test]
+        public static void StandardTextForCancellationToken()
         {
-            [Test]
-            public static void StandardTextForCancellationToken()
-            {
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.Threading;
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.Threading;
@@ -42,8 +42,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Generate standard xml documentation for parameter.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Generate standard xml documentation for parameter.");
         }
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void NoAuthor()
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-
-        [Test]
-        public static void NoAuthor()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -23,16 +23,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("[TestCase(\"a\", \"b\", null)]")]
-        [TestCase("[TestCase(null, \"a\", \"b\")]")]
-        [TestCase("[TestCase(\"a\", null, \"b\")]")]
-        [TestCase("[TestCase(null, null, null)]")]
-        public static void NullArgument(string testCase)
-        {
-            var code = @"
+    [TestCase("[TestCase(\"a\", \"b\", null)]")]
+    [TestCase("[TestCase(null, \"a\", \"b\")]")]
+    [TestCase("[TestCase(\"a\", null, \"b\")]")]
+    [TestCase("[TestCase(null, null, null)]")]
+    public static void NullArgument(string testCase)
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -46,13 +46,13 @@ namespace N
     }
 }".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArgumentIsNullAndParameterIsNullableInt()
-        {
-            var code = @"
+    [Test]
+    public static void ArgumentIsNullAndParameterIsNullableInt()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -65,13 +65,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void WithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -84,13 +84,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NullArgumentWithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void NullArgumentWithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -103,13 +103,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArrayOfInts()
-        {
-            var code = @"
+    [Test]
+    public static void ArrayOfInts()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -122,13 +122,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArraysOfDifferentTypes()
-        {
-            var code = @"
+    [Test]
+    public static void ArraysOfDifferentTypes()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -141,13 +141,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ParameterOfTypeObject()
-        {
-            var code = @"
+    [Test]
+    public static void ParameterOfTypeObject()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -160,13 +160,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ParameterOfInterfaceType()
-        {
-            var code = @"
+    [Test]
+    public static void ParameterOfInterfaceType()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -181,13 +181,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StringComparison()
-        {
-            var code = @"
+    [Test]
+    public static void StringComparison()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -201,13 +201,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StringAndStringComparison()
-        {
-            var code = @"
+    [Test]
+    public static void StringAndStringComparison()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -221,13 +221,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IntToDouble()
-        {
-            var code = @"
+    [Test]
+    public static void IntToDouble()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -240,13 +240,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ShortToInt()
-        {
-            var code = @"
+    [Test]
+    public static void ShortToInt()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -259,13 +259,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IntToShort()
-        {
-            var code = @"
+    [Test]
+    public static void IntToShort()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -278,13 +278,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -298,16 +298,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("where T : struct")]
-        [TestCase("where T : IComparable")]
-        [TestCase("where T : IComparable<T>")]
-        [TestCase("where T : struct, IComparable<T>, IComparable")]
-        public static void GenericFixtureWithTestCase(string constraints)
-        {
-            var code = @"
+    [TestCase("where T : struct")]
+    [TestCase("where T : IComparable")]
+    [TestCase("where T : IComparable<T>")]
+    [TestCase("where T : struct, IComparable<T>, IComparable")]
+    public static void GenericFixtureWithTestCase(string constraints)
+    {
+        var code = @"
 #pragma warning disable CS8019
 namespace N
 {
@@ -326,7 +326,6 @@ namespace N
     }
 }".AssertReplace("where T : struct, IComparable<T>, IComparable", constraints);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

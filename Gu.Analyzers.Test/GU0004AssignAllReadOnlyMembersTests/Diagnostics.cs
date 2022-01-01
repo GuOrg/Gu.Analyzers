@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
+﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ConstructorAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0004AssignAllReadOnlyMembers);
 
-    internal static class Diagnostics
+    [Test]
+    public static void Message()
     {
-        private static readonly ConstructorAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0004AssignAllReadOnlyMembers);
-
-        [Test]
-        public static void Message()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -27,14 +27,14 @@ namespace N
     }
 }";
 
-            var message = "The following readonly members are not assigned: B";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), code);
-        }
+        var message = "The following readonly members are not assigned: B";
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage(message), code);
+    }
 
-        [Test]
-        public static void NotSettingGetOnlyProperty()
-        {
-            var code = @"
+    [Test]
+    public static void NotSettingGetOnlyProperty()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -50,13 +50,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void NotSettingGetOnlyPropertyInOneCtor()
-        {
-            var code = @"
+    [Test]
+    public static void NotSettingGetOnlyPropertyInOneCtor()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -89,13 +89,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void NotSettingReadOnlyField()
-        {
-            var code = @"
+    [Test]
+    public static void NotSettingReadOnlyField()
+    {
+        var code = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -111,13 +111,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void StaticConstructorSettingProperties()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorSettingProperties()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -132,13 +132,13 @@ namespace N
         public static int B { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void StaticConstructorNotSettingField()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorNotSettingField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -154,7 +154,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

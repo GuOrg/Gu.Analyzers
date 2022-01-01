@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests
+﻿namespace Gu.Analyzers.Test.GU0004AssignAllReadOnlyMembersTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ConstructorAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ConstructorSettingProperties()
     {
-        private static readonly ConstructorAnalyzer Analyzer = new();
-
-        [Test]
-        public static void ConstructorSettingProperties()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -26,13 +26,13 @@ namespace N
         public int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingPropertiesStruct()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingPropertiesStruct()
+    {
+        var code = @"
 namespace N
 {
     public struct Foo
@@ -48,13 +48,13 @@ namespace N
         public int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticConstructorSettingProperties()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorSettingProperties()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -70,13 +70,13 @@ namespace N
         public static int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingAllFields()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingAllFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -91,13 +91,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingFieldRef()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingFieldRef()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -115,13 +115,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingFieldOut()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingFieldOut()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -139,13 +139,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ChainedConstructorSettingAllFields()
-        {
-            var code = @"
+    [Test]
+    public static void ChainedConstructorSettingAllFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -165,13 +165,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenNoUninitializedFields()
-        {
-            var code = @"
+    [Test]
+    public static void WhenNoUninitializedFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -185,13 +185,13 @@ namespace N
         public int A => a;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticConstructorSettingFields()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorSettingFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -207,13 +207,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticConstructorSettingQualifiedFields()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorSettingQualifiedFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -229,13 +229,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticConstructorSettingUninitializedField()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConstructorSettingUninitializedField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -251,13 +251,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingReadonlyFieldIgnoringMutable()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingReadonlyFieldIgnoringMutable()
+    {
+        var code = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -273,13 +273,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingPropertiesIgnoringMutable()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingPropertiesIgnoringMutable()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -294,13 +294,13 @@ namespace N
         public int B { get; private set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingReadonlyFieldIgnoringInitialized()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingReadonlyFieldIgnoringInitialized()
+    {
+        var code = @"
 #pragma warning disable CS0414
 namespace N
 {
@@ -315,13 +315,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingPropertiesIgnoringInitialized()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingPropertiesIgnoringInitialized()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -336,13 +336,13 @@ namespace N
         public int B { get; } = 6;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreAbstract()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreAbstract()
+    {
+        var code = @"
 namespace N
 {
     public abstract class C
@@ -357,13 +357,13 @@ namespace N
         public abstract int OtherValue { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreIndexer()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreIndexer()
+    {
+        var code = @"
 namespace N
 {
     public abstract class C
@@ -378,13 +378,13 @@ namespace N
         public int this[int index] => index;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreCalculatedStatementBody()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreCalculatedStatementBody()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -405,13 +405,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreCalculatedExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreCalculatedExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -426,7 +426,6 @@ namespace N
         public int Value => this.value;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

@@ -1,21 +1,21 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class NullableFixTests
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly NullableFix Fix = new();
+    private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
+    private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
+    private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
+    private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' must contain a non-null value when exiting constructor. Consider declaring the event as nullable.");
+    private static readonly ExpectedDiagnostic CS8765 = ExpectedDiagnostic.Create("CS8765");
 
-    internal static class NullableFixTests
+    [Test]
+    public static void AddNotNullWhenAndUsing()
     {
-        private static readonly NullableFix Fix = new();
-        private static readonly ExpectedDiagnostic CS8600 = ExpectedDiagnostic.Create("CS8600");
-        private static readonly ExpectedDiagnostic CS8601 = ExpectedDiagnostic.Create("CS8601");
-        private static readonly ExpectedDiagnostic CS8625 = ExpectedDiagnostic.Create("CS8625");
-        private static readonly ExpectedDiagnostic CS8618 = ExpectedDiagnostic.Create("CS8618", "Non-nullable event 'E' must contain a non-null value when exiting constructor. Consider declaring the event as nullable.");
-        private static readonly ExpectedDiagnostic CS8765 = ExpectedDiagnostic.Create("CS8765");
-
-        [Test]
-        public static void AddNotNullWhenAndUsing()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public static class C
@@ -34,7 +34,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -54,13 +54,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8625, before, after);
+    }
 
-        [Test]
-        public static void NoFixWhenLocalFunction()
-        {
-            var before = @"
+    [Test]
+    public static void NoFixWhenLocalFunction()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -84,13 +84,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(new PlaceholderAnalyzer(CS8625.Id), Fix, CS8625, before);
-        }
+        RoslynAssert.NoFix(new PlaceholderAnalyzer(CS8625.Id), Fix, CS8625, before);
+    }
 
-        [Test]
-        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithNullLiteral()
-        {
-            var before = @"
+    [Test]
+    public static void AddNotNullWhenTrueWhenAssigningOutParameterWithNullLiteral()
+    {
+        var before = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -112,7 +112,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -133,13 +133,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8625, before, after);
+    }
 
-        [Test]
-        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithAs()
-        {
-            var before = @"
+    [Test]
+    public static void AddNotNullWhenTrueWhenAssigningOutParameterWithAs()
+    {
+        var before = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -155,7 +155,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -170,13 +170,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8601, before, after);
+    }
 
-        [Test]
-        public static void AddNotNullWhenTrueWhenAssigningOutParameterWithOut()
-        {
-            var before = @"
+    [Test]
+    public static void AddNotNullWhenTrueWhenAssigningOutParameterWithOut()
+    {
+        var before = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -196,7 +196,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -215,13 +215,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8601, before, after);
+    }
 
-        [Test]
-        public static void FlowOutType()
-        {
-            var before = @"
+    [Test]
+    public static void FlowOutType()
+    {
+        var before = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -241,7 +241,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -260,13 +260,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8600, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8600, before, after);
+    }
 
-        [Test]
-        public static void AddMaybeNullWhenFalse()
-        {
-            var before = @"
+    [Test]
+    public static void AddMaybeNullWhenFalse()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -285,7 +285,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -305,13 +305,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8601, before, after);
+    }
 
-        [Test]
-        public static void AddMaybeNullWhenFalseDefaultOfT()
-        {
-            var before = @"
+    [Test]
+    public static void AddMaybeNullWhenFalseDefaultOfT()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -330,7 +330,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -350,13 +350,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8601, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8601, before, after);
+    }
 
-        [Test]
-        public static void MakeOptionalParameterNullable()
-        {
-            var before = @"
+    [Test]
+    public static void MakeOptionalParameterNullable()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -367,7 +367,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -377,13 +377,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8625, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8625, before, after);
+    }
 
-        [Test]
-        public static void MakeEventNullable()
-        {
-            var before = @"
+    [Test]
+    public static void MakeEventNullable()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -399,7 +399,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -414,13 +414,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8618, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8618, before, after);
+    }
 
-        [Test]
-        public static void Equals()
-        {
-            var before = @"
+    [Test]
+    public static void Equals()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -454,7 +454,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -487,7 +487,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS8765, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS8765, before, after);
     }
 }

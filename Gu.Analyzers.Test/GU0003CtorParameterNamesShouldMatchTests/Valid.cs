@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ConstructorAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ConstructorSettingProperties()
     {
-        private static readonly ConstructorAnalyzer Analyzer = new();
-
-        [Test]
-        public static void ConstructorSettingProperties()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class Foo
@@ -32,13 +32,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingPropertiesStruct()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingPropertiesStruct()
+    {
+        var code = @"
 namespace N
 {
     public struct Foo
@@ -60,13 +60,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ChainedConstructorSettingProperties()
-        {
-            var code = @"
+    [Test]
+    public static void ChainedConstructorSettingProperties()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -93,13 +93,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void BaseConstructorCall()
-        {
-            var c1 = @"
+    [Test]
+    public static void BaseConstructorCall()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -122,7 +122,7 @@ namespace N
     }
 }";
 
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2 : C1
@@ -133,13 +133,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, c2);
-        }
+        RoslynAssert.Valid(Analyzer, c1, c2);
+    }
 
-        [Test]
-        public static void ConstructorSettingField()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -158,13 +158,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingFieldPrefixedByUnderscore()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingFieldPrefixedByUnderscore()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -183,13 +183,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenSettingTwoProperties()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenSettingTwoProperties()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -205,13 +205,13 @@ namespace N
         public int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenBaseIsParams()
-        {
-            var c1 = @"
+    [Test]
+    public static void IgnoresWhenBaseIsParams()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -225,7 +225,7 @@ namespace N
     }
 }";
 
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2 : C1
@@ -237,13 +237,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, c1, c2);
-        }
+        RoslynAssert.Valid(Analyzer, c1, c2);
+    }
 
-        [Test]
-        public static void IgnoresWhenBaseIsParams2()
-        {
-            var c1 = @"
+    [Test]
+    public static void IgnoresWhenBaseIsParams2()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -259,7 +259,7 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2 : C1
@@ -271,13 +271,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, c1, c2);
-        }
+        RoslynAssert.Valid(Analyzer, c1, c2);
+    }
 
-        [Test]
-        public static void IgnoresIdCaps()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresIdCaps()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -290,13 +290,13 @@ namespace N
         public int ID { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresTupleCreate()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresTupleCreate()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -313,13 +313,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresNumbered()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresNumbered()
+    {
+        var code = @"
 namespace N
 {
     public class C1 : C2
@@ -340,13 +340,13 @@ namespace N
         public int[] Values { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoredWhenAssigningWeakReferenceTarget()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoredWhenAssigningWeakReferenceTarget()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -362,13 +362,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenUsingParameterAsTwoArguments()
-        {
-            var code = @"
+    [Test]
+    public static void WhenUsingParameterAsTwoArguments()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -388,13 +388,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ThrowExpressionNameofOther()
-        {
-            var code = @"
+    [Test]
+    public static void ThrowExpressionNameofOther()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -410,13 +410,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NullChecksAndThrowingForWrong()
-        {
-            var code = @"
+    [Test]
+    public static void NullChecksAndThrowingForWrong()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -439,7 +439,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

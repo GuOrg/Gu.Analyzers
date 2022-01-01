@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests
+﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ClassDeclarationAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0025SealTypeWithOverridenEquality);
+    private static readonly MakeSealedFix Fix = new();
 
-    internal static class CodeFix
+    [Test]
+    public static void Field()
     {
-        private static readonly ClassDeclarationAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0025SealTypeWithOverridenEquality);
-        private static readonly MakeSealedFix Fix = new();
-
-        [Test]
-        public static void Field()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class ↓C
@@ -37,7 +37,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public sealed class C
@@ -61,7 +61,6 @@ namespace N
         private bool Equals(C other) => this.P == other.P;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Make sealed.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Make sealed.");
     }
 }

@@ -1,19 +1,19 @@
-namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests
+namespace Gu.Analyzers.Test.GU0080TestAttributeCountMismatchTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [TestCase("[Test]")]
+    [TestCase("[Test(Author = \"Author\")]")]
+    [TestCase("[TestAttribute]")]
+    [TestCase("[TestAttribute()]")]
+    public static void TestAttribute(string attribute)
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-
-        [TestCase("[Test]")]
-        [TestCase("[Test(Author = \"Author\")]")]
-        [TestCase("[TestAttribute]")]
-        [TestCase("[TestAttribute()]")]
-        public static void TestAttribute(string attribute)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -27,14 +27,14 @@ namespace N
     }
 }".AssertReplace("[Test]", attribute);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("[TestCase(1)]")]
-        [TestCase("[TestCase(1, Author = \"Author\")]")]
-        public static void TestCaseAttribute(string attribute)
-        {
-            var code = @"
+    [TestCase("[TestCase(1)]")]
+    [TestCase("[TestCase(1, Author = \"Author\")]")]
+    public static void TestCaseAttribute(string attribute)
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -48,13 +48,13 @@ namespace N
     }
 }".AssertReplace("[TestCase(1)]", attribute);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TestAndTestCaseAttribute()
-        {
-            var code = @"
+    [Test]
+    public static void TestAndTestCaseAttribute()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TestCaseSourceAttribute()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseSourceAttribute()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -89,15 +89,15 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("[TestCase(1)]")]
-        [TestCase("[TestCase(1, 2)]")]
-        [TestCase("[TestCase(1, 2, 3)]")]
-        public static void TestAndTestCaseParams(string testCase)
-        {
-            var code = @"
+    [TestCase("[TestCase(1)]")]
+    [TestCase("[TestCase(1, 2)]")]
+    [TestCase("[TestCase(1, 2, 3)]")]
+    public static void TestAndTestCaseParams(string testCase)
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -112,15 +112,15 @@ namespace N
     }
 }".AssertReplace("[TestCase(1, 2, 3)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("[TestCase(1)]")]
-        [TestCase("[TestCase(1, 2)]")]
-        [TestCase("[TestCase(1, 2, 3)]")]
-        public static void TestCaseParams(string testCase)
-        {
-            var code = @"
+    [TestCase("[TestCase(1)]")]
+    [TestCase("[TestCase(1, 2)]")]
+    [TestCase("[TestCase(1, 2, 3)]")]
+    public static void TestCaseParams(string testCase)
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -134,7 +134,6 @@ namespace N
     }
 }".AssertReplace("[TestCase(1, 2, 3)]", testCase);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

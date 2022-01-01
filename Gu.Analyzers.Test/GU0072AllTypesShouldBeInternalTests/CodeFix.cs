@@ -1,18 +1,18 @@
-namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
+namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
+    private static readonly MakeInternalFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal);
 
-    internal static class CodeFix
+    [Test]
+    public static void Class()
     {
-        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
-        private static readonly MakeInternalFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal);
-
-        [Test]
-        public static void Class()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     ↓public class C
@@ -20,20 +20,20 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     internal class C
     {
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void Struct()
-        {
-            var before = @"
+    [Test]
+    public static void Struct()
+    {
+        var before = @"
 namespace N
 {
     ↓public struct Foo
@@ -41,14 +41,13 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     internal struct Foo
     {
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

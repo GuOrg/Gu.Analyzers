@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests
+﻿namespace Gu.Analyzers.Test.GU0052ExceptionShouldBeSerializableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0052ExceptionShouldBeSerializable Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0052ExceptionShouldBeSerializable);
 
-    internal static class Diagnostics
+    [Test]
+    public static void WhenNoAttribute()
     {
-        private static readonly GU0052ExceptionShouldBeSerializable Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0052ExceptionShouldBeSerializable);
-
-        [Test]
-        public static void WhenNoAttribute()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -24,13 +24,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ExtendedNoAttribute()
-        {
-            var code = @"
+    [Test]
+    public static void ExtendedNoAttribute()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -52,7 +52,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

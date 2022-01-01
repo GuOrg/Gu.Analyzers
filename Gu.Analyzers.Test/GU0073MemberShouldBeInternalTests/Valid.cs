@@ -1,23 +1,23 @@
-﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0073MemberShouldBeInternal Analyzer = new();
 
-    internal static class Valid
+    [TestCase("internal readonly int F;")]
+    [TestCase("internal event Action? E;")]
+    [TestCase("internal C() { }")]
+    [TestCase("internal int P { get; }")]
+    [TestCase("internal void M() { }")]
+    [TestCase("internal enum E { }")]
+    [TestCase("internal struct S { }")]
+    [TestCase("internal class Nested { }")]
+    public static void InternalClass(string member)
     {
-        private static readonly GU0073MemberShouldBeInternal Analyzer = new();
-
-        [TestCase("internal readonly int F;")]
-        [TestCase("internal event Action? E;")]
-        [TestCase("internal C() { }")]
-        [TestCase("internal int P { get; }")]
-        [TestCase("internal void M() { }")]
-        [TestCase("internal enum E { }")]
-        [TestCase("internal struct S { }")]
-        [TestCase("internal class Nested { }")]
-        public static void InternalClass(string member)
-        {
-            var code = @"
+        var code = @"
 #pragma warning disable CS0067, CS0649, CS8019
 namespace N
 {
@@ -29,17 +29,17 @@ namespace N
     }
 }".AssertReplace("internal readonly int F;", member);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("public readonly int F;")]
-        [TestCase("public event Action? E;")]
-        [TestCase("public C() { }")]
-        [TestCase("public int P { get; }")]
-        [TestCase("public void M() { }")]
-        public static void PublicClass(string member)
-        {
-            var code = @"
+    [TestCase("public readonly int F;")]
+    [TestCase("public event Action? E;")]
+    [TestCase("public C() { }")]
+    [TestCase("public int P { get; }")]
+    [TestCase("public void M() { }")]
+    public static void PublicClass(string member)
+    {
+        var code = @"
 #pragma warning disable CS0067, CS0649, CS8019
 namespace N
 {
@@ -51,13 +51,13 @@ namespace N
     }
 }".AssertReplace("public readonly int F;", member);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void InterfaceEvent()
-        {
-            var code = @"
+    [Test]
+    public static void InterfaceEvent()
+    {
+        var code = @"
 #pragma warning disable CS0067
 namespace N
 {
@@ -74,13 +74,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitInterfaceEvent()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitInterfaceEvent()
+    {
+        var code = @"
 #pragma warning disable CS0067
 namespace N
 {
@@ -103,13 +103,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void OverridingEvent()
-        {
-            var code = @"
+    [Test]
+    public static void OverridingEvent()
+    {
+        var code = @"
 #pragma warning disable CS0067
 namespace N
 {
@@ -126,13 +126,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void InterfaceProperty()
-        {
-            var code = @"
+    [Test]
+    public static void InterfaceProperty()
+    {
+        var code = @"
 namespace N
 {
     internal class C : IC
@@ -146,13 +146,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitInterfaceProperty()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitInterfaceProperty()
+    {
+        var code = @"
 namespace N
 {
     internal class C : IC
@@ -166,13 +166,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void OverridingProperty()
-        {
-            var code = @"
+    [Test]
+    public static void OverridingProperty()
+    {
+        var code = @"
 namespace N
 {
     internal class C : Abstract
@@ -186,13 +186,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void InterfaceMethod()
-        {
-            var code = @"
+    [Test]
+    public static void InterfaceMethod()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -203,13 +203,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void GenericInterfaceMethod()
-        {
-            var code = @"
+    [Test]
+    public static void GenericInterfaceMethod()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -224,7 +224,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

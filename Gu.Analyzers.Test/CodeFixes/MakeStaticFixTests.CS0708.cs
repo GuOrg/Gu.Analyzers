@@ -1,21 +1,21 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class MakeStaticFixTests
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly MakeStaticFix Fix = new();
 
-    internal static partial class MakeStaticFixTests
+    // ReSharper disable once InconsistentNaming
+    private static readonly ExpectedDiagnostic CS0708 = ExpectedDiagnostic.Create("CS0708");
+
+    [TestCase("public")]
+    [TestCase("internal")]
+    [TestCase("private")]
+    public static void SimpleMethod(string modifier)
     {
-        private static readonly MakeStaticFix Fix = new();
-
-        // ReSharper disable once InconsistentNaming
-        private static readonly ExpectedDiagnostic CS0708 = ExpectedDiagnostic.Create("CS0708");
-
-        [TestCase("public")]
-        [TestCase("internal")]
-        [TestCase("private")]
-        public static void SimpleMethod(string modifier)
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     static class C
@@ -26,7 +26,7 @@ namespace N
     }
 }".AssertReplace("public", modifier);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     static class C
@@ -36,13 +36,13 @@ namespace N
         }
     }
 }".AssertReplace("public", modifier);
-            RoslynAssert.CodeFix(Fix, CS0708, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS0708, before, after);
+    }
 
-        [Test]
-        public static void ImplicitPrivate()
-        {
-            var before = @"
+    [Test]
+    public static void ImplicitPrivate()
+    {
+        var before = @"
 namespace N
 {
     static class C
@@ -53,7 +53,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     static class C
@@ -63,13 +63,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS0708, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS0708, before, after);
+    }
 
-        [Test]
-        public static void TwoSimpleMethods()
-        {
-            var before = @"
+    [Test]
+    public static void TwoSimpleMethods()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -84,7 +84,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -98,13 +98,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.FixAll(Fix, CS0708, before, after);
-        }
+        RoslynAssert.FixAll(Fix, CS0708, before, after);
+    }
 
-        [Test]
-        public static void AsyncMethod()
-        {
-            var before = @"
+    [Test]
+    public static void AsyncMethod()
+    {
+        var before = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -115,7 +115,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -125,7 +125,6 @@ namespace N
         public static async Task M() => await Task.CompletedTask;
     }
 }";
-            RoslynAssert.CodeFix(Fix, CS0708, before, after);
-        }
+        RoslynAssert.CodeFix(Fix, CS0708, before, after);
     }
 }

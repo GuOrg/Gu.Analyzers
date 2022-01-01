@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
+    private static readonly TestMethodParametersFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
-    internal static class CodeFix
+    [Test]
+    public static void SingleArgument()
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly TestMethodParametersFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
-
-        [Test]
-        public static void SingleArgument()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -39,13 +39,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void TestCaseAttribute_IfMultipleParametersAreWrong()
-        {
-            var before = @"
+    [Test]
+    public static void TestCaseAttribute_IfMultipleParametersAreWrong()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -58,7 +58,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -71,13 +71,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WrongArrayType()
-        {
-            var before = @"
+    [Test]
+    public static void WrongArrayType()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -90,7 +90,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -103,13 +103,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void DoubleToInt()
-        {
-            var before = @"
+    [Test]
+    public static void DoubleToInt()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -122,7 +122,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -135,13 +135,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var before = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -155,7 +155,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -168,7 +168,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

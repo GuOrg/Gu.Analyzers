@@ -1,19 +1,19 @@
-﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
+﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0071ForeachImplicitCast Analyzer = new();
 
-    internal static class Valid
+    [TestCase("int[]")]
+    [TestCase("List<int>")]
+    [TestCase("IEnumerable<int>")]
+    [TestCase("IEnumerable<IEnumerable<char>>")]
+    public static void VarInAForeach(string type)
     {
-        private static readonly GU0071ForeachImplicitCast Analyzer = new();
-
-        [TestCase("int[]")]
-        [TestCase("List<int>")]
-        [TestCase("IEnumerable<int>")]
-        [TestCase("IEnumerable<IEnumerable<char>>")]
-        public static void VarInAForeach(string type)
-        {
-            var code = @"
+        var code = @"
 #pragma warning disable CS8019
 namespace N
 {
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }".AssertReplace("int[]", type);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitTypeMatchesInAForeach()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitTypeMatchesInAForeach()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MultipleIEnumerableInterfaces()
-        {
-            var code = @"
+    [Test]
+    public static void MultipleIEnumerableInterfaces()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections;
@@ -94,13 +94,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitTypeWhenLoopingRegexMatches()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitTypeWhenLoopingRegexMatches()
+    {
+        var code = @"
 namespace N
 {
     using System.Text.RegularExpressions;
@@ -115,13 +115,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DuckTypedEnumerable()
-        {
-            var code = @"
+    [Test]
+    public static void DuckTypedEnumerable()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -144,13 +144,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NonGenericIEnumerable()
-        {
-            var code = @"
+    [Test]
+    public static void NonGenericIEnumerable()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections;
@@ -165,7 +165,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

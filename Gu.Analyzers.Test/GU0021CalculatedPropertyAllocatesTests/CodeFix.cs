@@ -1,18 +1,18 @@
-namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
+namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly PropertyDeclarationAnalyzer Analyzer = new();
+    private static readonly UseGetOnlyFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates);
 
-    internal static class CodeFix
+    [Test]
+    public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
-        private static readonly UseGetOnlyFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates);
-
-        [Test]
-        public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyProperties()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class Foo
@@ -37,7 +37,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -62,13 +62,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
-        {
-            var before = @"
+    [Test]
+    public static void ExpressionBodyAllocatingReferenceTypeFromGetOnlyPropertiesUnderscoreNames()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -93,7 +93,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -118,13 +118,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
-        {
-            var before = @"
+    [Test]
+    public static void GetBodyAllocatingReferenceTypeFromGetOnlyProperties()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -152,7 +152,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -177,13 +177,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromGetOnlyPropertiesNoThis()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -208,7 +208,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -233,13 +233,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromReadOnlyFields()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromReadOnlyFields()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -261,7 +261,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -283,13 +283,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromReadOnlyFieldsUnderscore()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -312,7 +312,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -335,13 +335,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeEmptyCtor()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeEmptyCtor()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -354,7 +354,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -367,13 +367,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeLambdaUsingMutableCtor()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeLambdaUsingMutableCtor()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -391,7 +391,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -409,13 +409,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeMethodGroup()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeMethodGroup()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -435,7 +435,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -455,13 +455,13 @@ namespace N
         private static int CreateNumber() => 2;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromMutablePropertyNoFix1()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromMutablePropertyNoFix1()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -486,7 +486,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -511,13 +511,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromMutablePropertyNoFix2()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromMutablePropertyNoFix2()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -542,7 +542,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -567,13 +567,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromMutableFieldNoFix()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromMutableFieldNoFix()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -595,7 +595,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -617,13 +617,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromMutablePropertyUnderscore()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromMutablePropertyUnderscore()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -646,7 +646,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -669,13 +669,13 @@ namespace N
         public C P { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromMutableMembersObjectInitializerNoFix()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -703,7 +703,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -731,13 +731,13 @@ namespace N
         public Foo Bar { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromSecondLevelNoFix1()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromSecondLevelNoFix1()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -765,7 +765,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -793,13 +793,13 @@ namespace N
         public Foo Bar2 { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AllocatingReferenceTypeFromSecondLevelNoFix2()
-        {
-            var before = @"
+    [Test]
+    public static void AllocatingReferenceTypeFromSecondLevelNoFix2()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -827,7 +827,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -855,7 +855,6 @@ namespace N
         public Foo Bar2 { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

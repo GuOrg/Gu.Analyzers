@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
+﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0051XmlSerializerNotCached Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0051XmlSerializerNotCached);
 
-    internal static class Diagnostics
+    [Test]
+    public static void TrivialConstructionUnsaved()
     {
-        private static readonly GU0051XmlSerializerNotCached Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0051XmlSerializerNotCached);
-
-        [Test]
-        public static void TrivialConstructionUnsaved()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -28,13 +28,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The serializer is not cached"), code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("The serializer is not cached"), code);
+    }
 
-        [Test]
-        public static void TrivialConstructionUnsavedFullyQualified()
-        {
-            var code = @"
+    [Test]
+    public static void TrivialConstructionUnsavedFullyQualified()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -48,13 +48,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
-        public static void LocalVariable(string expression)
-        {
-            var code = @"
+    [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
+    public static void LocalVariable(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -71,13 +71,13 @@ namespace N
     }
 }".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
-        public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string expression)
-        {
-            var code = @"
+    [TestCase(@"new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""))")]
+    public static void PrivateStaticVariableAssignedToMoreThanOnceInAForLoop(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -96,7 +96,6 @@ namespace N
     }
 }".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code: code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code: code);
     }
 }

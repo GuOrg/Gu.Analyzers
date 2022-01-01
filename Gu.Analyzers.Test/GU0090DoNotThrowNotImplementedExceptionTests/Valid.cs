@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
+﻿namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ExceptionAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void Rethrowing()
     {
-        private static readonly ExceptionAnalyzer Analyzer = new();
-
-        [Test]
-        public static void Rethrowing()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -58,7 +58,6 @@ namespace N
     }
 }
 ";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

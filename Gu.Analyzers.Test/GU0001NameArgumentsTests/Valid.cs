@@ -1,17 +1,17 @@
-namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+namespace Gu.Analyzers.Test.GU0001NameArgumentsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentListAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [TestCase("new C(a, b)")]
+    [TestCase("new C(a: a, b: b)")]
+    public static void ConstructorCallWithTwoArguments(string call)
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new();
-
-        [TestCase("new C(a, b)")]
-        [TestCase("new C(a: a, b: b)")]
-        public static void ConstructorCallWithTwoArguments(string call)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -33,14 +33,14 @@ namespace N
     }
 }".AssertReplace("new C(a, b)", call);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("new Foo(a, b)")]
-        [TestCase("new Foo(a: a, b: b)")]
-        public static void ConstructorCallWithTwoArgumentsStruct(string call)
-        {
-            var code = @"
+    [TestCase("new Foo(a, b)")]
+    [TestCase("new Foo(a: a, b: b)")]
+    public static void ConstructorCallWithTwoArgumentsStruct(string call)
+    {
+        var code = @"
 namespace N
 {
     public struct Foo
@@ -62,13 +62,13 @@ namespace N
     }
 }".AssertReplace("new Foo(a, b)", call);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorCallWithNamedArgumentsOnSameRow()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorCallWithNamedArgumentsOnSameRow()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -96,13 +96,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorCallWithArgumentsOnSameRow()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorCallWithArgumentsOnSameRow()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -130,13 +130,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -168,13 +168,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresStringFormat()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresStringFormat()
+    {
+        var code = @"
 namespace N
 {
     using System.Globalization;
@@ -194,13 +194,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresTuple()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresTuple()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -218,13 +218,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ImmutableArrayCreate()
-        {
-            var code = @"
+    [Test]
+    public static void ImmutableArrayCreate()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Immutable;
@@ -242,13 +242,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresParams()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresParams()
+    {
+        var code = @"
 namespace N
 {
     public static class C
@@ -270,13 +270,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenDifferentTypes()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenDifferentTypes()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -308,13 +308,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenInExpressionTree()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenInExpressionTree()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -349,7 +349,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

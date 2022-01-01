@@ -1,23 +1,23 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests;
+
+using System;
+using System.Collections.Immutable;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static partial class CodeFixWhenMissingParameterDocsSA1611
 {
-    using System;
-    using System.Collections.Immutable;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly FakeStyleCopAnalyzer Analyzer = new();
+    private static readonly DocsFix Fix = new();
 
-    internal static partial class CodeFixWhenMissingParameterDocsSA1611
+    [Test]
+    public static void ForFirstParameterWhenSummaryOnly()
     {
-        private static readonly FakeStyleCopAnalyzer Analyzer = new();
-        private static readonly DocsFix Fix = new();
-
-        [Test]
-        public static void ForFirstParameterWhenSummaryOnly()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -31,7 +31,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -45,13 +45,13 @@ namespace N
         public StringBuilder Meh(StringBuilder builder) => builder;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForFirstParameterWhenSummaryAndTypeParam()
-        {
-            var before = @"
+    [Test]
+    public static void ForFirstParameterWhenSummaryAndTypeParam()
+    {
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -66,7 +66,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -81,13 +81,13 @@ namespace N
         public StringBuilder Meh<T>(StringBuilder builder) => builder;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForFirstParameter()
-        {
-            var before = @"
+    [Test]
+    public static void ForFirstParameter()
+    {
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -102,7 +102,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -117,13 +117,13 @@ namespace N
         public StringBuilder Meh(StringBuilder builder, string text) => builder;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForLastParameter()
-        {
-            var before = @"
+    [Test]
+    public static void ForLastParameter()
+    {
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -138,7 +138,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -153,13 +153,13 @@ namespace N
         public StringBuilder Meh(string text, StringBuilder builder) => builder;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForMiddleParameter()
-        {
-            var before = @"
+    [Test]
+    public static void ForMiddleParameter()
+    {
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -175,7 +175,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -191,13 +191,13 @@ namespace N
         public StringBuilder Meh(StringBuilder builder, StringBuilder text, StringBuilder builder2) => builder;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForGenericParameter()
-        {
-            var before = @"
+    [Test]
+    public static void ForGenericParameter()
+    {
+        var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -219,7 +219,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -241,14 +241,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [TestCase("int")]
-        [TestCase("string")]
-        public static void EmptyForPrimitiveTypes(string type)
-        {
-            var before = @"
+    [TestCase("int")]
+    [TestCase("string")]
+    public static void EmptyForPrimitiveTypes(string type)
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -262,7 +262,7 @@ namespace N
     }
 }".AssertReplace("string", type);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -276,34 +276,33 @@ namespace N
         }
     }
 }".AssertReplace("string", type);
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+    {
+        private static readonly DiagnosticDescriptor Descriptor = new("SA1611", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(this.Handle, SyntaxKind.Parameter);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+        private void Handle(SyntaxNodeAnalysisContext context)
         {
-            private static readonly DiagnosticDescriptor Descriptor = new("SA1611", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is ParameterSyntax parameter &&
+                parameter.Parent is ParameterListSyntax parameterList &&
+                parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
+                methodDeclaration.HasLeadingTrivia &&
+                !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText, StringComparison.OrdinalIgnoreCase))
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(this.Handle, SyntaxKind.Parameter);
-            }
-
-            private void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is ParameterSyntax parameter &&
-                    parameter.Parent is ParameterListSyntax parameterList &&
-                    parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                    methodDeclaration.HasLeadingTrivia &&
-                    !methodDeclaration.GetLeadingTrivia().ToString().Contains(parameter.Identifier.ValueText, StringComparison.OrdinalIgnoreCase))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
             }
         }
     }

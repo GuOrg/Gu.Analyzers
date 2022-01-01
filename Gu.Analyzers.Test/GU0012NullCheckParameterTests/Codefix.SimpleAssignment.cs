@@ -1,22 +1,22 @@
-namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    internal static partial class CodeFix
+    internal static class SimpleAssignment
     {
-        internal static class SimpleAssignment
-        {
-            private static readonly SimpleAssignmentAnalyzer Analyzer = new();
-            private static readonly NullCheckParameterFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
+        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
+        private static readonly NullCheckParameterFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
 
-            [TestCase("public")]
-            [TestCase("internal")]
-            [TestCase("protected")]
-            public static void ConstructorFullyQualified(string access)
-            {
-                var before = @"
+        [TestCase("public")]
+        [TestCase("internal")]
+        [TestCase("protected")]
+        public static void ConstructorFullyQualified(string access)
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -30,7 +30,7 @@ namespace N
     }
 }".AssertReplace("public C", $"{access} C");
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -44,13 +44,13 @@ namespace N
     }
 }".AssertReplace("public C", $"{access} C");
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void PublicCtor()
-            {
-                var before = @"
+        [Test]
+        public static void PublicCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -66,7 +66,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -81,13 +81,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void PublicCtorOutParameter()
-            {
-                var before = @"
+        [Test]
+        public static void PublicCtorOutParameter()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -104,7 +104,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -120,8 +120,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

@@ -1,13 +1,13 @@
-﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests;
 
-    internal static partial class CodeFix
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
+{
+    internal static class Simple
     {
-        internal static class Simple
-        {
-            private const string C1 = @"
+        private const string C1 = @"
 namespace N
 {
     public class C1
@@ -18,10 +18,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void WhenAssigningThisFieldWithObjectCreation()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningThisFieldWithObjectCreation()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -35,7 +35,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -48,14 +48,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting C1"), before, C1);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Prefer injecting C1"), before, C1);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenAssigningUnderscoreFieldWithObjectCreation()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningUnderscoreFieldWithObjectCreation()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -69,7 +69,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -82,14 +82,14 @@ namespace N
         }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
-            }
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenAssigningThisPropertyWithObjectCreation()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningThisPropertyWithObjectCreation()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -103,7 +103,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -116,14 +116,14 @@ namespace N
         public C1 P { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
-            }
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenAssigningPropertyWithObjectCreation()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningPropertyWithObjectCreation()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -137,7 +137,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -150,14 +150,14 @@ namespace N
         public C1 P { get; }
     }
 }";
-                var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
-                RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
-            }
+            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Prefer injecting C1");
+            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, new[] { before, C1 }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingChained()
-            {
-                var c1 = @"
+        [Test]
+        public static void WhenNotInjectingChained()
+        {
+            var c1 = @"
 namespace N
 {
     public class C2
@@ -171,7 +171,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C3 : C2
@@ -183,7 +183,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C3 : C2
@@ -194,13 +194,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, C1, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, C1, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingChainedNameCollision()
-            {
-                var c2 = @"
+        [Test]
+        public static void WhenNotInjectingChainedNameCollision()
+        {
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -214,7 +214,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C3 : C2
@@ -226,7 +226,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C3 : C2
@@ -237,13 +237,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, C1, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, C1, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingOptional()
-            {
-                var before = @"
+        [Test]
+        public static void WhenNotInjectingOptional()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -257,7 +257,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -270,13 +270,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingParams()
-            {
-                var before = @"
+        [Test]
+        public static void WhenNotInjectingParams()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -290,7 +290,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -303,13 +303,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { C1, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingChainedGeneric()
-            {
-                var c2 = @"
+        [Test]
+        public static void WhenNotInjectingChainedGeneric()
+        {
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -322,7 +322,7 @@ namespace N
         }
     }
 }";
-                var c3 = @"
+            var c3 = @"
 namespace N
 {
     public class C3<T>
@@ -330,7 +330,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C4 : C2
@@ -342,7 +342,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C4 : C2
@@ -353,13 +353,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, c3, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c2, c3, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingChainedGenericParameterName()
-            {
-                var before = @"
+        [Test]
+        public static void WhenNotInjectingChainedGenericParameterName()
+        {
+            var before = @"
 namespace N
 {
     public sealed class C
@@ -373,7 +373,7 @@ namespace N
     }
 }";
 
-                var moduleCode = @"
+            var moduleCode = @"
 namespace N
 {
     public class IsModuleReady<TModule>
@@ -386,7 +386,7 @@ namespace N
     public class CModule : Module { }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public sealed class C
@@ -399,13 +399,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, moduleCode }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { before, moduleCode }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingChainedNewWithInjectedArgument()
-            {
-                var c1 = @"
+        [Test]
+        public static void WhenNotInjectingChainedNewWithInjectedArgument()
+        {
+            var c1 = @"
 namespace N
 {
     public class C2
@@ -418,7 +418,7 @@ namespace N
         }
     }
 }";
-                var c2 = @"
+            var c2 = @"
 namespace N
 {
     public class C3
@@ -432,14 +432,14 @@ namespace N
     }
 }";
 
-                var c4 = @"
+            var c4 = @"
 namespace N
 {
     public class C4
     {
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C5 : C2
@@ -451,7 +451,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C5 : C2
@@ -462,13 +462,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, c4, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, c4, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void ChainedPropertyOnInjected()
-            {
-                var c1 = @"
+        [Test]
+        public static void ChainedPropertyOnInjected()
+        {
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -481,7 +481,7 @@ namespace N
         }
     }
 }";
-                var c2 = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -489,7 +489,7 @@ namespace N
     }
 }";
 
-                var bazCode = @"
+            var bazCode = @"
 namespace N
 {
     public class Baz
@@ -503,7 +503,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     public class C3 : C1
@@ -515,7 +515,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C3 : C1
@@ -526,8 +526,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, bazCode, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, c2, bazCode, before }, after, fixTitle: "Inject safe.");
         }
     }
 }

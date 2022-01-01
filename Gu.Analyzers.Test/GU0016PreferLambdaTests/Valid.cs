@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
+﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly MethodGroupAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void LinqWhereStaticMethod()
     {
-        private static readonly MethodGroupAnalyzer Analyzer = new();
-
-        [Test]
-        public static void LinqWhereStaticMethod()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -27,7 +27,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

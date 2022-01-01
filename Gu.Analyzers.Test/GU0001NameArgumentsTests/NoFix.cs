@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class NoFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentListAnalyzer Analyzer = new();
+    private static readonly NameArgumentsFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
 
-    internal static class NoFix
+    [Test]
+    public static void ConstructorIgnoredIfAnyNamed()
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new();
-        private static readonly NameArgumentsFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
-
-        [Test]
-        public static void ConstructorIgnoredIfAnyNamed()
-        {
-            var testCode = @"
+        var testCode = @"
 namespace N
 {
     public class Foo
@@ -43,7 +43,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
     }
 }

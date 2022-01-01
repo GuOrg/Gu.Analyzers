@@ -1,17 +1,17 @@
-namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests
+namespace Gu.Analyzers.Test.GU0090DoNotThrowNotImplementedExceptionTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ExceptionAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0090DoNotThrowNotImplementedException);
 
-    internal static class Diagnostics
+    [Test]
+    public static void ExceptionThrownInsideMethodBlock()
     {
-        private static readonly ExceptionAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0090DoNotThrowNotImplementedException);
-
-        [Test]
-        public static void ExceptionThrownInsideMethodBlock()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     class C
@@ -22,13 +22,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ExceptionThrownInline()
-        {
-            var code = @"
+    [Test]
+    public static void ExceptionThrownInline()
+    {
+        var code = @"
 namespace N
 {
     class C
@@ -36,13 +36,13 @@ namespace N
         int M() => throw ↓new System.NotImplementedException();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ExceptionNullCoalescing()
-        {
-            var code = @"
+    [Test]
+    public static void ExceptionNullCoalescing()
+    {
+        var code = @"
 namespace N
 {
     class C
@@ -55,7 +55,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

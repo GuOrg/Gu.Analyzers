@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests
+﻿namespace Gu.Analyzers.Test.GU0003CtorParameterNamesShouldMatchTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ConstructorAnalyzer Analyzer = new();
+    private static readonly RenameConstructorParameterFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch);
 
-    internal static class CodeFix
+    [Test]
+    public static void Message()
     {
-        private static readonly ConstructorAnalyzer Analyzer = new();
-        private static readonly RenameConstructorParameterFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0003CtorParameterNamesShouldMatch);
-
-        [Test]
-        public static void Message()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class Foo
@@ -35,7 +35,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -57,14 +57,14 @@ namespace N
         public int D { get; }
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Name the parameter to match the assigned member");
-            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Rename to 'a'");
-        }
+        var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Name the parameter to match the assigned member");
+        RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Rename to 'a'");
+    }
 
-        [Test]
-        public static void ConstructorSettingProperties()
-        {
-            var before = @"
+    [Test]
+    public static void ConstructorSettingProperties()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -87,7 +87,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -109,13 +109,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ChainedConstructor()
-        {
-            var before = @"
+    [Test]
+    public static void ChainedConstructor()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -143,7 +143,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -170,13 +170,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void BaseConstructorCall()
-        {
-            var c1 = @"
+    [Test]
+    public static void BaseConstructorCall()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -199,7 +199,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C2 : C1
@@ -211,7 +211,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C2 : C1
@@ -222,13 +222,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
+    }
 
-        [Test]
-        public static void ConstructorSettingFields()
-        {
-            var before = @"
+    [Test]
+    public static void ConstructorSettingFields()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -248,7 +248,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -267,13 +267,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ConstructorSettingFieldsPrefixedWithUnderscore()
-        {
-            var before = @"
+    [Test]
+    public static void ConstructorSettingFieldsPrefixedWithUnderscore()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -293,7 +293,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -312,13 +312,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenBaseIsParams()
-        {
-            var c1 = @"
+    [Test]
+    public static void WhenBaseIsParams()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -335,7 +335,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C2 : C1
@@ -347,7 +347,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C2 : C1
@@ -358,13 +358,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
+    }
 
-        [Test]
-        public static void WhenSettingPropertyAndChained()
-        {
-            var before = @"
+    [Test]
+    public static void WhenSettingPropertyAndChained()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -384,7 +384,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -403,13 +403,13 @@ namespace N
         public int B { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenAssignAndBaseCall()
-        {
-            var c1 = @"
+    [Test]
+    public static void WhenAssignAndBaseCall()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -420,7 +420,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C2 : C1
@@ -435,7 +435,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C2 : C1
@@ -449,7 +449,6 @@ namespace N
         public int A { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { c1, before }, after);
     }
 }

@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests
+﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentListAnalyzer Analyzer = new();
+    private static readonly NameArgumentsFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
 
-    internal static class CodeFix
+    [Test]
+    public static void Message()
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new();
-        private static readonly NameArgumentsFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0001NameArguments);
-
-        [Test]
-        public static void Message()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class Foo
@@ -47,13 +47,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the argument"), code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the argument"), code);
+    }
 
-        [Test]
-        public static void Constructor()
-        {
-            var before = @"
+    [Test]
+    public static void Constructor()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -85,7 +85,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -116,14 +116,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ConstructorInArrayInitializer()
-        {
-            var before = @"
+    [Test]
+    public static void ConstructorInArrayInitializer()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -158,7 +158,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -192,14 +192,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ConstructorInFunc()
-        {
-            var before = @"
+    [Test]
+    public static void ConstructorInFunc()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -233,7 +233,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -266,8 +266,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

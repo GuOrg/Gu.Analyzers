@@ -1,29 +1,29 @@
-﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests
+﻿namespace Gu.Analyzers.Test.GU0051XmlSerializerNotCachedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0051XmlSerializerNotCached Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void NoCreationsOfTheSerializer()
     {
-        private static readonly GU0051XmlSerializerNotCached Analyzer = new();
-
-        [Test]
-        public static void NoCreationsOfTheSerializer()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
     {
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CachedStaticReadonlyInitializedInlineXmlSerializer()
-        {
-            var code = @"
+    [Test]
+    public static void CachedStaticReadonlyInitializedInlineXmlSerializer()
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -33,13 +33,13 @@ namespace N
         private static readonly XmlSerializer serializer = new XmlSerializer(typeof(C), new XmlRootAttribute(""rootNode""));
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
-        {
-            var code = @"
+    [Test]
+    public static void CachedStaticReadonlyInitializedInStaticConstructorXmlSerializer()
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -62,13 +62,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CachedStaticInitializedInlineXmlSerializer()
-        {
-            var code = @"
+    [Test]
+    public static void CachedStaticInitializedInlineXmlSerializer()
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -86,14 +86,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase(@"new XmlSerializer(typeof(C), ""rootNode"")")]
-        [TestCase(@"new XmlSerializer(typeof(C))")]
-        public static void NonLeakyConstructor(string expression)
-        {
-            var code = @"
+    [TestCase(@"new XmlSerializer(typeof(C), ""rootNode"")")]
+    [TestCase(@"new XmlSerializer(typeof(C))")]
+    public static void NonLeakyConstructor(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Xml.Serialization;
@@ -110,7 +110,6 @@ namespace N
     }
 }".AssertReplace("default(XmlSerializer)", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

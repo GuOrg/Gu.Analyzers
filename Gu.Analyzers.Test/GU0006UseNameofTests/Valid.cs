@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests
+﻿namespace Gu.Analyzers.Test.GU0006UseNameofTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly StringLiteralExpressionAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void WhenThrowingArgumentException()
     {
-        private static readonly StringLiteralExpressionAnalyzer Analyzer = new();
-
-        [Test]
-        public static void WhenThrowingArgumentException()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -26,13 +26,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArgumentOutOfRangeException()
-        {
-            var code = @"
+    [Test]
+    public static void ArgumentOutOfRangeException()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresDebuggerDisplay()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresDebuggerDisplay()
+    {
+        var code = @"
 namespace N
 {
     [System.Diagnostics.DebuggerDisplay(""{Name}"")]
@@ -64,13 +64,13 @@ namespace N
         public string Name => string.Empty;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresTypeName()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresTypeName()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -88,13 +88,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresSameLocal()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresSameLocal()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -106,13 +106,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenUsedInDeclaration()
-        {
-            var code = @"
+    [Test]
+    public static void WhenUsedInDeclaration()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -125,13 +125,13 @@ namespace N
         private static string Id(string value) => value;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenLocalsNotVisible()
-        {
-            var code = @"
+    [Test]
+    public static void WhenLocalsNotVisible()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -154,13 +154,13 @@ namespace N
         private static string Id(string value) => value;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresNamespaceName()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresNamespaceName()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -178,7 +178,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

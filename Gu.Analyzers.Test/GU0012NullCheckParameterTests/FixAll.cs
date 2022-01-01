@@ -1,20 +1,20 @@
-﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    internal static partial class CodeFix
+    internal static class FixAll
     {
-        internal static class FixAll
-        {
-            private static readonly ParameterAnalyzer Analyzer = new();
-            private static readonly NullCheckParameterFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
+        private static readonly ParameterAnalyzer Analyzer = new();
+        private static readonly NullCheckParameterFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
 
-            [Test]
-            public static void TwoParameters()
-            {
-                var before = @"
+        [Test]
+        public static void TwoParameters()
+        {
+            var before = @"
 namespace N
 {
     public sealed class C
@@ -25,7 +25,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public sealed class C
@@ -44,8 +44,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

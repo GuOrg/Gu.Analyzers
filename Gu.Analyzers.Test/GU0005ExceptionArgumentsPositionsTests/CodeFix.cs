@@ -1,22 +1,22 @@
-namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
+namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ObjectCreationAnalyzer Analyzer = new();
+    private static readonly MoveArgumentFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0005ExceptionArgumentsPositions);
 
-    internal static class CodeFix
+    [TestCase(@"throw new ArgumentException(↓nameof(o), ""message"");", @"throw new ArgumentException(""message"", nameof(o));")]
+    [TestCase(@"throw new System.ArgumentException(↓nameof(o), ""message"");", @"throw new System.ArgumentException(""message"", nameof(o));")]
+    [TestCase(@"throw new ArgumentException(↓""o"", ""message"");", @"throw new ArgumentException(""message"", ""o"");")]
+    [TestCase(@"throw new ArgumentException(↓""o"", ""message"", new Exception());", @"throw new ArgumentException(""message"", ""o"", new Exception());")]
+    [TestCase(@"throw new ArgumentNullException(""Meh"", ↓nameof(o));", @"throw new ArgumentNullException(nameof(o), ""Meh"");")]
+    public static void WhenThrowing(string error, string @fixed)
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new();
-        private static readonly MoveArgumentFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0005ExceptionArgumentsPositions);
-
-        [TestCase(@"throw new ArgumentException(↓nameof(o), ""message"");", @"throw new ArgumentException(""message"", nameof(o));")]
-        [TestCase(@"throw new System.ArgumentException(↓nameof(o), ""message"");", @"throw new System.ArgumentException(""message"", nameof(o));")]
-        [TestCase(@"throw new ArgumentException(↓""o"", ""message"");", @"throw new ArgumentException(""message"", ""o"");")]
-        [TestCase(@"throw new ArgumentException(↓""o"", ""message"", new Exception());", @"throw new ArgumentException(""message"", ""o"", new Exception());")]
-        [TestCase(@"throw new ArgumentNullException(""Meh"", ↓nameof(o));", @"throw new ArgumentNullException(nameof(o), ""Meh"");")]
-        public static void WhenThrowing(string error, string @fixed)
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -30,7 +30,7 @@ namespace N
     }
 }".AssertReplace(@"throw new ArgumentException(↓nameof(o), ""message"");", error);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -44,13 +44,13 @@ namespace N
     }
 }".AssertReplace(@"throw new ArgumentException(""message"", nameof(o));", @fixed);
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AliasedInside()
-        {
-            var before = @"
+    [Test]
+    public static void AliasedInside()
+    {
+        var before = @"
 namespace N
 {
     using Meh = System.ArgumentException;
@@ -64,7 +64,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using Meh = System.ArgumentException;
@@ -77,13 +77,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AliasedOutside()
-        {
-            var before = @"
+    [Test]
+    public static void AliasedOutside()
+    {
+        var before = @"
 using Meh = System.ArgumentException;
 namespace N
 {
@@ -96,7 +96,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 using Meh = System.ArgumentException;
 namespace N
 {
@@ -108,7 +108,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

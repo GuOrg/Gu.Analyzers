@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests
+﻿namespace Gu.Analyzers.Test.GU0014PreferParameterTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ConstructorAnalyzer Analyzer = new();
+    private static readonly UseParameterFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0014PreferParameter);
 
-    internal static class CodeFix
+    [Test]
+    public static void Messages()
     {
-        private static readonly ConstructorAnalyzer Analyzer = new();
-        private static readonly UseParameterFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0014PreferParameter);
-
-        [Test]
-        public static void Messages()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C
@@ -27,7 +27,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -41,13 +41,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Prefer using parameter"), before, after, fixTitle: "Prefer parameter.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Prefer using parameter"), before, after, fixTitle: "Prefer parameter.");
+    }
 
-        [Test]
-        public static void WhenAccessingFieldProperty()
-        {
-            var before = @"
+    [Test]
+    public static void WhenAccessingFieldProperty()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -62,7 +62,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -76,13 +76,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenAccessingFieldElvisProperty()
-        {
-            var before = @"
+    [Test]
+    public static void WhenAccessingFieldElvisProperty()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -97,7 +97,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -111,13 +111,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenAccessingFieldMethod()
-        {
-            var before = @"
+    [Test]
+    public static void WhenAccessingFieldMethod()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -132,7 +132,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -146,13 +146,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenUsingPropertyProperty()
-        {
-            var before = @"
+    [Test]
+    public static void WhenUsingPropertyProperty()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -167,7 +167,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -181,13 +181,13 @@ namespace N
         public string Text { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenUsingPropertyMethod()
-        {
-            var before = @"
+    [Test]
+    public static void WhenUsingPropertyMethod()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -202,7 +202,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -216,13 +216,13 @@ namespace N
         public string Text { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenPassingFieldAsArgument()
-        {
-            var before = @"
+    [Test]
+    public static void WhenPassingFieldAsArgument()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -239,7 +239,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -255,13 +255,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenPassingFieldAsArgumentWhitespace()
-        {
-            var before = @"
+    [Test]
+    public static void WhenPassingFieldAsArgumentWhitespace()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -279,7 +279,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -296,13 +296,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenPassingUnderscoreFieldAsArgumentWhitespace()
-        {
-            var before = @"
+    [Test]
+    public static void WhenPassingUnderscoreFieldAsArgumentWhitespace()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -320,7 +320,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -337,13 +337,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenPassingUnderscoreFieldAsArgument()
-        {
-            var before = @"
+    [Test]
+    public static void WhenPassingUnderscoreFieldAsArgument()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -360,7 +360,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -376,13 +376,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void GetOnlyInLambda()
-        {
-            var before = @"
+    [Test]
+    public static void GetOnlyInLambda()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -399,7 +399,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -415,13 +415,13 @@ namespace N
         public string Text { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void LeftFieldInMultiplication()
-        {
-            var before = @"
+    [Test]
+    public static void LeftFieldInMultiplication()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -436,7 +436,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -450,13 +450,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void RightFieldInMultiplication()
-        {
-            var before = @"
+    [Test]
+    public static void RightFieldInMultiplication()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -471,7 +471,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -485,7 +485,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

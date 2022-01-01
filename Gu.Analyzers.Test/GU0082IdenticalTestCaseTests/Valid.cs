@@ -1,16 +1,16 @@
-namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
+namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void SingleArgument()
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-
-        [Test]
-        public static void SingleArgument()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -24,13 +24,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SingleArgumentWithAndWithoutAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void SingleArgumentWithAndWithoutAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SingleArgumentWithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void SingleArgumentWithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -64,13 +64,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Arrays()
-        {
-            var code = @"
+    [Test]
+    public static void Arrays()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -84,13 +84,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoubleAndInt()
-        {
-            var code = @"
+    [Test]
+    public static void DoubleAndInt()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -104,13 +104,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoubleAndIntMaxValue()
-        {
-            var code = @"
+    [Test]
+    public static void DoubleAndIntMaxValue()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -126,13 +126,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoubleMaxValueAndMinValue()
-        {
-            var code = @"
+    [Test]
+    public static void DoubleMaxValueAndMinValue()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -148,13 +148,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -168,13 +168,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TwoEnumsSameTypes()
-        {
-            var code = @"
+    [Test]
+    public static void TwoEnumsSameTypes()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -189,13 +189,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TwoEnumsDifferentTypes()
-        {
-            var code = @"
+    [Test]
+    public static void TwoEnumsDifferentTypes()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -210,7 +210,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests
+﻿namespace Gu.Analyzers.Test.GU0002NamedArgumentPositionMatchesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class NoFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentListAnalyzer Analyzer = new();
+    private static readonly MoveArgumentFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0002NamedArgumentPositionMatches);
 
-    internal static class NoFix
+    [Test]
+    public static void ConstructorIgnoredIfNonWhitespaceTrivia()
     {
-        private static readonly ArgumentListAnalyzer Analyzer = new();
-        private static readonly MoveArgumentFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0002NamedArgumentPositionMatches);
-
-        [Test]
-        public static void ConstructorIgnoredIfNonWhitespaceTrivia()
-        {
-            var testCode = @"
+        var testCode = @"
 namespace N
 {
     public class Foo
@@ -43,7 +43,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
     }
 }

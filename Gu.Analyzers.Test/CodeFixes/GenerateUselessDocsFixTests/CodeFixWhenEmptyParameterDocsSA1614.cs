@@ -1,22 +1,22 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests;
+
+using System.Collections.Immutable;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class CodeFixWhenEmptyParameterDocsSA1614
 {
-    using System.Collections.Immutable;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly FakeStyleCopAnalyzer Analyzer = new();
+    private static readonly DocsFix Fix = new();
 
-    internal static class CodeFixWhenEmptyParameterDocsSA1614
+    [Test]
+    public static void StandardTextForCancellationTokenWhenEmpty()
     {
-        private static readonly FakeStyleCopAnalyzer Analyzer = new();
-        private static readonly DocsFix Fix = new();
-
-        [Test]
-        public static void StandardTextForCancellationTokenWhenEmpty()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System.Threading;
@@ -33,7 +33,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Threading;
@@ -49,31 +49,30 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Generate standard xml documentation for parameter.");
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after, fixTitle: "Generate standard xml documentation for parameter.");
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+    {
+        private static readonly DiagnosticDescriptor Descriptor = new("SA1614", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.XmlElement);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            private static readonly DiagnosticDescriptor Descriptor = new("SA1614", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is XmlElementSyntax element &&
+                !element.Content.Any())
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.XmlElement);
-            }
-
-            private static void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is XmlElementSyntax element &&
-                    !element.Content.Any())
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
         }
     }

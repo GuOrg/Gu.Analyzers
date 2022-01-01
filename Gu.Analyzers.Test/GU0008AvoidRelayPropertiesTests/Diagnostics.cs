@@ -1,18 +1,18 @@
-namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests
+namespace Gu.Analyzers.Test.GU0008AvoidRelayPropertiesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly PropertyDeclarationAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0008AvoidRelayProperties);
 
-    internal static class Diagnostics
+    [TestCase("this.bar.Value;")]
+    [TestCase("bar.Value;")]
+    public static void WhenReturningPropertyOfInjectedField(string getter)
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0008AvoidRelayProperties);
-
-        [TestCase("this.bar.Value;")]
-        [TestCase("bar.Value;")]
-        public static void WhenReturningPropertyOfInjectedField(string getter)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C1
@@ -33,7 +33,7 @@ namespace N
         }
     }
 }".AssertReplace("this.bar.Value;", getter);
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2
@@ -41,14 +41,14 @@ namespace N
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, c2);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, c2);
+    }
 
-        [TestCase("this.bar.Value;")]
-        [TestCase("bar.Value;")]
-        public static void WhenReturningPropertyOfFieldExpressionBody(string body)
-        {
-            var code = @"
+    [TestCase("this.bar.Value;")]
+    [TestCase("bar.Value;")]
+    public static void WhenReturningPropertyOfFieldExpressionBody(string body)
+    {
+        var code = @"
 namespace N
 {
     public class C1
@@ -63,7 +63,7 @@ namespace N
         public int Value => ↓this.bar.Value;
     }
 }".AssertReplace("this.bar.Value;", body);
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2
@@ -71,7 +71,6 @@ namespace N
         public int Value { get; }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, c2);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code, c2);
     }
 }

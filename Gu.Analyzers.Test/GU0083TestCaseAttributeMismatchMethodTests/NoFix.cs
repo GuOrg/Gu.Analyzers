@@ -1,21 +1,21 @@
-﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests
+﻿namespace Gu.Analyzers.Test.GU0083TestCaseAttributeMismatchMethodTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class NoFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
+    private static readonly TestMethodParametersFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
 
-    internal static class NoFix
+    [TestCase("[TestCase(\"a\", ↓1, null)]")]
+    [TestCase("[TestCase(null, \"a\", ↓1)]")]
+    [TestCase("[TestCase(↓1, null, \"b\")]")]
+    [TestCase("[TestCase(null, null, ↓1)]")]
+    public static void NullArgument(string testCase)
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly TestMethodParametersFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0083TestCaseAttributeMismatchMethod);
-
-        [TestCase("[TestCase(\"a\", ↓1, null)]")]
-        [TestCase("[TestCase(null, \"a\", ↓1)]")]
-        [TestCase("[TestCase(↓1, null, \"b\")]")]
-        [TestCase("[TestCase(null, null, ↓1)]")]
-        public static void NullArgument(string testCase)
-        {
-            var testCode = @"
+        var testCode = @"
 namespace N
 {
     using NUnit.Framework;
@@ -29,13 +29,13 @@ namespace N
     }
 }".AssertReplace("[TestCase(\"x\", \"y\", null)]", testCase);
 
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+    }
 
-        [Test]
-        public static void ArgumentIsNullAndParameterIsInt()
-        {
-            var testCode = @"
+    [Test]
+    public static void ArgumentIsNullAndParameterIsInt()
+    {
+        var testCode = @"
 namespace N
 {
     using NUnit.Framework;
@@ -48,7 +48,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
     }
 }

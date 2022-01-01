@@ -1,22 +1,22 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests;
+
+using System.Collections.Immutable;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class CodeFixWhenMissingTypeParameterDocsSA1618
 {
-    using System.Collections.Immutable;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly FakeStyleCopAnalyzer Analyzer = new();
+    private static readonly DocsFix Fix = new();
 
-    internal static class CodeFixWhenMissingTypeParameterDocsSA1618
+    [Test]
+    public static void ForFirstParameterWhenSummaryOnly()
     {
-        private static readonly FakeStyleCopAnalyzer Analyzer = new();
-        private static readonly DocsFix Fix = new();
-
-        [Test]
-        public static void ForFirstParameterWhenSummaryOnly()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C
@@ -30,7 +30,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForFirstParameterWhenSummaryAndParam()
-        {
-            var before = @"
+    [Test]
+    public static void ForFirstParameterWhenSummaryAndParam()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -65,7 +65,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -80,13 +80,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void ForManyParameters()
-        {
-            var before = @"
+    [Test]
+    public static void ForManyParameters()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -100,7 +100,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -114,13 +114,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void Issue206()
-        {
-            var before = @"
+    [Test]
+    public static void Issue206()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -135,7 +135,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -150,15 +150,15 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [TestCase("T[]")]
-        [TestCase("List<T>")]
-        [TestCase("System.Collections.Generic.List<T>")]
-        public static void ForEnumerableParameter(string type)
-        {
-            var before = @"
+    [TestCase("T[]")]
+    [TestCase("List<T>")]
+    [TestCase("System.Collections.Generic.List<T>")]
+    public static void ForEnumerableParameter(string type)
+    {
+        var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -175,7 +175,7 @@ namespace N
     }
 }".AssertReplace("T[]", type);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -192,36 +192,35 @@ namespace N
         }
     }
 }".AssertReplace("T[]", type);
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+    {
+        private static readonly DiagnosticDescriptor Descriptor = new(
+            "SA1618",
+            "Title",
+            "Message",
+            "Category",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(this.Handle, SyntaxKind.TypeParameter);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+        private void Handle(SyntaxNodeAnalysisContext context)
         {
-            private static readonly DiagnosticDescriptor Descriptor = new(
-                "SA1618",
-                "Title",
-                "Message",
-                "Category",
-                DiagnosticSeverity.Warning,
-                isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is TypeParameterSyntax parameter)
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(this.Handle, SyntaxKind.TypeParameter);
-            }
-
-            private void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is TypeParameterSyntax parameter)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, parameter.Identifier.GetLocation()));
             }
         }
     }

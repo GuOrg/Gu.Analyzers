@@ -1,23 +1,23 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes;
+
+using System.Collections.Immutable;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class NullCheckParameterFixTests
 {
-    using System.Collections.Immutable;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly FakeFxCopAnalyzer Analyzer = new();
+    private static readonly NullCheckParameterFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
 
-    internal static class NullCheckParameterFixTests
+    [Test]
+    public static void Simple()
     {
-        private static readonly FakeFxCopAnalyzer Analyzer = new();
-        private static readonly NullCheckParameterFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
-
-        [Test]
-        public static void Simple()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public static class C
@@ -29,7 +29,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -45,13 +45,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ExpressionBody()
-        {
-            var before = @"
+    [Test]
+    public static void ExpressionBody()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -60,7 +60,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -76,13 +76,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ExpressionBodyVoid()
-        {
-            var before = @"
+    [Test]
+    public static void ExpressionBodyVoid()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -95,7 +95,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -115,32 +115,31 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+    {
+        internal static readonly DiagnosticDescriptor Descriptor = new("CA1062", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.IdentifierName);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            internal static readonly DiagnosticDescriptor Descriptor = new("CA1062", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is IdentifierNameSyntax element &&
+                element.Parent is MemberAccessExpressionSyntax memberAccess &&
+                memberAccess.Expression == element)
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.IdentifierName);
-            }
-
-            private static void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is IdentifierNameSyntax element &&
-                    element.Parent is MemberAccessExpressionSyntax memberAccess &&
-                    memberAccess.Expression == element)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, element.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, element.GetLocation()));
             }
         }
     }

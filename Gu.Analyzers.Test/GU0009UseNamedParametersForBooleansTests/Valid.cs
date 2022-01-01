@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
+﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void UsesNamedParameter()
     {
-        private static readonly ArgumentAnalyzer Analyzer = new();
-
-        [Test]
-        public static void UsesNamedParameter()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -26,13 +26,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingADefaultBooleanParameter()
-        {
-            var code = @"
+    [Test]
+    public static void UsingADefaultBooleanParameter()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -48,13 +48,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NonDeducedGenericBooleanParameter()
-        {
-            var code = @"
+    [Test]
+    public static void NonDeducedGenericBooleanParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DeducedGenericBooleanParameter()
-        {
-            var code = @"
+    [Test]
+    public static void DeducedGenericBooleanParameter()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -87,13 +87,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FunctionAcceptingABooleanVariable()
-        {
-            var code = @"
+    [Test]
+    public static void FunctionAcceptingABooleanVariable()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -109,13 +109,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void BooleanParamsArray()
-        {
-            var code = @"
+    [Test]
+    public static void BooleanParamsArray()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -131,13 +131,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoNotWarnOnDisposePattern()
-        {
-            var code = @"
+    [Test]
+    public static void DoNotWarnOnDisposePattern()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -169,13 +169,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoNotWarnOnAssertAreEqual()
-        {
-            var code = @"
+    [Test]
+    public static void DoNotWarnOnAssertAreEqual()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -189,14 +189,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Task")]
-        [TestCase("Task<int>")]
-        public static void DoNotWarnOnConfigureAwait(string expression)
-        {
-            var code = @"
+    [TestCase("Task")]
+    [TestCase("Task<int>")]
+    public static void DoNotWarnOnConfigureAwait(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -210,14 +210,14 @@ namespace N
         }
     }
 }".AssertReplace("Task<int>", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("SetValue")]
-        [TestCase("SetCurrentValue")]
-        public static void DoNotWarnOn(string method)
-        {
-            var code = @"
+    [TestCase("SetValue")]
+    [TestCase("SetCurrentValue")]
+    public static void DoNotWarnOn(string method)
+    {
+        var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -233,14 +233,14 @@ namespace N
     }
 }".AssertReplace("SetValue", method);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("textBox.SetM(true)")]
-        [TestCase("C.SetM(textBox, true)")]
-        public static void DoNotWarnOnAttachedPropertySetter(string method)
-        {
-            var c = @"
+    [TestCase("textBox.SetM(true)")]
+    [TestCase("C.SetM(textBox, true)")]
+    public static void DoNotWarnOnAttachedPropertySetter(string method)
+    {
+        var c = @"
 namespace N
 {
     using System.Windows;
@@ -264,7 +264,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+        var testCode = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -279,13 +279,13 @@ namespace N
     }
 }".AssertReplace("textBox.SetM(true)", method);
 
-            RoslynAssert.Valid(Analyzer, c, testCode);
-        }
+        RoslynAssert.Valid(Analyzer, c, testCode);
+    }
 
-        [Test]
-        public static void DoNotWarnInExpressionTree()
-        {
-            var code = @"
+    [Test]
+    public static void DoNotWarnInExpressionTree()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -305,13 +305,13 @@ namespace N
         private static bool Id(bool self) => self;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SchedulerOperationConfigureAwait()
-        {
-            var code = @"
+    [Test]
+    public static void SchedulerOperationConfigureAwait()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -327,7 +327,6 @@ namespace N
     }
 }
 ";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

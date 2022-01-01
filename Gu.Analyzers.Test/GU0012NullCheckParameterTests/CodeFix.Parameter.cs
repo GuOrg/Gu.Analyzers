@@ -1,22 +1,22 @@
-﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    internal static partial class CodeFix
+    internal static class Parameter
     {
-        internal static class Parameter
-        {
-            private static readonly ParameterAnalyzer Analyzer = new();
-            private static readonly NullCheckParameterFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
+        private static readonly ParameterAnalyzer Analyzer = new();
+        private static readonly NullCheckParameterFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0012NullCheckParameter);
 
-            [TestCase("public")]
-            [TestCase("internal")]
-            [TestCase("protected")]
-            public static void SimpleAssignFullyQualified(string access)
-            {
-                var before = @"
+        [TestCase("public")]
+        [TestCase("internal")]
+        [TestCase("protected")]
+        public static void SimpleAssignFullyQualified(string access)
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -30,7 +30,7 @@ namespace N
     }
 }".AssertReplace("public C", $"{access} C");
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -44,13 +44,13 @@ namespace N
     }
 }".AssertReplace("public C", $"{access} C");
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SimpleAssignWhenUsingExists()
-            {
-                var before = @"
+        [Test]
+        public static void SimpleAssignWhenUsingExists()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -66,7 +66,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -81,13 +81,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void WhenKeyword()
-            {
-                var before = @"
+        [Test]
+        public static void WhenKeyword()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -103,7 +103,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -118,13 +118,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIfNullThrow()
-            {
-                var before = @"
+        [Test]
+        public static void AddIfNullThrow()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -140,7 +140,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -160,13 +160,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIfNullThrowWhenComment()
-            {
-                var before = @"
+        [Test]
+        public static void AddIfNullThrowWhenComment()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -183,7 +183,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -204,13 +204,13 @@ namespace N
         private int M(string text) => text.Length;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIfNullThrowWhenKeyword()
-            {
-                var before = @"
+        [Test]
+        public static void AddIfNullThrowWhenKeyword()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -226,7 +226,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -246,13 +246,13 @@ namespace N
         private static int M(string s) => s.Length;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void WhenNotUsed()
-            {
-                var before = @"
+        [Test]
+        public static void WhenNotUsed()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -263,7 +263,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -277,15 +277,15 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [TestCase("s1 is null")]
-            [TestCase("s1 is null")]
-            [TestCase("ReferenceEquals(s1, null)")]
-            public static void AfterOtherParameter(string expression)
-            {
-                var before = @"
+        [TestCase("s1 is null")]
+        [TestCase("s1 is null")]
+        [TestCase("ReferenceEquals(s1, null)")]
+        public static void AfterOtherParameter(string expression)
+        {
+            var before = @"
 namespace N
 {
     public sealed class C
@@ -300,7 +300,7 @@ namespace N
     }
 }".AssertReplace("s1 is null", expression);
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public sealed class C
@@ -319,13 +319,13 @@ namespace N
         }
     }
 }".AssertReplace("s1 is null", expression);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void BeforeOtherParameter()
-            {
-                var before = @"
+        [Test]
+        public static void BeforeOtherParameter()
+        {
+            var before = @"
 namespace N
 {
     public sealed class C
@@ -340,7 +340,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public sealed class C
@@ -359,13 +359,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void OutParameter()
-            {
-                var before = @"
+        [Test]
+        public static void OutParameter()
+        {
+            var before = @"
 namespace N
 {
     public sealed class C
@@ -380,7 +380,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public sealed class C
@@ -394,13 +394,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void WhenInvoked()
-            {
-                var before = @"
+        [Test]
+        public static void WhenInvoked()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -415,7 +415,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -434,13 +434,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void WhenArgumentBeforeAssignment()
-            {
-                var before = @"
+        [Test]
+        public static void WhenArgumentBeforeAssignment()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -459,7 +459,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -482,8 +482,7 @@ namespace N
         private void M(FileInfo _) { }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

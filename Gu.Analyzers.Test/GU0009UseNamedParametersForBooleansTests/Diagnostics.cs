@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests
+﻿namespace Gu.Analyzers.Test.GU0009UseNamedParametersForBooleansTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ArgumentAnalyzer Analyzer = new();
+    private static readonly NameArgumentsFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans);
 
-    internal static class CodeFix
+    [Test]
+    public static void UnnamedBooleanParameters()
     {
-        private static readonly ArgumentAnalyzer Analyzer = new();
-        private static readonly NameArgumentsFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0009UseNamedParametersForBooleans);
-
-        [Test]
-        public static void UnnamedBooleanParameters()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -33,7 +33,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -54,13 +54,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Name the boolean argument"), before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Name the boolean argument"), before, after);
+    }
 
-        [Test]
-        public static void HandlesAnAlias()
-        {
-            var before = @"
+    [Test]
+    public static void HandlesAnAlias()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -82,7 +82,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -104,13 +104,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void HandlesAFullyQualifiedName()
-        {
-            var before = @"
+    [Test]
+    public static void HandlesAFullyQualifiedName()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -131,7 +131,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -151,7 +151,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

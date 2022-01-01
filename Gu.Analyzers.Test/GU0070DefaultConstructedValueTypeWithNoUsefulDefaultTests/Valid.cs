@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests
+﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new();
 
-    internal static class Valid
+    [TestCase("default(Guid)")]
+    [TestCase("Guid.NewGuid()")]
+    [TestCase("DateTime.Now")]
+    public static void When(string expression)
     {
-        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new();
-
-        [TestCase("default(Guid)")]
-        [TestCase("Guid.NewGuid()")]
-        [TestCase("DateTime.Now")]
-        public static void When(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -27,7 +27,6 @@ namespace N
     }
 }".AssertReplace("default(Guid)", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

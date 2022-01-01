@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0084AssertExceptionMessageTests
+﻿namespace Gu.Analyzers.Test.GU0084AssertExceptionMessageTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly AssertAnalyzer Analyzer = new();
+    private static readonly AssertFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0084AssertExceptionMessage);
 
-    internal static class CodeFix
+    [Test]
+    public static void ExplicitDiscard()
     {
-        private static readonly AssertAnalyzer Analyzer = new();
-        private static readonly AssertFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0084AssertExceptionMessage);
-
-        [Test]
-        public static void ExplicitDiscard()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -27,7 +27,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -42,13 +42,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
+    }
 
-        [Test]
-        public static void AssertThrowsExplicitDiscardToInline()
-        {
-            var before = @"
+    [Test]
+    public static void AssertThrowsExplicitDiscardToInline()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -63,7 +63,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -77,13 +77,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
+    }
 
-        [Test]
-        public static void AssertThrowsAsyncExplicitDiscardToInline()
-        {
-            var before = @"
+    [Test]
+    public static void AssertThrowsAsyncExplicitDiscardToInline()
+    {
+        var before = @"
 #pragma warning disable CS1998
 namespace N
 {
@@ -99,7 +99,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #pragma warning disable CS1998
 namespace N
 {
@@ -114,13 +114,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message inline.");
+    }
 
-        [Test]
-        public static void ImplicitDiscard()
-        {
-            var before = @"
+    [Test]
+    public static void ImplicitDiscard()
+    {
+        var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -135,7 +135,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -150,7 +150,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Assert exception message via local variable.");
     }
 }

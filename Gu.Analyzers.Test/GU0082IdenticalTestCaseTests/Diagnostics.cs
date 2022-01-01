@@ -1,19 +1,19 @@
-namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests
+namespace Gu.Analyzers.Test.GU0082IdenticalTestCaseTests;
+
+using System;
+using System.Collections.Generic;
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using System;
-    using System.Collections.Generic;
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0082IdenticalTestCase);
 
-    internal static class Diagnostics
+    [Test]
+    public static void TestCaseAttributeAndParameter()
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0082IdenticalTestCase);
-
-        [Test]
-        public static void TestCaseAttributeAndParameter()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void WithAndWithoutAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void WithAndWithoutAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -47,13 +47,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void WithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void WithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -67,13 +67,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void Enum()
-        {
-            var code = @"
+    [Test]
+    public static void Enum()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -88,13 +88,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void StringAndEnum()
-        {
-            var code = @"
+    [Test]
+    public static void StringAndEnum()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -109,13 +109,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void Arrays()
-        {
-            var code = @"
+    [Test]
+    public static void Arrays()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -129,14 +129,14 @@ namespace N
         }
     }
 }";
-            Console.WriteLine(new Dictionary<string, object>().ToString());
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        Console.WriteLine(new Dictionary<string, object>().ToString());
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ArraysWithAndWithoutExplicitTypeSpecification()
-        {
-            var code = @"
+    [Test]
+    public static void ArraysWithAndWithoutExplicitTypeSpecification()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -150,13 +150,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ArraysWithAndWithoutAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void ArraysWithAndWithoutAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -170,13 +170,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ArraysWithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void ArraysWithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -190,13 +190,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -211,7 +211,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

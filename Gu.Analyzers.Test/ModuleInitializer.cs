@@ -1,21 +1,20 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test;
+
+using System.Runtime.CompilerServices;
+
+using Gu.Roslyn.Asserts;
+
+internal static class ModuleInitializer
 {
-    using System.Runtime.CompilerServices;
-
-    using Gu.Roslyn.Asserts;
-
-    internal static class ModuleInitializer
+    [ModuleInitializer]
+    internal static void Initialize()
     {
-        [ModuleInitializer]
-        internal static void Initialize()
-        {
-            Settings.Default = Settings.Default.WithMetadataReferences(
-                MetadataReferences.Transitive(
-                    typeof(ModuleInitializer),
-                    typeof(System.Windows.Window),
-                    typeof(System.Reactive.Linq.Observable),
-                    typeof(Moq.Mock),
-                    typeof(Ninject.StandardKernel)));
-        }
+        Settings.Default = Settings.Default.WithMetadataReferences(
+            MetadataReferences.Transitive(
+                typeof(ModuleInitializer),
+                typeof(System.Windows.Window),
+                typeof(System.Reactive.Linq.Observable),
+                typeof(Moq.Mock),
+                typeof(Ninject.StandardKernel)));
     }
 }

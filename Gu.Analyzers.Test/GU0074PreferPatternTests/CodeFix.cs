@@ -1,21 +1,21 @@
-﻿namespace Gu.Analyzers.Test.GU0074PreferPatternTests
+﻿namespace Gu.Analyzers.Test.GU0074PreferPatternTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly PatternFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0074PreferPattern);
 
-    public static partial class CodeFix
+    public static class And
     {
-        private static readonly PatternFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0074PreferPattern);
+        private static readonly BinaryExpressionAnalyzer Analyzer = new();
 
-        public static class And
+        [Test]
+        public static void True()
         {
-            private static readonly BinaryExpressionAnalyzer Analyzer = new();
-
-            [Test]
-            public static void True()
-            {
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -36,13 +36,13 @@ namespace N
         bool M(Type type) => type is { IsPublic: true } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: true }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: true }");
+        }
 
-            [Test]
-            public static void TrueMultiLine()
-            {
-                var before = @"
+        [Test]
+        public static void TrueMultiLine()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -54,7 +54,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -65,13 +65,13 @@ namespace N
                              type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: true }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: true }");
+        }
 
-            [Test]
-            public static void Negated()
-            {
-                var before = @"
+        [Test]
+        public static void Negated()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -82,7 +82,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -92,9 +92,9 @@ namespace N
         bool M(Type type) => type is { IsPublic: false } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: false }");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsPublic: false }");
 
-                after = @"
+            after = @"
 namespace N
 {
     using System;
@@ -104,13 +104,13 @@ namespace N
         bool M(Type type) => !type.IsPublic && type is { IsAbstract: true };
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsAbstract: true }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsAbstract: true }");
+        }
 
-            [Test]
-            public static void String()
-            {
-                var before = @"
+        [Test]
+        public static void String()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -121,7 +121,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -131,13 +131,13 @@ namespace N
         bool M(Type type) => type is { Name: ""abc"" } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: \"abc\" }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: \"abc\" }");
+        }
 
-            [Test]
-            public static void Null()
-            {
-                var before = @"
+        [Test]
+        public static void Null()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -148,7 +148,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -158,13 +158,13 @@ namespace N
         bool M(Type type) => type is { Name: null } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: null }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: null }");
+        }
 
-            [Test]
-            public static void IsNull()
-            {
-                var before = @"
+        [Test]
+        public static void IsNull()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -175,7 +175,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -185,9 +185,9 @@ namespace N
         bool M(Type type) => type is { Name: null } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: null }");
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: null }");
 
-                after = @"
+            after = @"
 namespace N
 {
     using System;
@@ -197,13 +197,13 @@ namespace N
         bool M(Type type) => type.Name is null && type is { IsAbstract: true };
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsAbstract: true }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { IsAbstract: true }");
+        }
 
-            [Test]
-            public static void NotNull()
-            {
-                var before = @"
+        [Test]
+        public static void NotNull()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -214,7 +214,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -224,8 +224,7 @@ namespace N
         bool M(Type type) => type is { Name: { } } && type.IsAbstract;
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: { } }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "type is { Name: { } }");
         }
     }
 }

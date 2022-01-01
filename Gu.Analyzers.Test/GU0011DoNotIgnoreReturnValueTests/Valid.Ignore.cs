@@ -1,19 +1,19 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests;
 
-    internal static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class Valid
+{
+    internal static class Ignore
     {
-        internal static class Ignore
+        [TestCase("stringBuilder.AppendLine(\"test\");")]
+        [TestCase("stringBuilder.Append(\"test\");")]
+        [TestCase("stringBuilder.Clear();")]
+        public static void StringBuilder(string expression)
         {
-            [TestCase("stringBuilder.AppendLine(\"test\");")]
-            [TestCase("stringBuilder.Append(\"test\");")]
-            [TestCase("stringBuilder.Clear();")]
-            public static void StringBuilder(string expression)
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -28,13 +28,13 @@ namespace N
     }
 }".AssertReplace("stringBuilder.AppendLine(\"test\");", expression);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void StringBuilderChained()
-            {
-                var code = @"
+        [Test]
+        public static void StringBuilderChained()
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -54,13 +54,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void StringBuilderAppendChained()
-            {
-                var code = @"
+        [Test]
+        public static void StringBuilderAppendChained()
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -74,13 +74,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void WhenReturningSameInstance()
-            {
-                var ensure = @"
+        [Test]
+        public static void WhenReturningSameInstance()
+        {
+            var ensure = @"
 #nullable disable
 namespace N
 {
@@ -119,7 +119,7 @@ namespace N
         }
     }
 }";
-                var c = @"
+            var c = @"
 namespace N
 {
     public class C
@@ -130,13 +130,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, ensure, c);
-            }
+            RoslynAssert.Valid(Analyzer, ensure, c);
+        }
 
-            [Test]
-            public static void WhenReturningThis()
-            {
-                var code = @"
+        [Test]
+        public static void WhenReturningThis()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -152,13 +152,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void WhenExtensionMethodReturningThis()
-            {
-                var c2 = @"
+        [Test]
+        public static void WhenExtensionMethodReturningThis()
+        {
+            var c2 = @"
 namespace N
 {
     internal static class C2
@@ -169,7 +169,7 @@ namespace N
         }
     }
 }";
-                var c1 = @"
+            var c1 = @"
 namespace N
 {
     public class C1
@@ -181,16 +181,16 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, c2, c1);
-            }
+            RoslynAssert.Valid(Analyzer, c2, c1);
+        }
 
-            [Explicit("Don't know if we want this.")]
-            [TestCase("this.ints.Add(1);")]
-            [TestCase("ints.Add(1);")]
-            [TestCase("this.ints.Remove(1);")]
-            public static void HashSet(string operation)
-            {
-                var code = @"
+        [Explicit("Don't know if we want this.")]
+        [TestCase("this.ints.Add(1);")]
+        [TestCase("ints.Add(1);")]
+        [TestCase("this.ints.Remove(1);")]
+        public static void HashSet(string operation)
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -206,15 +206,15 @@ namespace N
     }
 }".AssertReplace("this.ints.Add(1);", operation);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("this.ints.Add(1);")]
-            [TestCase("ints.Add(1);")]
-            [TestCase("this.ints.Remove(1);")]
-            public static void IList(string operation)
-            {
-                var code = @"
+        [TestCase("this.ints.Add(1);")]
+        [TestCase("ints.Add(1);")]
+        [TestCase("this.ints.Remove(1);")]
+        public static void IList(string operation)
+        {
+            var code = @"
 namespace N
 {
     using System.Collections;
@@ -231,15 +231,15 @@ namespace N
     }
 }".AssertReplace("this.ints.Add(1);", operation);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("ints.Add(1);")]
-            [TestCase("ints.Remove(1);")]
-            [TestCase("ints.RemoveAll(x => x > 2);")]
-            public static void ListOfInt(string operation)
-            {
-                var code = @"
+        [TestCase("ints.Add(1);")]
+        [TestCase("ints.Remove(1);")]
+        [TestCase("ints.RemoveAll(x => x > 2);")]
+        public static void ListOfInt(string operation)
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -253,13 +253,13 @@ namespace N
     }
 }".AssertReplace("ints.RemoveAll(x => x > 2);", operation);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("map.TryAdd(1, 1);")]
-            public static void ConcurrentDictionary(string operation)
-            {
-                var code = @"
+        [TestCase("map.TryAdd(1, 1);")]
+        public static void ConcurrentDictionary(string operation)
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -273,13 +273,13 @@ namespace N
     }
 }".AssertReplace("map.TryAdd(1, 1);", operation);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)")]
-            public static void MoqSetupReturns(string expression)
-            {
-                var code = @"
+        [TestCase("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)")]
+        public static void MoqSetupReturns(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -297,13 +297,13 @@ namespace N
     }
 }".AssertReplace("mock.Setup(x => x.GetFormat(It.IsAny<Type>())).Returns(null)", expression);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("mock.Setup(x => x.M())")]
-            public static void MoqSetupVoid(string setup)
-            {
-                var code = @"
+        [TestCase("mock.Setup(x => x.M())")]
+        public static void MoqSetupVoid(string setup)
+        {
+            var code = @"
 namespace N
 {
     using Moq;
@@ -323,15 +323,15 @@ namespace N
     }
 }".AssertReplace("mock.Setup(x => x.M())", setup);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("this.Bind<C>().To<C>()")]
-            [TestCase("this.Bind<C>().To<C>().InSingletonScope()")]
-            [TestCase("this.Bind<C>().ToMethod(x => new C())")]
-            public static void NinjectFluent(string bind)
-            {
-                var code = @"
+        [TestCase("this.Bind<C>().To<C>()")]
+        [TestCase("this.Bind<C>().To<C>().InSingletonScope()")]
+        [TestCase("this.Bind<C>().ToMethod(x => new C())")]
+        public static void NinjectFluent(string bind)
+        {
+            var code = @"
 namespace N
 {
     using Ninject.Modules;
@@ -345,13 +345,13 @@ namespace N
     }
 }".AssertReplace("this.Bind<C>().To<C>()", bind);
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void DocumentEditorExtensionMethod()
-            {
-                var extCode = @"
+        [Test]
+        public static void DocumentEditorExtensionMethod()
+        {
+            var extCode = @"
 namespace N
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -369,7 +369,7 @@ namespace N
         }
     }
 }";
-                var c = @"
+            var c = @"
 namespace N
 {
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -383,8 +383,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, extCode, c);
-            }
+            RoslynAssert.Valid(Analyzer, extCode, c);
         }
     }
 }

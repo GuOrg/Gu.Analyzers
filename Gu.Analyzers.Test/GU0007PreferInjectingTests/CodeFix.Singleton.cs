@@ -1,13 +1,13 @@
-﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests;
 
-    internal static partial class CodeFix
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class CodeFix
+{
+    public static class SingletonTests
     {
-        public static class SingletonTests
-        {
-            private const string Singleton = @"
+        private const string Singleton = @"
 namespace N
 {
     public sealed class Singleton
@@ -20,7 +20,7 @@ namespace N
     }
 }";
 
-            private const string AbstractC = @"
+        private const string AbstractC = @"
 namespace N
 {
     public abstract class AbstractC
@@ -34,10 +34,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void AssigningThisFieldInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningThisFieldInCtor()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -51,7 +51,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -64,13 +64,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void AssigningUnderscoreFieldInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningUnderscoreFieldInCtor()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -84,7 +84,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -97,13 +97,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void WhenNotInjectingFieldInitializationObject()
-            {
-                var before = @"
+        [Test]
+        public static void WhenNotInjectingFieldInitializationObject()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -130,13 +130,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void FieldInitializationAndBaseCall()
-            {
-                var before = @"
+        [Test]
+        public static void FieldInitializationAndBaseCall()
+        {
+            var before = @"
 namespace N
 {
     public class C : AbstractC
@@ -151,7 +151,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C : AbstractC
@@ -165,13 +165,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { AbstractC, Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { AbstractC, Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void UsingInMethodWhenCtorExists()
-            {
-                var before = @"
+        [Test]
+        public static void UsingInMethodWhenCtorExists()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -187,7 +187,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -205,13 +205,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Test]
-            public static void UsingInMethodExpressionBodyWhenCtorExists()
-            {
-                var before = @"
+        [Test]
+        public static void UsingInMethodExpressionBodyWhenCtorExists()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -224,7 +224,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -239,14 +239,14 @@ namespace N
         public string? M() => this.singleton.ToString();
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
+        }
 
-            [Ignore("Not creating ctors yet.")]
-            [Test]
-            public static void UsingInMethodWhenNoCtor()
-            {
-                var before = @"
+        [Ignore("Not creating ctors yet.")]
+        [Test]
+        public static void UsingInMethodWhenNoCtor()
+        {
+            var before = @"
 namespace N
 {
     public class C
@@ -258,7 +258,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     public class C
@@ -276,8 +276,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Singleton, before }, after, fixTitle: "Inject safe.");
         }
     }
 }

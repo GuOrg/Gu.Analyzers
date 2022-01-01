@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests
+﻿namespace Gu.Analyzers.Test.GU0025SealTypeWithOverridenEqualityTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ClassDeclarationAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void WhenSealed()
     {
-        private static readonly ClassDeclarationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void WhenSealed()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -34,20 +34,19 @@ namespace N
         private bool Equals(C other) => this.P == other.P;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenNotOverridden()
-        {
-            var code = @"
+    [Test]
+    public static void WhenNotOverridden()
+    {
+        var code = @"
 namespace N
 {
     public class C
     {
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

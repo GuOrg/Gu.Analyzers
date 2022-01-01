@@ -1,19 +1,19 @@
-﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests
+﻿namespace Gu.Analyzers.Test.GU0071ForeachImplicitCastTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0071ForeachImplicitCast Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0071ForeachImplicitCast);
 
-    internal static class Diagnostics
+    [TestCase("int[]")]
+    [TestCase("System.Collections.Generic.List<int>")]
+    [TestCase("System.Collections.Generic.IEnumerable<int>")]
+    public static void ExplicitDouble(string type)
     {
-        private static readonly GU0071ForeachImplicitCast Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0071ForeachImplicitCast);
-
-        [TestCase("int[]")]
-        [TestCase("System.Collections.Generic.List<int>")]
-        [TestCase("System.Collections.Generic.IEnumerable<int>")]
-        public static void ExplicitDouble(string type)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class A
@@ -27,13 +27,13 @@ namespace N
     }
 }".AssertReplace("int[]", type);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void GenericCollectionWithACast()
-        {
-            var code = @"
+    [Test]
+    public static void GenericCollectionWithACast()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void GenericCollectionWithAnExplicitImplementation()
-        {
-            var code = @"
+    [Test]
+    public static void GenericCollectionWithAnExplicitImplementation()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections;
@@ -86,13 +86,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void Array()
-        {
-            var code = @"
+    [Test]
+    public static void Array()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -107,13 +107,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void DuckTypedEnumerable()
-        {
-            var code = @"
+    [Test]
+    public static void DuckTypedEnumerable()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -136,7 +136,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

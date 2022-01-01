@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0075PreferReturnNullable
+﻿namespace Gu.Analyzers.Test.GU0075PreferReturnNullable;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ParameterAnalyzer Analyzer = new();
+    private static readonly ReturnNullableFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0075PreferReturnNullable);
 
-    public static class CodeFix
+    [Test]
+    public static void InstanceMethodSingleParameter()
     {
-        private static readonly ParameterAnalyzer Analyzer = new();
-        private static readonly ReturnNullableFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0075PreferReturnNullable);
-
-        [Test]
-        public static void InstanceMethodSingleParameter()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     class C
@@ -31,7 +31,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -47,13 +47,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void InstanceMethodSingleGenericParameter()
-        {
-            var before = @"
+    [Test]
+    public static void InstanceMethodSingleGenericParameter()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -73,7 +73,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -90,13 +90,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void InstanceMethodTwoParameters()
-        {
-            var before = @"
+    [Test]
+    public static void InstanceMethodTwoParameters()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -115,7 +115,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -131,13 +131,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+    }
 
-        [Test]
-        public static void Switch()
-        {
-            var before = @"
+    [Test]
+    public static void Switch()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -157,7 +157,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -174,16 +174,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+    }
 
-        [Ignore("tbd")]
-        [TestCase("s != null")]
-        [TestCase("s is { }")]
-        [TestCase("s is object")]
-        public static void ReturnNotNull(string expression)
-        {
-            var before = @"
+    [Ignore("tbd")]
+    [TestCase("s != null")]
+    [TestCase("s is { }")]
+    [TestCase("s is object")]
+    public static void ReturnNotNull(string expression)
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -208,7 +208,7 @@ namespace N
     }
 }".AssertReplace("s != null", expression);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -232,13 +232,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
+    }
 
-        [Test]
-        public static void ReturnAssignedViaOut()
-        {
-            var before = @"
+    [Test]
+    public static void ReturnAssignedViaOut()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -263,7 +263,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -287,14 +287,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
+    }
 
-        [TestCase("s = null")]
-        [TestCase("s = default")]
-        public static void AssignedNullInFirstStatement(string expression)
-        {
-            var before = @"
+    [TestCase("s = null")]
+    [TestCase("s = default")]
+    public static void AssignedNullInFirstStatement(string expression)
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -321,7 +321,7 @@ namespace N
     }
 }".AssertReplace("s = null", expression);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -346,13 +346,13 @@ namespace N
         }
     }
 }".AssertReplace("s = null", expression);
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "UNSAFE Return nullable", settings: Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.WarningsAndErrors));
+    }
 
-        [Test]
-        public static void LocalFunction()
-        {
-            var before = @"
+    [Test]
+    public static void LocalFunction()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -375,7 +375,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -395,7 +395,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Return nullable");
     }
 }

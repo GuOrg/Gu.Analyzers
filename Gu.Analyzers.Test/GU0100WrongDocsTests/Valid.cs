@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
+﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DocsAnalyzer Analyzer = new();
 
-    public static class Valid
+    [TestCase("StringBuilder")]
+    [TestCase("System.Text.StringBuilder")]
+    public static void WhenCorrect(string cref)
     {
-        private static readonly DocsAnalyzer Analyzer = new();
-
-        [TestCase("StringBuilder")]
-        [TestCase("System.Text.StringBuilder")]
-        public static void WhenCorrect(string cref)
-        {
-            var code = @"
+        var code = @"
 #pragma warning disable CS8019
 namespace N
 {
@@ -28,18 +28,18 @@ namespace N
         }
     }
 }".AssertReplace("StringBuilder", cref);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("List{int}")]
-        [TestCase("List{Int32}")]
-        [TestCase("List{System.Int32}")]
-        [TestCase("System.Collections.Generic.List{int}")]
-        [TestCase("System.Collections.Generic.List{Int32}")]
-        [TestCase("System.Collections.Generic.List{System.Int32}")]
-        public static void WhenListOfInt(string cref)
-        {
-            var code = @"
+    [TestCase("List{int}")]
+    [TestCase("List{Int32}")]
+    [TestCase("List{System.Int32}")]
+    [TestCase("System.Collections.Generic.List{int}")]
+    [TestCase("System.Collections.Generic.List{Int32}")]
+    [TestCase("System.Collections.Generic.List{System.Int32}")]
+    public static void WhenListOfInt(string cref)
+    {
+        var code = @"
 #pragma warning disable CS8019
 namespace N
 {
@@ -57,16 +57,16 @@ namespace N
         }
     }
 }".AssertReplace("List{int}", cref);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("List{C}")]
-        [TestCase("List{N.C}")]
-        [TestCase("System.Collections.Generic.List{C}")]
-        [TestCase("System.Collections.Generic.List{N.C}")]
-        public static void WhenListOfC(string cref)
-        {
-            var code = @"
+    [TestCase("List{C}")]
+    [TestCase("List{N.C}")]
+    [TestCase("System.Collections.Generic.List{C}")]
+    [TestCase("System.Collections.Generic.List{N.C}")]
+    public static void WhenListOfC(string cref)
+    {
+        var code = @"
 #pragma warning disable CS8019
 namespace N
 {
@@ -84,13 +84,13 @@ namespace N
         }
     }
 }".AssertReplace("List{C}", cref);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenKeyValuePair()
-        {
-            var code = @"
+    [Test]
+    public static void WhenKeyValuePair()
+    {
+        var code = @"
 namespace N
 {
     using System.Text;
@@ -108,13 +108,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenOtherText()
-        {
-            var code = @"
+    [Test]
+    public static void WhenOtherText()
+    {
+        var code = @"
 namespace N
 {
     using System.Text;
@@ -130,7 +130,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

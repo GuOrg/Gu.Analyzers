@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0018NameMockTests
+﻿namespace Gu.Analyzers.Test.GU0018NameMockTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly VariableDeclaratorAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void LocalSuffixed()
     {
-        private static readonly VariableDeclaratorAnalyzer Analyzer = new();
-
-        [Test]
-        public static void LocalSuffixed()
-        {
-            var iPlc = @"
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -18,7 +18,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -33,13 +33,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
+    }
 
-        [Test]
-        public static void TwoLocalsSuffixed()
-        {
-            var iPlc = @"
+    [Test]
+    public static void TwoLocalsSuffixed()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -47,7 +47,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -63,13 +63,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
+    }
 
-        [Test]
-        public static void LocalGeneric()
-        {
-            var iPlc = @"
+    [Test]
+    public static void LocalGeneric()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -77,7 +77,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -92,13 +92,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
+    }
 
-        [Test]
-        public static void FieldSuffixed()
-        {
-            var iPlc = @"
+    [Test]
+    public static void FieldSuffixed()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -106,7 +106,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -123,13 +123,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
+    }
 
-        [Test]
-        public static void FieldsSuffixed()
-        {
-            var iPlc = @"
+    [Test]
+    public static void FieldsSuffixed()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -137,7 +137,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -156,13 +156,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
+    }
 
-        [Test]
-        public static void PublicField()
-        {
-            var iPlc = @"
+    [Test]
+    public static void PublicField()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -170,7 +170,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Moq;
@@ -180,7 +180,6 @@ namespace N
         public static readonly Mock<IPlc> PlcClientMock = new Mock<IPlc>(MockBehavior.Strict);
     }
 }";
-            RoslynAssert.Valid(Analyzer, iPlc, code);
-        }
+        RoslynAssert.Valid(Analyzer, iPlc, code);
     }
 }

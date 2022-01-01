@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
+﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0022UseGetOnly Analyzer = new();
+    private static readonly UseGetOnlyFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0022UseGetOnly);
 
-    internal static class CodeFix
+    [Test]
+    public static void InitializedInCtor()
     {
-        private static readonly GU0022UseGetOnly Analyzer = new();
-        private static readonly UseGetOnlyFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0022UseGetOnly);
-
-        [Test]
-        public static void InitializedInCtor()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class Foo
@@ -35,7 +35,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -57,13 +57,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void InitializedInCtorAndPropertyInitializer()
-        {
-            var before = @"
+    [Test]
+    public static void InitializedInCtorAndPropertyInitializer()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -86,7 +86,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -108,7 +108,6 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

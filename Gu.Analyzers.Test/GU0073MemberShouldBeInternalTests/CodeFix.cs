@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0073MemberShouldBeInternalTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0073MemberShouldBeInternal Analyzer = new();
+    private static readonly MakeInternalFix Fix = new();
 
-    internal static class CodeFix
+    [Test]
+    public static void Messages()
     {
-        private static readonly GU0073MemberShouldBeInternal Analyzer = new();
-        private static readonly MakeInternalFix Fix = new();
-
-        [Test]
-        public static void Messages()
-        {
-            var before = @"
+        var before = @"
 #pragma warning disable CS0649
 namespace N
 {
@@ -23,7 +23,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #pragma warning disable CS0649
 namespace N
 {
@@ -34,22 +34,22 @@ namespace N
         internal readonly int F;
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0073MemberShouldBeInternal).WithMessage("Member F of non-public type C should be internal");
-            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Make internal.");
-        }
+        var expectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0073MemberShouldBeInternal).WithMessage("Member F of non-public type C should be internal");
+        RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "Make internal.");
+    }
 
-        [TestCase("readonly int F;")]
-        [TestCase("static readonly int F;")]
-        [TestCase("C() { }")]
-        [TestCase("event Action? E;")]
-        [TestCase("int P { get; }")]
-        [TestCase("void M() { }")]
-        [TestCase("enum E { }")]
-        [TestCase("struct S { }")]
-        [TestCase("class Nested { }")]
-        public static void InternalClass(string member)
-        {
-            var before = @"
+    [TestCase("readonly int F;")]
+    [TestCase("static readonly int F;")]
+    [TestCase("C() { }")]
+    [TestCase("event Action? E;")]
+    [TestCase("int P { get; }")]
+    [TestCase("void M() { }")]
+    [TestCase("enum E { }")]
+    [TestCase("struct S { }")]
+    [TestCase("class Nested { }")]
+    public static void InternalClass(string member)
+    {
+        var before = @"
 #pragma warning disable CS0067, CS0649
 namespace N
 {
@@ -61,7 +61,7 @@ namespace N
     }
 }".AssertReplace("readonly int F;", member);
 
-            var after = @"
+        var after = @"
 #pragma warning disable CS0067, CS0649
 namespace N
 {
@@ -72,7 +72,6 @@ namespace N
         internal readonly int F;
     }
 }".AssertReplace("readonly int F;", member);
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
     }
 }

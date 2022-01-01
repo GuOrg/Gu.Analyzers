@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests
+﻿namespace Gu.Analyzers.Test.GU0023StaticMemberOrderTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0023StaticMemberOrderAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void StaticFieldInitializedWithField()
     {
-        private static readonly GU0023StaticMemberOrderAnalyzer Analyzer = new();
-
-        [Test]
-        public static void StaticFieldInitializedWithField()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -20,13 +20,13 @@ namespace N
         public static readonly int Value2 = Value1;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstFieldInitializedWithField()
-        {
-            var code = @"
+    [Test]
+    public static void ConstFieldInitializedWithField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -36,13 +36,13 @@ namespace N
         public const int Value2 = Value1;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldInitializedWithFuncUsingField()
-        {
-            var code = @"
+    [Test]
+    public static void FieldInitializedWithFuncUsingField()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -54,13 +54,13 @@ namespace N
         public static readonly int Value2 = 2;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldInitializedWithStaticProperty()
-        {
-            var code = @"
+    [Test]
+    public static void FieldInitializedWithStaticProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -70,13 +70,13 @@ namespace N
         public static readonly DateTime DateTime = DateTime.MaxValue;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExcludeNameof()
-        {
-            var code = @"
+    [Test]
+    public static void ExcludeNameof()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -85,13 +85,13 @@ namespace N
         public static readonly string Value2 = ""2"";
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UninitializedField()
-        {
-            var code = @"
+    [Test]
+    public static void UninitializedField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -99,13 +99,13 @@ namespace N
         public static int Value1;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UninitializedProperty()
-        {
-            var code = @"
+    [Test]
+    public static void UninitializedProperty()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -113,13 +113,13 @@ namespace N
         public static int Value2 { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldInitializedWithExpressionBodyProperty()
-        {
-            var code = @"
+    [Test]
+    public static void FieldInitializedWithExpressionBodyProperty()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -129,13 +129,13 @@ namespace N
         public static int Value2 => 2;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DependencyPropertyRegisterReadOnly()
-        {
-            var code = @"
+    [Test]
+    public static void DependencyPropertyRegisterReadOnly()
+    {
+        var code = @"
 namespace N
 {
     using System.Windows;
@@ -158,13 +158,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExtensionMethod()
-        {
-            var ext = @"
+    [Test]
+    public static void ExtensionMethod()
+    {
+        var ext = @"
 namespace N
 {
     public static class Ext
@@ -175,7 +175,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -183,7 +183,6 @@ namespace N
         private static readonly string F = string.Empty.M1().M2();
     }
 }";
-            RoslynAssert.Valid(Analyzer, ext, code);
-        }
+        RoslynAssert.Valid(Analyzer, ext, code);
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void IgnoredEvent()
     {
-        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new();
-
-        [Test]
-        public static void IgnoredEvent()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -42,13 +42,13 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoredEventSimple()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoredEventSimple()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -62,13 +62,13 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoredEventHandler()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoredEventHandler()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -86,13 +86,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NotSerializable()
-        {
-            var code = @"
+    [Test]
+    public static void NotSerializable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -123,7 +123,6 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

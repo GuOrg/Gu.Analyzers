@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0018NameMockTests
+﻿namespace Gu.Analyzers.Test.GU0018NameMockTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly VariableDeclaratorAnalyzer Analyzer = new();
+    private static readonly RenameFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0018aNameMock);
 
-    internal static class CodeFix
+    [Test]
+    public static void Local()
     {
-        private static readonly VariableDeclaratorAnalyzer Analyzer = new();
-        private static readonly RenameFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0018aNameMock);
-
-        [Test]
-        public static void Local()
-        {
-            var iPlc = @"
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -20,7 +20,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     using Moq;
@@ -36,7 +36,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using Moq;
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlc, before }, after: after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlc, before }, after: after);
+    }
 
-        [Test]
-        public static void LocalGeneric()
-        {
-            var iPlcOfT = @"
+    [Test]
+    public static void LocalGeneric()
+    {
+        var iPlcOfT = @"
 namespace N
 {
     public interface IPlc<T>
@@ -65,7 +65,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -82,7 +82,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -98,13 +98,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlcOfT, before }, after: after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlcOfT, before }, after: after);
+    }
 
-        [Test]
-        public static void OneLocalMock()
-        {
-            var iPlc = @"
+    [Test]
+    public static void OneLocalMock()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -112,7 +112,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     using Moq;
@@ -127,7 +127,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     using Moq;
@@ -142,13 +142,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.Create(Descriptors.GU0018bNameMock), new[] { iPlc, before }, after: after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.Create(Descriptors.GU0018bNameMock), new[] { iPlc, before }, after: after);
+    }
 
-        [Test]
-        public static void Field()
-        {
-            var iPlc = @"
+    [Test]
+    public static void Field()
+    {
+        var iPlc = @"
 namespace N
 {
     public interface IPlc
@@ -156,7 +156,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     using Moq;
@@ -174,7 +174,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using Moq;
@@ -191,7 +191,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlc, before }, after: after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { iPlc, before }, after: after);
     }
 }

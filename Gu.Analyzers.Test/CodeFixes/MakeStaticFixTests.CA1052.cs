@@ -1,28 +1,28 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes
+﻿namespace Gu.Analyzers.Test.CodeFixes;
+
+using System.Collections.Immutable;
+
+using Gu.Roslyn.Asserts;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+using NUnit.Framework;
+
+internal static partial class MakeStaticFixTests
 {
-    using System.Collections.Immutable;
+    private static readonly FakeFxCopAnalyzer Analyzer = new();
 
-    using Gu.Roslyn.Asserts;
+    // ReSharper disable once InconsistentNaming
+    private static readonly ExpectedDiagnostic CA1052 = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
 
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    using NUnit.Framework;
-
-    internal static partial class MakeStaticFixTests
+    [TestCase("public")]
+    [TestCase("internal")]
+    public static void StaticHolderClass(string modifier)
     {
-        private static readonly FakeFxCopAnalyzer Analyzer = new();
-
-        // ReSharper disable once InconsistentNaming
-        private static readonly ExpectedDiagnostic CA1052 = ExpectedDiagnostic.Create(FakeFxCopAnalyzer.Descriptor);
-
-        [TestCase("public")]
-        [TestCase("internal")]
-        public static void StaticHolderClass(string modifier)
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class ↓C
@@ -33,7 +33,7 @@ namespace N
     }
 }".AssertReplace("public", modifier);
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -43,30 +43,29 @@ namespace N
         }
     }
 }".AssertReplace("public", modifier);
-            RoslynAssert.CodeFix(Analyzer, Fix, CA1052, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, CA1052, before, after);
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+    {
+        internal static readonly DiagnosticDescriptor Descriptor = new("CA1052", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ClassDeclaration);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            internal static readonly DiagnosticDescriptor Descriptor = new("CA1052", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is ClassDeclarationSyntax { Identifier: { } identifier })
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ClassDeclaration);
-            }
-
-            private static void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is ClassDeclarationSyntax { Identifier: { } identifier })
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, identifier.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, identifier.GetLocation()));
             }
         }
     }

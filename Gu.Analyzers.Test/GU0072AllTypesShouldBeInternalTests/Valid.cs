@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests
+﻿namespace Gu.Analyzers.Test.GU0072AllTypesShouldBeInternalTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
 
-    internal static class Valid
+    [TestCase("internal class C")]
+    [TestCase("internal struct S")]
+    public static void SimpleType(string signature)
     {
-        private static readonly GU0072AllTypesShouldBeInternal Analyzer = new();
-
-        [TestCase("internal class C")]
-        [TestCase("internal struct S")]
-        public static void SimpleType(string signature)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     internal class C
@@ -19,18 +19,18 @@ namespace N
     }
 }".AssertReplace("internal class C", signature);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("internal class C2")]
-        [TestCase("protected class C2")]
-        [TestCase("private class C2")]
-        [TestCase("internal struct S")]
-        [TestCase("protected struct S")]
-        [TestCase("private struct S")]
-        public static void NestedType(string signature)
-        {
-            var code = @"
+    [TestCase("internal class C2")]
+    [TestCase("protected class C2")]
+    [TestCase("private class C2")]
+    [TestCase("internal struct S")]
+    [TestCase("protected struct S")]
+    [TestCase("private struct S")]
+    public static void NestedType(string signature)
+    {
+        var code = @"
 namespace N
 {
     internal class C1
@@ -41,7 +41,6 @@ namespace N
     }
 }".AssertReplace("private class C2", signature);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

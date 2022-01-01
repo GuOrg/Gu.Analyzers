@@ -1,16 +1,16 @@
-namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests
+namespace Gu.Analyzers.Test.GU0005ExceptionArgumentsPositionsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ObjectCreationAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ArgumentExceptionWithMessageAndNameof()
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void ArgumentExceptionWithMessageAndNameof()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -23,13 +23,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArgumentNullExceptionWithMessageAndNameof()
-        {
-            var code = @"
+    [Test]
+    public static void ArgumentNullExceptionWithMessageAndNameof()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -42,13 +42,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArgumentOutOfRangeExceptionWithMessageAndNameof()
-        {
-            var code = @"
+    [Test]
+    public static void ArgumentOutOfRangeExceptionWithMessageAndNameof()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -61,7 +61,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

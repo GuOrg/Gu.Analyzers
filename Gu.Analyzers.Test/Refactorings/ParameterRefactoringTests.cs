@@ -1,21 +1,21 @@
-﻿namespace Gu.Analyzers.Test.Refactorings
+﻿namespace Gu.Analyzers.Test.Refactorings;
+
+using Gu.Analyzers.Refactoring;
+using Gu.Roslyn.Asserts;
+
+using Microsoft.CodeAnalysis.CodeRefactorings;
+
+using NUnit.Framework;
+
+[Ignore("RoslynAssert does not handle many.")]
+public static class ParameterRefactoringTests
 {
-    using Gu.Analyzers.Refactoring;
-    using Gu.Roslyn.Asserts;
+    private static readonly CodeRefactoringProvider Refactoring = new ParameterRefactoring();
 
-    using Microsoft.CodeAnalysis.CodeRefactorings;
-
-    using NUnit.Framework;
-
-    [Ignore("RoslynAssert does not handle many.")]
-    public static class ParameterRefactoringTests
+    [Test]
+    public static void MoveAssignmentBefore()
     {
-        private static readonly CodeRefactoringProvider Refactoring = new ParameterRefactoring();
-
-        [Test]
-        public static void MoveAssignmentBefore()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C
@@ -31,7 +31,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, before, after, title: "Move assignment to match parameter position.");
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after, title: "Move assignment to match parameter position.");
+    }
 
-        [Test]
-        public static void MoveAssignmentAfter()
-        {
-            var before = @"
+    [Test]
+    public static void MoveAssignmentAfter()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -68,7 +68,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -83,13 +83,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, before, after, title: "Move assignment to match parameter position.");
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after, title: "Move assignment to match parameter position.");
+    }
 
-        [Test]
-        public static void MoveParameterBefore()
-        {
-            var before = @"
+    [Test]
+    public static void MoveParameterBefore()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -105,7 +105,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -120,13 +120,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, before, after, title: "Move parameter to match assigned member position.");
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after, title: "Move parameter to match assigned member position.");
+    }
 
-        [Test]
-        public static void MoveParameterAfter()
-        {
-            var before = @"
+    [Test]
+    public static void MoveParameterAfter()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -142,7 +142,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -157,7 +157,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, before, after, title: "Move parameter to match assigned member position.");
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after, title: "Move parameter to match assigned member position.");
     }
 }

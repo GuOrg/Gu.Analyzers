@@ -1,20 +1,20 @@
-﻿namespace Gu.Analyzers.Test.Refactorings
+﻿namespace Gu.Analyzers.Test.Refactorings;
+
+using Gu.Analyzers.Refactoring;
+using Gu.Roslyn.Asserts;
+
+using Microsoft.CodeAnalysis.CodeRefactorings;
+
+using NUnit.Framework;
+
+internal static class SplitStringRefactoringTests
 {
-    using Gu.Analyzers.Refactoring;
-    using Gu.Roslyn.Asserts;
+    private static readonly CodeRefactoringProvider Refactoring = new SplitStringRefactoring();
 
-    using Microsoft.CodeAnalysis.CodeRefactorings;
-
-    using NUnit.Framework;
-
-    internal static class SplitStringRefactoringTests
+    [Test]
+    public static void StartingWithNewLine()
     {
-        private static readonly CodeRefactoringProvider Refactoring = new SplitStringRefactoring();
-
-        [Test]
-        public static void StartingWithNewLine()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public static class C
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -38,13 +38,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void NoFixWhenEndingWithNewLine()
-        {
-            var code = @"
+    [Test]
+    public static void NoFixWhenEndingWithNewLine()
+    {
+        var code = @"
 namespace N
 {
     public static class C
@@ -56,7 +56,7 @@ namespace N
     }
 }";
 
-            var title = @"
+        var title = @"
 namespace N
 {
     public static class C
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoRefactoring(Refactoring, code, title);
-        }
+        RoslynAssert.NoRefactoring(Refactoring, code, title);
+    }
 
-        [Test]
-        public static void StartingAndEndingWithNewLine()
-        {
-            var before = @"
+    [Test]
+    public static void StartingAndEndingWithNewLine()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -86,7 +86,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -99,13 +99,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void OneCarriageReturnNewLine()
-        {
-            var before = @"
+    [Test]
+    public static void OneCarriageReturnNewLine()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -130,13 +130,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void OneCarriageReturnNewLineAndEndingWithCarriageReturnNewLine()
-        {
-            var before = @"
+    [Test]
+    public static void OneCarriageReturnNewLineAndEndingWithCarriageReturnNewLine()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -148,7 +148,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -161,13 +161,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void TwoCarriageReturnNewLines()
-        {
-            var before = @"
+    [Test]
+    public static void TwoCarriageReturnNewLines()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -179,7 +179,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -193,13 +193,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void TwoCarriageReturnNewLinesAndEndingWithCarriageReturnNewLine()
-        {
-            var before = @"
+    [Test]
+    public static void TwoCarriageReturnNewLinesAndEndingWithCarriageReturnNewLine()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -211,7 +211,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -225,13 +225,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void TwoNewLinesEndingWithNewline()
-        {
-            var before = @"
+    [Test]
+    public static void TwoNewLinesEndingWithNewline()
+    {
+        var before = @"
 namespace N
 {
     public static class C
@@ -243,7 +243,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public static class C
@@ -257,13 +257,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Refactoring(Refactoring, before, after);
-        }
+        RoslynAssert.Refactoring(Refactoring, before, after);
+    }
 
-        [Test]
-        public static void IgnoreVerbatim()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreVerbatim()
+    {
+        var code = @"
 namespace N
 {
     public static class C
@@ -275,7 +275,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoRefactoring(Refactoring, code);
-        }
+        RoslynAssert.NoRefactoring(Refactoring, code);
     }
 }

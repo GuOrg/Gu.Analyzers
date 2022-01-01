@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
+﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly SimpleAssignmentAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce);
 
-    internal static class Diagnostics
+    [Test]
+    public static void FieldInConstructor()
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0015DoNotAssignMoreThanOnce);
-
-        [Test]
-        public static void FieldInConstructor()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -26,13 +26,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void PropertyInConstructor()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyInConstructor()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -48,13 +48,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void FieldInMethod()
-        {
-            var code = @"
+    [Test]
+    public static void FieldInMethod()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -69,7 +69,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

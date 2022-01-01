@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
+﻿namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void BitShiftWithinRange()
     {
-        private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new();
-
-        [Test]
-        public static void BitShiftWithinRange()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public enum EnumHigh
@@ -21,13 +21,13 @@ namespace N
         Good = 1<<30
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DoNotAnalyzeLong()
-        {
-            var code = @"
+    [Test]
+    public static void DoNotAnalyzeLong()
+    {
+        var code = @"
 namespace N
 {
     public enum EnumHigh: long
@@ -38,13 +38,13 @@ namespace N
         Bad = 1<<31
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StandardEnum()
-        {
-            var code = @"
+    [Test]
+    public static void StandardEnum()
+    {
+        var code = @"
 namespace N
 {
     public enum StandardEnum
@@ -55,7 +55,6 @@ namespace N
         C,		
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

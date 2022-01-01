@@ -1,33 +1,33 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class HandlesRecursion
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
+        typeof(Descriptors)
+            .Assembly
+            .GetTypes()
+            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+            .ToArray();
 
-    internal static class HandlesRecursion
+    [Test]
+    public static void NotEmpty()
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(Descriptors)
-                .Assembly
-                .GetTypes()
-                .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
-                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-                .ToArray();
+        CollectionAssert.IsNotEmpty(AllAnalyzers);
+        Assert.Pass($"Count: {AllAnalyzers.Count}");
+    }
 
-        [Test]
-        public static void NotEmpty()
-        {
-            CollectionAssert.IsNotEmpty(AllAnalyzers);
-            Assert.Pass($"Count: {AllAnalyzers.Count}");
-        }
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void CtorCallingSelf(DiagnosticAnalyzer analyzer)
-        {
-            var testCode = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void CtorCallingSelf(DiagnosticAnalyzer analyzer)
+    {
+        var testCode = @"
 namespace N
 {
     internal abstract class C
@@ -38,13 +38,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void RecursiveSample(DiagnosticAnalyzer analyzer)
-        {
-            var c = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void RecursiveSample(DiagnosticAnalyzer analyzer)
+    {
+        var c = @"
 namespace N
 {
     using System;
@@ -127,7 +127,7 @@ namespace N
         }
      }
 }";
-            var validationErrorToStringConverter = @"
+        var validationErrorToStringConverter = @"
 namespace N
 {
     using System;
@@ -170,13 +170,13 @@ namespace N
 #pragma warning restore GU0012
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, c, validationErrorToStringConverter);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, c, validationErrorToStringConverter);
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void InSetAndRaise(DiagnosticAnalyzer analyzer)
-        {
-            var viewModelBaseCode = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void InSetAndRaise(DiagnosticAnalyzer analyzer)
+    {
+        var viewModelBaseCode = @"
 namespace N.Core
 {
     using System.ComponentModel;
@@ -198,7 +198,7 @@ namespace N.Core
     }
 }";
 
-            var testCode = @"
+        var testCode = @"
 namespace N.Client
 {
     internal class C : N.Core.ViewModelBase
@@ -214,13 +214,13 @@ namespace N.Client
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void InOnPropertyChanged(DiagnosticAnalyzer analyzer)
-        {
-            var viewModelBaseCode = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void InOnPropertyChanged(DiagnosticAnalyzer analyzer)
+    {
+        var viewModelBaseCode = @"
 namespace N.Core
 {
     using System.ComponentModel;
@@ -237,7 +237,7 @@ namespace N.Core
     }
 }";
 
-            var testCode = @"
+        var testCode = @"
 namespace N.Client
 {
     internal class C : N.Core.ViewModelBase
@@ -266,13 +266,13 @@ namespace N.Client
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, viewModelBaseCode, testCode);
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void InProperty(DiagnosticAnalyzer analyzer)
-        {
-            var testCode = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void InProperty(DiagnosticAnalyzer analyzer)
+    {
+        var testCode = @"
 namespace N
 {
     using System.ComponentModel;
@@ -343,7 +343,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, testCode);
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0020SortProperties Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void WithCustomEvent()
     {
-        private static readonly GU0020SortProperties Analyzer = new();
-
-        [Test]
-        public static void WithCustomEvent()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -28,13 +28,13 @@ namespace N
         public int Value { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void GetOnlies()
-        {
-            var code = @"
+    [Test]
+    public static void GetOnlies()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -56,13 +56,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitImplementationGetOnly()
-        {
-            var iValue = @"
+    [Test]
+    public static void ExplicitImplementationGetOnly()
+    {
+        var iValue = @"
 namespace N
 {
     interface IValue
@@ -71,7 +71,7 @@ namespace N
     }
 }";
 
-            var c = @"
+        var c = @"
 namespace N
 {
     public class C : IValue
@@ -81,13 +81,13 @@ namespace N
         object IValue.Value { get; } = 5;
     }
 }";
-            RoslynAssert.Valid(Analyzer, iValue, c);
-        }
+        RoslynAssert.Valid(Analyzer, iValue, c);
+    }
 
-        [Test]
-        public static void ExplicitImplementationGetOnlyIndexer()
-        {
-            var iValue = @"
+    [Test]
+    public static void ExplicitImplementationGetOnlyIndexer()
+    {
+        var iValue = @"
 namespace N
 {
     interface IValue
@@ -96,7 +96,7 @@ namespace N
     }
 }";
 
-            var c = @"
+        var c = @"
 namespace N
 {
     public class C : IValue
@@ -106,13 +106,13 @@ namespace N
         object IValue.this[int index] => index;
     }
 }";
-            RoslynAssert.Valid(Analyzer, iValue, c);
-        }
+        RoslynAssert.Valid(Analyzer, iValue, c);
+    }
 
-        [Test]
-        public static void ExplicitGetSetIndexerAndGetOnlyIndexer()
-        {
-            var iValue = @"
+    [Test]
+    public static void ExplicitGetSetIndexerAndGetOnlyIndexer()
+    {
+        var iValue = @"
 namespace N
 {
     interface IValue
@@ -121,7 +121,7 @@ namespace N
     }
 }";
 
-            var c = @"
+        var c = @"
 namespace N
 {
     public class C : IValue
@@ -135,13 +135,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iValue, c);
-        }
+        RoslynAssert.Valid(Analyzer, iValue, c);
+    }
 
-        [Test]
-        public static void ExplicitGetSetIndexerAndGetSetIndexer()
-        {
-            var iValue = @"
+    [Test]
+    public static void ExplicitGetSetIndexerAndGetSetIndexer()
+    {
+        var iValue = @"
 namespace N
 {
     interface IValue
@@ -150,7 +150,7 @@ namespace N
     }
 }";
 
-            var c = @"
+        var c = @"
 namespace N
 {
     public class C : IValue
@@ -170,13 +170,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iValue, c);
-        }
+        RoslynAssert.Valid(Analyzer, iValue, c);
+    }
 
-        [Test]
-        public static void ExplicitImplementationCalculatedBeforeGetSet()
-        {
-            var iValue = @"
+    [Test]
+    public static void ExplicitImplementationCalculatedBeforeGetSet()
+    {
+        var iValue = @"
 namespace N
 {
     interface IValue
@@ -185,7 +185,7 @@ namespace N
     }
 }";
 
-            var c = @"
+        var c = @"
 namespace N
 {
     public class C : IValue
@@ -195,13 +195,13 @@ namespace N
         public int Value { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iValue, c);
-        }
+        RoslynAssert.Valid(Analyzer, iValue, c);
+    }
 
-        [Test]
-        public static void Mutables()
-        {
-            var code = @"
+    [Test]
+    public static void Mutables()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -223,13 +223,13 @@ namespace N
         public int D { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NotifyingMutables()
-        {
-            var code = @"
+    [Test]
+    public static void NotifyingMutables()
+    {
+        var code = @"
 namespace N
 {
     using System.ComponentModel;
@@ -314,13 +314,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MutablesBySetter()
-        {
-            var code = @"
+    [Test]
+    public static void MutablesBySetter()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -342,13 +342,13 @@ namespace N
         public int D { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExpressionBodies()
-        {
-            var code = @"
+    [Test]
+    public static void ExpressionBodies()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -369,13 +369,13 @@ namespace N
         public int D => this.a;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Calculated()
-        {
-            var code = @"
+    [Test]
+    public static void Calculated()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -410,13 +410,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void InternalBeforePublicIndexer()
-        {
-            var code = @"
+    [Test]
+    public static void InternalBeforePublicIndexer()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -426,13 +426,13 @@ namespace N
         public int this[int index] => index;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticBeforeInstance()
-        {
-            var code = @"
+    [Test]
+    public static void StaticBeforeInstance()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -447,13 +447,13 @@ namespace N
         public int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticGetOnlyBeforeCalculated()
-        {
-            var code = @"
+    [Test]
+    public static void StaticGetOnlyBeforeCalculated()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -463,13 +463,13 @@ namespace N
         public int B => A;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PublicBeforeProtectedStatic()
-        {
-            var code = @"
+    [Test]
+    public static void PublicBeforeProtectedStatic()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -484,13 +484,13 @@ namespace N
         protected static int B { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PublicInitializedWithProtectedStatic()
-        {
-            var code = @"
+    [Test]
+    public static void PublicInitializedWithProtectedStatic()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -500,13 +500,13 @@ namespace N
         public static int A { get; } = B;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Realistic()
-        {
-            var code = @"
+    [Test]
+    public static void Realistic()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -542,7 +542,6 @@ namespace N
         public int I { get; set; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

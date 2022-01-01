@@ -1,17 +1,17 @@
-namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests
+namespace Gu.Analyzers.Test.GU0081TestCasesAttributeMismatchTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly TestMethodAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0081TestCasesAttributeMismatch);
 
-    internal static class Diagnostics
+    [Test]
+    public static void TestCaseAttributeAndParameter()
     {
-        private static readonly TestMethodAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0081TestCasesAttributeMismatch);
-
-        [Test]
-        public static void TestCaseAttributeAndParameter()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -25,13 +25,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void TestCaseAttributeWithAuthor()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseAttributeWithAuthor()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -45,13 +45,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void TestCaseParams()
-        {
-            var code = @"
+    [Test]
+    public static void TestCaseParams()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -65,7 +65,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

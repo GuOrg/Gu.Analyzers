@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0076MergePatternTests
+﻿namespace Gu.Analyzers.Test.GU0076MergePatternTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class When
     {
-        public static class When
-        {
-            private static readonly WhenAnalyzer Analyzer = new();
+        private static readonly WhenAnalyzer Analyzer = new();
 
-            [Test]
-            public static void RightEnum()
-            {
-                var before = @"
+        [Test]
+        public static void RightEnum()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -32,7 +32,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchStatementDeclarationPatternsUsesDesignation()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchStatementDeclarationPatternsUsesDesignation()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -76,7 +76,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -94,13 +94,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchStatementRecursivePatternsUsesDesignation()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchStatementRecursivePatternsUsesDesignation()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -119,7 +119,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -137,13 +137,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchStatementUsesExpression()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchStatementUsesExpression()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -162,7 +162,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -180,13 +180,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchExpressionSingleLineUsesDesignation()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchExpressionSingleLineUsesDesignation()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -204,7 +204,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -221,13 +221,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchExpressionSingleLineUsesExpression()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchExpressionSingleLineUsesExpression()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -245,7 +245,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -262,13 +262,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void SwitchExpressionWhenOnSeparateLine()
-            {
-                var before = @"
+        [Test]
+        public static void SwitchExpressionWhenOnSeparateLine()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -287,7 +287,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -304,13 +304,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void LeftIsTypeRightIsType()
-            {
-                var before = @"
+        [Test]
+        public static void LeftIsTypeRightIsType()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -328,7 +328,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -345,13 +345,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
+        }
 
-            [Test]
-            public static void LeftIsTypeDeclarationRightIsDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LeftIsTypeDeclarationRightIsDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -369,7 +369,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -386,13 +386,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: string name }");
+        }
 
-            [Test]
-            public static void LeftIsTypeDeclarationRightIsPattern()
-            {
-                var before = @"
+        [Test]
+        public static void LeftIsTypeDeclarationRightIsPattern()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -410,7 +410,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -427,13 +427,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: { } name }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Name: { } name }");
+        }
 
-            [Test]
-            public static void LeftIsRecursiveWhenRightIsDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LeftIsRecursiveWhenRightIsDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -450,7 +450,7 @@ namespace N
         }
     }
 }";
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -467,13 +467,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
+        }
 
-            [Test]
-            public static void LeftIsRecursiveTypeDeclarationWhenRightIsPattern()
-            {
-                var before = @"
+        [Test]
+        public static void LeftIsRecursiveTypeDeclarationWhenRightIsPattern()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -491,7 +491,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -508,8 +508,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "{ Length: 5 }");
         }
     }
 }

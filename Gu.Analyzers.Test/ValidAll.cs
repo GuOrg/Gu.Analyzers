@@ -1,66 +1,66 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test;
+
+using System;
+using System.Collections.Immutable;
+using System.Linq;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class ValidAll
 {
-    using System;
-    using System.Collections.Immutable;
-    using System.Linq;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers =
+        typeof(KnownSymbols)
+            .Assembly
+            .GetTypes()
+            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+            .ToImmutableArray();
 
-    internal static class ValidAll
+    private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
+        ProjectFile.Find("Gu.Analyzers.csproj"));
+
+    private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
+        ProjectFile.Find("ValidCode.csproj"));
+
+    [Test]
+    public static void NotEmpty()
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(KnownSymbols)
-                .Assembly
-                .GetTypes()
-                .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t) && !t.IsAbstract)
-                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-                .ToImmutableArray();
+        CollectionAssert.IsNotEmpty(AllAnalyzers);
+        Assert.Pass($"Count: {AllAnalyzers.Length}");
+    }
 
-        private static readonly Solution AnalyzerProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("Gu.Analyzers.csproj"));
-
-        private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("ValidCode.csproj"));
-
-        [Test]
-        public static void NotEmpty()
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void AnalyzerProject(DiagnosticAnalyzer analyzer)
+    {
+        if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer or BinaryExpressionAnalyzer or GU0007PreferInjecting)
         {
-            CollectionAssert.IsNotEmpty(AllAnalyzers);
-            Assert.Pass($"Count: {AllAnalyzers.Length}");
+            Analyze.GetDiagnostics(analyzer, AnalyzerProjectSln);
         }
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void AnalyzerProject(DiagnosticAnalyzer analyzer)
+        else
         {
-            if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer or BinaryExpressionAnalyzer or GU0007PreferInjecting)
-            {
-                Analyze.GetDiagnostics(analyzer, AnalyzerProjectSln);
-            }
-            else
-            {
-                RoslynAssert.NoAnalyzerDiagnostics(analyzer, AnalyzerProjectSln);
-            }
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, AnalyzerProjectSln);
         }
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
+    {
+        if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer)
         {
-            if (analyzer is SimpleAssignmentAnalyzer or ParameterAnalyzer)
-            {
-                _ = Analyze.GetDiagnostics(analyzer, ValidCodeProjectSln);
-            }
-            else
-            {
-                RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
-            }
+            _ = Analyze.GetDiagnostics(analyzer, ValidCodeProjectSln);
         }
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
+        else
         {
-            var code = @"
+            RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
+        }
+    }
+
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -88,7 +88,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
     }
 }

@@ -1,38 +1,38 @@
-﻿namespace Gu.Analyzers.Test
+﻿namespace Gu.Analyzers.Test;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+
+using NUnit.Framework;
+
+[Ignore("Only for digging out repros.")]
+internal static class ReproBox
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
+    // ReSharper disable once UnusedMember.Local
+    private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
+        typeof(KnownSymbols).Assembly.GetTypes()
+                            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
+                            .ToArray();
 
-    using NUnit.Framework;
+    private static readonly Solution Solution = CodeFactory.CreateSolution(
+        new FileInfo("C:\\Git\\_GuOrg\\Gu.Inject\\Gu.Inject.sln"));
 
-    [Ignore("Only for digging out repros.")]
-    internal static class ReproBox
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void SolutionRepro(DiagnosticAnalyzer analyzer)
     {
-        // ReSharper disable once UnusedMember.Local
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(KnownSymbols).Assembly.GetTypes()
-                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
-                               .ToArray();
+        RoslynAssert.Valid(analyzer, Solution);
+    }
 
-        private static readonly Solution Solution = CodeFactory.CreateSolution(
-            new FileInfo("C:\\Git\\_GuOrg\\Gu.Inject\\Gu.Inject.sln"));
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void SolutionRepro(DiagnosticAnalyzer analyzer)
-        {
-            RoslynAssert.Valid(analyzer, Solution);
-        }
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void Repro(DiagnosticAnalyzer analyzer)
-        {
-            var code = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void Repro(DiagnosticAnalyzer analyzer)
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -40,7 +40,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(analyzer, code);
-        }
+        RoslynAssert.Valid(analyzer, code);
     }
 }

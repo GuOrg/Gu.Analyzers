@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests
+﻿namespace Gu.Analyzers.Test.GU0070DefaultConstructedValueTypeWithNoUsefulDefaultTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0070DefaultConstructedValueTypeWithNoUsefulDefault);
 
-    internal static class Diagnostics
+    [TestCase("new Guid()")]
+    [TestCase("new DateTime()")]
+    public static void When(string expression)
     {
-        private static readonly GU0070DefaultConstructedValueTypeWithNoUsefulDefault Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0070DefaultConstructedValueTypeWithNoUsefulDefault);
-
-        [TestCase("new Guid()")]
-        [TestCase("new DateTime()")]
-        public static void When(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -26,7 +26,6 @@ namespace N
         }
     }
 }".AssertReplace("new Guid()", expression);
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

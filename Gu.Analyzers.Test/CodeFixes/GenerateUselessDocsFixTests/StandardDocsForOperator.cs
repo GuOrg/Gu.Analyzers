@@ -1,22 +1,22 @@
-﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests
+﻿namespace Gu.Analyzers.Test.CodeFixes.GenerateUselessDocsFixTests;
+
+using System.Collections.Immutable;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+internal static class StandardDocsForOperator
 {
-    using System.Collections.Immutable;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly FakeAnalyzer Analyzer = new();
+    private static readonly DocsFix Fix = new();
 
-    internal static class StandardDocsForOperator
+    [Test]
+    public static void OperatorEquals()
     {
-        private static readonly FakeAnalyzer Analyzer = new();
-        private static readonly DocsFix Fix = new();
-
-        [Test]
-        public static void OperatorEquals()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public sealed class C
@@ -56,7 +56,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public sealed class C
@@ -99,13 +99,13 @@ namespace N
         public override int GetHashCode() => 1;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
 
-        [Test]
-        public static void OperatorNotEquals()
-        {
-            var before = @"
+    [Test]
+    public static void OperatorNotEquals()
+    {
+        var before = @"
 namespace N
 {
     public sealed class C
@@ -145,7 +145,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public sealed class C
@@ -188,31 +188,30 @@ namespace N
         public override int GetHashCode() => 1;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
+    }
+
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    private class FakeAnalyzer : DiagnosticAnalyzer
+    {
+        private static readonly DiagnosticDescriptor Descriptor = new("CS1591", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            Descriptor);
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.EnableConcurrentExecution();
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.OperatorDeclaration);
         }
 
-        [DiagnosticAnalyzer(LanguageNames.CSharp)]
-        private class FakeAnalyzer : DiagnosticAnalyzer
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            private static readonly DiagnosticDescriptor Descriptor = new("CS1591", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
-
-            public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-                Descriptor);
-
-            public override void Initialize(AnalysisContext context)
+            if (context.Node is OperatorDeclarationSyntax declaration &&
+                !declaration.HasStructuredTrivia)
             {
-                context.EnableConcurrentExecution();
-                context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
-                context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.OperatorDeclaration);
-            }
-
-            private static void Handle(SyntaxNodeAnalysisContext context)
-            {
-                if (context.Node is OperatorDeclarationSyntax declaration &&
-                    !declaration.HasStructuredTrivia)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, declaration.OperatorToken.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, declaration.OperatorToken.GetLocation()));
             }
         }
     }

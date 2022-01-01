@@ -1,17 +1,17 @@
-﻿namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests
+﻿namespace Gu.Analyzers.Test.GU0061EnumMemberValueOutOfRangeTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0061EnumMemberValueOutOfRange);
 
-    internal static class Diagnostics
+    [Test]
+    public static void BitShiftOutOfRange()
     {
-        private static readonly GU0061EnumMemberValueOutOfRange Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0061EnumMemberValueOutOfRange);
-
-        [Test]
-        public static void BitShiftOutOfRange()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public enum EnumHigh
@@ -22,7 +22,6 @@ namespace N
         Bad = ↓1<<31
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

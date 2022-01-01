@@ -1,18 +1,18 @@
-namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+namespace Gu.Analyzers.Test.GU0020SortPropertiesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class FixAll
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0020SortProperties Analyzer = new();
+    private static readonly SortPropertiesFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
 
-    internal static class FixAll
+    [Test]
+    public static void WhenMutableBeforeGetOnlyFirst()
     {
-        private static readonly GU0020SortProperties Analyzer = new();
-        private static readonly SortPropertiesFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("GU0020");
-
-        [Test]
-        public static void WhenMutableBeforeGetOnlyFirst()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C
@@ -27,7 +27,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -41,13 +41,13 @@ namespace N
         public int P1 { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenAMess()
-        {
-            var before = @"
+    [Test]
+    public static void WhenAMess()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -62,7 +62,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -76,13 +76,13 @@ namespace N
         public int P1 { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenAMess1WithDocs()
-        {
-            var before = @"
+    [Test]
+    public static void WhenAMess1WithDocs()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -109,7 +109,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -135,14 +135,14 @@ namespace N
         public int P1 { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        [Ignore("Fails on devops, move to issue #154")]
-        public static void PreservesDocumentOrder()
-        {
-            var before = @"
+    [Test]
+    [Ignore("Fails on devops, move to issue #154")]
+    public static void PreservesDocumentOrder()
+    {
+        var before = @"
 namespace RoslynSandbox
 {
     public class C
@@ -157,7 +157,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace RoslynSandbox
 {
     public class C
@@ -171,7 +171,6 @@ namespace RoslynSandbox
         public int P3 { get; set; }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

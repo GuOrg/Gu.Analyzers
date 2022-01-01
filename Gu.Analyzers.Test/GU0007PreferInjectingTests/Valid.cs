@@ -1,13 +1,13 @@
-namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
+namespace Gu.Analyzers.Test.GU0007PreferInjectingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0007PreferInjecting Analyzer = new();
 
-    internal static partial class Valid
-    {
-        private static readonly GU0007PreferInjecting Analyzer = new();
-
-        private const string Bar = @"
+    private const string Bar = @"
 namespace N
 {
     public class Bar
@@ -18,7 +18,7 @@ namespace N
     }
 }";
 
-        private const string ServiceLocator = @"
+    private const string ServiceLocator = @"
 namespace N
 {
     public class ServiceLocator
@@ -35,10 +35,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void WhenInjecting()
-        {
-            var code = @"
+    [Test]
+    public static void WhenInjecting()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, Bar);
-        }
+        RoslynAssert.Valid(Analyzer, code, Bar);
+    }
 
-        [Test]
-        public static void WhenNotInjectingChained()
-        {
-            var c1 = @"
+    [Test]
+    public static void WhenNotInjectingChained()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -70,7 +70,7 @@ namespace N
         }
     }
 }";
-            var c2 = @"
+        var c2 = @"
 namespace N
 {
     public class C2
@@ -84,7 +84,7 @@ namespace N
     }
 }";
 
-            var meh = @"
+        var meh = @"
 namespace N
 {
     public class Meh : C1
@@ -95,7 +95,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, c2, meh);
-        }
+        RoslynAssert.Valid(Analyzer, c1, c2, meh);
     }
 }

@@ -1,16 +1,16 @@
-namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests
+namespace Gu.Analyzers.Test.GU0021CalculatedPropertyAllocatesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly PropertyDeclarationAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ArrowAdd()
     {
-        private static readonly PropertyDeclarationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void ArrowAdd()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class Foo
@@ -34,13 +34,13 @@ namespace N
         public int Sum => this.A + this.B + this.C + this.D;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ArrowStruct()
-        {
-            var code = @"
+    [Test]
+    public static void ArrowStruct()
+    {
+        var code = @"
 namespace N
 {
     public struct Foo
@@ -64,13 +64,13 @@ namespace N
         public Foo Sum => new Foo(this.A, this.B, this.C, this.D);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExpressionBodyMethodIsNoError()
-        {
-            var code = @"
+    [Test]
+    public static void ExpressionBodyMethodIsNoError()
+    {
+        var code = @"
 namespace N
 {
     public class Foo
@@ -95,7 +95,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
+﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly IdentifierNameAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void DiscardSymbol()
     {
-        private static readonly IdentifierNameAnalyzer Analyzer = new();
-
-        [Test]
-        public static void DiscardSymbol()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -21,13 +21,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Local()
-        {
-            var code = @"
+    [Test]
+    public static void Local()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -39,14 +39,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var _")]
-        public static void Out(string arg)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var _")]
+    public static void Out(string arg)
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -57,13 +57,13 @@ namespace N
         }
     }
 }".AssertReplace("out _", arg);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void OneParameterLambda()
-        {
-            var code = @"
+    [Test]
+    public static void OneParameterLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -79,13 +79,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TwoParameterLambda()
-        {
-            var code = @"
+    [Test]
+    public static void TwoParameterLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -98,7 +98,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

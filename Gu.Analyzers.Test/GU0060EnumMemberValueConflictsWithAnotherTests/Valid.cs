@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests
+﻿namespace Gu.Analyzers.Test.GU0060EnumMemberValueConflictsWithAnotherTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ExplicitAlias()
     {
-        private static readonly GU0060EnumMemberValueConflictsWithAnother Analyzer = new();
-
-        [Test]
-        public static void ExplicitAlias()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -23,13 +23,13 @@ namespace N
         Gooooood = B
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitBitwiseOrSum()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitBitwiseOrSum()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -42,13 +42,13 @@ namespace N
         Gooooood = A | B
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SequentialNonFlagEnum()
-        {
-            var code = @"
+    [Test]
+    public static void SequentialNonFlagEnum()
+    {
+        var code = @"
 namespace N
 {
     public enum Bad
@@ -59,13 +59,13 @@ namespace N
         C
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AliasingEnumMembersNonFlag()
-        {
-            var code = @"
+    [Test]
+    public static void AliasingEnumMembersNonFlag()
+    {
+        var code = @"
 namespace N
 {
     public enum Bad
@@ -76,13 +76,13 @@ namespace N
         C = B
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitNoFlags()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitNoFlags()
+    {
+        var code = @"
 namespace N
 {
     public enum E
@@ -95,7 +95,6 @@ namespace N
         M5 = 5,
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

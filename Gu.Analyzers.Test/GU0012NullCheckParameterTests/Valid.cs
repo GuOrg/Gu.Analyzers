@@ -1,20 +1,20 @@
-﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests
+﻿namespace Gu.Analyzers.Test.GU0012NullCheckParameterTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+[TestFixture(typeof(SimpleAssignmentAnalyzer))]
+[TestFixture(typeof(ParameterAnalyzer))]
+internal static class Valid<T>
+    where T : DiagnosticAnalyzer, new()
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly T Analyzer = new();
 
-    [TestFixture(typeof(SimpleAssignmentAnalyzer))]
-    [TestFixture(typeof(ParameterAnalyzer))]
-    internal static class Valid<T>
-        where T : DiagnosticAnalyzer, new()
+    [Test]
+    public static void WhenPrivate()
     {
-        private static readonly T Analyzer = new();
-
-        [Test]
-        public static void WhenPrivate()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenDefaultValue()
-        {
-            var code = @"
+    [Test]
+    public static void WhenDefaultValue()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenValueType()
-        {
-            var code = @"
+    [Test]
+    public static void WhenValueType()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -65,13 +65,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenOutParameter()
-        {
-            var code = @"
+    [Test]
+    public static void WhenOutParameter()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -83,13 +83,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Descriptors.GU0012NullCheckParameter, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptors.GU0012NullCheckParameter, code);
+    }
 
-        [Test]
-        public static void WhenThrowing()
-        {
-            var code = @"
+    [Test]
+    public static void WhenThrowing()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -104,13 +104,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenThrowingOnLineAbove()
-        {
-            var code = @"
+    [Test]
+    public static void WhenThrowingOnLineAbove()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -128,14 +128,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("text is null")]
-        [TestCase("text is null")]
-        public static void WhenOldStyleNullCheckAbove(string check)
-        {
-            var code = @"
+    [TestCase("text is null")]
+    [TestCase("text is null")]
+    public static void WhenOldStyleNullCheckAbove(string check)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -156,7 +156,6 @@ namespace N
     }
 }".AssertReplace("text is null", check);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

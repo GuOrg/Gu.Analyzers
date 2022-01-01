@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace Gu.Analyzers.Test.GU0007PreferInjectingTests;
 
-    internal partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal partial class Valid
+{
+    internal static class Ignore
     {
-        internal static class Ignore
+        [Test]
+        public static void WhenPrivateCtor()
         {
-            [Test]
-            public static void WhenPrivateCtor()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -23,13 +23,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, Bar);
-            }
+            RoslynAssert.Valid(Analyzer, code, Bar);
+        }
 
-            [Test]
-            public static void WhenStatic()
-            {
-                var code = @"
+        [Test]
+        public static void WhenStatic()
+        {
+            var code = @"
 namespace N
 {
     public static class C
@@ -43,13 +43,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, Bar);
-            }
+            RoslynAssert.Valid(Analyzer, code, Bar);
+        }
 
-            [Test]
-            public static void WhenMethodInjectedLocatorInStaticMethod()
-            {
-                var code = @"
+        [Test]
+        public static void WhenMethodInjectedLocatorInStaticMethod()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -64,14 +64,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, ServiceLocator, Bar, code);
-            }
+            RoslynAssert.Valid(Analyzer, ServiceLocator, Bar, code);
+        }
 
-            [TestCase("int")]
-            [TestCase("Abstract?")]
-            public static void WhenNewNotInjectable(string type)
-            {
-                var @abstract = @"
+        [TestCase("int")]
+        [TestCase("Abstract?")]
+        public static void WhenNewNotInjectable(string type)
+        {
+            var @abstract = @"
 namespace N
 {
     public abstract class Abstract
@@ -79,7 +79,7 @@ namespace N
     }
 }";
 
-                var c2 = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -93,7 +93,7 @@ namespace N
     }
 }".AssertReplace("int", type);
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C1
@@ -106,13 +106,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, @abstract, c2, code);
-            }
+            RoslynAssert.Valid(Analyzer, @abstract, c2, code);
+        }
 
-            [Test]
-            public static void WhenParams()
-            {
-                var baz = @"
+        [Test]
+        public static void WhenParams()
+        {
+            var baz = @"
 namespace N
 {
     public class Baz
@@ -120,7 +120,7 @@ namespace N
     }
 }";
 
-                var c2 = @"
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -134,7 +134,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C1
@@ -148,13 +148,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, baz, c2, code);
-            }
+            RoslynAssert.Valid(Analyzer, baz, c2, code);
+        }
 
-            [Test]
-            public static void NewDictionaryOfBarAndBar()
-            {
-                var code = @"
+        [Test]
+        public static void NewDictionaryOfBarAndBar()
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -170,13 +170,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Bar, code);
-            }
+            RoslynAssert.Valid(Analyzer, Bar, code);
+        }
 
-            [Test]
-            public static void InLambda()
-            {
-                var code = @"
+        [Test]
+        public static void InLambda()
+        {
+            var code = @"
 namespace N
 {
     using System.Linq;
@@ -192,13 +192,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Bar, ServiceLocator, code);
-            }
+            RoslynAssert.Valid(Analyzer, Bar, ServiceLocator, code);
+        }
 
-            [Test]
-            public static void WhenAssigningTwoFieldWithObjectCreations()
-            {
-                var code = @"
+        [Test]
+        public static void WhenAssigningTwoFieldWithObjectCreations()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -214,13 +214,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, Bar);
-            }
+            RoslynAssert.Valid(Analyzer, code, Bar);
+        }
 
-            [Test]
-            public static void WhenAssigningWithObjectInitializer()
-            {
-                var c2 = @"
+        [Test]
+        public static void WhenAssigningWithObjectInitializer()
+        {
+            var c2 = @"
 namespace N
 {
     public class C2
@@ -229,7 +229,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -243,8 +243,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, c2, code);
-            }
+            RoslynAssert.Valid(Analyzer, c2, code);
         }
     }
 }

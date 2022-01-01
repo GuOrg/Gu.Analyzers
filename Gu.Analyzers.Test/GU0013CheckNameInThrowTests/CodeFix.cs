@@ -1,18 +1,18 @@
-namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
+namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ObjectCreationAnalyzer Analyzer = new();
+    private static readonly ThrowForCorrectParameterFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0013TrowForCorrectParameter);
 
-    internal static class CodeFix
+    [Test]
+    public static void ThrowExpressionNameofWrong()
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new();
-        private static readonly ThrowForCorrectParameterFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0013TrowForCorrectParameter);
-
-        [Test]
-        public static void ThrowExpressionNameofWrong()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -28,7 +28,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -43,13 +43,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(bar).");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(bar).");
+    }
 
-        [Test]
-        public static void ThrowExpressionNameofOther()
-        {
-            var before = @"
+    [Test]
+    public static void ThrowExpressionNameofOther()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -65,7 +65,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -80,13 +80,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(s1).");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(s1).");
+    }
 
-        [Test]
-        public static void ThrowExpressionStringLiteral()
-        {
-            var before = @"
+    [Test]
+    public static void ThrowExpressionStringLiteral()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -102,7 +102,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -117,7 +117,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(bar).");
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Use nameof(bar).");
     }
 }

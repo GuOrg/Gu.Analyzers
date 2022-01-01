@@ -1,20 +1,20 @@
-namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
+namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly SimpleAssignmentAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0010DoNotAssignSameValue);
 
-    internal static class Diagnostics
+    [TestCase("this.A = this.A;")]
+    [TestCase("this.A = A;")]
+    [TestCase("A = A;")]
+    [TestCase("A = this.A;")]
+    public static void AssignToToSelf(string statement)
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0010DoNotAssignSameValue);
-
-        [TestCase("this.A = this.A;")]
-        [TestCase("this.A = A;")]
-        [TestCase("A = A;")]
-        [TestCase("A = this.A;")]
-        public static void AssignToToSelf(string statement)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -28,13 +28,13 @@ namespace N
     }
 }".AssertReplace("this.A = this.A;", statement);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Assigning made to same, did you mean to assign something else?"), code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Assigning made to same, did you mean to assign something else?"), code);
+    }
 
-        [Test]
-        public static void SetPropertyToSelfWithThis()
-        {
-            var code = @"
+    [Test]
+    public static void SetPropertyToSelfWithThis()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -48,7 +48,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

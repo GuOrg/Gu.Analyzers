@@ -1,20 +1,20 @@
-﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests
+﻿namespace Gu.Analyzers.Test.GU0100WrongDocsTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DocsAnalyzer Analyzer = new();
+    private static readonly DocsFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongCrefType);
 
-    internal static class CodeFix
+    [TestCase("string")]
+    [TestCase("System.String")]
+    [TestCase("Decoder")]
+    public static void WhenWrong(string type)
     {
-        private static readonly DocsAnalyzer Analyzer = new();
-        private static readonly DocsFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0100WrongCrefType);
-
-        [TestCase("string")]
-        [TestCase("System.String")]
-        [TestCase("Decoder")]
-        public static void WhenWrong(string type)
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -30,7 +30,7 @@ namespace N
         }
     }
 }".AssertReplace("string", type);
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenWrongArray()
-        {
-            var before = @"
+    [Test]
+    public static void WhenWrongArray()
+    {
+        var before = @"
 namespace N
 {
     class C
@@ -66,7 +66,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     class C
@@ -80,13 +80,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void WhenWrongGenericList()
-        {
-            var before = @"
+    [Test]
+    public static void WhenWrongGenericList()
+    {
+        var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -102,7 +102,7 @@ namespace N
         }
     }
 }";
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -118,13 +118,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void OnPropertyChanged()
-        {
-            var before = @"
+    [Test]
+    public static void OnPropertyChanged()
+    {
+        var before = @"
 namespace N
 {
     using System.ComponentModel;
@@ -165,7 +165,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.ComponentModel;
@@ -205,14 +205,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [TestCase("KeyValuePair{int, StringBuilder}")]
-        [TestCase("KeyValuePair{Type, int}")]
-        public static void WhenKeyValuePair(string cref)
-        {
-            var before = @"
+    [TestCase("KeyValuePair{int, StringBuilder}")]
+    [TestCase("KeyValuePair{Type, int}")]
+    public static void WhenKeyValuePair(string cref)
+    {
+        var before = @"
 namespace N
 {
     using System.Text;
@@ -230,7 +230,7 @@ namespace N
         }
     }
 }".AssertReplace("KeyValuePair{Type, StringBuilder}", cref);
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Text;
@@ -248,7 +248,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

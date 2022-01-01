@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests
+﻿namespace Gu.Analyzers.Test.GU0013CheckNameInThrowTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ObjectCreationAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void WhenPrivate()
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void WhenPrivate()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -23,13 +23,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenDefaultValue()
-        {
-            var code = @"
+    [Test]
+    public static void WhenDefaultValue()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -42,13 +42,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenValueType()
-        {
-            var code = @"
+    [Test]
+    public static void WhenValueType()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -61,13 +61,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenThrowing()
-        {
-            var code = @"
+    [Test]
+    public static void WhenThrowing()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -82,7 +82,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

@@ -1,19 +1,19 @@
-﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
+﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue);
 
-    internal static class Diagnostics
+    [TestCase("ints.Select(x => x);")]
+    [TestCase("ints.Select(x => x).Where(x => x > 1);")]
+    [TestCase("ints.Where(x => x > 1);")]
+    public static void Linq(string linq)
     {
-        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0011DoNotIgnoreReturnValue);
-
-        [TestCase("ints.Select(x => x);")]
-        [TestCase("ints.Select(x => x).Where(x => x > 1);")]
-        [TestCase("ints.Where(x => x > 1);")]
-        public static void Linq(string linq)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Linq;
@@ -28,13 +28,13 @@ namespace N
     }
 }".AssertReplace("ints.Select(x => x);", linq);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the returned value"), code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Don't ignore the returned value"), code);
+    }
 
-        [Test]
-        public static void StringBuilderWriteLineToString()
-        {
-            var code = @"
+    [Test]
+    public static void StringBuilderWriteLineToString()
+    {
+        var code = @"
 namespace N
 {
     using System.Text;
@@ -50,14 +50,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [TestCase("Add(1)")]
-        [TestCase("Remove(1)")]
-        public static void ImmutableArray(string call)
-        {
-            var code = @"
+    [TestCase("Add(1)")]
+    [TestCase("Remove(1)")]
+    public static void ImmutableArray(string call)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Immutable;
@@ -71,14 +71,14 @@ namespace N
     }
 }".AssertReplace("Add(1)", call);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [TestCase("Add(1)")]
-        [TestCase("Remove(1)")]
-        public static void ImmutableList(string call)
-        {
-            var code = @"
+    [TestCase("Add(1)")]
+    [TestCase("Remove(1)")]
+    public static void ImmutableList(string call)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Immutable;
@@ -92,14 +92,14 @@ namespace N
     }
 }".AssertReplace("Add(1)", call);
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Ignore("Fix later.")]
-        [Test]
-        public static void MoqSetupNonVoidNoReturn()
-        {
-            var code = @"
+    [Ignore("Fix later.")]
+    [Test]
+    public static void MoqSetupNonVoidNoReturn()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -116,7 +116,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

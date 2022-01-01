@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests
+﻿namespace Gu.Analyzers.Test.GU0020SortPropertiesTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0020SortProperties Analyzer = new();
+    private static readonly SortPropertiesFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0020SortProperties);
 
-    internal static class CodeFix
+    [Test]
+    public static void MutableBeforeGetOnlySimple()
     {
-        private static readonly GU0020SortProperties Analyzer = new();
-        private static readonly SortPropertiesFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0020SortProperties);
-
-        [Test]
-        public static void MutableBeforeGetOnlySimple()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C
@@ -23,7 +23,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -33,13 +33,13 @@ namespace N
         public int B { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlySimpleWithDocs()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlySimpleWithDocs()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -56,7 +56,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -72,13 +72,13 @@ namespace N
         public int B { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ExplicitImplementation()
-        {
-            var interfaceCode = @"
+    [Test]
+    public static void ExplicitImplementation()
+    {
+        var interfaceCode = @"
 namespace N
 {
     interface IValue
@@ -87,7 +87,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C : IValue
@@ -98,7 +98,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C : IValue
@@ -108,13 +108,13 @@ namespace N
         private int Value { get; } = 5;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { interfaceCode, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { interfaceCode, before }, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlyFirst()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlyFirst()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -137,7 +137,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -159,13 +159,13 @@ namespace N
         public int A { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlyFirstWithNamespaces()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlyFirstWithNamespaces()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -190,7 +190,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -214,13 +214,13 @@ namespace N
         public int A { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlyLast()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlyLast()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -243,7 +243,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -265,13 +265,13 @@ namespace N
         public int C { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void PrivateSetAfterPublicSet()
-        {
-            var before = @"
+    [Test]
+    public static void PrivateSetAfterPublicSet()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -315,7 +315,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -358,13 +358,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlyFirstWithInitializers()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlyFirstWithInitializers()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -387,7 +387,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -409,13 +409,13 @@ namespace N
         public int A { get; set; } = 1;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void MutableBeforeGetOnlyWithComments()
-        {
-            var before = @"
+    [Test]
+    public static void MutableBeforeGetOnlyWithComments()
+    {
+        var before = @"
 namespace N
 {
     public class Foo
@@ -444,7 +444,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class Foo
@@ -472,13 +472,13 @@ namespace N
         public int C { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void ExpressionBodyBeforeGetOnly()
-        {
-            var before = @"
+    [Test]
+    public static void ExpressionBodyBeforeGetOnly()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -494,7 +494,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -509,13 +509,13 @@ namespace N
         public int A => B;
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void CalculatedBeforeGetOnly()
-        {
-            var before = @"
+    [Test]
+    public static void CalculatedBeforeGetOnly()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -537,7 +537,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -558,13 +558,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void IndexerBeforeMutable()
-        {
-            var before = @"
+    [Test]
+    public static void IndexerBeforeMutable()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -602,7 +602,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -639,13 +639,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void PublicSetBeforePrivateSetFirst()
-        {
-            var before = @"
+    [Test]
+    public static void PublicSetBeforePrivateSetFirst()
+    {
+        var before = @"
 namespace N
 {
     public class C
@@ -662,7 +662,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C
@@ -678,13 +678,13 @@ namespace N
         public int A { get; set; }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void NestedClass()
-        {
-            var before = @"
+    [Test]
+    public static void NestedClass()
+    {
+        var before = @"
 namespace N
 {
     public sealed class C
@@ -708,7 +708,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public sealed class C
@@ -731,7 +731,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

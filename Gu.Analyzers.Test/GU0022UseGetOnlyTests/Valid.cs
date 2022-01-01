@@ -1,29 +1,29 @@
-﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests
+﻿namespace Gu.Analyzers.Test.GU0022UseGetOnlyTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0022UseGetOnly Analyzer = new();
 
-    internal static class Valid
+    private static readonly TestCaseData[] TestCases =
     {
-        private static readonly GU0022UseGetOnly Analyzer = new();
+        new TestCaseData("int", "A++;"),
+        new TestCaseData("int", "A--;"),
+        new TestCaseData("int", "A+=a;"),
+        new TestCaseData("int", "A-=a;"),
+        new TestCaseData("int", "A*=a;"),
+        new TestCaseData("int", "A/=a;"),
+        new TestCaseData("int", "A%=a;"),
+        new TestCaseData("int", "A = a;"),
+        new TestCaseData("bool", "A|=a;"),
+    };
 
-        private static readonly TestCaseData[] TestCases =
-        {
-            new TestCaseData("int", "A++;"),
-            new TestCaseData("int", "A--;"),
-            new TestCaseData("int", "A+=a;"),
-            new TestCaseData("int", "A-=a;"),
-            new TestCaseData("int", "A*=a;"),
-            new TestCaseData("int", "A/=a;"),
-            new TestCaseData("int", "A%=a;"),
-            new TestCaseData("int", "A = a;"),
-            new TestCaseData("bool", "A|=a;"),
-        };
-
-        [TestCaseSource(nameof(TestCases))]
-        public static void UpdatedInMethodThis(string type, string statement)
-        {
-            var code = @"
+    [TestCaseSource(nameof(TestCases))]
+    public static void UpdatedInMethodThis(string type, string statement)
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -38,13 +38,13 @@ namespace N
 }".AssertReplace("A = a;", statement)
   .AssertReplace("int", type);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCaseSource(nameof(TestCases))]
-        public static void UpdatedInMethodUnderscoreNames(string type, string statement)
-        {
-            var code = @"
+    [TestCaseSource(nameof(TestCases))]
+    public static void UpdatedInMethodUnderscoreNames(string type, string statement)
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -59,13 +59,13 @@ namespace N
 }".AssertReplace("A = a;", statement)
   .AssertReplace("int", type);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCaseSource(nameof(TestCases))]
-        public static void UpdatingOtherInstanceInCtor(string type, string statement)
-        {
-            var code = @"
+    [TestCaseSource(nameof(TestCases))]
+    public static void UpdatingOtherInstanceInCtor(string type, string statement)
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -80,13 +80,13 @@ namespace N
 }".AssertReplace("A = a;", statement)
   .AssertReplace("int", type);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UpdatedInLambdaInCtor()
-        {
-            var code = @"
+    [Test]
+    public static void UpdatedInLambdaInCtor()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -105,13 +105,13 @@ namespace N
         public void M() => this.E.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DifferentProperties()
-        {
-            var iFoo = @"
+    [Test]
+    public static void DifferentProperties()
+    {
+        var iFoo = @"
 namespace N
 {
     public interface IFoo
@@ -119,7 +119,7 @@ namespace N
         int D { get; set; }
     }
 }";
-            var foo = @"
+        var foo = @"
 namespace N
 {
     public class Foo : IFoo
@@ -157,13 +157,13 @@ namespace N
         // }
     }
 }";
-            RoslynAssert.Valid(Analyzer, iFoo, foo);
-        }
+        RoslynAssert.Valid(Analyzer, iFoo, foo);
+    }
 
-        [Test]
-        public static void OtherInstanceObjectInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void OtherInstanceObjectInitializer()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -176,13 +176,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SideEffectStaticMethod()
-        {
-            var code = @"
+    [Test]
+    public static void SideEffectStaticMethod()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -195,13 +195,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SideEffectStaticMethodPrivateProperty()
-        {
-            var code = @"
+    [Test]
+    public static void SideEffectStaticMethodPrivateProperty()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -214,13 +214,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssignedInSetOnlyWithTernary()
-        {
-            var code = @"
+    [Test]
+    public static void AssignedInSetOnlyWithTernary()
+    {
+        var code = @"
 namespace N
 {
     public class C<T>
@@ -234,13 +234,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitImplementationStatementBodies()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitImplementationStatementBodies()
+    {
+        var code = @"
 namespace N
 {
     interface I
@@ -259,13 +259,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ExplicitImplementationExpressionBodies()
-        {
-            var code = @"
+    [Test]
+    public static void ExplicitImplementationExpressionBodies()
+    {
+        var code = @"
 namespace N
 {
     interface I
@@ -284,7 +284,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

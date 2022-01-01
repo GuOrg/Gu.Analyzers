@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests
+﻿namespace Gu.Analyzers.Test.GU0010DoNotAssignSameValueTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly SimpleAssignmentAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void ConstructorSettingProperties()
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
-
-        [Test]
-        public static void ConstructorSettingProperties()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class Foo
@@ -32,13 +32,13 @@ namespace N
         public int D { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConstructorSettingFields()
-        {
-            var code = @"
+    [Test]
+    public static void ConstructorSettingFields()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -53,13 +53,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Increment()
-        {
-            var code = @"
+    [Test]
+    public static void Increment()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -72,13 +72,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ObjectInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void ObjectInitializer()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -91,13 +91,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ObjectInitializerStruct()
-        {
-            var code = @"
+    [Test]
+    public static void ObjectInitializerStruct()
+    {
+        var code = @"
 namespace N
 {
     public struct Foo
@@ -110,14 +110,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("c.A = this.A;")]
-        [TestCase("c.A = A;")]
-        public static void SetSameMemberOnOtherInstance(string after)
-        {
-            var code = @"
+    [TestCase("c.A = this.A;")]
+    [TestCase("c.A = A;")]
+    public static void SetSameMemberOnOtherInstance(string after)
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -132,13 +132,13 @@ namespace N
     }
 }".AssertReplace("c.A = A;", after);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SetSameMemberOnOtherInstance2()
-        {
-            var code = @"
+    [Test]
+    public static void SetSameMemberOnOtherInstance2()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -153,13 +153,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SetSameMemberOnOtherInstanceRecursive()
-        {
-            var code = @"
+    [Test]
+    public static void SetSameMemberOnOtherInstanceRecursive()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -175,7 +175,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

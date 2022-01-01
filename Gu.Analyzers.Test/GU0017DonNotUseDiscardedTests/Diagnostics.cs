@@ -1,20 +1,20 @@
-﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests
+﻿namespace Gu.Analyzers.Test.GU0017DonNotUseDiscardedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly IdentifierNameAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0017DoNotUseDiscarded);
 
-    internal static class Diagnostics
+    [TestCase("var o = ↓_ + 3;")]
+    [TestCase("var o = ↓_++;")]
+    [TestCase("var o = ↓_.ToString();")]
+    [TestCase("Console.WriteLine(↓_);")]
+    public static void Local(string statement)
     {
-        private static readonly IdentifierNameAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0017DoNotUseDiscarded);
-
-        [TestCase("var o = ↓_ + 3;")]
-        [TestCase("var o = ↓_++;")]
-        [TestCase("var o = ↓_.ToString();")]
-        [TestCase("Console.WriteLine(↓_);")]
-        public static void Local(string statement)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
 #pragma warning disable CS8019
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }".AssertReplace("var o = ↓_ + 3;", statement);
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void OneParameterLambda()
-        {
-            var code = @"
+    [Test]
+    public static void OneParameterLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void TwoParameterLambda()
-        {
-            var code = @"
+    [Test]
+    public static void TwoParameterLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -70,7 +70,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests
+﻿namespace Gu.Analyzers.Test.GU0015DoNotAssignMoreThanOnceTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly SimpleAssignmentAnalyzer Analyzer = new();
 
-    internal static class Valid
+    [Test]
+    public static void SimpleAssign()
     {
-        private static readonly SimpleAssignmentAnalyzer Analyzer = new();
-
-        [Test]
-        public static void SimpleAssign()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -23,13 +23,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssignInIfElse()
-        {
-            var code = @"
+    [Test]
+    public static void AssignInIfElse()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreMutableInLambda()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreMutableInLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -72,13 +72,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreOutParameter()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreOutParameter()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -96,13 +96,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreOutParameterIfReturn()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreOutParameterIfReturn()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -127,13 +127,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreObjectInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoreObjectInitializer()
+    {
+        var code = @"
 namespace N
 {
     public class C1
@@ -151,13 +151,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DifferentInstances()
-        {
-            var code = @"
+    [Test]
+    public static void DifferentInstances()
+    {
+        var code = @"
 namespace N
 {
     public class C1
@@ -175,13 +175,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Enum()
-        {
-            var code = @"
+    [Test]
+    public static void Enum()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -205,13 +205,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Boolean()
-        {
-            var code = @"
+    [Test]
+    public static void Boolean()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -229,13 +229,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenUsingTheValueStringReplace()
-        {
-            var code = @"
+    [Test]
+    public static void WhenUsingTheValueStringReplace()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -249,13 +249,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenUsingTheValue1()
-        {
-            var code = @"
+    [Test]
+    public static void WhenUsingTheValue1()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -276,13 +276,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenUsingTheValue2()
-        {
-            var code = @"
+    [Test]
+    public static void WhenUsingTheValue2()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -345,7 +345,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

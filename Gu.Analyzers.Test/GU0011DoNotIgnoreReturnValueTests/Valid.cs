@@ -1,16 +1,16 @@
-﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests
+﻿namespace Gu.Analyzers.Test.GU0011DoNotIgnoreReturnValueTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
 
-    internal static partial class Valid
+    [Test]
+    public static void ChainedCtor()
     {
-        private static readonly GU0011DoNotIgnoreReturnValue Analyzer = new();
-
-        [Test]
-        public static void ChainedCtor()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Text;
@@ -30,13 +30,13 @@ namespace N
         public StringBuilder Builder { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void RealisticClass()
-        {
-            var code = @"
+    [Test]
+    public static void RealisticClass()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -54,13 +54,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Using()
-        {
-            var code = @"
+    [Test]
+    public static void Using()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -86,13 +86,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void RealisticExtensionMethodClass()
-        {
-            var code = @"
+    [Test]
+    public static void RealisticExtensionMethodClass()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -209,13 +209,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void VoidMethod()
-        {
-            var code = @"
+    [Test]
+    public static void VoidMethod()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -231,13 +231,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void VoidMethodWithReturn()
-        {
-            var code = @"
+    [Test]
+    public static void VoidMethodWithReturn()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -254,13 +254,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticVoidMethod()
-        {
-            var code = @"
+    [Test]
+    public static void StaticVoidMethod()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -276,13 +276,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticVoidMethodWithReturn()
-        {
-            var code = @"
+    [Test]
+    public static void StaticVoidMethodWithReturn()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -299,13 +299,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IfTry()
-        {
-            var code = @"
+    [Test]
+    public static void IfTry()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -326,13 +326,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenThrowing()
-        {
-            var code = @"
+    [Test]
+    public static void WhenThrowing()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -345,13 +345,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenInvocationInExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void WhenInvocationInExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -364,13 +364,13 @@ namespace N
         public void M2() => M1();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenNewInExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void WhenNewInExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -378,13 +378,13 @@ namespace N
         public void M() => new C();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningThisMethodExpressionBody()
-        {
-            var c = @"
+    [Test]
+    public static void ReturningThisMethodExpressionBody()
+    {
+        var c = @"
 namespace N
 {
     public class C
@@ -393,7 +393,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C1
@@ -406,13 +406,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c, code);
-        }
+        RoslynAssert.Valid(Analyzer, c, code);
+    }
 
-        [Test]
-        public static void ReturningThisMethodExpressionBodyDisposable()
-        {
-            var c = @"
+    [Test]
+    public static void ReturningThisMethodExpressionBodyDisposable()
+    {
+        var c = @"
 namespace N
 {
     using System;
@@ -427,7 +427,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C1
@@ -440,16 +440,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c, code);
-        }
+        RoslynAssert.Valid(Analyzer, c, code);
+    }
 
-        [TestCase("xs.Add(1)")]
-        [TestCase("xs.Remove(1)")]
-        [TestCase("xs.RemoveAt(1)")]
-        [TestCase("xs.Clear()")]
-        public static void ListMethods(string expression)
-        {
-            var code = @"
+    [TestCase("xs.Add(1)")]
+    [TestCase("xs.Remove(1)")]
+    [TestCase("xs.RemoveAt(1)")]
+    [TestCase("xs.Clear()")]
+    public static void ListMethods(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -463,15 +463,15 @@ namespace N
         }
     }
 }".AssertReplace("xs.Add(1)", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("xs.Add(1)")]
-        [TestCase("xs.RemoveAt(1)")]
-        [TestCase("xs.Clear()")]
-        public static void CustomListMethods(string expression)
-        {
-            var xs = @"
+    [TestCase("xs.Add(1)")]
+    [TestCase("xs.RemoveAt(1)")]
+    [TestCase("xs.Clear()")]
+    public static void CustomListMethods(string expression)
+    {
+        var xs = @"
 namespace N
 {
     using System.Collections;
@@ -539,7 +539,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -551,7 +551,6 @@ namespace N
         }
     }
 }".AssertReplace("xs.Add(1)", expression);
-            RoslynAssert.Valid(Analyzer, xs, code);
-        }
+        RoslynAssert.Valid(Analyzer, xs, code);
     }
 }

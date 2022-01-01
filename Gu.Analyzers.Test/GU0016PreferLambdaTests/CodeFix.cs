@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests
+﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly MethodGroupAnalyzer Analyzer = new();
+    private static readonly UseLambdaFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0016PreferLambda);
 
-    internal static class CodeFix
+    [Test]
+    public static void LinqWhereStaticMethod()
     {
-        private static readonly MethodGroupAnalyzer Analyzer = new();
-        private static readonly UseLambdaFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0016PreferLambda);
-
-        [Test]
-        public static void LinqWhereStaticMethod()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -29,7 +29,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -46,13 +46,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void LinqWhereStaticMethodWhenNameCollision()
-        {
-            var before = @"
+    [Test]
+    public static void LinqWhereStaticMethodWhenNameCollision()
+    {
+        var before = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -69,7 +69,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -86,13 +86,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void EventHandler()
-        {
-            var before = @"
+    [Test]
+    public static void EventHandler()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -110,7 +110,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -128,7 +128,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

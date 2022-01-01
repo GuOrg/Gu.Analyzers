@@ -1,18 +1,18 @@
-﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests
+﻿namespace Gu.Analyzers.Test.GU0050IgnoreEventsWhenSerializingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+internal static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new();
+    private static readonly NonSerializedFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing);
 
-    internal static class CodeFix
+    [Test]
+    public static void Messages()
     {
-        private static readonly GU0050IgnoreEventsWhenSerializing Analyzer = new();
-        private static readonly NonSerializedFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0050IgnoreEventsWhenSerializing);
-
-        [Test]
-        public static void Messages()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -40,14 +40,14 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing");
-            RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "[field:NonSerialized].");
-        }
+        var expectedDiagnostic = ExpectedDiagnostic.WithMessage("Ignore events when serializing");
+        RoslynAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, before, after, fixTitle: "[field:NonSerialized].");
+    }
 
-        [Test]
-        public static void Event()
-        {
-            var before = @"
+    [Test]
+    public static void Event()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -79,7 +79,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -111,14 +111,14 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void EventWithAttribute()
-        {
-            var attributeCode = @"
+    [Test]
+    public static void EventWithAttribute()
+    {
+        var attributeCode = @"
 namespace N
 {
     using System;
@@ -127,7 +127,7 @@ namespace N
     {
     }
 }";
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -160,7 +160,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -193,14 +193,14 @@ namespace N
         public void M() =>  this.E?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, before }, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, before }, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { attributeCode, before }, after);
+    }
 
-        [Test]
-        public static void EventHandler()
-        {
-            var before = @"
+    [Test]
+    public static void EventHandler()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -218,7 +218,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -236,14 +236,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void TwoEvents()
-        {
-            var before = @"
+    [Test]
+    public static void TwoEvents()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -279,7 +279,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -316,7 +316,6 @@ namespace N
         public void M2() =>  this.E2?.Invoke(this, EventArgs.Empty);
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }
