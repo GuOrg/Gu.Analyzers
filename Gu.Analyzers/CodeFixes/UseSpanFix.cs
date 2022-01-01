@@ -28,7 +28,7 @@ internal class UseSpanFix : DocumentEditorCodeFixProvider
             if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is BracketedArgumentListSyntax { Parent: ElementAccessExpressionSyntax elementAccess })
             {
                 context.RegisterCodeFix(
-                    "Use span",
+                    "AsSpan()",
                     (editor, _) => editor.ReplaceNode(
                         elementAccess,
                         x => x.WithExpression(
@@ -37,7 +37,7 @@ internal class UseSpanFix : DocumentEditorCodeFixProvider
                                     SyntaxKind.SimpleMemberAccessExpression,
                                     x.Expression,
                                     SyntaxFactory.IdentifierName("AsSpan"))))),
-                    "Use span",
+                    "AsSpan()",
                     diagnostic);
             }
         }

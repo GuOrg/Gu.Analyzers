@@ -1,6 +1,7 @@
 ﻿namespace Gu.Analyzers.Test.GU0026RangeAllocation;
 
 using Gu.Roslyn.Asserts;
+
 using NUnit.Framework;
 
 internal static class CodeFix
@@ -41,6 +42,6 @@ public class C
     }
 }".AssertReplace("int[]", type);
 
-        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "AsSpan()");
     }
 }
