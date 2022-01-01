@@ -25,10 +25,10 @@ internal class UseSpanFix : DocumentEditorCodeFixProvider
 
         foreach (var diagnostic in context.Diagnostics)
         {
-            if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is BracketedArgumentListSyntax { Parent: ElementAccessExpressionSyntax elementAccess })
+            if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan, getInnermostNodeForTie: true) is BracketedArgumentListSyntax { Parent: ElementAccessExpressionSyntax elementAccess } range)
             {
                 context.RegisterCodeFix(
-                    "AsSpan()",
+                    $"AsSpan(){range}",
                     (editor, _) => editor.ReplaceNode(
                         elementAccess,
                         x => x.WithExpression(
@@ -39,6 +39,23 @@ internal class UseSpanFix : DocumentEditorCodeFixProvider
                                     SyntaxFactory.IdentifierName("AsSpan"))))),
                     "AsSpan()",
                     diagnostic);
+
+                if (range is { Arguments: { Count: 1 } arguments } &&
+                    arguments[0] is { Expression: RangeExpressionSyntax { LeftOperand: LiteralExpressionSyntax left, RightOperand: null } })
+                {
+                    context.RegisterCodeFix(
+                        $"AsSpan({left})",
+                        (editor, _) => editor.ReplaceNode(
+                            elementAccess,
+                            x => SyntaxFactory.InvocationExpression(
+                                SyntaxFactory.MemberAccessExpression(
+                                    SyntaxKind.SimpleMemberAccessExpression,
+                                    x.Expression,
+                                    SyntaxFactory.IdentifierName("AsSpan")),
+                                argumentList: SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(left))))),
+                        "AsSpan(start)",
+                        diagnostic);
+                }
             }
         }
     }

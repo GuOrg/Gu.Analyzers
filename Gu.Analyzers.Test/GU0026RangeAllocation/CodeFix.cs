@@ -14,7 +14,7 @@ internal static class CodeFix
     [TestCase("Int32[]")]
     [TestCase("string[]")]
     [TestCase("String[]")]
-    public static void For(string type)
+    public static void AsSpanThenRange(string type)
     {
         var before = @"
 namespace N;
@@ -42,6 +42,41 @@ public class C
     }
 }".AssertReplace("int[]", type);
 
-        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "AsSpan()");
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "AsSpan()[1..]");
+    }
+
+    [TestCase("int[]")]
+    [TestCase("Int32[]")]
+    [TestCase("string[]")]
+    [TestCase("String[]")]
+    public static void AsSpanStart(string type)
+    {
+        var before = @"
+namespace N;
+
+using System;
+
+public class C
+{
+    public void M(int[] xs)
+    {
+        var tail = xs↓[1..];
+    }
+}".AssertReplace("int[]", type);
+
+        var after = @"
+namespace N;
+
+using System;
+
+public class C
+{
+    public void M(int[] xs)
+    {
+        var tail = xs.AsSpan(1);
+    }
+}".AssertReplace("int[]", type);
+
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "AsSpan(1)");
     }
 }
