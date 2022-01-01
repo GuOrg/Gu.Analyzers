@@ -28,7 +28,7 @@ public class C
     [TestCase("xs.FirstOrDefault(x => x > 1)")]
     [TestCase("xs.LastOrDefault()")]
     [TestCase("xs.SingleOrDefault()")]
-    public static void Local(string expression)
+    public static void Call(string expression)
     {
         var code = @"
 namespace N;

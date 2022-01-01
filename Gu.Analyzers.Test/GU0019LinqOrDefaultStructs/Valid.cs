@@ -11,7 +11,7 @@ internal static class Valid
     [TestCase("IEnumerable<string>", "xs.FirstOrDefault()")]
     [TestCase("IEnumerable<int?>", "xs.FirstOrDefault()")]
     [TestCase("IEnumerable<int>", "xs.First()")]
-    public static void DiscardSymbol(string type, string expression)
+    public static void Call(string type, string expression)
     {
         var code = @"
 namespace N;
