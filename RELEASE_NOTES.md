@@ -1,3 +1,6 @@
+#### 2.0.2
+* BUGFIX: Don't warn when indexing.
+
 #### 2.0.1
 * GU0019: Warn on IEnumerable&lt;struct&gt;.FirstOrDefault()
 * GU0026: Warn on array[1..] as it allocates
