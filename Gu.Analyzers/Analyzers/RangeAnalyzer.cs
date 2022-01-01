@@ -34,7 +34,7 @@ internal class RangeAnalyzer : DiagnosticAnalyzer
         bool Allocates(BracketedArgumentListSyntax candidate)
         {
             if (candidate.Parent is ElementAccessExpressionSyntax { Expression: { } expression } &&
-                context.SemanticModel.GetType(expression, context.CancellationToken) is IArrayTypeSymbol)
+                context.SemanticModel.GetType(expression, context.CancellationToken) is IArrayTypeSymbol or INamedTypeSymbol { MetadataName: "string" })
             {
                 return true;
             }
