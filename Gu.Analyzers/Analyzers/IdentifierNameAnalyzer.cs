@@ -24,8 +24,7 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is IdentifierNameSyntax name &&
-                name.Identifier.ValueText == "_" &&
+                context.Node is IdentifierNameSyntax { Identifier: { ValueText: "_" } } name &&
                 IsUsed(name))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0017DoNotUseDiscarded, name.Identifier.GetLocation()));
