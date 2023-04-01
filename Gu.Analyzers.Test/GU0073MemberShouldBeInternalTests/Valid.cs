@@ -226,4 +226,19 @@ namespace N
 
         RoslynAssert.Valid(Analyzer, code);
     }
+
+    [Test]
+    public static void StructCtor()
+    {
+        var code = @"
+namespace N
+{
+    internal struct S
+    {
+        public S() { }
+    }
+}";
+
+        RoslynAssert.Valid(Analyzer, code);
+    }
 }

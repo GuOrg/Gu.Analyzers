@@ -36,6 +36,7 @@ internal class GU0073MemberShouldBeInternal : DiagnosticAnalyzer
             context.ContainingSymbol is { IsOverride: false, DeclaredAccessibility: Accessibility.Public, ContainingType: { } containingType } memberSymbol &&
             containingType.DeclaredAccessibility != Accessibility.Public &&
             TryFindPublicKeyword(out var keyword) &&
+            !IsStructCtor() &&
             !ImplementsInterface())
         {
             context.ReportDiagnostic(
@@ -76,6 +77,9 @@ internal class GU0073MemberShouldBeInternal : DiagnosticAnalyzer
 
             return false;
         }
+
+        bool IsStructCtor() => containingType.TypeKind == TypeKind.Struct &&
+                               context.Node.IsKind(SyntaxKind.ConstructorDeclaration);
 
         bool TryFindPublicKeyword(out SyntaxToken result)
         {
