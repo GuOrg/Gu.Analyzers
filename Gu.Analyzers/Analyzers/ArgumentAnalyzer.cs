@@ -40,8 +40,7 @@ internal class ArgumentAnalyzer : DiagnosticAnalyzer
                    expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
                    !argument.IsInExpressionTree(context.SemanticModel, context.CancellationToken) &&
                    context.SemanticModel.TryGetSymbol(parent, context.CancellationToken, out IMethodSymbol? method) &&
-                   method.FindParameter(argument) is { Type: { SpecialType: SpecialType.System_Boolean } } parameter &&
-                   parameter.OriginalDefinition.Type.SpecialType == SpecialType.System_Boolean &&
+                   method.FindParameter(argument) is { Name: not "value", Type.SpecialType: SpecialType.System_Boolean, OriginalDefinition.Type.SpecialType: SpecialType.System_Boolean } &&
                    !IsIgnored(method, context.Compilation);
         }
     }

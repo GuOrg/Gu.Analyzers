@@ -120,14 +120,36 @@ namespace N
 {
     public class C
     {
-        public void Floof(params bool[] useFluffyBuns)
+        public void M(params bool[] useFluffyBuns)
         {
         
         }
 
         public void Another()
         {
-            Floof(true, true, true, false, true, false);
+            M(true, true, true, false, true, false);
+        }
+    }
+}";
+        RoslynAssert.Valid(Analyzer, code);
+    }
+
+    [Test]
+    public static void DonNotNagWhenNamedValue()
+    {
+        var code = @"
+namespace N
+{
+    public class C
+    {
+        public void M(bool value)
+        {
+        
+        }
+
+        public void M1()
+        {
+            M(true);
         }
     }
 }";
