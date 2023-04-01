@@ -26,12 +26,14 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>Roslyn analyzers and fixes.</Description>
     <PackageTags>Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      2.0.3
+      BUGFIX: GU0073 don't warn for struct ctor.
       2.0.2
       BUGFIX: Don't warn when indexing.
       2.0.1
