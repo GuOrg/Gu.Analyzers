@@ -47,7 +47,7 @@ namespace N
     }
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    private class FakeFxCopAnalyzer : DiagnosticAnalyzer
+    private sealed class FakeFxCopAnalyzer : DiagnosticAnalyzer
     {
         internal static readonly DiagnosticDescriptor Descriptor = new("CA1052", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 

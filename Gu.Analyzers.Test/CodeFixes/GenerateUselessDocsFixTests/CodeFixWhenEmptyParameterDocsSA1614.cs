@@ -53,7 +53,7 @@ namespace N
     }
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    private class FakeStyleCopAnalyzer : DiagnosticAnalyzer
+    private sealed class FakeStyleCopAnalyzer : DiagnosticAnalyzer
     {
         private static readonly DiagnosticDescriptor Descriptor = new("SA1614", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 

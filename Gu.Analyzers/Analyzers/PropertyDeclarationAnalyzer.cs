@@ -29,8 +29,7 @@ internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (context.Node is PropertyDeclarationSyntax propertyDeclaration &&
-            context.ContainingSymbol is IPropertySymbol { GetMethod: { } } property &&
+        if (context is { Node: PropertyDeclarationSyntax propertyDeclaration, ContainingSymbol: IPropertySymbol { GetMethod: { } } property } &&
             ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
         {
             if (property is { Type.IsReferenceType: true, SetMethod: null } &&
