@@ -79,7 +79,7 @@ internal class GU0060EnumMemberValueConflictsWithAnother : DiagnosticAnalyzer
 
     private static bool IsDerivedFromOtherEnumMembers(EnumMemberDeclarationSyntax enumMember, SemanticModel semanticModel, CancellationToken cancellationToken)
     {
-        if (enumMember is { EqualsValue: { Value: { } value } } &&
+        if (enumMember is { EqualsValue.Value: { } value } &&
             !value.IsKind(SyntaxKind.NumericLiteralExpression))
         {
             foreach (var node in value.DescendantNodesAndSelf())

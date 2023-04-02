@@ -133,7 +133,7 @@ internal class TestMethodAnalyzer : DiagnosticAnalyzer
     {
         attributeArgument = null;
         if (methodSymbol.Parameters.Length > 0 &&
-            attributeSyntax is { ArgumentList: { Arguments: { } arguments } } &&
+            attributeSyntax is { ArgumentList.Arguments: { } arguments } &&
             arguments.Count > 0)
         {
             for (var i = 0; i < Math.Min(CountArgs(attributeSyntax), methodSymbol.Parameters.Length); i++)
@@ -339,7 +339,7 @@ internal class TestMethodAnalyzer : DiagnosticAnalyzer
     private static int CountArgs(AttributeSyntax attribute)
     {
         var count = 0;
-        if (attribute is { ArgumentList: { Arguments: { } arguments } })
+        if (attribute is { ArgumentList.Arguments: { } arguments })
         {
             foreach (var argument in arguments)
             {

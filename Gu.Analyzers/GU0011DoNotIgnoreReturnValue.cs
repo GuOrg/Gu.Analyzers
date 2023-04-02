@@ -81,7 +81,7 @@ internal class GU0011DoNotIgnoreReturnValue : DiagnosticAnalyzer
                 {
                     switch (returnValue)
                     {
-                        case IdentifierNameSyntax { Identifier: { ValueText: { } valueText } }
+                        case IdentifierNameSyntax { Identifier.ValueText: { } valueText }
                             when method.TryFindParameter(valueText, out _):
                         case ThisExpressionSyntax _:
                             continue;

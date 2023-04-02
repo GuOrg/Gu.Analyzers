@@ -24,7 +24,7 @@ internal class IdentifierNameAnalyzer : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is IdentifierNameSyntax { Identifier: { ValueText: "_" } } name &&
+            context.Node is IdentifierNameSyntax { Identifier.ValueText: "_" } name &&
             IsUsed(name))
         {
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0017DoNotUseDiscarded, name.Identifier.GetLocation()));

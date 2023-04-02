@@ -81,7 +81,7 @@ internal class ArgumentAnalyzer : DiagnosticAnalyzer
                    method.Name.StartsWith("Set", StringComparison.Ordinal);
         }
 
-        return method is { ReceiverType: { } receiver, IsExtensionMethod: true, Parameters: { Length: 1 } } &&
+        return method is { ReceiverType: { } receiver, IsExtensionMethod: true, Parameters.Length: 1 } &&
                receiver.IsAssignableTo(KnownSymbols.DependencyObject, compilation) &&
                method.Name.StartsWith("Set", StringComparison.Ordinal);
     }

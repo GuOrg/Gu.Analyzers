@@ -41,7 +41,7 @@ internal class SimpleAssignmentAnalyzer : DiagnosticAnalyzer
                 context.ContainingSymbol is IMethodSymbol method &&
                 method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
                 method.Parameters.TryFirst(x => x.Name == identifier.Identifier.ValueText, out var parameter) &&
-                parameter is { Type: { IsReferenceType: true }, HasExplicitDefaultValue: false } &&
+                parameter is { Type.IsReferenceType: true, HasExplicitDefaultValue: false } &&
                 assignment.TryFirstAncestor(out BaseMethodDeclarationSyntax? containingMethod) &&
                 !NullCheck.IsChecked(parameter, containingMethod, context.SemanticModel, context.CancellationToken))
             {

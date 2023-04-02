@@ -70,7 +70,7 @@ internal class ParameterRefactoring : CodeRefactoringProvider
 
     private static Move<StatementSyntax>? ShouldMoveAssignment(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
     {
-        if (ctor is { ParameterList: { } parameterList, Body: { Statements: { } statements } } &&
+        if (ctor is { ParameterList: { } parameterList, Body.Statements: { } statements } &&
             Assignment(parameter, statements) is { } assignment)
         {
             var indexOf = parameterList.Parameters.IndexOf(parameter);
@@ -133,7 +133,7 @@ internal class ParameterRefactoring : CodeRefactoringProvider
 
         static MemberDeclarationSyntax? Member(ParameterSyntax parameter, ConstructorDeclarationSyntax ctor)
         {
-            if (ctor is { Body: { Statements: { } statements } } &&
+            if (ctor is { Body.Statements: { } statements } &&
                 Assignment(parameter, statements) is { Expression: AssignmentExpressionSyntax assignment } &&
                 Name(assignment.Left) is { } name &&
                 ctor.Parent is TypeDeclarationSyntax type)
@@ -142,7 +142,7 @@ internal class ParameterRefactoring : CodeRefactoringProvider
                 {
                     switch (candidate)
                     {
-                        case FieldDeclarationSyntax { Declaration: { Variables: { Count: 1 } variables } }
+                        case FieldDeclarationSyntax { Declaration.Variables: { Count: 1 } variables }
                             when variables[0].Identifier.ValueText == name:
                             return candidate;
                         case PropertyDeclarationSyntax { Identifier: { } identifier }

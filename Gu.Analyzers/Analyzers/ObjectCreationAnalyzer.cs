@@ -27,7 +27,7 @@ internal class ObjectCreationAnalyzer : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is ObjectCreationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } objectCreation &&
+            context.Node is ObjectCreationExpressionSyntax { ArgumentList.Arguments: { } arguments } objectCreation &&
             arguments.Count > 0 &&
             context.SemanticModel.TryGetSymbol(objectCreation, context.CancellationToken, out var ctor) &&
             context.ContainingSymbol is IMethodSymbol method &&
@@ -35,7 +35,7 @@ internal class ObjectCreationAnalyzer : DiagnosticAnalyzer
             ctor.TryFindParameter("paramName", out var nameParameter))
         {
             if (objectCreation.FindArgument(nameParameter) is { } nameArgument &&
-                objectCreation.Parent is ThrowExpressionSyntax { Parent: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "??" } } } &&
+                objectCreation.Parent is ThrowExpressionSyntax { Parent: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken.ValueText: "??" } } &&
                 nameArgument.TryGetStringValue(context.SemanticModel, context.CancellationToken, out var name) &&
                 left.Identifier.ValueText != name)
             {
@@ -47,7 +47,7 @@ internal class ObjectCreationAnalyzer : DiagnosticAnalyzer
 
                 Location GetLocation()
                 {
-                    return nameArgument is { Expression: InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 1 } } } invocation } &&
+                    return nameArgument is { Expression: InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1 } invocation } &&
                            invocation.IsNameOf() &&
                            invocation.ArgumentList.Arguments.TrySingle(out var nameofArg)
                         ? nameofArg.GetLocation()

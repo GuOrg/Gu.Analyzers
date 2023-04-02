@@ -222,7 +222,7 @@ internal class GU0007PreferInjecting : DiagnosticAnalyzer
                 AssignmentExecutionWalker.SingleFor(symbol, containingType, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.Right is IdentifierNameSyntax identifier)
             {
-                if (assignment.FirstAncestor<ConstructorDeclarationSyntax>() is { ParameterList: { Parameters: { } parameters } } &&
+                if (assignment.FirstAncestor<ConstructorDeclarationSyntax>() is { ParameterList.Parameters: { } parameters } &&
                     parameters.TryFirst(p => p.Identifier.ValueText == identifier.Identifier.ValueText, out var parameter))
                 {
                     return semanticModel.TryGetNamedType(parameter, cancellationToken, out memberType);
@@ -236,7 +236,7 @@ internal class GU0007PreferInjecting : DiagnosticAnalyzer
 
     private static bool IsInjectable(INamedTypeSymbol? type)
     {
-        if (type is { ContainingNamespace: { }, IsValueType: false, IsStatic: false, IsAbstract: false, DeclaringSyntaxReferences: { Length: 1 } } &&
+        if (type is { ContainingNamespace: { }, IsValueType: false, IsStatic: false, IsAbstract: false, DeclaringSyntaxReferences.Length: 1 } &&
             type.Constructors.TrySingle(x => !x.IsStatic, out var ctor))
         {
             if (ctor.Parameters.TryFirst(x => !IsInjectable(x.Type as INamedTypeSymbol), out _))

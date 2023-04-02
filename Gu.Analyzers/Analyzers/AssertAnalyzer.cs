@@ -26,11 +26,10 @@ internal class AssertAnalyzer : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { } name } } invocation &&
+            context.Node is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier.ValueText: "Assert" }, Name: { } name } } invocation &&
             name.Identifier.ValueText.StartsWith("Throws", StringComparison.InvariantCulture))
         {
-            if (invocation.Parent is ExpressionStatementSyntax ||
-                invocation.Parent is AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } })
+            if (invocation.Parent is ExpressionStatementSyntax or AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier.ValueText: "_" } })
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0084AssertExceptionMessage, invocation.GetLocation()));
             }

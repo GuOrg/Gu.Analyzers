@@ -90,7 +90,7 @@ internal class NullCheckParameterFix : DocumentEditorCodeFixProvider
                             diagnostic.Id,
                             diagnostic);
                     }
-                    else if (methodDeclaration is { ExpressionBody: { Expression: { } expression } })
+                    else if (methodDeclaration is { ExpressionBody.Expression: { } expression })
                     {
                         context.RegisterCodeFix(
                             "Add null check.",
@@ -109,7 +109,7 @@ internal class NullCheckParameterFix : DocumentEditorCodeFixProvider
                         {
                             return methodDeclaration switch
                             {
-                                MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } => SyntaxFactory.ExpressionStatement(expression!),
+                                MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword.ValueText: "void" } } => SyntaxFactory.ExpressionStatement(expression!),
                                 MethodDeclarationSyntax _ => SyntaxFactory.ReturnStatement(expression),
                                 _ => SyntaxFactory.ExpressionStatement(expression!),
                             };

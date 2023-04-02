@@ -55,7 +55,7 @@ internal class MoveArgumentFix : DocumentEditorCodeFixProvider
                             {
                                 return argument switch
                                 {
-                                    { NameColon: { Name: { } } } => ParameterIndex(method, argument.NameColon.Name.Identifier.ValueText),
+                                    { NameColon.Name: { } } => ParameterIndex(method, argument.NameColon.Name.Identifier.ValueText),
                                     _ => old.Arguments.IndexOf(argument),
                                 };
                             }

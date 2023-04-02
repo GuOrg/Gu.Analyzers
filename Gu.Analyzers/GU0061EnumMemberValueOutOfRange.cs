@@ -25,9 +25,9 @@ internal class GU0061EnumMemberValueOutOfRange : DiagnosticAnalyzer
     private void HandleEnumMember(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is EnumMemberDeclarationSyntax { EqualsValue: { Value: BinaryExpressionSyntax { Left: LiteralExpressionSyntax { Token: { Value: 1 } }, OperatorToken: { ValueText: "<<" }, Right: LiteralExpressionSyntax right } leftShiftExpression } } &&
-            context.ContainingSymbol is { ContainingType: { EnumUnderlyingType: { SpecialType: SpecialType.System_Int32 } } } &&
-            right is { Token: { Value: int intValueRight } } &&
+            context.Node is EnumMemberDeclarationSyntax { EqualsValue.Value: BinaryExpressionSyntax { Left: LiteralExpressionSyntax { Token.Value: 1 }, OperatorToken.ValueText: "<<", Right: LiteralExpressionSyntax right } leftShiftExpression } &&
+            context.ContainingSymbol is { ContainingType.EnumUnderlyingType.SpecialType: SpecialType.System_Int32 } &&
+            right is { Token.Value: int intValueRight } &&
             intValueRight > 30)
         {
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0061EnumMemberValueOutOfRange, leftShiftExpression.GetLocation()));

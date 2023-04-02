@@ -30,12 +30,12 @@ internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
         {
             switch (context.Node)
             {
-                case FieldDeclarationSyntax { Declaration: { Variables: { } variables } } field
-                    when variables.Last() is { Initializer: { Value: { } value } } &&
+                case FieldDeclarationSyntax { Declaration.Variables: { } variables } field
+                    when variables.Last() is { Initializer.Value: { } value } &&
                          IsInitializedWithUninitialized(field, value, context, out var other):
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, value.GetLocation(), other.Symbol, context.ContainingSymbol));
                     break;
-                case PropertyDeclarationSyntax { Initializer: { Value: { } value } } property
+                case PropertyDeclarationSyntax { Initializer.Value: { } value } property
                     when IsInitializedWithUninitialized(property, value, context, out var other):
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0023StaticMemberOrder, value.GetLocation(), other.Symbol, context.ContainingSymbol));
                     break;
@@ -76,7 +76,7 @@ internal class GU0023StaticMemberOrderAnalyzer : DiagnosticAnalyzer
             return declaration switch
             {
                 PropertyDeclarationSyntax { Initializer: { } } => true,
-                FieldDeclarationSyntax { Declaration: { Variables: { } variables } } => variables.TryFirst(x => x.Initializer != null, out _),
+                FieldDeclarationSyntax { Declaration.Variables: { } variables } => variables.TryFirst(x => x.Initializer != null, out _),
                 _ => false,
             };
         }

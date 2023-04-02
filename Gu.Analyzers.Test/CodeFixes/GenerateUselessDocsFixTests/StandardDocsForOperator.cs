@@ -192,7 +192,7 @@ namespace N
     }
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    private class FakeAnalyzer : DiagnosticAnalyzer
+    private sealed class FakeAnalyzer : DiagnosticAnalyzer
     {
         private static readonly DiagnosticDescriptor Descriptor = new("CS1591", "Title", "Message", "Category", DiagnosticSeverity.Warning, isEnabledByDefault: true);
 

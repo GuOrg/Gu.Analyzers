@@ -28,7 +28,7 @@ internal class BinaryExpressionAnalyzer : DiagnosticAnalyzer
         if (!context.IsExcludedFromAnalysis() &&
             context.Node is BinaryExpressionSyntax binaryExpression)
         {
-            if (binaryExpression is { Left: { }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } })
+            if (binaryExpression is { Left: { }, OperatorToken.ValueText: "==", Right: LiteralExpressionSyntax { Token.ValueText: "null" } })
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
@@ -36,7 +36,7 @@ internal class BinaryExpressionAnalyzer : DiagnosticAnalyzer
                         binaryExpression.GetLocation()));
             }
 
-            if (binaryExpression is { Left: { } left, OperatorToken: { ValueText: "&&" }, Right: { } right } and)
+            if (binaryExpression is { Left: { } left, OperatorToken.ValueText: "&&", Right: { } right } and)
             {
                 Handle(left);
                 Handle(right);
@@ -68,20 +68,20 @@ internal class BinaryExpressionAnalyzer : DiagnosticAnalyzer
     {
         return parent switch
         {
-            { Left: IsPatternExpressionSyntax left, OperatorToken: { ValueText: "&&" } }
+            { Left: IsPatternExpressionSyntax left, OperatorToken.ValueText: "&&" }
                 when Pattern.MergePattern(identifier, left) is { } mergePattern
                 => mergePattern,
-            { OperatorToken: { ValueText: "&&" }, Right: IsPatternExpressionSyntax right }
+            { OperatorToken.ValueText: "&&", Right: IsPatternExpressionSyntax right }
                 when Pattern.MergePattern(identifier, right) is { } mergePattern
                 => mergePattern,
             { Parent: WhenClauseSyntax { Parent: SwitchExpressionArmSyntax { Pattern: { } pattern } } }
                 => Pattern.MergePattern(identifier, pattern),
             { Parent: WhenClauseSyntax { Parent: CasePatternSwitchLabelSyntax { Pattern: { } pattern } } }
                 => Pattern.MergePattern(identifier, pattern),
-            { Left: BinaryExpressionSyntax { OperatorToken: { ValueText: "&&" } } left }
+            { Left: BinaryExpressionSyntax { OperatorToken.ValueText: "&&" } left }
                 when !left.Contains(identifier)
                 => FindMergePattern(identifier, left),
-            { Parent: BinaryExpressionSyntax { Left: { } left, OperatorToken: { ValueText: "&&" } } gp }
+            { Parent: BinaryExpressionSyntax { Left: { } left, OperatorToken.ValueText: "&&" } gp }
                 when left.Contains(identifier)
                 => FindMergePattern(identifier, gp),
             _ => null,
@@ -94,11 +94,11 @@ internal class BinaryExpressionAnalyzer : DiagnosticAnalyzer
         {
             case MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }:
             case PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ } }:
-            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax _ }:
-            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "==" }, Right: MemberAccessExpressionSyntax memberAccess }
-                when semanticModel.GetTypeInfo(memberAccess, cancellationToken) is { Type: { TypeKind: TypeKind.Enum } }:
-            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }:
-            case IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax { Token: { ValueText: "null" } } } }:
+            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken.ValueText: "==", Right: LiteralExpressionSyntax _ }:
+            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken.ValueText: "==", Right: MemberAccessExpressionSyntax memberAccess }
+                when semanticModel.GetTypeInfo(memberAccess, cancellationToken) is { Type.TypeKind: TypeKind.Enum }:
+            case BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, OperatorToken.ValueText: "!=", Right: LiteralExpressionSyntax { Token.ValueText: "null" } }:
+            case IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _, Name: IdentifierNameSyntax _ }, Pattern: ConstantPatternSyntax { Expression: LiteralExpressionSyntax { Token.ValueText: "null" } } }:
                 return true;
             default:
                 return false;

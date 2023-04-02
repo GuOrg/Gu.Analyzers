@@ -33,7 +33,7 @@ internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
             context.ContainingSymbol is IPropertySymbol { GetMethod: { } } property &&
             ReturnValueWalker.TrySingle(propertyDeclaration, out var returnValue))
         {
-            if (property is { Type: { IsReferenceType: true }, SetMethod: null } &&
+            if (property is { Type.IsReferenceType: true, SetMethod: null } &&
                 returnValue is ObjectCreationExpressionSyntax)
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0021CalculatedPropertyAllocates, returnValue.GetLocation()));
@@ -66,15 +66,13 @@ internal class PropertyDeclarationAnalyzer : DiagnosticAnalyzer
 
     private static bool IsInjected(FieldOrProperty member, TypeDeclarationSyntax typeDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
     {
-        using (var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, SearchScope.Instance, semanticModel, cancellationToken))
+        using var walker = AssignmentExecutionWalker.For(member.Symbol, typeDeclaration, SearchScope.Instance, semanticModel, cancellationToken);
+        foreach (var assignment in walker.Assignments)
         {
-            foreach (var assignment in walker.Assignments)
+            if (assignment.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _) &&
+                semanticModel.GetSymbolSafe(assignment.Right, cancellationToken) is IParameterSymbol)
             {
-                if (assignment.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out _) &&
-                    semanticModel.GetSymbolSafe(assignment.Right, cancellationToken) is IParameterSymbol)
-                {
-                    return true;
-                }
+                return true;
             }
         }
 

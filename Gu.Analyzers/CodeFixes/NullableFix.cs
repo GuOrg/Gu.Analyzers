@@ -71,7 +71,7 @@ internal class NullableFix : DocumentEditorCodeFixProvider
                     return candidate switch
                     {
                         EventDeclarationSyntax { Type: { } t } => t,
-                        EventFieldDeclarationSyntax { Declaration: { Type: { } t } } => t,
+                        EventFieldDeclarationSyntax { Declaration.Type: { } t } => t,
                         ConstructorDeclarationSyntax { Parent: TypeDeclarationSyntax typeDeclaration }
                             when Regex.Match(diagnostic.GetMessage(CultureInfo.InvariantCulture), "Non-nullable event '(?<name>[^']+)' is uninitialized") is { Success: true } match &&
                                  typeDeclaration.TryFindEvent(match.Groups["name"].Value, out member)
@@ -86,7 +86,7 @@ internal class NullableFix : DocumentEditorCodeFixProvider
             {
                 switch (method)
                 {
-                    case { Identifier: { ValueText: "Equals" }, ParameterList: { Parameters: { Count: 1 } parameters } }
+                    case { Identifier.ValueText: "Equals", ParameterList.Parameters: { Count: 1 } parameters }
                         when parameters[0].Type is { } type:
                         context.RegisterCodeFix(
                             "Declare as nullable.",
@@ -178,7 +178,7 @@ internal class NullableFix : DocumentEditorCodeFixProvider
         {
             return expression switch
             {
-                LiteralExpressionSyntax { Token: { ValueText: "default" } } => true,
+                LiteralExpressionSyntax { Token.ValueText: "default" } => true,
                 DefaultExpressionSyntax _ => true,
                 _ => false,
             };

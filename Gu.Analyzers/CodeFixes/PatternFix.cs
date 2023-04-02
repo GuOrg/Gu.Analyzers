@@ -73,7 +73,7 @@ internal class PatternFix : DocumentEditorCodeFixProvider
                          syntaxRoot.FindNode(additionalLocation.SourceSpan) is PatternSyntax mergeWith)
                 {
                     context.RegisterCodeFix(
-                        mergeWith is RecursivePatternSyntax { PropertyPatternClause: { Subpatterns: { } subs } } &&
+                        mergeWith is RecursivePatternSyntax { PropertyPatternClause.Subpatterns: { } subs } &&
                         subs.Any()
                             ? $", {property}: {pattern}"
                             : $"{{ {property}: {pattern} }}",
@@ -161,11 +161,11 @@ internal class PatternFix : DocumentEditorCodeFixProvider
                 => (p, True),
             PrefixUnaryExpressionSyntax { Operand: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p } }
                 => (p, False),
-            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: LiteralExpressionSyntax c }
+            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken.ValueText: "==", Right: LiteralExpressionSyntax c }
                 => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia())),
-            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "==" }, Right: MemberAccessExpressionSyntax c }
+            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken.ValueText: "==", Right: MemberAccessExpressionSyntax c }
                 => (p, SyntaxFactory.ConstantPattern(c.WithoutTrivia().WithTrailingTrivia(SyntaxFactory.Space))),
-            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } } }
+            BinaryExpressionSyntax { Left: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, OperatorToken.ValueText: "!=", Right: LiteralExpressionSyntax { Token.ValueText: "null" } }
                 => (p, Empty),
             IsPatternExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax p }, Pattern: ConstantPatternSyntax c }
                 => (p, c),

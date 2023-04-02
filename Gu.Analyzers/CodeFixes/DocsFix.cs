@@ -118,7 +118,7 @@ internal class DocsFix : DocumentEditorCodeFixProvider
                 }
                 else if (diagnostic.Id == "CS1591" &&
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out OperatorDeclarationSyntax? operatorDeclaration) &&
-                         operatorDeclaration.ParameterList is { Parameters: { Count: 2 } } parameterList &&
+                         operatorDeclaration.ParameterList is { Parameters.Count: 2 } parameterList &&
                          parameterList.Parameters.TryElementAt(0, out var left) &&
                          left is { Type: { } leftType } &&
                          parameterList.Parameters.TryElementAt(1, out var right) &&

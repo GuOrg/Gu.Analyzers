@@ -24,7 +24,7 @@ internal class ParameterAnalyzer : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is ParameterSyntax { Identifier: { ValueText: { } valueText }, Parent: ParameterListSyntax { Parameters: { } parameters } } parameter)
+            context.Node is ParameterSyntax { Identifier.ValueText: { } valueText, Parent: ParameterListSyntax { Parameters: { } parameters } } parameter)
         {
             if (ShouldCheckNull())
             {
@@ -33,7 +33,7 @@ internal class ParameterAnalyzer : DiagnosticAnalyzer
 
             if (parameter.Modifiers.Any(SyntaxKind.OutKeyword) &&
                 parameters.TrySingle(x => x.Modifiers.Count > 0, out _) &&
-                context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is { Type: { IsValueType: false }, ContainingSymbol: IMethodSymbol { ReturnType: { SpecialType: SpecialType.System_Boolean } } })
+                context.SemanticModel.GetDeclaredSymbol(parameter, context.CancellationToken) is { Type.IsValueType: false, ContainingSymbol: IMethodSymbol { ReturnType.SpecialType: SpecialType.System_Boolean } })
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0075PreferReturnNullable, parameter.GetLocation()));
             }
@@ -43,7 +43,7 @@ internal class ParameterAnalyzer : DiagnosticAnalyzer
                 return context.ContainingSymbol is IMethodSymbol method &&
                        method.TryFindParameter(valueText, out var parameterSymbol) &&
                        method.DeclaredAccessibility.IsEither(Accessibility.Internal, Accessibility.Protected, Accessibility.Public) &&
-                       parameterSymbol is { Type: { IsReferenceType: true }, HasExplicitDefaultValue: false } &&
+                       parameterSymbol is { Type.IsReferenceType: true, HasExplicitDefaultValue: false } &&
                        parameterSymbol.RefKind != RefKind.Out &&
                        parameter.Parent is ParameterListSyntax { Parent: BaseMethodDeclarationSyntax methodDeclaration } &&
                        !NullCheck.IsChecked(parameterSymbol, methodDeclaration, context.SemanticModel, context.CancellationToken);

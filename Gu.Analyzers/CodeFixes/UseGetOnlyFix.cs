@@ -53,7 +53,7 @@ internal class UseGetOnlyFix : DocumentEditorCodeFixProvider
 
                 bool IsUnsafe()
                 {
-                    return objectCreation is { ArgumentList: { Arguments: { } arguments } } &&
+                    return objectCreation is { ArgumentList.Arguments: { } arguments } &&
                            (IsAnyArgumentMutable(semanticModel, arguments, context.CancellationToken) ||
                             IsAnyInitializerMutable(semanticModel, objectCreation.Initializer, context.CancellationToken));
                 }

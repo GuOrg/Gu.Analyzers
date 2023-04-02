@@ -167,7 +167,7 @@ internal class ConstructorAnalyzer : DiagnosticAnalyzer
                 return true;
             }
 
-            if (ctor.Initializer is { ArgumentList: { Arguments: { } arguments } } initializer &&
+            if (ctor.Initializer is { ArgumentList.Arguments: { } arguments } initializer &&
                 arguments.TrySingle(syntax => IsParameter(syntax), out var argument) &&
                 context.SemanticModel.GetSymbolSafe(initializer, context.CancellationToken) is { } chained &&
                 chained.TryFindParameter(argument, out var parameterSymbol) &&
@@ -440,7 +440,7 @@ internal class ConstructorAnalyzer : DiagnosticAnalyzer
                     var isStatic = ctor.Modifiers.Any(SyntaxKind.StaticKeyword);
                     switch (member)
                     {
-                        case FieldDeclarationSyntax { Modifiers: { } modifiers, Declaration: { Variables: { } variables } }
+                        case FieldDeclarationSyntax { Modifiers: { } modifiers, Declaration.Variables: { } variables }
                             when modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
                                  isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
                                  variables.LastOrDefault() is { Initializer: null }:
@@ -453,8 +453,8 @@ internal class ConstructorAnalyzer : DiagnosticAnalyzer
                             }
 
                             break;
-                        case PropertyDeclarationSyntax { Modifiers: { } modifiers, ExpressionBody: null, AccessorList: { Accessors: { Count: 1 } accessors }, Initializer: null } property
-                            when accessors[0] is { Keyword: { ValueText: "get" }, Body: null } &&
+                        case PropertyDeclarationSyntax { Modifiers: { } modifiers, ExpressionBody: null, AccessorList.Accessors: { Count: 1 } accessors, Initializer: null } property
+                            when accessors[0] is { Keyword.ValueText: "get", Body: null } &&
                                  !modifiers.Any(SyntaxKind.AbstractKeyword) &&
                                  isStatic == modifiers.Any(SyntaxKind.StaticKeyword) &&
                                  this.semanticModel.GetDeclaredSymbol(property, this.cancellationToken) is { } type:

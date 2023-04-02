@@ -62,10 +62,10 @@ internal class ReturnNullableFix : DocumentEditorCodeFixProvider
                     {
                         switch (value)
                         {
-                            case LiteralExpressionSyntax { Token: { ValueText: "true" }, Parent: ReturnStatementSyntax statement }
+                            case LiteralExpressionSyntax { Token.ValueText: "true", Parent: ReturnStatementSyntax statement }
                                 when IsPreviousStatementAssigning(statement, parameter!):
-                            case LiteralExpressionSyntax { Token: { ValueText: "false" }, Parent: ReturnStatementSyntax _ }:
-                            case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ }
+                            case LiteralExpressionSyntax { Token.ValueText: "false", Parent: ReturnStatementSyntax _ }:
+                            case BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken.ValueText: "!=", Right: LiteralExpressionSyntax { Token.ValueText: "null" }, Parent: ReturnStatementSyntax _ }
                                 when left.Identifier.ValueText == parameter!.Identifier.ValueText:
                                 break;
                             default:
@@ -117,10 +117,10 @@ internal class ReturnNullableFix : DocumentEditorCodeFixProvider
         {
             return node switch
             {
-                { Expression: LiteralExpressionSyntax { Token: { ValueText: "true" } } } => null,
-                { Parent: SwitchSectionSyntax { Statements: { Count: 1 } }, Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => node.WithExpression(SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)),
-                { Expression: LiteralExpressionSyntax { Token: { ValueText: "false" } } } => null,
-                { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken: { ValueText: "!=" }, Right: LiteralExpressionSyntax { Token: { ValueText: "null" } }, Parent: ReturnStatementSyntax _ } }
+                { Expression: LiteralExpressionSyntax { Token.ValueText: "true" } } => null,
+                { Parent: SwitchSectionSyntax { Statements.Count: 1 }, Expression: LiteralExpressionSyntax { Token.ValueText: "false" } } => node.WithExpression(SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)),
+                { Expression: LiteralExpressionSyntax { Token.ValueText: "false" } } => null,
+                { Expression: BinaryExpressionSyntax { Left: IdentifierNameSyntax left, OperatorToken.ValueText: "!=", Right: LiteralExpressionSyntax { Token.ValueText: "null" }, Parent: ReturnStatementSyntax _ } }
                     when left.Identifier.ValueText == this.parameter.Identifier.ValueText
                     => node.WithExpression(left.WithoutTrailingTrivia()),
                 { Expression: { } expression }
@@ -153,7 +153,7 @@ internal class ReturnNullableFix : DocumentEditorCodeFixProvider
 
         public override SyntaxNode VisitLocalFunctionStatement(LocalFunctionStatementSyntax node)
         {
-            if (node is { ParameterList: { Parameters: { } parameters } } &&
+            if (node is { ParameterList.Parameters: { } parameters } &&
                 parameters.Any(x => x.IsEquivalentTo(this.parameter)))
             {
                 return base.VisitLocalFunctionStatement(node)!;

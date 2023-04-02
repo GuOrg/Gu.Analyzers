@@ -54,7 +54,7 @@ internal class ClassDeclarationAnalyzer : DiagnosticAnalyzer
                          property.IsGetOnly() &&
                          IsInitializedWithContainingType(initializer, context):
                     return true;
-                case FieldDeclarationSyntax { Declaration: { Variables: { Count: 1 } variables } } field
+                case FieldDeclarationSyntax { Declaration.Variables: { Count: 1 } variables } field
                     when IsStaticPublicOrInternal(field.Modifiers) &&
                          field.Modifiers.Any(SyntaxKind.ReadOnlyKeyword) &&
                          variables.TrySingle(out var variable) &&
