@@ -13,7 +13,7 @@ namespace Gu.Analyzers.Benchmarks
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
 
-    internal class Program
+    internal sealed class Program
     {
         public static void Main()
         {

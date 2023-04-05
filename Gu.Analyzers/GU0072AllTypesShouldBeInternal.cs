@@ -23,8 +23,7 @@ internal class GU0072AllTypesShouldBeInternal : DiagnosticAnalyzer
     private static void Handle(SyntaxNodeAnalysisContext context)
     {
         if (!context.IsExcludedFromAnalysis() &&
-            context.Node is TypeDeclarationSyntax typeDeclaration &&
-            context.ContainingSymbol is ITypeSymbol &&
+            context is { Node: TypeDeclarationSyntax typeDeclaration, ContainingSymbol: ITypeSymbol } &&
             typeDeclaration.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PublicKeyword), out var modifier))
         {
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.GU0072AllTypesShouldBeInternal, modifier.GetLocation()));

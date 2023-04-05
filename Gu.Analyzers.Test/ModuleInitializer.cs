@@ -1,7 +1,6 @@
 ﻿namespace Gu.Analyzers.Test;
 
 using System.Runtime.CompilerServices;
-
 using Gu.Roslyn.Asserts;
 
 internal static class ModuleInitializer

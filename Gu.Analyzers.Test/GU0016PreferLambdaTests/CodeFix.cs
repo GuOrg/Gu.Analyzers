@@ -1,11 +1,12 @@
 ﻿namespace Gu.Analyzers.Test.GU0016PreferLambdaTests;
 
 using Gu.Roslyn.Asserts;
+
 using NUnit.Framework;
 
 internal static class CodeFix
 {
-    private static readonly MethodGroupAnalyzer Analyzer = new();
+    private static readonly DefaultEnabledAnalyzer Analyzer = new(new MethodGroupAnalyzer());
     private static readonly UseLambdaFix Fix = new();
     private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0016PreferLambda);
 
