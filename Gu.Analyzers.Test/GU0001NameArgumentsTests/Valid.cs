@@ -1,4 +1,4 @@
-namespace Gu.Analyzers.Test.GU0001NameArgumentsTests;
+﻿namespace Gu.Analyzers.Test.GU0001NameArgumentsTests;
 
 using Gu.Roslyn.Asserts;
 using NUnit.Framework;
@@ -11,27 +11,28 @@ internal static class Valid
     [TestCase("new C(a: a, b: b)")]
     public static void ConstructorCallWithTwoArguments(string call)
     {
-        var code = @"
-namespace N
-{
-    public class C
-    {
-        public C(int a, int b)
-        {
-            this.A = a;
-            this.B = b;
-        }
+        var code = """
+            namespace N
+            {
+                public class C
+                {
+                    public C(int a, int b)
+                    {
+                        this.A = a;
+                        this.B = b;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        private C Create(int a, int b)
-        {
-            return new C(a, b);
-        }
-    }
-}".AssertReplace("new C(a, b)", call);
+                    private C Create(int a, int b)
+                    {
+                        return new C(a, b);
+                    }
+                }
+            }
+            """.AssertReplace("new C(a, b)", call);
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -40,27 +41,28 @@ namespace N
     [TestCase("new Foo(a: a, b: b)")]
     public static void ConstructorCallWithTwoArgumentsStruct(string call)
     {
-        var code = @"
-namespace N
-{
-    public struct Foo
-    {
-        public Foo(int a, int b)
-        {
-            this.A = a;
-            this.B = b;
-        }
+        var code = """
+            namespace N
+            {
+                public struct Foo
+                {
+                    public Foo(int a, int b)
+                    {
+                        this.A = a;
+                        this.B = b;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        private Foo Create(int a, int b)
-        {
-            return new Foo(a, b);
-        }
-    }
-}".AssertReplace("new Foo(a, b)", call);
+                    private Foo Create(int a, int b)
+                    {
+                        return new Foo(a, b);
+                    }
+                }
+            }
+            """.AssertReplace("new Foo(a, b)", call);
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -68,33 +70,34 @@ namespace N
     [Test]
     public static void ConstructorCallWithNamedArgumentsOnSameRow()
     {
-        var code = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var code = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo(a: a, b: b, c: c, d: d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo(a: a, b: b, c: c, d: d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -102,33 +105,34 @@ namespace N
     [Test]
     public static void ConstructorCallWithArgumentsOnSameRow()
     {
-        var code = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var code = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo(a, b, c, d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo(a, b, c, d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -136,37 +140,38 @@ namespace N
     [Test]
     public static void ConstructorCallWithNamedArgumentsOnSeparateRows()
     {
-        var code = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var code = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo(
-                a: a, 
-                b: b, 
-                c: c, 
-                d: d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo(
+                            a: a, 
+                            b: b, 
+                            c: c, 
+                            d: d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -174,25 +179,26 @@ namespace N
     [Test]
     public static void IgnoresStringFormat()
     {
-        var code = @"
-namespace N
-{
-    using System.Globalization;
+        var code = """
+            namespace N
+            {
+                using System.Globalization;
 
-    public static class C
-    {
-        private static string M(int a, int b, int c, int d)
-        {
-            return string.Format(
-                CultureInfo.InvariantCulture,
-                ""{0}{1}{2}{3}"",
-                a,
-                b,
-                c,
-                d);
-        }
-    }
-}";
+                public static class C
+                {
+                    private static string M(int a, int b, int c, int d)
+                    {
+                        return string.Format(
+                            CultureInfo.InvariantCulture,
+                            "{0}{1}{2}{3}",
+                            a,
+                            b,
+                            c,
+                            d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -200,23 +206,24 @@ namespace N
     [Test]
     public static void IgnoresTuple()
     {
-        var code = @"
-namespace N
-{
-    using System;
+        var code = """
+            namespace N
+            {
+                using System;
 
-    public static class C
-    {
-        private static Tuple<int,int,int,int> M(int a, int b, int c, int d)
-        {
-            return Tuple.Create(
-                a,
-                b,
-                c,
-                d);
-        }
-    }
-}";
+                public static class C
+                {
+                    private static Tuple<int,int,int,int> M(int a, int b, int c, int d)
+                    {
+                        return Tuple.Create(
+                            a,
+                            b,
+                            c,
+                            d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -224,23 +231,24 @@ namespace N
     [Test]
     public static void ImmutableArrayCreate()
     {
-        var code = @"
-namespace N
-{
-    using System.Collections.Immutable;
+        var code = """
+            namespace N
+            {
+                using System.Collections.Immutable;
 
-    public class C
-    {
-        public C()
-        {
-            var ints = ImmutableArray.Create(
-                1,
-                2,
-                3,
-                4);
-        }
-    }
-}";
+                public class C
+                {
+                    public C()
+                    {
+                        var ints = ImmutableArray.Create(
+                            1,
+                            2,
+                            3,
+                            4);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -248,27 +256,28 @@ namespace N
     [Test]
     public static void IgnoresParams()
     {
-        var code = @"
-namespace N
-{
-    public static class C
-    {
-        public static void M(params int[] args)
-        {
-        }
+        var code = """
+            namespace N
+            {
+                public static class C
+                {
+                    public static void M(params int[] args)
+                    {
+                    }
 
-        public static void Meh()
-        {
-            M(
-                1,
-                2,
-                3,
-                4,
-                5,
-                6);
-        }
-    }
-}";
+                    public static void Meh()
+                    {
+                        M(
+                            1,
+                            2,
+                            3,
+                            4,
+                            5,
+                            6);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -276,37 +285,38 @@ namespace N
     [Test]
     public static void IgnoresWhenDifferentTypes()
     {
-        var code = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, double b, string c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var code = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, double b, string c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public double B { get; }
+                    public double B { get; }
 
-        public string C { get; }
+                    public string C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, double b, string c, int d)
-        {
-            return new Foo(
-                a, 
-                b, 
-                c, 
-                d);
-        }
-    }
-}";
+                    private Foo Create(int a, double b, string c, int d)
+                    {
+                        return new Foo(
+                            a, 
+                            b, 
+                            c, 
+                            d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }
@@ -314,40 +324,41 @@ namespace N
     [Test]
     public static void IgnoresWhenInExpressionTree()
     {
-        var code = @"
-namespace N
-{
-    using System;
-    using System.Linq.Expressions;
+        var code = """
+            namespace N
+            {
+                using System;
+                using System.Linq.Expressions;
 
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Expression<Func<Foo>> Create(int a, int b, int c, int d)
-        {
-            return () => new Foo(
-                a,
-                b,
-                c,
-                d);
-        }
-    }
-}";
+                    private Expression<Func<Foo>> Create(int a, int b, int c, int d)
+                    {
+                        return () => new Foo(
+                            a,
+                            b,
+                            c,
+                            d);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Valid(Analyzer, code);
     }

@@ -12,47 +12,49 @@ internal static class CodeFix
     [Test]
     public static void UnnamedBooleanParameters()
     {
-        var before = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
+        var before = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
 
-    public class C
-    {
-        public void Floof(int howMuch, bool useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, bool useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, ↓false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, ↓false);
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
+        var after = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
 
-    public class C
-    {
-        public void Floof(int howMuch, bool useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, bool useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, useFluffyBuns: false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, useFluffyBuns: false);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic.WithMessage("Name the boolean argument"), before, after);
     }
@@ -60,49 +62,51 @@ namespace N
     [Test]
     public static void HandlesAnAlias()
     {
-        var before = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
-    using Alias = System.Boolean;
+        var before = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
+                using Alias = System.Boolean;
 
-    public class C
-    {
-        public void Floof(int howMuch, Alias useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, Alias useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, ↓false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, ↓false);
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
-    using Alias = System.Boolean;
+        var after = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
+                using Alias = System.Boolean;
 
-    public class C
-    {
-        public void Floof(int howMuch, Alias useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, Alias useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, useFluffyBuns: false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, useFluffyBuns: false);
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
@@ -110,47 +114,49 @@ namespace N
     [Test]
     public static void HandlesAFullyQualifiedName()
     {
-        var before = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
+        var before = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
 
-    public class C
-    {
-        public void Floof(int howMuch, System.Boolean useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, System.Boolean useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, ↓false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, ↓false);
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Xml.Serialization;
+        var after = """
+            namespace N
+            {
+                using System;
+                using System.Collections.Generic;
+                using System.Xml.Serialization;
 
-    public class C
-    {
-        public void Floof(int howMuch, System.Boolean useFluffyBuns)
-        {
-        
-        }
+                public class C
+                {
+                    public void Floof(int howMuch, System.Boolean useFluffyBuns)
+                    {
+                    
+                    }
 
-        public void Another()
-        {
-            Floof(42, useFluffyBuns: false);
-        }
-    }
-}";
+                    public void Another()
+                    {
+                        Floof(42, useFluffyBuns: false);
+                    }
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

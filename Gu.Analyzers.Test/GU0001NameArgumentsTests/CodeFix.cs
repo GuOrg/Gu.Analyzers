@@ -12,40 +12,41 @@ internal static class CodeFix
     [Test]
     public static void Message()
     {
-        var code = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var code = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo[] Create(int a, int b, int c, int d)
-        {
-            return new[]
-                       {
-                           new Foo↓(
-                               a,
-                               b,
-                               c,
-                               d)
-                       };
-        }
-    }
-}";
+                    private Foo[] Create(int a, int b, int c, int d)
+                    {
+                        return new[]
+                                   {
+                                       new Foo↓(
+                                           a,
+                                           b,
+                                           c,
+                                           d)
+                                   };
+                    }
+                }
+            }
+            """;
 
         RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic.WithMessage("Name the argument"), code);
     }
@@ -53,69 +54,71 @@ namespace N
     [Test]
     public static void Constructor()
     {
-        var before = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var before = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo↓(
-                a, 
-                b, 
-                c, 
-                d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo↓(
+                            a, 
+                            b, 
+                            c, 
+                            d);
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var after = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo(
-                a: a,
-                b: b,
-                c: c,
-                d: d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo(
+                            a: a,
+                            b: b,
+                            c: c,
+                            d: d);
+                    }
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
@@ -123,75 +126,77 @@ namespace N
     [Test]
     public static void ConstructorInArrayInitializer()
     {
-        var before = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var before = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo[] Create(int a, int b, int c, int d)
-        {
-            return new[]
-                       {
-                           new Foo↓(
-                               a,
-                               b,
-                               c,
-                               d)
-                       };
-        }
-    }
-}";
+                    private Foo[] Create(int a, int b, int c, int d)
+                    {
+                        return new[]
+                                   {
+                                       new Foo↓(
+                                           a,
+                                           b,
+                                           c,
+                                           d)
+                                   };
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var after = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo[] Create(int a, int b, int c, int d)
-        {
-            return new[]
-                       {
-                           new Foo(
-                               a: a,
-                               b: b,
-                               c: c,
-                               d: d)
-                       };
-        }
-    }
-}";
+                    private Foo[] Create(int a, int b, int c, int d)
+                    {
+                        return new[]
+                                   {
+                                       new Foo(
+                                           a: a,
+                                           b: b,
+                                           c: c,
+                                           d: d)
+                                   };
+                    }
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
@@ -199,73 +204,75 @@ namespace N
     [Test]
     public static void ConstructorInFunc()
     {
-        var before = @"
-namespace N
-{
-    using System;
+        var before = """
+            namespace N
+            {
+                using System;
 
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Func<Foo> Create(int a, int b, int c, int d)
-        {
-            return () => new Foo↓(
-                a,
-                b,
-                c,
-                d);
-        }
-    }
-}";
+                    private Func<Foo> Create(int a, int b, int c, int d)
+                    {
+                        return () => new Foo↓(
+                            a,
+                            b,
+                            c,
+                            d);
+                    }
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    using System;
+        var after = """
+            namespace N
+            {
+                using System;
 
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Func<Foo> Create(int a, int b, int c, int d)
-        {
-            return () => new Foo(
-                a: a,
-                b: b,
-                c: c,
-                d: d);
-        }
-    }
-}";
+                    private Func<Foo> Create(int a, int b, int c, int d)
+                    {
+                        return () => new Foo(
+                            a: a,
+                            b: b,
+                            c: c,
+                            d: d);
+                    }
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }

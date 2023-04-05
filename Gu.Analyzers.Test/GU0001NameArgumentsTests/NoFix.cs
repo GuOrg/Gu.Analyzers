@@ -12,37 +12,38 @@ internal static class NoFix
     [Test]
     public static void ConstructorIgnoredIfAnyNamed()
     {
-        var testCode = @"
-namespace N
-{
-    public class Foo
-    {
-        public Foo(int a, int b, int c, int d)
-        {
-            this.A = a;
-            this.B = b;
-            this.C = c;
-            this.D = d;
-        }
+        var testCode = """
+            namespace N
+            {
+                public class Foo
+                {
+                    public Foo(int a, int b, int c, int d)
+                    {
+                        this.A = a;
+                        this.B = b;
+                        this.C = c;
+                        this.D = d;
+                    }
 
-        public int A { get; }
+                    public int A { get; }
 
-        public int B { get; }
+                    public int B { get; }
 
-        public int C { get; }
+                    public int C { get; }
 
-        public int D { get; }
+                    public int D { get; }
 
-        private Foo Create(int a, int b, int c, int d)
-        {
-            return new Foo↓(
-               a,
-               b,
-               c,
-               d: d);
-        }
-    }
-}";
+                    private Foo Create(int a, int b, int c, int d)
+                    {
+                        return new Foo↓(
+                           a,
+                           b,
+                           c,
+                           d: d);
+                    }
+                }
+            }
+            """;
         RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
     }
 }
