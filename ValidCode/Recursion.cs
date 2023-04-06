@@ -18,7 +18,9 @@ namespace ValidCode
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
+#pragma warning disable CS1717 // Assignment made to same variable
             value = value;
+#pragma warning restore CS1717 // Assignment made to same variable
         }
 
         internal IDisposable RecursiveProperty => this.RecursiveProperty;
@@ -217,12 +219,17 @@ namespace ValidCode
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
+#pragma warning disable GU0011
             RecursiveOut(out value);
             RecursiveOut(1, out value);
             RecursiveOut(1.0, out value);
             RecursiveOut(string.Empty, out value);
             RecursiveRef(ref value);
+#pragma warning restore GU0011
+
+#pragma warning disable CS1717 // Assignment made to same variable
             value = value;
+#pragma warning restore CS1717 // Assignment made to same variable
         }
 
         private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable>? values = null)
