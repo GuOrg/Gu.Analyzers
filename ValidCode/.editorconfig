@@ -13,7 +13,6 @@ dotnet_diagnostic.GU0010.severity = none
 dotnet_diagnostic.GU0011.severity = none
 dotnet_diagnostic.GU0015.severity = none
 
-# IDE0079: Remove unnecessary suppression
 dotnet_diagnostic.IDE0052.severity = none
 dotnet_diagnostic.IDE0079.severity = none
 
