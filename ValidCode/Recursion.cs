@@ -1,7 +1,4 @@
 ﻿// ReSharper disable All
-#pragma warning disable 1717, CA2011
-#pragma warning disable GU0011 // Don't ignore the returned value
-#pragma warning disable GU0010 // Assigning same value
 namespace ValidCode
 {
     using System;
@@ -213,7 +210,6 @@ namespace ValidCode
 
         internal void Meh()
         {
-#pragma warning disable IDE0079, GU0015 // Don't assign same more than once
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
@@ -227,7 +223,6 @@ namespace ValidCode
             RecursiveOut(string.Empty, out value);
             RecursiveRef(ref value);
             value = value;
-#pragma warning restore IDE0079, GU0015 // Don't assign same more than once
         }
 
         private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable>? values = null)

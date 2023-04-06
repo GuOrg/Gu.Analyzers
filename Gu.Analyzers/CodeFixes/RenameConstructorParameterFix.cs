@@ -40,8 +40,8 @@ internal class RenameConstructorParameterFix : CodeFixProvider
                         cancellationToken => Renamer.RenameSymbolAsync(
                             context.Document.Project.Solution,
                             parameter,
+                            default,
                             name!,
-                            context.Document.Project.Solution.Options,
                             cancellationToken),
                         nameof(NameArgumentsFix)),
                     diagnostic);

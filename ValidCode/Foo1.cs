@@ -1,5 +1,4 @@
 ﻿// ReSharper disable All
-#pragma warning disable CA1822 // Mark members as static
 namespace ValidCode
 {
     using System;
@@ -14,9 +13,7 @@ namespace ValidCode
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
         private readonly Lazy<IDisposable> lazyDisposable;
-#pragma warning disable IDE0052 // Remove unread private members
         private readonly IDisposable disposable;
-#pragma warning restore IDE0052 // Remove unread private members
 
         private bool isDirty;
 

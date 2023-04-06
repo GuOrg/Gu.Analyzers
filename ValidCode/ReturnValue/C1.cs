@@ -1,5 +1,4 @@
-﻿#pragma warning disable CA1822 // Mark members as static
-namespace ValidCode.ReturnValue
+﻿namespace ValidCode.ReturnValue
 {
     internal class C1
     {

@@ -27,6 +27,7 @@ internal class RenameFix : CodeFixProvider
         var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                       .ConfigureAwait(false);
         var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
+
         foreach (var diagnostic in context.Diagnostics)
         {
             if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is VariableDeclaratorSyntax variable &&
@@ -40,8 +41,8 @@ internal class RenameFix : CodeFixProvider
                         cancellationToken => Renamer.RenameSymbolAsync(
                             context.Document.Project.Solution,
                             symbol,
+                            default,
                             name!,
-                            context.Document.Project.Solution.Options,
                             cancellationToken),
                         nameof(NameArgumentsFix)),
                     diagnostic);

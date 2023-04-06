@@ -1,5 +1,4 @@
 ﻿// ReSharper disable All
-#pragma warning disable CA1822 // Mark members as static
 namespace ValidCode
 {
     using System;
