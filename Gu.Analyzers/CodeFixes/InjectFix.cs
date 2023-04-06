@@ -147,6 +147,7 @@ internal class InjectFix : DocumentEditorCodeFixProvider
     private static ExpressionSyntax? WithField(DocumentEditor editor, ConstructorDeclarationSyntax ctor, ParameterSyntax parameter)
     {
         if (ctor is { Body: { }, Parent: TypeDeclarationSyntax containingType } &&
+            parameter.Type is { } &&
             editor.SemanticModel.GetDeclaredSymbol(containingType) is { } declaredSymbol)
         {
             var underscoreFields = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;

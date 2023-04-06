@@ -3,22 +3,20 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-/// <summary>
-/// Microsoft.CodeAnalysis.CSharp.Workspaces 4.5.0 skips default disabled analyzers even if passing SpecificDiagnosticOptions setting severity to warning
-/// This is not ideal but the only workaround I could find for the regression in Microsoft.CodeAnalysis.CSharp.Workspaces
-/// </summary>
-[DiagnosticAnalyzer(LanguageNames.CSharp)]
-internal sealed class DefaultEnabledAnalyzer : DiagnosticAnalyzer
+public static class AnalyzerExt
 {
-    private readonly DiagnosticAnalyzer inner;
-
-    internal DefaultEnabledAnalyzer(DiagnosticAnalyzer inner)
+    public static T DefaultEnabled<T>(this T analyzer)
+        where T : DiagnosticAnalyzer
     {
-        this.inner = inner;
-        this.SupportedDiagnostics = EnabledDiagnostics(inner.SupportedDiagnostics);
+        var field = analyzer.GetType()
+                            .GetField("<SupportedDiagnostics>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic) ??
+                    throw new InvalidOperationException("did not find field");
+        field.SetValue(analyzer, EnabledDiagnostics(analyzer.SupportedDiagnostics));
+        return analyzer;
 
         static ImmutableArray<DiagnosticDescriptor> EnabledDiagnostics(ImmutableArray<DiagnosticDescriptor> source)
         {
@@ -41,10 +39,4 @@ internal sealed class DefaultEnabledAnalyzer : DiagnosticAnalyzer
             return builder.MoveToImmutable();
         }
     }
-
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; }
-
-#pragma warning disable RS1025, RS1026
-    public override void Initialize(AnalysisContext context) => this.inner.Initialize(context);
-#pragma warning restore RS1025, RS1026
 }

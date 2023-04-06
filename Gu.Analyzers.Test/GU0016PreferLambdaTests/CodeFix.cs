@@ -6,7 +6,7 @@ using NUnit.Framework;
 
 internal static class CodeFix
 {
-    private static readonly DefaultEnabledAnalyzer Analyzer = new(new MethodGroupAnalyzer());
+    private static readonly MethodGroupAnalyzer Analyzer = new MethodGroupAnalyzer().DefaultEnabled();
     private static readonly UseLambdaFix Fix = new();
     private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.GU0016PreferLambda);
 
