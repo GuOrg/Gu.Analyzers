@@ -6,6 +6,7 @@ This is a collection of warnings and refactorings with no real plan/scope. Made 
 [![NuGet](https://img.shields.io/nuget/v/Gu.Analyzers.svg)](https://www.nuget.org/packages/Gu.Analyzers/)
 [![Build status](https://ci.appveyor.com/api/projects/status/nplt8lc7rhmgdi17/branch/master?svg=true)](https://ci.appveyor.com/project/JohanLarsson/gu-analyzers-qh7oa/branch/master)
 [![Build Status](https://dev.azure.com/guorg/Gu.Analyzers/_apis/build/status/GuOrg.Gu.Analyzers?branchName=master)](https://dev.azure.com/guorg/Gu.Analyzers/_build/latest?definitionId=1&branchName=master)
+[![ci](https://github.com/GuOrg/Gu.Analyzers/actions/workflows/ci.yml/badge.svg)](https://github.com/GuOrg/Gu.Analyzers/actions/workflows/ci.yml)
 [![Join the chat at https://gitter.im/JohanLarsson/Gu.Analyzers](https://badges.gitter.im/JohanLarsson/Gu.Analyzers.svg)](https://gitter.im/JohanLarsson/Gu.Analyzers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 | Id       | Title
